@@ -9,8 +9,8 @@
 
 namespace acmacs::tal::inline v3
 {
-    using EdgeLength = named_double_t<struct acmacs_tal_EdgeLength_tag>;
-    using SeqId = std::string;
+    using EdgeLength = named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>;
+    using SeqId = std::string_view;
 
     class Node
     {
@@ -18,12 +18,16 @@ namespace acmacs::tal::inline v3
         using Subtree = std::vector<Node>;
 
         Node() = default;
+        Node(SeqId a_seq_id, EdgeLength a_edge) : seq_id{a_seq_id}, edge_length{a_edge} {}
 
         bool is_leaf() const { return subtree.empty() && !seq_id.empty(); }
 
+        Node& add_leaf(SeqId a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
+        Node& add_subtree() { return subtree.emplace_back(); }
+
+        SeqId seq_id;
         EdgeLength edge_length{0.0};
         EdgeLength cumulative_edge_length{-1.0};
-        SeqId seq_id;
         Subtree subtree;
 
     // size_t number_strains = 1;
