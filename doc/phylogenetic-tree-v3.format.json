@@ -2,13 +2,16 @@
  "  version": "phylogenetic-tree-v3",
  "tree": {
   "l": <edge-length: double>,
+  "c": <cumulative-edge-length: double>,
   "t": [
    {
     "l": 0.001,
+    "c": 0.001,
     "t": [...]
    },
    {
     "l": 0.002,
+    "c": 0.002,
     "n": "seq_id"
    }
    ]

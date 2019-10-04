@@ -66,6 +66,9 @@ namespace acmacs::tal::inline v3
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 
+        void cumulative_calculate();
+        void cumulative_reset();
+
       private:
         std::string data_buffer_;
     };

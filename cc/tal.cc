@@ -43,6 +43,7 @@ int main(int argc, const char *argv[])
         acmacs::seqdb::setup(opt.seqdb);
 
         auto tree = acmacs::tal::newick_import(opt.tree_file);
+        tree.cumulative_calculate();
         for (const auto& output : *opt.outputs)
             acmacs::tal::export_tree(tree, output);
 
