@@ -6,7 +6,7 @@ TARGETS = \
 
 SOURCES = \
   tal.cc tree.cc \
-  newick.cc
+  export.cc json-export.cc newick.cc
 
 # ----------------------------------------------------------------------
 

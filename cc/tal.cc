@@ -1,6 +1,7 @@
 #include "acmacs-base/argv.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/newick.hh"
+#include "acmacs-tal/export.hh"
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +43,8 @@ int main(int argc, const char *argv[])
         acmacs::seqdb::setup(opt.seqdb);
 
         auto tree = acmacs::tal::newick_import(opt.tree_file);
+        for (const auto& output : *opt.outputs)
+            acmacs::tal::export_tree(tree, output);
 
         return 0;
     }

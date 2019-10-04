@@ -9,8 +9,15 @@
 
 namespace acmacs::tal::inline v3
 {
-    using EdgeLength = named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>;
     using SeqId = std::string_view;
+
+    using EdgeLength = named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>;
+    // class EdgeLength : public named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>
+    // {
+    //   public:
+    // };
+
+    // ----------------------------------------------------------------------
 
     class Node
     {
@@ -30,24 +37,24 @@ namespace acmacs::tal::inline v3
         EdgeLength cumulative_edge_length{-1.0};
         Subtree subtree;
 
-    // size_t number_strains = 1;
-    // double ladderize_max_edge_length = 0;
-    // std::string ladderize_max_date;
-    // std::string ladderize_max_name_alphabetically;
-    // double cumulative_edge_length = -1;
-    // double distance_from_previous = -1; // for hz sections auto-detection
-    // std::string continent;
-    // std::string aa_at;          // see make_aa_at()
-    // AA_Transitions aa_transitions;
-    // bool shown = true;
-    // size_t line_no = 0;
-    // size_t hz_section_index = HzSectionNoIndex;
-    // double vertical_pos = -1;
-    // Color mark_with_line = ColorNoChange;
-    // Pixels mark_with_line_width{0};
-    // std::optional<size_t> chart_antigen_index;
-    // size_t matched_antigens = 0; // for parent nodes only
-    // std::optional<size_t> mark_with_label;
+        // size_t number_strains = 1;
+        // double ladderize_max_edge_length = 0;
+        // std::string ladderize_max_date;
+        // std::string ladderize_max_name_alphabetically;
+        // double cumulative_edge_length = -1;
+        // double distance_from_previous = -1; // for hz sections auto-detection
+        // std::string continent;
+        // std::string aa_at;          // see make_aa_at()
+        // AA_Transitions aa_transitions;
+        // bool shown = true;
+        // size_t line_no = 0;
+        // size_t hz_section_index = HzSectionNoIndex;
+        // double vertical_pos = -1;
+        // Color mark_with_line = ColorNoChange;
+        // Pixels mark_with_line_width{0};
+        // std::optional<size_t> chart_antigen_index;
+        // size_t matched_antigens = 0; // for parent nodes only
+        // std::optional<size_t> mark_with_label;
 
     }; // class Node
 
@@ -56,7 +63,6 @@ namespace acmacs::tal::inline v3
     class Tree : public Node
     {
       public:
-
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 
