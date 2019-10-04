@@ -161,11 +161,39 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::newick_export(const Tree& /*tree*/)
+static std::string export_node(const acmacs::tal::v3::Node& node);
+
+std::string acmacs::tal::v3::newick_export(const Tree& tree)
 {
-    throw std::runtime_error("Not Implemented Yet");
+    std::string result = export_node(tree);
+    result.append(1, ';');
+    return result;
 
 } // acmacs::tal::v3::newick_export
+
+// ----------------------------------------------------------------------
+
+std::string export_node(const acmacs::tal::v3::Node& node)
+{
+    std::string result;
+    if (!node.subtree.empty()) {
+        result.append(1, '(');
+        for (const auto& sub_node : node.subtree) {
+            if (result.back() != '(')
+                result.append(1, ',');
+            result.append(export_node(sub_node));
+        }
+        result.append(1, ')');
+    }
+    if (!node.seq_id.empty())
+        result.append(node.seq_id);
+    if (!node.edge_length.is_zero()) {
+        result.append(1, ':');
+        result.append(node.edge_length.as_string());
+    }
+    return result;
+
+} // export_node
 
 // ----------------------------------------------------------------------
 
