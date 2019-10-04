@@ -128,11 +128,13 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
     Tokenizer tokenizer{tree.data_buffer()};
     try {
         std::stack<Node*> node_stack;
-        node_stack.push(&tree);
         for (auto token = tokenizer.next(); token.type != Tokenizer::EndTree; token = tokenizer.next()) {
             switch (token.type) {
                 case Tokenizer::BeginSubtree:
-                    node_stack.push(&node_stack.top()->add_subtree());
+                    if (node_stack.empty())
+                        node_stack.push(&tree);
+                    else
+                        node_stack.push(&node_stack.top()->add_subtree());
                     break;
                 case Tokenizer::Leaf:
                     // fmt::print(stderr, "DEBUG: Leaf {} :{} -- {}\n", token.name, token.edge_length, tokenizer.rest().substr(0, 20));
@@ -147,6 +149,8 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
                     break;
             }
         }
+        if (!node_stack.empty())
+            throw NewickImportError{"newick import error: unexpected end of data{}"};
     }
     catch (TokenizerError& err) {
         throw NewickImportError{fmt::format("newick import error: {}", err)};
