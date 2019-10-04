@@ -1,0 +1,48 @@
+#! /bin/bash
+
+if [ -f /Volumes/rdisk/ramdisk-id ]; then
+    TDIR=$(mktemp -d /Volumes/rdisk/ad-test.XXXXXX)
+else
+    TDIR=$(mktemp -d -t XXXXXX)
+fi
+TESTDIR=$(dirname $0)
+
+# ======================================================================
+
+function on_exit
+{
+    rm -rf "$TDIR"
+}
+
+trap on_exit EXIT
+
+function failed
+{
+    echo FAILED >&2
+    exit 1
+}
+
+trap failed ERR
+
+function test
+{
+    echo "======================================================================"
+    echo "$@"
+    "$@" || failed
+    printf "======================================================================\n\n"
+}
+
+# ======================================================================
+
+export LD_LIBRARY_PATH="${ACMACSD_ROOT}/lib:${LD_LIBRARY_PATH}"
+cd "$TESTDIR"
+
+#../bin/test-copy ./newick.json.xz "$TDIR"/tree.json.xz
+#../bin/test-copy "$TDIR"/tree.json.xz "$TDIR"/tree2.json.xz
+#xzdiff "$TDIR"/tree.json.xz "$TDIR"/tree2.json.xz
+
+echo "WARNING: tests disabled!" >&2
+
+# SETTINGS="$TDIR/tree.settings.json"
+# test ../dist/sigp --init-settings "$SETTINGS" ./newick.json.xz "$TDIR"/tree.pdf
+# test ../dist/sigp -s "$SETTINGS" ./newick.json.xz "$TDIR"/tree.pdf

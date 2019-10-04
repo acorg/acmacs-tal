@@ -1,0 +1,16 @@
+{"_":"-*- js-indent-level: 1 -*-",
+ "  version": "phylogenetic-tree-v3",
+ "tree": {
+  "l": <edge-length: double>,
+  "t": [
+   {
+    "l": 0.001,
+    "t": [...]
+   },
+   {
+    "l": 0.002,
+    "n": "seq_id"
+   }
+   ]
+ }
+}

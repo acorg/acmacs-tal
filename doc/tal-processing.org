@@ -1,0 +1,175 @@
+# Time-stamp: <2019-10-04 12:28:32 eu>
+
+* Settings
+- layout
+- tree
+- time series
+- maps
+- clades
+- legend
+- title
+
+* Tree
+** Import
+*** Newick
+*** json
+** Export
+*** Newick
+- omit hidden subtrees
+*** json
+- with sequences, clades, aa substs hz lines etc. to be able to draw everything
+*** text
+*** html
+*** isig: data.csv and tree.newick for https://github.com/acorg/isig
+** Processing
+*** Obtain sequences and hi-namses from seqdb
+*** Obtain sequences from fasta
+*** Infer subtype, lineage
+*** Ladderize
+*** Re-root
+- kills Cumulative edge length
+*** Cumulative edge length
+*** Infer long branch subtrees
+*** Infer AA subst for subrees ("to" part of AA)
+*** Infer "from" part of AA subst
+*** Infer clades
+- regular clades
+  - remove small clades
+- H1 183P subclades
+- B/Vic 2del and 3del
+*** Infer vaccines
+*** Infer hz sections
+- AA subst for a section (to be shown in the map title)
+- hide/show sections
+*** Infer Continents
+- and countries
+*** Stat by month for time series
+- TimeSeriesDraw::all_months
+*** Hide subtrees and leaves
+- hide-isolated-before
+- hide-if-cumulative-edge-length-bigger-than
+- hide by aa
+- hide-between
+- hide-one
+- hide-not-found-in-chart
+*** AAAtPosDraw
+- find_most_diverse_positions
+- infer sections: make_aa_pos_sections
+*** Match antigens from chart
+- tracked antigens for each section
+- tracked sera for each section
+  - egg/cell/reasortant matched
+  - all matched by antigen name without passage
+
+
+* Draw 
+** Read from json and draw
+** Layout
+- Aspect ratio, resolution
+  - tree 565 x 800
+  - sig page 1360 x 850
+  - A4 595 x 841.5
+- Tree
+  - AA subst (colored) with tether
+  - Readable names for few strains, e.g. vaccine names
+  - Lines and circles attached to strain or clade positions
+- Legend with continent and optional colored continent names
+  Colors of continents may vary (slightly)
+- Title: subtype, chart lab and assay
+- Time series
+- Isolation month coloring bar
+- Markers: colored dashes
+  - B/Vic 2del and 3del mutants
+  - H1 183P subclades
+- Names of subclades or hz sections (e.g. H1 183P subclades)
+- Clades
+- AA at pos
+- Antigens from chart
+- Maps
+- Text anywhere
+** Tree
+- coloring
+  - continent
+    - make some colors darker to make labels more readable
+  - clade
+  - aa at pos
+  - all of the same color
+- gaps between sections and clades
+- horizontal and vertical steps, line_no
+- fit_labels_into_viewport
+- draw_aa_transition
+** Time series
+- coloring
+  - continent
+  - clade
+  - aa at pos
+  - all of the same color
+- month labels
+  - offset for the coloring by months bar
+- month separator
+- hz lines
+- section label (in the last month: A, B, C, ...) TimeSeriesDraw::draw_hz_section_label
+** Dashes for mapped antigens and section border
+- MappedAntigensDraw
+** Clades
+- slots
+- label and label position, rotated label
+- left and right orientation (to the left/right of time series)
+** Dashes for strains by clade or by AA (3del mutants, 183P subclades)
+- mark-with-line
+- mark-aa-with-line
+- mark-clade-with-line
+- mark-having-serum-with-line
+** Readable labels (e.g. Vaccine)
+- mark-with-label
+** Legend
+- world map
+- continents: colored labels
+- coloring by aa at pos (ColoringByPosLegend)
+- coloring by clade
+** Maps
+- grid: rows and columns
+  - optimal map size
+- data from map-draw settings
+  - rotate
+  - flip
+  - viewport
+  - vaccines
+- specific settings
+  - background
+  - grid
+  - border (after drawing everything else)
+  - point scale
+  - ref antigens
+  - test antigens
+  - sequenced antigens (all tracked antigens)
+  - tracked antigens for this section
+    - colored by month
+    - the same color for all
+    - outline color and width
+    - egg/cell shape
+  - marked and labelled antigens (vaccines)
+    - tethered label
+  - sera
+  - tracked sera for this section
+    - egg/cell shape
+  - serum circles for tracked sera in this section
+    - color by passage
+  - serum circle for a serum
+  - marked and labelled sera
+    - color by passage
+- title
+  - letter
+  - clade
+  - AA substs
+
+* COMMENT ====== local vars
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+#+STARTUP: showall indent
+Local Variables:
+eval: (auto-fill-mode 0)
+eval: (add-hook 'before-save-hook 'time-stamp)
+eval: (set (make-local-variable org-confirm-elisp-link-function) nil)
+End:
