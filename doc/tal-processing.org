@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-04 12:28:32 eu>
+# Time-stamp: <2019-10-04 18:59:01 eu>
 
 * Settings
 - layout
@@ -39,6 +39,7 @@
 - B/Vic 2del and 3del
 *** Infer vaccines
 *** Infer hz sections
+- infer all as substitute for section
 - AA subst for a section (to be shown in the map title)
 - hide/show sections
 *** Infer Continents
@@ -60,6 +61,7 @@
 - tracked sera for each section
   - egg/cell/reasortant matched
   - all matched by antigen name without passage
+  - infer all as substitute for a panel, find all sequenced ags in chart that have those aa substitutions and find all Sera in chart with names of those antigens and draw circles
 
 
 * Draw 
