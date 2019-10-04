@@ -25,7 +25,7 @@ to_json::object export_node(const acmacs::tal::v3::Node& node)
     if (!node.seq_id.empty())
         result << to_json::key_val("n", node.seq_id);
     if (!node.edge_length.is_zero())
-        result << to_json::key_val("l", node.edge_length.as_string());
+        result << to_json::key_val("l", to_json::raw(node.edge_length.as_string()));
     if (!node.subtree.empty()) {
         to_json::array subtree;
         for (const auto& sub_node : node.subtree)
