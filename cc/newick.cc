@@ -1,10 +1,122 @@
+#include <cctype>
+
+#include "acmacs-base/read-file.hh"
 #include "acmacs-tal/newick.hh"
+
+// https://en.wikipedia.org/wiki/Newick_format
+
+// ----------------------------------------------------------------------
+
+class TokenizerError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
+
+class Tokenizer
+{
+  public:
+    enum TokenType { BeginSubtree, Leaf, EndSubtree, EndTree };
+
+    struct Token
+    {
+        Token() : type{EndTree} {}
+        Token(TokenType a_type) : type{a_type} {}
+        Token(TokenType a_type, Token&& src) : type{a_type}, name(std::move(src.name)), edge_length(std::move(src.edge_length)) {}
+        Token(std::string_view a_name, std::string_view a_edge) : type{EndTree}, name(a_name), edge_length(a_edge) {}
+
+        TokenType type;
+        std::string_view name{};
+        std::string_view edge_length{};
+    };
+
+    Tokenizer(std::string_view data) : data_{data}, data_all_{data} {}
+
+    Token next()
+    {
+        skip_ws();
+        if (data_.empty())
+            return Token{EndTree};
+        switch (data_.front()) {
+          case '(':
+              data_.remove_prefix(1);
+              return Token{BeginSubtree};
+          case ')':
+              data_.remove_prefix(1);
+              return Token(EndSubtree, name_edge());
+          case ';':
+              data_.remove_prefix(1);
+              return Token{EndTree};
+          default:
+              return Token{Leaf, name_edge()};
+        }
+        // throw TokenizerError("internal");
+    }
+
+  private:
+    std::string_view data_;
+    std::string_view data_all_;
+
+    Token name_edge()
+    {
+        if (data_.empty())
+            return Token{};
+        std::string_view name;
+        if (data_.front() != ',' && data_.front() != ':')
+            name = name_or_edge();
+        switch (data_.front()) {
+            case ',':
+                data_.remove_prefix(1);
+                return Token{name, std::string_view{}};
+            case ')':
+            case '(': // comma missing
+                return Token{name, std::string_view{}};
+            case ':':
+                data_.remove_prefix(1);
+                return Token{name, name_or_edge()};
+            default:
+                throw TokenizerError(fmt::format("unexpected symbol '{}' at pos {}", data_.front(), data_.data() - data_all_.data()));
+        }
+    }
+
+    std::string_view name_or_edge()
+    {
+        const auto make_result = [this](size_t size) {
+            const auto result = data_.substr(0, size);
+            data_.remove_prefix(size);
+            return result;
+        };
+
+        skip_ws();
+        for (size_t pos = 0; pos < data_.size(); ++pos) {
+            switch (data_[pos]) {
+              case ':':
+              case ',':
+              case '(':         // comma missing
+              case ')':
+              case ';':
+              case ' ':
+              case '\n':
+                  return make_result(pos);
+              default:
+                  if (std::isspace(data_[pos]))
+                      return make_result(pos);
+                  break;
+            }
+        }
+        throw TokenizerError("unexpected end of file");
+    }
+
+    void skip_ws()
+    {
+        while (!data_.empty() && std::isspace(data_.front()))
+            data_.remove_prefix(1);
+    }
+};
 
 // ----------------------------------------------------------------------
 
 acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
 {
-    return Tree{};
+    Tree tree;
+    tree.data_buffer(acmacs::file::read(filename));
+    return tree;
 
 } // acmacs::tal::v3::newick_import
 

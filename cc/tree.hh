@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 
+#include "acmacs-base/named-type.hh"
+
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
-    using EdgeLength = double;
+    using EdgeLength = named_double_t<struct acmacs_tal_EdgeLength_tag>;
     using SeqId = std::string;
 
     class Node
@@ -19,8 +21,8 @@ namespace acmacs::tal::inline v3
 
         bool is_leaf() const { return subtree.empty() && !seq_id.empty(); }
 
-        EdgeLength edge_length = 0;
-        EdgeLength cumulative_edge_length = -1;
+        EdgeLength edge_length{0.0};
+        EdgeLength cumulative_edge_length{-1.0};
         SeqId seq_id;
         Subtree subtree;
 
@@ -49,6 +51,13 @@ namespace acmacs::tal::inline v3
 
     class Tree : public Node
     {
+      public:
+
+        void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
+        std::string_view data_buffer() const { return data_buffer_; }
+
+      private:
+        std::string data_buffer_;
     };
 
 } // namespace acmacs::tal::inlinev3
