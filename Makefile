@@ -33,7 +33,7 @@ LDLIBS = $(ACMACSD_LIBS) $(CAIRO_LIBS) $(XZ_LIBS)
 install: $(TARGETS)
 	$(call symbolic_link,$(DIST)/tal,$(AD_BIN))
 
-test: install $(DIST)/sigp
+test: install $(DIST)/tal
 	test/test
 .PHONY: test
 
