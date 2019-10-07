@@ -29,7 +29,7 @@ void acmacs::tal::v3::Tree::cumulative_reset()
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::Tree::report_cumulative()
+std::string acmacs::tal::v3::Tree::report_cumulative(CumulativeReport report)
 {
     cumulative_calculate();
 
@@ -38,8 +38,10 @@ std::string acmacs::tal::v3::Tree::report_cumulative()
     std::sort(std::begin(nodes), std::end(nodes), [](const auto& e1, const auto& e2) { return e1.second > e2.second; });
 
     std::string result;
-    for (const auto& entry : nodes)
-        result.append(fmt::format("{:.10f} {}\n", entry.second.as_number(), entry.first));
+    if (report == CumulativeReport::all) {
+        for (const auto& entry : nodes)
+            result.append(fmt::format("{:.10f} {}\n", entry.second.as_number(), entry.first));
+    }
     return result;
 
 } // acmacs::tal::v3::Tree::report_cumulative

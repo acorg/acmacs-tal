@@ -68,7 +68,8 @@ namespace acmacs::tal::inline v3
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 
-        std::string report_cumulative();
+        enum class CumulativeReport { clusters, all };
+        std::string report_cumulative(CumulativeReport report);
         void cumulative_calculate();
         void cumulative_reset();
 
