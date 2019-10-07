@@ -17,6 +17,14 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         if (getenv("apply", false))
             tree_.match_seqdb(getenv("filename", ""));
     }
+    else if (name == "ladderize") {
+        if (const auto method = getenv("method", "number-of_leaves"); method == "number-of_leaves")
+            tree_.ladderize(Tree::Ladderize::NumberOfLeaves);
+        else if (method == "max-edge-length")
+            tree_.ladderize(Tree::Ladderize::MaxEdgeLength);
+        else
+            throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
+    }
     else
         return false;
     return true;

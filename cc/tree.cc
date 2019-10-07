@@ -140,6 +140,64 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::ladderize(Ladderize method)
+{
+    // const auto set_max_edge = [](Node& node) {
+    //     node.data.ladderize_max_edge_length = node.edge_length;
+    //     node.data.ladderize_max_date = node.data.date();
+    //     node.data.ladderize_max_name_alphabetically = node.seq_id;
+    // };
+
+    // const auto compute_max_edge = [](Node& node) {
+    //     auto const max_subtree_edge_node = std::max_element(node.subtree.begin(), node.subtree.end(), [](auto const& a, auto const& b) { return a.data.ladderize_max_edge_length < b.data.ladderize_max_edge_length; });
+    //     node.data.ladderize_max_edge_length = node.edge_length + max_subtree_edge_node->data.ladderize_max_edge_length;
+    //     node.data.ladderize_max_date = std::max_element(node.subtree.begin(), node.subtree.end(), [](auto const& a, auto const& b) { return a.data.ladderize_max_date < b.data.ladderize_max_date; })->data.ladderize_max_date;
+    //     node.data.ladderize_max_name_alphabetically = std::max_element(node.subtree.begin(), node.subtree.end(), [](auto const& a, auto const& b) { return a.data.ladderize_max_name_alphabetically < b.data.ladderize_max_name_alphabetically; })->data.ladderize_max_name_alphabetically;
+    // };
+
+    //   // set max_edge_length field for every node
+    // tree::iterate_leaf_post(*this, set_max_edge, compute_max_edge);
+
+    // const auto reorder_by_max_edge_length = [](const Node& a, const Node& b) -> bool {
+    //     bool r = false;
+    //     if (float_equal(a.data.ladderize_max_edge_length, b.data.ladderize_max_edge_length)) {
+    //         if (a.data.ladderize_max_date == b.data.ladderize_max_date) {
+    //             r = a.data.ladderize_max_name_alphabetically < b.data.ladderize_max_name_alphabetically;
+    //         }
+    //         else {
+    //             r = a.data.ladderize_max_date < b.data.ladderize_max_date;
+    //         }
+    //     }
+    //     else {
+    //         r = a.data.ladderize_max_edge_length < b.data.ladderize_max_edge_length;
+    //     }
+    //     return r;
+    // };
+
+    // const auto reorder_by_number_of_leaves = [reorder_by_max_edge_length](const Node& a, const Node& b) -> bool {
+    //     bool r = false;
+    //     if (a.data.number_strains == b.data.number_strains) {
+    //         r = reorder_by_max_edge_length(a, b);
+    //     }
+    //     else {
+    //         r = a.data.number_strains < b.data.number_strains;
+    //     }
+    //     return r;
+    // };
+
+    // switch (method) {
+    //   case LadderizeMethod::MaxEdgeLength:
+    //       tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
+    //       break;
+    //   case LadderizeMethod::NumberOfLeaves:
+    //       tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
+    //       break;
+    // }
+
+} // acmacs::tal::v3::Tree::ladderize
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

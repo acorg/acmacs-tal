@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 17:54:35 eu>
+# Time-stamp: <2019-10-07 18:38:31 eu>
 
 * Command line defines
 
@@ -11,6 +11,8 @@
 
 {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
 - {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
+
+{"N": "ladderize", "method": "number-of_leaves", "?method": "max-edge-length"}
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-selected", "select": {see Select Nodes section below}}

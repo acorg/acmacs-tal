@@ -98,6 +98,9 @@ namespace acmacs::tal::inline v3
         enum class Select { Init, Update };
         void select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const;
 
+        enum class Ladderize { MaxEdgeLength, NumberOfLeaves };
+        void ladderize(Ladderize method);
+
       private:
         std::string data_buffer_;
         std::string virus_type_;

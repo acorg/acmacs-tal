@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 17:50:11 eu>
+# Time-stamp: <2019-10-07 18:09:11 eu>
 
 * Settings
 - layout
@@ -24,7 +24,7 @@
 ** Processing
 *** DONE Obtain sequences and hi-names from seqdb
 *** Obtain sequences from fasta
-*** Infer subtype, lineage
+*** DONE Infer subtype, lineage
 *** DONE Cumulative edge length
 *** Infer long branch subtrees
 *** Ladderize

@@ -2,12 +2,14 @@
  "init": [
   {"N": "set",
    "?report-cumulative-output": "",
-   "whocc": false
+   "whocc": false,
+   "ladderize-method": "number-of_leaves"
   }
  ],
  "main-tree": [
   {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
-  {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true}
+  {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
+  {"N": "ladderize", "method": "{ladderize-method}"}
  ],
  "main-integrated": [
  ]
