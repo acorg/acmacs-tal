@@ -5,7 +5,7 @@
   }
  ],
  "main-tree": [
-  {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
+  {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true}
  ],
  "main-integrated": [
  ]
