@@ -23,7 +23,7 @@ struct Options : public argv
     option<bool>      verbose{*this, 'v', "verbose"};
 
     argument<str> tree_file{*this, arg_name{"tree.newick|tree.json[.xz]"}, mandatory};
-    argument<str_array> outputs{*this, arg_name{".pdf, .json[.xz], .html, .txt"}, mandatory};
+    argument<str_array> outputs{*this, arg_name{".pdf, .json[.xz], .html, .txt"}}; // , mandatory};
 
     // option<bool>      no_whocc{*this, "no-whocc", desc{"init settings without whocc defaults (clades, hz sections)"}};
     // option<str>       report_cumulative{*this, "report-cumulative"};
@@ -62,7 +62,6 @@ int main(int argc, const char *argv[])
         else
             settings.apply("main-tree");
 
-        // tree.cumulative_calculate();
         for (const auto& output : *opt.outputs)
             acmacs::tal::export_tree(tree, output);
 

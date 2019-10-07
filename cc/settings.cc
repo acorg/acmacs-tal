@@ -7,11 +7,12 @@
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 {
     if (name == "report-cumulative") {
+        // printenv();
         if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty()) {
             acmacs::file::write(output_filename, tree_.report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
         }
         // else {
-        //     fmt::print(stderr, "DEBUG: report-cumulative-output empyt\n");
+        //     fmt::print(stderr, "DEBUG: report-cumulative-output empty\n");
         // }
         return true;
     }
