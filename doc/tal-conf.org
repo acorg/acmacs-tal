@@ -1,12 +1,15 @@
-# Time-stamp: <2019-10-07 14:10:00 eu>
+# Time-stamp: <2019-10-07 16:12:26 eu>
 
 * Command line defines
+
+-D whocc --> match seqdb
 
 -D report-cumulative-output=-  write cumulative report to stdout
 -D report-cumulative-output=filename  write cumulative report to filename
 
 * Settings
 
+{"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-selected", "select": {see Select Nodes section below}}
 

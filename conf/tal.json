@@ -1,10 +1,12 @@
 {"_": "-*- js-indent-level: 1 -*-",
  "init": [
   {"N": "set",
-   "report-cumulative-output": ""
+   "?report-cumulative-output": "",
+   "whocc": false
   }
  ],
  "main-tree": [
+  {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true}
  ],
  "main-integrated": [

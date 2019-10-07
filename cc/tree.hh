@@ -39,6 +39,12 @@ namespace acmacs::tal::inline v3
         mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
         Subtree subtree;
 
+        std::string_view aa_sequence;
+        std::string_view date;
+        std::string_view continent;
+        std::string_view country;
+        std::vector<std::string_view> hi_names;
+
         // size_t number_strains = 1;
         // double ladderize_max_edge_length = 0;
         // std::string ladderize_max_date;
@@ -78,6 +84,8 @@ namespace acmacs::tal::inline v3
       public:
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
+
+        void match_seqdb(std::string_view seqdb_filename);
 
         enum class CumulativeReport { clusters, all };
         std::string report_cumulative(CumulativeReport report) const;

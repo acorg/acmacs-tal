@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
@@ -105,6 +106,29 @@ void acmacs::tal::v3::Tree::select_cumulative(NodeConstSet& nodes, Select update
     select_update(nodes, update, *this, [cumulative_min=EdgeLength{cumulative_min}](const Node& node) { return node.cumulative_edge_length >= cumulative_min; });
 
 } // acmacs::tal::v3::Tree::select_cumulative
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
+{
+    acmacs::seqdb::setup(seqdb_filename);
+    const auto& seqdb = acmacs::seqdb::get();
+
+    tree::iterate_leaf(*this, [&seqdb](Node& node) {
+        if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
+            const auto& ref = subset.front();
+            node.aa_sequence = ref.seq().aa_aligned();
+            node.date = ref.entry->date();
+            node.continent = ref.entry->continent;
+            node.country = ref.entry->country;
+            node.hi_names = ref.seq().hi_names;
+        }
+        else {
+            fmt::print(stderr, "WARNING: seq_id {} not found in seqdb\n", node.seq_id);
+        }
+    });
+
+} // acmacs::tal::v3::Tree::match_seqdb
 
 // ----------------------------------------------------------------------
 

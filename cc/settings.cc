@@ -13,6 +13,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
     else if (name == "report-selected") {
         select_and_report_nodes(getenv("select"), true);
     }
+    else if (name == "seqdb") {
+        if (getenv("apply", false))
+            tree_.match_seqdb(getenv("filename", ""));
+    }
     else
         return false;
     return true;
