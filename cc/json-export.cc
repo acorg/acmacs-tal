@@ -22,8 +22,15 @@ std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
 to_json::object export_node(const acmacs::tal::v3::Node& node)
 {
     to_json::object result;
-    if (!node.seq_id.empty())
-        result << to_json::key_val("n", node.seq_id);
+    if (!node.seq_id.empty()) {
+        result << to_json::key_val("n", node.seq_id)
+               << to_json::key_val_if_not_empty("a", node.aa_sequence)
+               << to_json::key_val_if_not_empty("d", node.date)
+               << to_json::key_val_if_not_empty("C", node.continent)
+               << to_json::key_val_if_not_empty("D", node.country);
+        if (!node.hi_names.empty())
+            result << to_json::key_val("h", to_json::array(std::begin(node.hi_names), std::end(node.hi_names)));
+    }
     if (!node.edge_length.is_zero())
         result << to_json::key_val("l", to_json::raw(node.edge_length.as_string()));
     if (node.cumulative_edge_length >= acmacs::tal::v3::EdgeLength{0.0})

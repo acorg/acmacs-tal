@@ -12,7 +12,12 @@
    {
     "l": 0.002,
     "c": 0.002,
-    "n": "seq_id"
+    "n": "seq_id",
+    "a": "aligned aa sequence",
+    "d": "2019-01-01: isolation date",
+    "C": "continent",
+    "D": "country",
+    "h": ["hi names"]
    }
    ]
  }

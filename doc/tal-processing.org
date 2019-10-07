@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-04 18:59:01 eu>
+# Time-stamp: <2019-10-07 16:52:15 eu>
 
 * Settings
 - layout
@@ -11,7 +11,7 @@
 
 * Tree
 ** Import
-*** Newick
+*** DONE Newick
 *** json
 ** Export
 *** Newick
@@ -22,14 +22,14 @@
 *** html
 *** isig: data.csv and tree.newick for https://github.com/acorg/isig
 ** Processing
-*** Obtain sequences and hi-namses from seqdb
+*** DONE Obtain sequences and hi-names from seqdb
 *** Obtain sequences from fasta
 *** Infer subtype, lineage
+*** DONE Cumulative edge length
+*** Infer long branch subtrees
 *** Ladderize
 *** Re-root
 - kills Cumulative edge length
-*** Cumulative edge length
-*** Infer long branch subtrees
 *** Infer AA subst for subrees ("to" part of AA)
 *** Infer "from" part of AA subst
 *** Infer clades
