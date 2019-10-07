@@ -114,7 +114,7 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
     acmacs::seqdb::setup(seqdb_filename);
     const auto& seqdb = acmacs::seqdb::get();
 
-    tree::iterate_leaf(*this, [&seqdb](Node& node) {
+    tree::iterate_leaf(*this, [this,&seqdb](Node& node) {
         if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
             const auto& ref = subset.front();
             node.aa_sequence = ref.seq().aa_aligned();
@@ -122,6 +122,14 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
             node.continent = ref.entry->continent;
             node.country = ref.entry->country;
             node.hi_names = ref.seq().hi_names;
+            if (virus_type_.empty())
+                virus_type_ = ref.entry->virus_type;
+            else if (virus_type_ != ref.entry->virus_type)
+                fmt::print(stderr, "WARNING: multiple virus_types from seqdb: {} and {}\n", virus_type_, ref.entry->virus_type);
+            if (lineage_.empty())
+                lineage_ = ref.entry->lineage;
+            else if (lineage_ != ref.entry->lineage)
+                fmt::print(stderr, "WARNING: multiple lineages from seqdb: {} and {}\n", lineage_, ref.entry->lineage);
         }
         else {
             fmt::print(stderr, "WARNING: seq_id {} not found in seqdb\n", node.seq_id);

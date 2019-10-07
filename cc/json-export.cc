@@ -9,10 +9,12 @@ static to_json::object export_node(const acmacs::tal::v3::Node& node);
 
 std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
 {
-    const auto json = to_json::object(to_json::key_val("_", fmt::format("-*- js-indent-level: {} -*-", indent)),
-                                      to_json::key_val("  version", "phylogenetic-tree-v3"),
-                                      to_json::key_val("  date", date::current_date_time()),
-                                      to_json::key_val("tree", export_node(tree)));
+    auto json = to_json::object(to_json::key_val("_", fmt::format("-*- js-indent-level: {} -*-", indent)),
+                                to_json::key_val("  version", "phylogenetic-tree-v3"),
+                                to_json::key_val("  date", date::current_date_time()));
+    json << to_json::key_val_if_not_empty("v", tree.virus_type())
+         << to_json::key_val_if_not_empty("l", tree.lineage())
+         << to_json::key_val("tree", export_node(tree));
     return fmt::format(fmt::format("{{:{}}}", indent), json);
 
 } // acmacs::tal::v3::json_export

@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 16:52:15 eu>
+# Time-stamp: <2019-10-07 17:50:11 eu>
 
 * Settings
 - layout
@@ -17,7 +17,7 @@
 *** Newick
 - omit hidden subtrees
 *** json
-- with sequences, clades, aa substs hz lines etc. to be able to draw everything
+- with sequences, clades, aa substs, hz lines etc. to be able to draw everything
 *** text
 *** html
 *** isig: data.csv and tree.newick for https://github.com/acorg/isig

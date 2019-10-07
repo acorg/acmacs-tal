@@ -1,8 +1,11 @@
 {"_":"-*- js-indent-level: 1 -*-",
  "  version": "phylogenetic-tree-v3",
+ "v": "A(H3N2)",
+ "l": "YAMAGATA",
  "tree": {
   "l": <edge-length: double>,
   "c": <cumulative-edge-length: double>,
+  "A": ["aa subst", "N193K"],
   "t": [
    {
     "l": 0.001,
@@ -17,7 +20,9 @@
     "d": "2019-01-01: isolation date",
     "C": "continent",
     "D": "country",
-    "h": ["hi names"]
+    "h": ["hi names"],
+    "A": ["aa subst", "N193K"],
+    "L": ["clade", "2A1B"]
    }
    ]
  }

@@ -85,6 +85,9 @@ namespace acmacs::tal::inline v3
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 
+        std::string_view virus_type() const { return virus_type_; }
+        std::string_view lineage() const { return lineage_; }
+
         void match_seqdb(std::string_view seqdb_filename);
 
         enum class CumulativeReport { clusters, all };
@@ -97,6 +100,8 @@ namespace acmacs::tal::inline v3
 
       private:
         std::string data_buffer_;
+        std::string virus_type_;
+        std::string lineage_;
     };
 
     // ----------------------------------------------------------------------

@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 16:12:26 eu>
+# Time-stamp: <2019-10-07 17:54:35 eu>
 
 * Command line defines
 
@@ -10,6 +10,8 @@
 * Settings
 
 {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
+- {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
+
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-selected", "select": {see Select Nodes section below}}
 
