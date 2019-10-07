@@ -1,0 +1,21 @@
+# Time-stamp: <2019-10-07 09:14:10 eu>
+
+* Command line defines
+
+-D report-cumulative-output=-  write cumulative report to stdout
+-D report-cumulative-output=filename  write cumulative report to filename
+
+* Settings
+
+{"N": "report-cumulative", "output": "{report-cumulative-output}"}
+
+* COMMENT ====== local vars
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+#+STARTUP: showall indent
+Local Variables:
+eval: (auto-fill-mode 0)
+eval: (add-hook 'before-save-hook 'time-stamp)
+eval: (set (make-local-variable org-confirm-elisp-link-function) nil)
+End:

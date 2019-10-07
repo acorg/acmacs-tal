@@ -1,0 +1,12 @@
+{"_": "-*- js-indent-level: 1 -*-",
+ "init": [
+  {"N": "set",
+   "report-cumulative-output": ""
+  }
+ ],
+ "main-tree": [
+  {"N": "report-cumulative", "output": "{report-cumulative-output}"}
+ ],
+ "main-integrated": [
+ ]
+}

@@ -1,14 +1,14 @@
 #pragma once
 
+#include "acmacs-tal/tree.hh"
+
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
-    class ExportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
+    class JsonImportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
 
-    class Tree;
-
-    void export_tree(const Tree& tree, std::string_view filename);
+    Tree json_import(std::string_view filename);
 }
 
 // ----------------------------------------------------------------------

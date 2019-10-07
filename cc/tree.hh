@@ -17,6 +17,8 @@ namespace acmacs::tal::inline v3
     //   public:
     // };
 
+    constexpr const EdgeLength EdgeLengthNotSet{-1.0};
+
     // ----------------------------------------------------------------------
 
     class Node
@@ -34,7 +36,7 @@ namespace acmacs::tal::inline v3
 
         SeqId seq_id;
         EdgeLength edge_length{0.0};
-        EdgeLength cumulative_edge_length{-1.0};
+        EdgeLength cumulative_edge_length{EdgeLengthNotSet};
         Subtree subtree;
 
         // size_t number_strains = 1;
@@ -66,6 +68,7 @@ namespace acmacs::tal::inline v3
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 
+        std::string report_cumulative();
         void cumulative_calculate();
         void cumulative_reset();
 

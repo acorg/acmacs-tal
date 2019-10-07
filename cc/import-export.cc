@@ -1,7 +1,37 @@
 #include "acmacs-base/read-file.hh"
-#include "acmacs-tal/export.hh"
+#include "acmacs-tal/import-export.hh"
 #include "acmacs-tal/newick.hh"
+#include "acmacs-tal/json-import.hh"
 #include "acmacs-tal/json-export.hh"
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::Tree acmacs::tal::v3::import_tree(std::string_view filename)
+{
+    fs::path filepath{filename};
+    auto ext = filepath.extension();
+    if (ext == ".xz" || ext == ".bz2")
+        ext = filepath.stem().extension();
+    if (ext == ".newick") {
+        try {
+            return newick_import(filename);
+        }
+        catch (NewickImportError& err) {
+            throw ImportError{fmt::format("cannot import from newick: {}", err)};
+        }
+    }
+    else if (filename == "-" || ext == ".json") {
+        try {
+            return json_import(filename);
+        }
+        catch (JsonImportError& err) {
+            throw ImportError{fmt::format("cannot import from json: {}", err)};
+        }
+    }
+    else
+        throw ImportError{fmt::format("cannot infer import method from filename: {}", filename)};
+
+} // acmacs::tal::v3::import_tree
 
 // ----------------------------------------------------------------------
 
