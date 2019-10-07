@@ -36,7 +36,7 @@ namespace acmacs::tal::inline v3
 
         SeqId seq_id;
         EdgeLength edge_length{0.0};
-        EdgeLength cumulative_edge_length{EdgeLengthNotSet};
+        mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
         Subtree subtree;
 
         // size_t number_strains = 1;
@@ -62,6 +62,17 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
+    template <typename N> class NodeSetT : public std::vector<N>
+    {
+      public:
+        NodeSetT() = default;
+    };
+
+    using NodeSet = NodeSetT<Node*>;
+    using NodeConstSet = NodeSetT<const Node*>;
+
+    // ----------------------------------------------------------------------
+
     class Tree : public Node
     {
       public:
@@ -69,13 +80,18 @@ namespace acmacs::tal::inline v3
         std::string_view data_buffer() const { return data_buffer_; }
 
         enum class CumulativeReport { clusters, all };
-        std::string report_cumulative(CumulativeReport report);
-        void cumulative_calculate();
-        void cumulative_reset();
+        std::string report_cumulative(CumulativeReport report) const;
+        void cumulative_calculate() const;
+        void cumulative_reset() const;
+
+        enum class Select { Init, Update };
+        void select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const;
 
       private:
         std::string data_buffer_;
     };
+
+    // ----------------------------------------------------------------------
 
 } // namespace acmacs::tal::inlinev3
 

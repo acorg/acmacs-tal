@@ -1,18 +1,20 @@
+#include <algorithm>
+
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::cumulative_calculate()
+void acmacs::tal::v3::Tree::cumulative_calculate() const
 {
     if (cumulative_edge_length == EdgeLengthNotSet) {
         EdgeLength cumulative{0.0};
-        const auto leaf = [&cumulative](Node& node) { node.cumulative_edge_length = cumulative + node.edge_length; };
-        const auto pre = [&cumulative](Node& node) {
+        const auto leaf = [&cumulative](const Node& node) { node.cumulative_edge_length = cumulative + node.edge_length; };
+        const auto pre = [&cumulative](const Node& node) {
             node.cumulative_edge_length = cumulative + node.edge_length;
             cumulative = node.cumulative_edge_length;
         };
-        const auto post = [&cumulative](Node& node) { cumulative -= node.edge_length; };
+        const auto post = [&cumulative](const Node& node) { cumulative -= node.edge_length; };
 
         tree::iterate_leaf_pre_post(*this, leaf, pre, post);
     }
@@ -21,9 +23,9 @@ void acmacs::tal::v3::Tree::cumulative_calculate()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::cumulative_reset()
+void acmacs::tal::v3::Tree::cumulative_reset() const
 {
-    tree::iterate_leaf(*this, [](Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });
+    tree::iterate_leaf(*this, [](const Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });
 
 } // acmacs::tal::v3::Tree::cumulative_reset
 
@@ -40,12 +42,12 @@ struct CumulativeEntry
     void set_gap(acmacs::tal::EdgeLength next_edge) { gap_to_next = edge_length - next_edge; }
 };
 
-std::string acmacs::tal::v3::Tree::report_cumulative(CumulativeReport report)
+std::string acmacs::tal::v3::Tree::report_cumulative(CumulativeReport report) const
 {
     cumulative_calculate();
 
     std::vector<CumulativeEntry> nodes;
-    tree::iterate_leaf(*this, [&nodes](Node& node) { nodes.emplace_back(node.seq_id, node.cumulative_edge_length); });
+    tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.emplace_back(node.seq_id, node.cumulative_edge_length); });
     std::sort(std::begin(nodes), std::end(nodes));
     for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it)
         it->set_gap(std::next(it)->edge_length);
@@ -81,6 +83,28 @@ std::string acmacs::tal::v3::Tree::report_cumulative(CumulativeReport report)
     return result;
 
 } // acmacs::tal::v3::Tree::report_cumulative
+
+// ----------------------------------------------------------------------
+
+template <typename F> inline void select_update(acmacs::tal::v3::NodeConstSet& nodes, acmacs::tal::v3::Tree::Select update, const acmacs::tal::v3::Node& root, F func)
+{
+    using namespace acmacs::tal::v3;
+    switch (update) {
+      case Tree::Select::Init:
+          tree::iterate_leaf(root, [&nodes,func](const Node& node) { if (func(node)) nodes.push_back(&node); });
+          break;
+      case Tree::Select::Update:
+          nodes.erase(std::remove_if(std::begin(nodes), std::end(nodes), [func](const Node* node) { return !func(*node); }), std::end(nodes));
+          break;
+    }
+}
+
+void acmacs::tal::v3::Tree::select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const
+{
+    cumulative_calculate();
+    select_update(nodes, update, *this, [cumulative_min=EdgeLength{cumulative_min}](const Node& node) { return node.cumulative_edge_length >= cumulative_min; });
+
+} // acmacs::tal::v3::Tree::select_cumulative
 
 // ----------------------------------------------------------------------
 
