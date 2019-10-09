@@ -179,6 +179,8 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
           number_strains_in_subtree();
           tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
           break;
+      case Ladderize::None:
+          break;
     }
 
 } // acmacs::tal::v3::Tree::ladderize

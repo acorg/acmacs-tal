@@ -106,7 +106,7 @@ namespace acmacs::tal::inline v3
         enum class Select { Init, Update };
         void select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const;
 
-        enum class Ladderize { MaxEdgeLength, NumberOfLeaves };
+        enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
 
         void number_strains_in_subtree() const;
