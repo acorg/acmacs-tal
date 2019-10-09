@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 #include "acmacs-base/named-type.hh"
 
@@ -39,17 +40,24 @@ namespace acmacs::tal::inline v3
         mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
         Subtree subtree;
 
+        bool hidden{false};
         std::string_view aa_sequence;
         std::string_view date;
         std::string_view continent;
         std::string_view country;
         std::vector<std::string_view> hi_names;
 
-        // size_t number_strains = 1;
+        // -------------------- not exported --------------------
+
+        mutable size_t number_strains_in_subtree_{1};
+
+        using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
+        ladderize_helper_t ladderize_helper_{EdgeLengthNotSet};
+
         // double ladderize_max_edge_length = 0;
         // std::string ladderize_max_date;
         // std::string ladderize_max_name_alphabetically;
-        // double cumulative_edge_length = -1;
+
         // double distance_from_previous = -1; // for hz sections auto-detection
         // std::string continent;
         // std::string aa_at;          // see make_aa_at()
@@ -100,6 +108,8 @@ namespace acmacs::tal::inline v3
 
         enum class Ladderize { MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
+
+        void number_strains_in_subtree() const;
 
       private:
         std::string data_buffer_;

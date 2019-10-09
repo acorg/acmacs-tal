@@ -176,20 +176,22 @@ std::string acmacs::tal::v3::newick_export(const Tree& tree)
 std::string export_node(const acmacs::tal::v3::Node& node)
 {
     std::string result;
-    if (!node.subtree.empty()) {
-        result.append(1, '(');
-        for (const auto& sub_node : node.subtree) {
-            if (result.back() != '(')
-                result.append(1, ',');
-            result.append(export_node(sub_node));
+    if (!node.hidden) {
+        if (!node.subtree.empty()) {
+            result.append(1, '(');
+            for (const auto& sub_node : node.subtree) {
+                if (result.back() != '(')
+                    result.append(1, ',');
+                result.append(export_node(sub_node));
+            }
+            result.append(1, ')');
         }
-        result.append(1, ')');
-    }
-    if (!node.seq_id.empty())
-        result.append(node.seq_id);
-    if (!node.edge_length.is_zero()) {
-        result.append(1, ':');
-        result.append(node.edge_length.as_string());
+        if (!node.seq_id.empty())
+            result.append(node.seq_id);
+        if (!node.edge_length.is_zero()) {
+            result.append(1, ':');
+            result.append(node.edge_length.as_string());
+        }
     }
     return result;
 

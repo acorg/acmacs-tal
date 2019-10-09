@@ -26,6 +26,7 @@ to_json::object export_node(const acmacs::tal::v3::Node& node)
     to_json::object result;
     if (!node.seq_id.empty()) {
         result << to_json::key_val("n", node.seq_id)
+               << to_json::key_val_if_true("H", node.hidden)
                << to_json::key_val_if_not_empty("a", node.aa_sequence)
                << to_json::key_val_if_not_empty("d", node.date)
                << to_json::key_val_if_not_empty("C", node.continent)

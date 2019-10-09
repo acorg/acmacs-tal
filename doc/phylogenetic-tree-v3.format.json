@@ -6,6 +6,7 @@
   "l": <edge-length: double>,
   "c": <cumulative-edge-length: double>,
   "A": ["aa subst", "N193K"],
+  "H": <true if hidden>,
   "t": [
    {
     "l": 0.001,
