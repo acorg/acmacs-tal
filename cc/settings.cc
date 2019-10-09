@@ -18,7 +18,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
             tree_.match_seqdb(getenv("filename", ""));
     }
     else if (name == "ladderize") {
-        if (const auto method = getenv("method", "number-of_leaves"); method == "number-of_leaves")
+        if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
             tree_.ladderize(Tree::Ladderize::NumberOfLeaves);
         else if (method == "max-edge-length")
             tree_.ladderize(Tree::Ladderize::MaxEdgeLength);

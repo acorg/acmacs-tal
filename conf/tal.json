@@ -3,7 +3,7 @@
   {"N": "set",
    "?report-cumulative-output": "",
    "whocc": false,
-   "ladderize-method": "number-of_leaves"
+   "ladderize-method": "number-of-leaves"
   }
  ],
  "main-tree": [

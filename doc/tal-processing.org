@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 18:09:11 eu>
+# Time-stamp: <2019-10-09 14:35:21 eu>
 
 * Settings
 - layout
@@ -27,7 +27,7 @@
 *** DONE Infer subtype, lineage
 *** DONE Cumulative edge length
 *** Infer long branch subtrees
-*** Ladderize
+*** DONE Ladderize
 *** Re-root
 - kills Cumulative edge length
 *** Infer AA subst for subrees ("to" part of AA)

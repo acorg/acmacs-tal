@@ -173,13 +173,16 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 
     switch (method) {
       case Ladderize::MaxEdgeLength:
+          fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
           tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
           break;
       case Ladderize::NumberOfLeaves:
+          fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
           number_strains_in_subtree();
           tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
           break;
       case Ladderize::None:
+          fmt::print(stderr, "WARNING: no ladderizing\n");
           break;
     }
 

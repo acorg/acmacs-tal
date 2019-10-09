@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-07 18:38:31 eu>
+# Time-stamp: <2019-10-09 14:31:38 eu>
 
 * Command line defines
 
@@ -7,12 +7,14 @@
 -D report-cumulative-output=-  write cumulative report to stdout
 -D report-cumulative-output=filename  write cumulative report to filename
 
+-D ladderize-method=max-edge-length  (number-of-leaves is default)
+
 * Settings
 
 {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
 - {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
 
-{"N": "ladderize", "method": "number-of_leaves", "?method": "max-edge-length"}
+{"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-selected", "select": {see Select Nodes section below}}
