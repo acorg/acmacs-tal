@@ -59,7 +59,7 @@ acmacs::tal::v3::NodeConstSet acmacs::tal::v3::Settings::select_nodes(const rjso
     NodeConstSet nodes;
     rjson::for_each(criteria, [&nodes,this,update=Tree::Select::Init](const std::string& key, const rjson::value& val) mutable {
         if (key == "cumulative >=") {
-            tree_.select_cumulative(nodes, update, static_cast<double>(val));
+            tree_.select_cumulative(nodes, update, val.to<double>());
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
