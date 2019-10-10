@@ -52,7 +52,7 @@ namespace acmacs::tal::inline v3
         mutable size_t number_strains_in_subtree_{1};
 
         using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
-        ladderize_helper_t ladderize_helper_{EdgeLengthNotSet};
+        ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
 
         // double ladderize_max_edge_length = 0;
         // std::string ladderize_max_date;
