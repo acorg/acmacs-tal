@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-09 14:31:38 eu>
+# Time-stamp: <2019-10-10 12:24:04 eu>
 
 * Command line defines
 
@@ -15,6 +15,7 @@
 - {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
 
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
+{"N": "re-root", "new-root": <seq-id>}
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-selected", "select": {see Select Nodes section below}}

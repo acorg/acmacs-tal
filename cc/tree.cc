@@ -6,9 +6,9 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::cumulative_calculate() const
+void acmacs::tal::v3::Tree::cumulative_calculate(bool recalculate) const
 {
-    if (cumulative_edge_length == EdgeLengthNotSet) {
+    if (recalculate || cumulative_edge_length == EdgeLengthNotSet) {
         EdgeLength cumulative{0.0};
         const auto leaf = [&cumulative](const Node& node) { node.cumulative_edge_length = cumulative + node.edge_length; };
         const auto pre = [&cumulative](const Node& node) {
@@ -24,11 +24,11 @@ void acmacs::tal::v3::Tree::cumulative_calculate() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::cumulative_reset() const
-{
-    tree::iterate_leaf(*this, [](const Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });
+// void acmacs::tal::v3::Tree::cumulative_reset() const
+// {
+//     tree::iterate_leaf(*this, [](const Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });
 
-} // acmacs::tal::v3::Tree::cumulative_reset
+// } // acmacs::tal::v3::Tree::cumulative_reset
 
 // ----------------------------------------------------------------------
 
@@ -205,6 +205,75 @@ void acmacs::tal::v3::Tree::number_strains_in_subtree() const
     }
 
 } // acmacs::tal::v3::Tree::number_strains_in_subtree
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_name(SeqId look_for) const
+{
+    NodePath path;
+    bool found{false};
+
+    const auto stop = [&found](const Node&) -> bool { return found; };
+
+    const auto leaf = [&found, &path, look_for](const Node& node) {
+        if (node.seq_id == look_for) {
+            found = true;
+            path.push_back(&node);
+        }
+    };
+
+    const auto pre = [&path](const Node& node) { path.push_back(&node); };
+
+    const auto post = [&path, &found](const Node&) {
+        if (!found)
+            path.get().pop_back();
+    };
+
+    tree::iterate_stop_leaf_pre_post(*this, stop, leaf, pre, post);
+    if (!found)
+        throw error(fmt::format("seq-id \"{}\" not found in the tree", look_for));
+    return path;
+
+} // acmacs::tal::v3::Tree::find_name
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::re_root(SeqId new_root)
+{
+    auto path = find_name(new_root);
+    path.get().pop_back();
+    re_root(path);
+
+} // acmacs::tal::v3::Tree::re_root
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
+{
+    if (new_root->front() != this)
+        throw error("Invalid path passed to Tree::re_root");
+
+    std::vector<Node> nodes;
+    for (size_t item_no = 0; item_no < (new_root.size() - 1); ++item_no) {
+        const auto& source = *new_root[item_no];
+        nodes.push_back(Node());
+        std::copy_if(source.subtree.begin(), source.subtree.end(), std::back_inserter(nodes.back().subtree), [&](const Node& to_copy) -> bool { return &to_copy != new_root[item_no + 1]; });
+        nodes.back().edge_length = new_root[item_no + 1]->edge_length;
+    }
+
+    std::vector<Node> new_subtree(new_root->back()->subtree.begin(), new_root->back()->subtree.end());
+    Subtree* append_to = &new_subtree;
+    for (auto child = nodes.rbegin(); child != nodes.rend(); ++child) {
+        append_to->push_back(*child);
+        append_to = &append_to->back().subtree;
+    }
+    subtree = new_subtree;
+    edge_length = EdgeLength{0.0};
+
+    if (cumulative_edge_length != EdgeLengthNotSet)
+        cumulative_calculate(true);
+
+} // acmacs::tal::v3::Tree::re_root
 
 // ----------------------------------------------------------------------
 

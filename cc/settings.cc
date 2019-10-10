@@ -25,6 +25,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         else
             throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
     }
+    else if (name == "re-root") {
+        tree_.re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
+    }
     else
         return false;
     return true;

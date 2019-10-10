@@ -10,13 +10,22 @@
 
 namespace acmacs::tal::inline v3
 {
-    using SeqId = std::string_view;
+    class Node;
+
+    class error : public std::runtime_error
+    {
+        using std::runtime_error::runtime_error;
+    };
+
+    using SeqId = acmacs::named_string_view_t<struct acmacs_tal_SeqId_tag>;
 
     using EdgeLength = named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>;
     // class EdgeLength : public named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>
     // {
     //   public:
     // };
+
+    using NodePath = acmacs::named_vector_t<const Node*, struct acmacs_tal_NodePath_tag>;
 
     constexpr const EdgeLength EdgeLengthNotSet{-1.0};
 
@@ -54,9 +63,6 @@ namespace acmacs::tal::inline v3
         using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
 
-        // double ladderize_max_edge_length = 0;
-        // std::string ladderize_max_date;
-        // std::string ladderize_max_name_alphabetically;
 
         // double distance_from_previous = -1; // for hz sections auto-detection
         // std::string continent;
@@ -85,6 +91,7 @@ namespace acmacs::tal::inline v3
     using NodeSet = NodeSetT<Node*>;
     using NodeConstSet = NodeSetT<const Node*>;
 
+
     // ----------------------------------------------------------------------
 
     class Tree : public Node
@@ -96,18 +103,24 @@ namespace acmacs::tal::inline v3
         std::string_view virus_type() const { return virus_type_; }
         std::string_view lineage() const { return lineage_; }
 
+        NodePath find_name(SeqId look_for) const;
+
         void match_seqdb(std::string_view seqdb_filename);
 
         enum class CumulativeReport { clusters, all };
         std::string report_cumulative(CumulativeReport report) const;
-        void cumulative_calculate() const;
-        void cumulative_reset() const;
+        void cumulative_calculate(bool recalculate = false) const;
+        // void cumulative_reset() const;
 
         enum class Select { Init, Update };
         void select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const;
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
+
+        // re-roots tree making the parent of the leaf node with the passed name root
+        void re_root(SeqId new_root);
+        void re_root(const NodePath& new_root);
 
         void number_strains_in_subtree() const;
 

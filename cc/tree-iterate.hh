@@ -7,14 +7,14 @@ namespace acmacs::tal::inline v3::tree
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F1> inline void iterate_leaf(N && aNode, F1 && f_name)
+    template <typename N, typename F1> inline void iterate_leaf(N&& node, F1 f_name)
     {
-        if (aNode.is_leaf()) {
-            f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            f_name(std::forward<N>(node));
         }
         else {
-            for (auto& node : aNode.subtree) {
-                iterate_leaf(node, std::forward<F1>(f_name));
+            for (auto& subnode : node.subtree) {
+                iterate_leaf(subnode, f_name);
             }
         }
     }
@@ -22,15 +22,15 @@ namespace acmacs::tal::inline v3::tree
     // ----------------------------------------------------------------------
 
     // stops iterating if f_name returns true
-    template <typename N, typename F1> inline bool iterate_leaf_stop(N && aNode, F1 && f_name)
+    template <typename N, typename F1> inline bool iterate_leaf_stop(N&& node, F1 f_name)
     {
         bool stop = false;
-        if (aNode.is_leaf()) {
-            stop = f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            stop = f_name(std::forward<N>(node));
         }
         else {
-            for (auto& node : aNode.subtree) {
-                if ((stop = iterate_leaf_stop(node, f_name)))
+            for (auto& subnode : node.subtree) {
+                if ((stop = iterate_leaf_stop(subnode, f_name)))
                     break;
             }
         }
@@ -39,30 +39,30 @@ namespace acmacs::tal::inline v3::tree
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F1, typename F3> inline void iterate_leaf_post(N && aNode, F1 && f_name, F3 && f_subtree_post)
+    template <typename N, typename F1, typename F3> inline void iterate_leaf_post(N&& node, F1 f_name, F3 f_subtree_post)
     {
-        if (aNode.is_leaf()) {
-            f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            f_name(std::forward<N>(node));
         }
         else {
-            for (auto& node : aNode.subtree) {
-                iterate_leaf_post(node, std::forward<F1>(f_name), std::forward<F3>(f_subtree_post));
+            for (auto& subnode : node.subtree) {
+                iterate_leaf_post(subnode, f_name, f_subtree_post);
             }
-            f_subtree_post(std::forward<N>(aNode));
+            f_subtree_post(std::forward<N>(node));
         }
     }
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F1, typename F2> inline void iterate_leaf_pre(N && aNode, F1 && f_name, F2 && f_subtree_pre)
+    template <typename N, typename F1, typename F2> inline void iterate_leaf_pre(N&& node, F1 f_name, F2 f_subtree_pre)
     {
-        if (aNode.is_leaf()) {
-            f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            f_name(std::forward<N>(node));
         }
         else {
-            f_subtree_pre(std::forward<N>(aNode));
-            for (auto& node : aNode.subtree) {
-                iterate_leaf_pre(node, std::forward<F1>(f_name), std::forward<F2>(f_subtree_pre));
+            f_subtree_pre(std::forward<N>(node));
+            for (auto& subnode : node.subtree) {
+                iterate_leaf_pre(subnode, f_name, f_subtree_pre);
             }
         }
     }
@@ -70,15 +70,15 @@ namespace acmacs::tal::inline v3::tree
     // ----------------------------------------------------------------------
 
     // Stop descending the tree if f_subtree_pre returned false
-    template <typename N, typename F1, typename F2> inline void iterate_leaf_pre_stop(N && aNode, F1 && f_name, F2 && f_subtree_pre)
+    template <typename N, typename F1, typename F2> inline void iterate_leaf_pre_stop(N&& node, F1 f_name, F2 f_subtree_pre)
     {
-        if (aNode.is_leaf()) {
-            f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            f_name(std::forward<N>(node));
         }
         else {
-            if (f_subtree_pre(std::forward<N>(aNode))) {
-                for (auto& node : aNode.subtree) {
-                    iterate_leaf_pre_stop(node, std::forward<F1>(f_name), std::forward<F2>(f_subtree_pre));
+            if (f_subtree_pre(std::forward<N>(node))) {
+                for (auto& subnode : node.subtree) {
+                    iterate_leaf_pre_stop(subnode, f_name, f_subtree_pre);
                 }
             }
         }
@@ -86,61 +86,75 @@ namespace acmacs::tal::inline v3::tree
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F3> inline void iterate_pre(N && aNode, F3 && f_subtree_pre)
+    template <typename N, typename F3> inline void iterate_pre(N&& node, F3 f_subtree_pre)
     {
-        if (!aNode.is_leaf()) {
-            f_subtree_pre(std::forward<N>(aNode));
-            for (auto& node : aNode.subtree) {
-                iterate_pre(node, std::forward<F3>(f_subtree_pre));
+        if (!node.is_leaf()) {
+            f_subtree_pre(std::forward<N>(node));
+            for (auto& subnode : node.subtree) {
+                iterate_pre(subnode, f_subtree_pre);
             }
         }
     }
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F3> inline void iterate_pre_path(N && aNode, F3 && f_subtree_pre, std::string path = std::string{})
+    // template <typename N, typename F3> inline void iterate_pre_path(N&& node, F3 f_subtree_pre, std::string path = std::string{})
+    // {
+    //     constexpr const char path_parts[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    //     if (!node.is_leaf()) {
+    //         f_subtree_pre(std::forward<N>(node), path);
+    //         auto subpath_p = std::begin(path_parts);
+    //         std::string subpath_infix;
+    //         for (auto& node : node.subtree) {
+    //             iterate_pre_path(node, f_subtree_pre, path + subpath_infix + *subpath_p);
+    //             ++subpath_p;
+    //             if (!*subpath_p) {
+    //                 subpath_p = std::begin(path_parts);
+    //                 subpath_infix += '-';
+    //             }
+    //         }
+    //     }
+    // }
+
+    // ----------------------------------------------------------------------
+
+    template <typename N, typename F3> inline void iterate_post(N&& node, F3 f_subtree_post)
     {
-        constexpr const char path_parts[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        if (!aNode.is_leaf()) {
-            f_subtree_pre(std::forward<N>(aNode), path);
-            auto subpath_p = std::begin(path_parts);
-            std::string subpath_infix;
-            for (auto& node : aNode.subtree) {
-                iterate_pre_path(node, std::forward<F3>(f_subtree_pre), path + subpath_infix + *subpath_p);
-                ++subpath_p;
-                if (!*subpath_p) {
-                    subpath_p = std::begin(path_parts);
-                    subpath_infix += '-';
-                }
+        if (!node.is_leaf()) {
+            for (auto& subnode : node.subtree) {
+                iterate_post(subnode, f_subtree_post);
             }
+            f_subtree_post(std::forward<N>(node));
         }
     }
 
     // ----------------------------------------------------------------------
 
-    template <typename N, typename F3> inline void iterate_post(N && aNode, F3 && f_subtree_post)
+    template <typename N, typename F1, typename F2, typename F3> inline void iterate_leaf_pre_post(N&& node, F1 f_leaf, F2 f_subtree_pre, F3 f_subtree_post)
     {
-        if (!aNode.is_leaf()) {
-            for (auto& node : aNode.subtree) {
-                iterate_post(node, std::forward<F3>(f_subtree_post));
-            }
-            f_subtree_post(std::forward<N>(aNode));
-        }
-    }
-
-    // ----------------------------------------------------------------------
-
-    template <typename N, typename F1, typename F2, typename F3> inline void iterate_leaf_pre_post(N && aNode, F1 && f_name, F2 && f_subtree_pre, F3 && f_subtree_post)
-    {
-        if (aNode.is_leaf()) {
-            f_name(std::forward<N>(aNode));
+        if (node.is_leaf()) {
+            f_leaf(std::forward<N>(node));
         }
         else {
-            f_subtree_pre(std::forward<N>(aNode));
-            for (auto node = aNode.subtree.begin(); node != aNode.subtree.end(); ++node) {
-                iterate_leaf_pre_post(*node, std::forward<F1>(f_name), std::forward<F2>(f_subtree_pre), std::forward<F3>(f_subtree_post));
+            f_subtree_pre(std::forward<N>(node));
+            for (auto& subnode : node.subtree)
+                iterate_leaf_pre_post(subnode, f_leaf, f_subtree_pre, f_subtree_post);
+            f_subtree_post(std::forward<N>(node));
+        }
+    }
+
+    template <typename N, typename F1, typename F2, typename F3, typename F4> inline void iterate_stop_leaf_pre_post(N&& node, F1 f_stop, F2 f_leaf, F3 f_subtree_pre, F4 f_subtree_post)
+    {
+        if (!f_stop(std::forward<N>(node))) {
+            if (node.is_leaf()) {
+                f_leaf(std::forward<N>(node));
             }
-            f_subtree_post(std::forward<N>(aNode));
+            else {
+                f_subtree_pre(std::forward<N>(node));
+                for (auto& subnode : node.subtree)
+                    iterate_stop_leaf_pre_post(subnode, f_stop, f_leaf, f_subtree_pre, f_subtree_post);
+                f_subtree_post(std::forward<N>(node));
+            }
         }
     }
 
