@@ -24,6 +24,20 @@ void acmacs::tal::v3::Tree::cumulative_calculate(bool recalculate) const
 
 // ----------------------------------------------------------------------
 
+acmacs::tal::v3::EdgeLength acmacs::tal::v3::Tree::max_cumulative_shown() const
+{
+    cumulative_calculate();
+    EdgeLength max_cumulative{0.0};
+    tree::iterate_leaf(*this, [&max_cumulative](const Node& node) {
+        if (!node.hidden)
+            max_cumulative = std::max(max_cumulative, node.cumulative_edge_length);
+    });
+    return max_cumulative;
+
+} // acmacs::tal::v3::Tree::max_cumulative_shown
+
+// ----------------------------------------------------------------------
+
 // void acmacs::tal::v3::Tree::cumulative_reset() const
 // {
 //     tree::iterate_leaf(*this, [](const Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });

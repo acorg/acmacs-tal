@@ -7,7 +7,7 @@ TARGETS = \
 SOURCES = \
   tal.cc tree.cc \
   settings.cc \
-  import-export.cc json-export.cc json-import.cc newick.cc
+  import-export.cc json-export.cc json-import.cc newick.cc html-export.cc
 
 # ----------------------------------------------------------------------
 

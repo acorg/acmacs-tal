@@ -9,6 +9,7 @@ static to_json::object export_node(const acmacs::tal::v3::Node& node);
 
 std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
 {
+    tree.cumulative_calculate();
     auto json = to_json::object(to_json::key_val("_", fmt::format("-*- js-indent-level: {} -*-", indent)),
                                 to_json::key_val("  version", "phylogenetic-tree-v3"),
                                 to_json::key_val("  date", date::current_date_time()));

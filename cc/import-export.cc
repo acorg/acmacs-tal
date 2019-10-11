@@ -3,6 +3,7 @@
 #include "acmacs-tal/newick.hh"
 #include "acmacs-tal/json-import.hh"
 #include "acmacs-tal/json-export.hh"
+#include "acmacs-tal/html-export.hh"
 
 // ----------------------------------------------------------------------
 
@@ -56,6 +57,14 @@ void acmacs::tal::v3::export_tree(const Tree& tree, std::string_view filename)
         }
         catch (JsonExportError& err) {
             throw ExportError{fmt::format("cannot export to json: {}", err)};
+        }
+    }
+    else if (ext == ".html") {
+        try {
+            exported = html_export(tree);
+        }
+        catch (JsonExportError& err) {
+            throw ExportError{fmt::format("cannot export to html: {}", err)};
         }
     }
     else
