@@ -57,6 +57,8 @@ namespace acmacs::tal::inline v3
         std::string_view continent;
         std::string_view country;
         std::vector<std::string_view> hi_names;
+        std::vector<std::string_view> aa_substs;
+        std::vector<std::string_view> clades;
 
         // -------------------- not exported --------------------
 

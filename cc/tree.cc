@@ -150,14 +150,14 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
             if (virus_type_.empty())
                 virus_type_ = ref.entry->virus_type;
             else if (virus_type_ != ref.entry->virus_type)
-                fmt::print(stderr, "WARNING: multiple virus_types from seqdb: {} and {}\n", virus_type_, ref.entry->virus_type);
+                fmt::print(stderr, "WARNING: multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, ref.entry->virus_type);
             if (lineage_.empty())
                 lineage_ = ref.entry->lineage;
             else if (lineage_ != ref.entry->lineage)
-                fmt::print(stderr, "WARNING: multiple lineages from seqdb: {} and {}\n", lineage_, ref.entry->lineage);
+                fmt::print(stderr, "WARNING: multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, ref.entry->lineage);
         }
         else {
-            fmt::print(stderr, "WARNING: seq_id {} not found in seqdb\n", node.seq_id);
+            fmt::print(stderr, "WARNING: seq_id \"{}\" not found in seqdb\n", node.seq_id);
         }
     });
 

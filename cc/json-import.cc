@@ -2,26 +2,6 @@
 #include "acmacs-base/in-json-parser.hh"
 #include "acmacs-tal/json-import.hh"
 
- // "tree": {
- //  "A": ["aa subst", "N193K"],
- //  "H": <true if hidden>,
- //  "t": [
- //   {
- //    "t": [...]
- //   },
- //   {
- //    "n": "seq_id",
- //    "a": "aligned aa sequence",
- //    "d": "2019-01-01: isolation date",
- //    "C": "continent",
- //    "D": "country",
- //    "h": ["hi names"],
- //    "A": ["aa subst", "N193K"],
- //    "L": ["clade", "2A1B"]
- //   }
- //   ]
- // }
-
 // ----------------------------------------------------------------------
 
 namespace
@@ -46,12 +26,12 @@ namespace
                       node_.edge_length = acmacs::tal::v3::EdgeLength{data};
                       break;
                   default:
-                      throw in_json::parse_error("unsupported field: ", key_);
+                      throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
                 }
                 reset_key();
             }
             else
-                throw in_json::parse_error("unsupported field: ", key_);
+                throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
         }
 
         void injson_put_integer(std::string_view data) override
@@ -76,11 +56,11 @@ namespace
                       array_processing_ = array_processing::clades;
                       break;
                   default:
-                      throw in_json::parse_error("unsupported field: ", key_);
+                      throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
                 }
             }
             else
-                throw in_json::parse_error("unsupported field: ", key_);
+                throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
         }
 
         void injson_pop_array() override
@@ -98,7 +78,7 @@ namespace
               case array_processing::hi_names:
               case array_processing::clades:
               case array_processing::none:
-                  throw in_json::parse_error("unsupported object for key ", key_);
+                  throw in_json::parse_error(fmt::format("unsupported object for key \"{}\"", key_));
             }
         }
 
@@ -111,20 +91,54 @@ namespace
                             case 'n':
                                 node_.seq_id = acmacs::tal::v3::SeqId{data};
                                 break;
+                            case 'a':
+                                node_.aa_sequence = data;
+                                break;
+                            case 'd':
+                                node_.date = data;
+                                break;
+                            case 'C':
+                                node_.continent = data;
+                                break;
+                            case 'D':
+                                node_.country = data;
+                                break;
                             default:
-                                throw in_json::parse_error("unsupported string for key ", key_);
+                                throw in_json::parse_error(fmt::format("unsupported string  \"{}\" for key \"{}\"", data, key_));
                         }
                     }
                     else
-                        throw in_json::parse_error("unsupported string for key ", key_);
+                        throw in_json::parse_error(fmt::format("unsupported string \"{}\" for key \"{}\"", data, key_));
                     reset_key();
                     break;
-                case array_processing::subnodes:
-                case array_processing::aa_substs:
                 case array_processing::hi_names:
+                    node_.hi_names.push_back(data);
+                    break;
+                case array_processing::aa_substs:
+                    node_.aa_substs.push_back(data);
+                    break;
                 case array_processing::clades:
-                    throw in_json::parse_error("unsupported string for key ", key_);
+                    node_.clades.push_back(data);
+                    break;
+                case array_processing::subnodes:
+                    throw in_json::parse_error(fmt::format("unsupported string \"{}\" for key \"{}\"", data, key_));
             }
+        }
+
+        void injson_put_bool(bool val) override
+        {
+            if (key_.size() == 1) {
+                switch (key_.front()) {
+                  case 'H':
+                      node_.hidden = val;
+                      break;
+                  default:
+                      throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
+                }
+            }
+            else
+                throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
+            reset_key();
         }
 
       private:
@@ -145,14 +159,14 @@ namespace
                 return std::make_unique<node_data>(tree_);
             }
             else
-                throw in_json::parse_error("unsupported field: ", key_);
+                throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
         }
 
         void injson_put_string(std::string_view data) override
         {
             if (key_ == "  version") {
                 if (data != "phylogenetic-tree-v3" && data != "newick-tree-v1")
-                    throw in_json::parse_error("unsupported version: ", data);
+                    throw in_json::parse_error(fmt::format("unsupported version: {}", data));
                 reset_key();
             }
             else if (key_ == "  date" || key_ == "_")
@@ -166,7 +180,7 @@ namespace
                 reset_key();
             }
             else
-                throw in_json::parse_error("unsupported field: ", key_);
+                throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
         }
 
         void injson_put_array() override {}
