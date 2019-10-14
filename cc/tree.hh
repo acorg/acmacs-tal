@@ -102,6 +102,8 @@ namespace acmacs::tal::inline v3
 
         std::string_view virus_type() const { return virus_type_; }
         std::string_view lineage() const { return lineage_; }
+        void virus_type(std::string_view virus_type) { virus_type_.assign(virus_type); }
+        void lineage(std::string_view lineage) { lineage_.assign(lineage); }
 
         NodePath find_name(SeqId look_for) const;
 

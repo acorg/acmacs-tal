@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-14 09:38:47 eu>
+# Time-stamp: <2019-10-14 12:02:09 eu>
 
 * Settings
 - layout
@@ -12,14 +12,20 @@
 * Tree
 ** Import
 *** DONE Newick
-*** json
+*** STARTED json
 ** Export
 *** Newick
 - omit hidden subtrees
-*** json
-- with sequences, clades, aa substs, hz lines etc. to be able to draw everything
+*** SOMETHING json
+**** DONE sequences
+**** DONE dates
+**** DONE continent, country
+**** DONE hi names
+**** clades
+**** aa substs
+**** hz lines
 *** text
-*** html
+*** SOMETHING html
 *** isig: data.csv and tree.newick for https://github.com/acorg/isig
 ** Processing
 *** DONE Obtain sequences and hi-names from seqdb
@@ -66,7 +72,7 @@ the evolution might have gone, and do not care about egg adaptions.
   - infer all as substitute for a panel, find all sequenced ags in chart that have those aa substitutions and find all Sera in chart with names of those antigens and draw circles
 
 
-* Draw 
+* Draw
 ** Read from json and draw
 ** Layout
 - Aspect ratio, resolution
@@ -171,6 +177,7 @@ the evolution might have gone, and do not care about egg adaptions.
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
+#+TODO: STARTED SOMETHING MORE ALMOST | DONE
 #+STARTUP: showall indent
 Local Variables:
 eval: (auto-fill-mode 0)
