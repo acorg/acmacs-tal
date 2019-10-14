@@ -45,9 +45,8 @@ int main(int argc, const char *argv[])
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
 
-        auto tree = acmacs::tal::import_tree(opt.tree_file);
 
-        acmacs::tal::Settings settings(tree);
+        acmacs::tal::Settings settings;
         settings.load(fmt::format("{}/share/conf/tal.json", acmacs::acmacsd_root()));
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
@@ -57,10 +56,15 @@ int main(int argc, const char *argv[])
                 settings.setenv(def, true);
         }
 
-        if (opt.chart)
-            settings.apply("main-integrated");
-        else
-            settings.apply("main-tree");
+        auto tree = acmacs::tal::import_tree(opt.tree_file);
+        settings.tree(tree);
+
+        settings.apply("main");
+
+        // if (opt.chart)
+        //     settings.apply("main-integrated");
+        // else
+        //     settings.apply("main-tree");
 
         for (const auto& output : *opt.outputs)
             acmacs::tal::export_tree(tree, output);

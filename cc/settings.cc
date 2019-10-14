@@ -3,33 +3,44 @@
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::tree(Tree& tree)
+{
+    tree_ = &tree;
+    setenv("virus-type", tree.virus_type());
+    setenv("lineage", tree.lineage());
+    setenv("tree-has-sequences", tree.has_sequences());
+
+} // acmacs::tal::v3::Settings::tree
+
+// ----------------------------------------------------------------------
+
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 {
     // printenv();
     if (name == "report-cumulative") {
         if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty())
-            acmacs::file::write(output_filename, tree_.report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
+            acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
     }
     else if (name == "report-selected") {
         select_and_report_nodes(getenv("select"), true);
     }
     else if (name == "seqdb") {
         if (getenv("apply", false))
-            tree_.match_seqdb(getenv("filename", ""));
+            tree().match_seqdb(getenv("filename", ""));
     }
     else if (name == "ladderize") {
         if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
-            tree_.ladderize(Tree::Ladderize::NumberOfLeaves);
+            tree().ladderize(Tree::Ladderize::NumberOfLeaves);
         else if (method == "max-edge-length")
-            tree_.ladderize(Tree::Ladderize::MaxEdgeLength);
+            tree().ladderize(Tree::Ladderize::MaxEdgeLength);
         else
             throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
     }
     else if (name == "re-root") {
-        tree_.re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
+        tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
     }
     else
-        return false;
+        return acmacs::settings::Settings::apply_built_in(name);
     return true;
 
 } // acmacs::tal::v3::Settings::apply_built_in
@@ -62,7 +73,7 @@ acmacs::tal::v3::NodeConstSet acmacs::tal::v3::Settings::select_nodes(const rjso
     NodeConstSet nodes;
     rjson::for_each(criteria, [&nodes,this,update=Tree::Select::Init](const std::string& key, const rjson::value& val) mutable {
         if (key == "cumulative >=") {
-            tree_.select_cumulative(nodes, update, val.to<double>());
+            tree().select_cumulative(nodes, update, val.to<double>());
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};

@@ -6,6 +6,17 @@
 
 // ----------------------------------------------------------------------
 
+const acmacs::tal::v3::Node& acmacs::tal::v3::Node::first_leaf() const
+{
+    if (is_leaf())
+        return *this;
+    else
+        return subtree.front().first_leaf();
+
+} // acmacs::tal::v3::Node::first_leaf
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::cumulative_calculate(bool recalculate) const
 {
     if (recalculate || cumulative_edge_length == EdgeLengthNotSet) {

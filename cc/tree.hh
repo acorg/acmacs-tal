@@ -44,6 +44,8 @@ namespace acmacs::tal::inline v3
         Node& add_leaf(SeqId a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
         Node& add_subtree() { return subtree.emplace_back(); }
 
+        const Node& first_leaf() const;
+
         SeqId seq_id;
         EdgeLength edge_length{0.0};
         mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
@@ -104,6 +106,8 @@ namespace acmacs::tal::inline v3
         std::string_view lineage() const { return lineage_; }
         void virus_type(std::string_view virus_type) { virus_type_.assign(virus_type); }
         void lineage(std::string_view lineage) { lineage_.assign(lineage); }
+
+        bool has_sequences() const { return !first_leaf().aa_sequence.empty(); }
 
         NodePath find_name(SeqId look_for) const;
 

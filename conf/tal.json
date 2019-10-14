@@ -6,11 +6,10 @@
    "ladderize-method": "number-of-leaves"
   }
  ],
- "main-tree": [
-  {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
+ "main": [
+  {"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "do": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
+  {"?N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
   {"N": "ladderize", "method": "{ladderize-method}"}
- ],
- "main-integrated": [
  ]
 }

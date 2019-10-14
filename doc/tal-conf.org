@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-10 12:24:04 eu>
+# Time-stamp: <2019-10-14 15:10:38 eu>
 
 * Command line defines
 
@@ -9,7 +9,13 @@
 
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
 
+* Settings features
+
+{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}, {"or": ["{xxx}", {"not": "{yyy}"}]}]}, "then": [{"N": ...}], "else": [{"N": ...}]}
+
 * Settings
+
+{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "do": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []}
 
 {"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
 - {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
