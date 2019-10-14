@@ -16,32 +16,36 @@ void acmacs::tal::v3::Settings::tree(Tree& tree)
 
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 {
-    // printenv();
-    if (name == "report-cumulative") {
-        if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty())
-            acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
-    }
-    else if (name == "report-selected") {
-        select_and_report_nodes(getenv("select"), true);
-    }
-    else if (name == "seqdb") {
-        if (getenv("apply", false))
+    try {
+        // printenv();
+        if (name == "report-cumulative") {
+            if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty())
+                acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
+        }
+        else if (name == "report-selected") {
+            select_and_report_nodes(getenv("select"), true);
+        }
+        else if (name == "seqdb") {
             tree().match_seqdb(getenv("filename", ""));
-    }
-    else if (name == "ladderize") {
-        if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
-            tree().ladderize(Tree::Ladderize::NumberOfLeaves);
-        else if (method == "max-edge-length")
-            tree().ladderize(Tree::Ladderize::MaxEdgeLength);
+        }
+        else if (name == "ladderize") {
+            if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
+                tree().ladderize(Tree::Ladderize::NumberOfLeaves);
+            else if (method == "max-edge-length")
+                tree().ladderize(Tree::Ladderize::MaxEdgeLength);
+            else
+                throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
+        }
+        else if (name == "re-root") {
+            tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
+        }
         else
-            throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
+            return acmacs::settings::Settings::apply_built_in(name);
+        return true;
     }
-    else if (name == "re-root") {
-        tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
+    catch (std::exception& err) {
+        throw error{fmt::format("cannot apply \"{}\": {}", name, err)};
     }
-    else
-        return acmacs::settings::Settings::apply_built_in(name);
-    return true;
 
 } // acmacs::tal::v3::Settings::apply_built_in
 

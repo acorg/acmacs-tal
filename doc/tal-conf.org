@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-14 15:10:38 eu>
+# Time-stamp: <2019-10-14 16:50:22 eu>
 
 * Command line defines
 
@@ -15,9 +15,9 @@
 
 * Settings
 
-{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "do": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []}
+{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}]}
+{"N": "seqdb", "filename": "{seqdb-filename}"}
 
-{"N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"}
 - {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
 
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
