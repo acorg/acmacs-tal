@@ -39,6 +39,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         else if (name == "re-root") {
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
         }
+        else if (name == "nodes") {
+            apply_nodes();
+        }
         else
             return acmacs::settings::Settings::apply_built_in(name);
         return true;
@@ -51,7 +54,29 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodeConstSet acmacs::tal::v3::Settings::select_and_report_nodes(const rjson::value& criteria, bool report) const
+void acmacs::tal::v3::Settings::apply_nodes() const
+{
+    const auto selected = select_nodes(getenv("select"));
+    std::visit(
+        [&selected]<typename T>(T && arg) {
+            if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                if (arg == "hide") {
+                    for (Node* node : selected)
+                        node->hidden = true;
+                }
+                else
+                    throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+            }
+            else
+                throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+        },
+        getenv("apply").val_());
+
+} // acmacs::tal::v3::Settings::apply_nodes
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_and_report_nodes(const rjson::value& criteria, bool report) const
 {
     const auto selected = select_nodes(criteria);
     if (report)
@@ -62,7 +87,7 @@ acmacs::tal::v3::NodeConstSet acmacs::tal::v3::Settings::select_and_report_nodes
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::string_view indent, const NodeConstSet& nodes) const
+void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const
 {
     fmt::print("{}", prefix);
     for (const auto* node : nodes)
@@ -72,16 +97,16 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodeConstSet acmacs::tal::v3::Settings::select_nodes(const rjson::value& criteria) const
+acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::value& criteria) const
 {
-    NodeConstSet nodes;
-    rjson::for_each(criteria, [&nodes,this,update=Tree::Select::Init](const std::string& key, const rjson::value& val) mutable {
+    NodeSet nodes;
+    rjson::for_each(criteria, [&nodes, this, update = Tree::Select::init](const std::string& key, const rjson::value& val) mutable {
         if (key == "cumulative >=") {
-            tree().select_cumulative(nodes, update, val.to<double>());
+            tree().select_if_cumulative_more_than(nodes, update, val.to<double>());
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
-            update = Tree::Select::Update;
+        update = Tree::Select::update;
     });
     return nodes;
 

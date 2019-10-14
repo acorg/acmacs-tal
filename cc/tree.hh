@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <algorithm>
 
 #include "acmacs-base/named-type.hh"
 
@@ -68,6 +69,8 @@ namespace acmacs::tal::inline v3
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
 
 
+        bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
+
         // double distance_from_previous = -1; // for hz sections auto-detection
         // std::string continent;
         // std::string aa_at;          // see make_aa_at()
@@ -93,8 +96,7 @@ namespace acmacs::tal::inline v3
     };
 
     using NodeSet = NodeSetT<Node*>;
-    using NodeConstSet = NodeSetT<const Node*>;
-
+    // using NodeConstSet = NodeSetT<const Node*>;
 
     // ----------------------------------------------------------------------
 
@@ -120,8 +122,9 @@ namespace acmacs::tal::inline v3
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
 
-        enum class Select { Init, Update };
-        void select_cumulative(NodeConstSet& nodes, Select update, double cumulative_min) const;
+        enum class Select { init, update };
+        enum class Descent { no, yes };
+        void select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent = Descent::no);
         EdgeLength max_cumulative_shown() const;
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };

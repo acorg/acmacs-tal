@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-14 12:02:09 eu>
+# Time-stamp: <2019-10-14 18:01:45 eu>
 
 * Settings
 - layout
@@ -12,9 +12,9 @@
 * Tree
 ** Import
 *** DONE Newick
-*** STARTED json
+*** SOMETHING json
 ** Export
-*** Newick
+*** DONE Newick
 - omit hidden subtrees
 *** SOMETHING json
 **** DONE sequences
@@ -55,12 +55,12 @@ the evolution might have gone, and do not care about egg adaptions.
 *** Stat by month for time series
 - TimeSeriesDraw::all_months
 *** Hide subtrees and leaves
-- hide-isolated-before
-- hide-if-cumulative-edge-length-bigger-than
-- hide by aa
-- hide-between
-- hide-one
-- hide-not-found-in-chart
+**** STARTED hide if cumulative edge length bigger than
+**** hide isolated before
+**** hide by aa
+**** hide between
+**** hide one
+**** hide not found in chart
 *** AAAtPosDraw
 - find_most_diverse_positions
 - infer sections: make_aa_pos_sections
