@@ -47,7 +47,7 @@ void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, doub
                        fmt::arg("prefix", ::string::join("", prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""), fmt::arg("edge", edge));
         prefix.push_back(fmt::format("<td class='subnode subnode-middle'><div style='width: {edge}px;'></div></td>", fmt::arg("edge", edge)));
         for (auto subnode = std::begin(node.subtree); subnode != std::end(node.subtree); ++subnode) {
-            if (!subnode->hidden) {
+            if (subnode->children_are_shown()) {
                 const auto sub_last = std::next(subnode) == std::end(node.subtree);
                 if (sub_last)
                     prefix.back() = ::string::replace(prefix.back(), "subnode-middle", "subnode-last");
