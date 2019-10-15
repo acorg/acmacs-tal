@@ -127,6 +127,7 @@ namespace acmacs::tal::inline v3
         void select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent = Descent::no);
         EdgeLength max_cumulative_shown() const;
 
+        void select_all(NodeSet& nodes, Select update);
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };

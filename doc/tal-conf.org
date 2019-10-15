@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 08:53:48 eu>
+# Time-stamp: <2019-10-15 11:29:32 eu>
 
 * Command line defines
 
@@ -21,6 +21,8 @@
 ** hide isolated before
 {"N": "nodes", "select": {"date": ["", "2017"], "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
+** just report selected
+{"N": "nodes", "select": {}, "apply": "report"} -- see [[Select Nodes][Select Nodes]]
 
 * Settings
 
@@ -35,12 +37,12 @@
 {"N": "node", "select": <select>, "apply": <node-apply>}
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
-{"N": "report-selected", "select": <[[Select Nodes][Select Nodes]]>}
 
 * Select Nodes
 
 If multiple criteria specified within single "select" object, they all used (conjunction)
 
+{"all": true}
 {"cumulative >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 

@@ -19,7 +19,6 @@ namespace acmacs::tal::inline v3
 
         void report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const;
         NodeSet select_nodes(const rjson::value& criteria) const;
-        NodeSet select_and_report_nodes(const rjson::value& criteria, bool report) const;
 
       private:
         Tree* tree_;

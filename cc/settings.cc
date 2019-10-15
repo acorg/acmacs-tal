@@ -22,9 +22,6 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
             if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
         }
-        else if (name == "report-selected") {
-            select_and_report_nodes(getenv("select"), true);
-        }
         else if (name == "seqdb") {
             tree().match_seqdb(getenv("filename", ""));
         }
@@ -58,11 +55,14 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 {
     const auto selected = select_nodes(getenv("select"));
     std::visit(
-        [&selected]<typename T>(T && arg) {
+        [this, &selected]<typename T>(T && arg) {
             if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
                 if (arg == "hide") {
                     for (Node* node : selected)
                         node->hidden = true;
+                }
+                else if (arg == "report") {
+                    report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
                 }
                 else
                     throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
@@ -76,25 +76,14 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_and_report_nodes(const rjson::value& criteria, bool report) const
-{
-    const auto selected = select_nodes(criteria);
-    if (report)
-        report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
-    return selected;
-
-} // acmacs::tal::v3::Settings::select_and_report_nodes
-
-// ----------------------------------------------------------------------
-
 void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const
 {
     fmt::print("{}", prefix);
     for (const auto* node : nodes) {
         if (node->is_leaf())
-            fmt::print("{}{} cumul:{}\n", indent, node->seq_id, node->cumulative_edge_length);
+            fmt::print("{}{} [{}] cumul:{:.6f}\n", indent, node->seq_id, node->date, node->cumulative_edge_length.as_number());
         else
-            fmt::print("{}(children: {}) cumul:{}\n", indent, node->subtree.size(), node->cumulative_edge_length);
+            fmt::print("{}(children: {}) cumul:{:.6f}\n", indent, node->subtree.size(), node->cumulative_edge_length.as_number());
     }
 
 } // acmacs::tal::v3::Settings::report_nodes
@@ -111,6 +100,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "date") {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
+        }
+        else if (key == "all") {
+            tree().select_all(selected, update);
         }
         else if (key == "report") {
             report = val.to<bool>();
