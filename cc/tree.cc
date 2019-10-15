@@ -163,6 +163,11 @@ void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std:
     select_update(nodes, update, Descent::yes, *this, [&re](Node& node) {return node.is_leaf() && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
 }
 
+void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos_list_t& aa_at_pos)
+{
+    fmt::print(stderr, "DEBUG: select_by_aa {}\n", aa_at_pos);
+}
+
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)

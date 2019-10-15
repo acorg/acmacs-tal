@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 11:39:06 eu>
+# Time-stamp: <2019-10-15 12:19:46 eu>
 
 * Command line defines
 
@@ -46,6 +46,7 @@
 If multiple criteria specified within single "select" object, they all used (conjunction)
 
 {"all": true}
+{"aa": ["192Q", "!123E"]}
 {"cumulative >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 {"seq_id": "regexp", "report": true}
