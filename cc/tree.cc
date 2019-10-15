@@ -165,7 +165,7 @@ void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std:
 
 void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_list_t& aa_at_pos1)
 {
-    fmt::print(stderr, "DEBUG: select_by_aa {}\n", aa_at_pos);
+    fmt::print(stderr, "DEBUG: select_by_aa {}\n", aa_at_pos1);
 }
 
 // ----------------------------------------------------------------------
