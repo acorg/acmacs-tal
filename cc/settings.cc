@@ -90,8 +90,12 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_and_report_nodes(cons
 void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const
 {
     fmt::print("{}", prefix);
-    for (const auto* node : nodes)
-        fmt::print("{}{} cumul:{}\n", indent, node->seq_id, node->cumulative_edge_length);
+    for (const auto* node : nodes) {
+        if (node->is_leaf())
+            fmt::print("{}{} cumul:{}\n", indent, node->seq_id, node->cumulative_edge_length);
+        else
+            fmt::print("{}(children: {}) cumul:{}\n", indent, node->subtree.size(), node->cumulative_edge_length);
+    }
 
 } // acmacs::tal::v3::Settings::report_nodes
 
@@ -99,16 +103,25 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
 
 acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::value& criteria) const
 {
-    NodeSet nodes;
-    rjson::for_each(criteria, [&nodes, this, update = Tree::Select::init](const std::string& key, const rjson::value& val) mutable {
+    NodeSet selected;
+    bool report = false;
+    rjson::for_each(criteria, [&selected, this, update = Tree::Select::init, &report](const std::string& key, const rjson::value& val) mutable {
         if (key == "cumulative >=") {
-            tree().select_if_cumulative_more_than(nodes, update, val.to<double>());
+            tree().select_if_cumulative_more_than(selected, update, val.to<double>());
+        }
+        else if (key == "date") {
+            tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
+        }
+        else if (key == "report") {
+            report = val.to<bool>();
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
         update = Tree::Select::update;
     });
-    return nodes;
+    if (report)
+        report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
+    return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
 

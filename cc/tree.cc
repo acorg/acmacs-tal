@@ -145,6 +145,12 @@ void acmacs::tal::v3::Tree::select_if_cumulative_more_than(NodeSet& nodes, Selec
 
 } // acmacs::tal::v3::Tree::select_cumulative
 
+void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end)
+{
+    select_update(nodes, update, Descent::yes, *this, [start,end](Node& node) { return (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
+
+} // acmacs::tal::v3::Tree::select_by_date
+
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)

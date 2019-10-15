@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-14 18:01:45 eu>
+# Time-stamp: <2019-10-15 08:53:45 eu>
 
 * Settings
 - layout
@@ -55,8 +55,8 @@ the evolution might have gone, and do not care about egg adaptions.
 *** Stat by month for time series
 - TimeSeriesDraw::all_months
 *** Hide subtrees and leaves
-**** STARTED hide if cumulative edge length bigger than
-**** hide isolated before
+**** DONE hide if cumulative edge length bigger than
+**** SOMETHING hide isolated before
 **** hide by aa
 **** hide between
 **** hide one
