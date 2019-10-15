@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 11:29:32 eu>
+# Time-stamp: <2019-10-15 11:39:06 eu>
 
 * Command line defines
 
@@ -20,6 +20,9 @@
 
 ** hide isolated before
 {"N": "nodes", "select": {"date": ["", "2017"], "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
+
+** hide by regexp
+{"N": "nodes", "select": {"seq_id": "/SWINE/", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
 ** just report selected
 {"N": "nodes", "select": {}, "apply": "report"} -- see [[Select Nodes][Select Nodes]]
@@ -45,6 +48,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"all": true}
 {"cumulative >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
+{"seq_id": "regexp", "report": true}
 
 * COMMENT ====== local vars
 :PROPERTIES:

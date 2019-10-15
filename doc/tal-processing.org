@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 11:37:12 eu>
+# Time-stamp: <2019-10-15 11:59:15 eu>
 
 * Settings
 - layout
@@ -57,7 +57,7 @@ the evolution might have gone, and do not care about egg adaptions.
 *** Hide subtrees and leaves
 **** DONE hide if cumulative edge length bigger than
 **** DONE hide isolated before
-**** hide by seq_id and regexp
+**** DONE hide by seq_id and regexp
 **** hide by aa
 **** hide between
 **** hide not found in chart

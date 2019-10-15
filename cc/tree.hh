@@ -129,6 +129,7 @@ namespace acmacs::tal::inline v3
 
         void select_all(NodeSet& nodes, Select update);
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
+        void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);

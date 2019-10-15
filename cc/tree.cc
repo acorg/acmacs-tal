@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <regex>
 
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tree.hh"
@@ -155,6 +156,12 @@ void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::s
     select_update(nodes, update, Descent::yes, *this, [start,end](Node& node) { return node.is_leaf() && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
 
 } // acmacs::tal::v3::Tree::select_by_date
+
+void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp)
+{
+    std::regex re{std::begin(regexp), std::end(regexp), std::regex_constants::ECMAScript|std::regex_constants::icase|std::regex_constants::optimize};
+    select_update(nodes, update, Descent::yes, *this, [&re](Node& node) {return node.is_leaf() && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
+}
 
 // ----------------------------------------------------------------------
 

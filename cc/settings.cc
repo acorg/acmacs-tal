@@ -95,21 +95,25 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
     NodeSet selected;
     bool report = false;
     rjson::for_each(criteria, [&selected, this, update = Tree::Select::init, &report](const std::string& key, const rjson::value& val) mutable {
-        if (key == "cumulative >=") {
+        if (key == "all") {
+            tree().select_all(selected, update);
+        }
+        else if (key == "cumulative >=") {
             tree().select_if_cumulative_more_than(selected, update, val.to<double>());
         }
         else if (key == "date") {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
-        else if (key == "all") {
-            tree().select_all(selected, update);
+        else if (key == "seq_id") {
+            tree().select_by_seq_id(selected, update, val.to<std::string_view>());
         }
         else if (key == "report") {
             report = val.to<bool>();
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
-        update = Tree::Select::update;
+        if (key != "report")
+            update = Tree::Select::update;
     });
     if (report)
         report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), criteria), "  ", selected);

@@ -59,7 +59,7 @@ int main(int argc, const char *argv[])
         auto tree = acmacs::tal::import_tree(opt.tree_file);
         settings.tree(tree);
 
-        settings.apply("main");
+        settings.apply("main", acmacs::verbose::yes);
 
         // if (opt.chart)
         //     settings.apply("main-integrated");
