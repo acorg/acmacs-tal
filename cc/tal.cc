@@ -12,7 +12,7 @@ struct Options : public argv
 {
     Options(int a_argc, const char* const a_argv[], on_error on_err = on_error::exit) : argv() { parse(a_argc, a_argv, on_err); }
 
-    option<str> db_dir{*this, "db-dir"};
+    // option<str> db_dir{*this, "db-dir"};
     option<str> seqdb{*this, "seqdb"};
 
     option<str_array> settings_files{*this, 's'};
