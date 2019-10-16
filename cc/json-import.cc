@@ -92,7 +92,7 @@ namespace
                                 node_.seq_id = acmacs::tal::v3::SeqId{data};
                                 break;
                             case 'a':
-                                node_.aa_sequence = data;
+                                node_.aa_sequence = acmacs::seqdb::sequence_aligned_ref_t{data};
                                 break;
                             case 'd':
                                 node_.date = data;

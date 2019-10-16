@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 12:19:46 eu>
+# Time-stamp: <2019-10-16 11:54:27 eu>
 
 * Settings
 - layout
@@ -58,7 +58,7 @@ the evolution might have gone, and do not care about egg adaptions.
 **** DONE hide if cumulative edge length bigger than
 **** DONE hide isolated before
 **** DONE hide by seq_id and regexp
-**** STARTED hide by aa
+**** DONE hide by aa
 **** hide between
 **** hide not found in chart
 *** AAAtPosDraw

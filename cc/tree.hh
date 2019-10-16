@@ -54,7 +54,7 @@ namespace acmacs::tal::inline v3
         Subtree subtree;
 
         bool hidden{false};
-        std::string_view aa_sequence;
+        acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
         std::string_view date;
         std::string_view continent;
         std::string_view country;

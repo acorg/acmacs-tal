@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-15 12:19:46 eu>
+# Time-stamp: <2019-10-16 11:54:27 eu>
 
 * Command line defines
 
@@ -23,6 +23,9 @@
 
 ** hide by regexp
 {"N": "nodes", "select": {"seq_id": "/SWINE/", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
+
+** hide by aa
+{"N": "nodes", "select": {"aa": "159F", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
 ** just report selected
 {"N": "nodes", "select": {}, "apply": "report"} -- see [[Select Nodes][Select Nodes]]
