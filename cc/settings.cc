@@ -18,9 +18,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 {
     try {
         // printenv();
-        if (name == "report-cumulative") {
-            if (const auto output_filename = getenv("report-cumulative-output", ""); !output_filename.empty())
-                acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
+        if (name == "nodes") {
+            apply_nodes();
         }
         else if (name == "seqdb") {
             tree().match_seqdb(getenv("filename", ""));
@@ -36,8 +35,13 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         else if (name == "re-root") {
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
         }
-        else if (name == "nodes") {
-            apply_nodes();
+        else if (name == "report-cumulative") {
+            if (const auto output_filename = getenv("output", ""); !output_filename.empty())
+                acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
+        }
+        else if (name == "report-time-series") {
+            if (const auto output_filename = getenv("output", ""); !output_filename.empty())
+                acmacs::file::write(output_filename, tree().report_time_series());
         }
         else
             return acmacs::settings::Settings::apply_built_in(name);

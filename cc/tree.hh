@@ -142,6 +142,8 @@ namespace acmacs::tal::inline v3
 
         void number_strains_in_subtree() const;
 
+        std::string report_time_series() const;
+
       private:
         std::string data_buffer_;
         std::string virus_type_;

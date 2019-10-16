@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <regex>
 
+#include "acmacs-base/counter.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
@@ -335,6 +336,22 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
         cumulative_calculate(true);
 
 } // acmacs::tal::v3::Tree::re_root
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::Tree::report_time_series() const
+{
+    acmacs::Counter<std::string_view> by_month;
+    tree::iterate_leaf(*this, [&by_month](const Node& node) {
+        if (node.date.size() >= 7)
+            by_month.count(node.date.substr(0, 7));
+    });
+    fmt::memory_buffer out;
+    for (auto [month, count] : by_month.counter())
+        fmt::format_to(out, "  {} {}\n", month, count);
+    return fmt::format("INFO: Month ({})\n{}", by_month.size(), fmt::to_string(out));
+
+} // acmacs::tal::v3::Tree::report_time_series
 
 // ----------------------------------------------------------------------
 
