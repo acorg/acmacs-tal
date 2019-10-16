@@ -35,6 +35,11 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         else if (name == "re-root") {
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
         }
+        else if (name == "update-common-aa") {
+            tree().update_common_aa();
+            if (getenv("report", false))
+                tree().report_common_aa();
+        }
         else if (name == "report-cumulative") {
             if (const auto output_filename = getenv("output", ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative(getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters));
@@ -58,12 +63,26 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
 void acmacs::tal::v3::Settings::apply_nodes() const
 {
     const auto selected = select_nodes(getenv("select"));
+    fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
     std::visit(
         [this, &selected]<typename T>(T && arg) {
             if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
                 if (arg == "hide") {
                     for (Node* node : selected)
                         node->hidden = true;
+                }
+                else if (arg == "color") {
+                    fmt::print(stderr, "DEBUG: apply color {}\n", getenv("tree-label", ""));
+                    if (const auto tree_label = getenv("tree-label", ""); !tree_label.empty()) {
+                        const Color color{tree_label};
+                        for (Node* node : selected)
+                            node->color_tree_label = color;
+                    }
+                    if (const auto time_series_dash = getenv("time-series-dash", ""); !time_series_dash.empty()) {
+                        const Color color{time_series_dash};
+                        for (Node* node : selected)
+                            node->color_time_series_dash = color;
+                    }
                 }
                 else if (arg == "report") {
                     report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);

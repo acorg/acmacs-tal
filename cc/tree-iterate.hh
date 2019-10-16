@@ -13,9 +13,8 @@ namespace acmacs::tal::inline v3::tree
             f_name(std::forward<N>(node));
         }
         else {
-            for (auto& subnode : node.subtree) {
+            for (auto& subnode : node.subtree)
                 iterate_leaf(subnode, f_name);
-            }
         }
     }
 
@@ -45,9 +44,8 @@ namespace acmacs::tal::inline v3::tree
             f_name(std::forward<N>(node));
         }
         else {
-            for (auto& subnode : node.subtree) {
+            for (auto& subnode : node.subtree)
                 iterate_leaf_post(subnode, f_name, f_subtree_post);
-            }
             f_subtree_post(std::forward<N>(node));
         }
     }
@@ -61,9 +59,8 @@ namespace acmacs::tal::inline v3::tree
         }
         else {
             f_subtree_pre(std::forward<N>(node));
-            for (auto& subnode : node.subtree) {
+            for (auto& subnode : node.subtree)
                 iterate_leaf_pre(subnode, f_name, f_subtree_pre);
-            }
         }
     }
 
@@ -77,9 +74,8 @@ namespace acmacs::tal::inline v3::tree
         }
         else {
             if (f_subtree_pre(std::forward<N>(node))) {
-                for (auto& subnode : node.subtree) {
+                for (auto& subnode : node.subtree)
                     iterate_leaf_pre_stop(subnode, f_name, f_subtree_pre);
-                }
             }
         }
     }
@@ -90,9 +86,27 @@ namespace acmacs::tal::inline v3::tree
     {
         if (!node.is_leaf()) {
             f_subtree_pre(std::forward<N>(node));
-            for (auto& subnode : node.subtree) {
+            for (auto& subnode : node.subtree)
                 iterate_pre(subnode, f_subtree_pre);
-            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    template <typename N, typename P, typename F1> inline void iterate_pre_parent(N&& node, P&& parent, F1 f_subtree_pre)
+    {
+        if (!node.is_leaf()) {
+            f_subtree_pre(std::forward<N>(node), std::forward<P>(parent));
+            for (auto& subnode : node.subtree)
+                iterate_pre_parent(subnode, std::forward<N>(node), f_subtree_pre);
+        }
+    }
+
+    template <typename N, typename F1> inline void iterate_pre_parent(N&& node, F1 f_subtree_pre)
+    {
+        if (!node.is_leaf()) {
+            for (auto& subnode : node.subtree)
+                iterate_pre_parent(subnode, std::forward<N>(node), f_subtree_pre);
         }
     }
 
@@ -121,9 +135,8 @@ namespace acmacs::tal::inline v3::tree
     template <typename N, typename F3> inline void iterate_post(N&& node, F3 f_subtree_post)
     {
         if (!node.is_leaf()) {
-            for (auto& subnode : node.subtree) {
+            for (auto& subnode : node.subtree)
                 iterate_post(subnode, f_subtree_post);
-            }
             f_subtree_post(std::forward<N>(node));
         }
     }

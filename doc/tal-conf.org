@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-16 12:03:31 eu>
+# Time-stamp: <2019-10-16 17:48:43 eu>
 
 * Command line defines
 
@@ -15,17 +15,24 @@
 
 * Node modifications
 
-** hide if cumulative edge length bigger than
+
+** hide
+{"N": "nodes", "select": {"[[Select Nodes][Select Nodes]]"}, "apply": "hide"}
+
+*** hide if cumulative edge length bigger than
 {"N": "nodes", "select": {"cumulative >=": 0.01, "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
-** hide isolated before
+*** hide isolated before
 {"N": "nodes", "select": {"date": ["", "2017"], "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
-** hide by regexp
+*** hide by regexp
 {"N": "nodes", "select": {"seq_id": "/SWINE/", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
-** hide by aa
+*** hide by aa
 {"N": "nodes", "select": {"aa": "159F", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
+
+** color
+{"N": "nodes", "select": {"[[Select Nodes][Select Nodes]]"}, "apply": "color", "tree-label": "red", "time-series-dash": "red"}
 
 ** just report selected
 {"N": "nodes", "select": {}, "apply": "report"} -- see [[Select Nodes][Select Nodes]]
@@ -39,6 +46,8 @@
 
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
+
+{"N": "update-common-aa", "report": false} -- use upon hiding nodes
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 

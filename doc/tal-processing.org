@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-16 13:10:56 eu>
+# Time-stamp: <2019-10-16 18:31:10 eu>
 
 * Settings
 - layout
@@ -36,7 +36,8 @@
 *** DONE Ladderize
 *** DONE Re-root
 *** DONE Continents and countries
-*** Infer AA subst for subrees ("to" part of AA)
+*** DONE Stat by month for time series
+*** SOMETHING Infer AA subst for subrees ("to" part of AA)
 *** Infer "from" part of AA subst
 *** Infer clades
 - regular clades
@@ -51,8 +52,6 @@ the evolution might have gone, and do not care about egg adaptions.
 - infer all as substitute for section
 - AA subst for a section (to be shown in the map title)
 - hide/show sections
-*** DONE Stat by month for time series
-- TimeSeriesDraw::all_months
 *** Hide subtrees and leaves
 **** DONE hide if cumulative edge length bigger than
 **** DONE hide isolated before

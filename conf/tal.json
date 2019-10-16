@@ -10,6 +10,7 @@
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
   {"?N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
-  {"N": "ladderize", "method": "{ladderize-method}"}
+  {"N": "ladderize", "method": "{ladderize-method}"},
+  {"N": "update-common-aa", "report": false}
  ]
 }

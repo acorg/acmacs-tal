@@ -8,6 +8,7 @@
 #include "acmacs-base/named-type.hh"
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/date.hh"
+#include "acmacs-base/color.hh"
 #include "seqdb-3/aa-at-pos.hh"
 
 // ----------------------------------------------------------------------
@@ -31,7 +32,27 @@ namespace acmacs::tal::inline v3
 
     using NodePath = acmacs::named_vector_t<const Node*, struct acmacs_tal_NodePath_tag>;
 
+    using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
+
     constexpr const EdgeLength EdgeLengthNotSet{-1.0};
+
+    // ----------------------------------------------------------------------
+
+    class CommonAA : public acmacs::named_string_t<struct acmacs_tal_CommonAA_tag>
+    {
+      public:
+        constexpr static const char NotCommon{'.'};
+        constexpr CommonAA() = default;
+
+        void update(acmacs::seqdb::sequence_aligned_ref_t seq);
+        void update(const CommonAA& subtree);
+        constexpr bool is_common(size_t pos) const { return pos < size() && get()[pos] != NotCommon; }
+        ssize_t num_common() const { return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NotCommon; }); }
+        void set_to_not_common(size_t pos) { get().at(pos) = NotCommon; }
+        void check_common(size_t pos, char aa) { if (aa == NotCommon || pos >= size() || (aa != 'X' && get()[pos] != aa)) set_to_not_common(pos); }
+        std::string report() const;
+        std::string report(const CommonAA& parent) const;
+    };
 
     // ----------------------------------------------------------------------
 
@@ -41,7 +62,7 @@ namespace acmacs::tal::inline v3
         using Subtree = std::vector<Node>;
 
         Node() = default;
-        Node(SeqId a_seq_id, EdgeLength a_edge) : seq_id{a_seq_id}, edge_length{a_edge} {}
+        Node(SeqId a_seq_id, EdgeLength a_edge) : edge_length{a_edge}, seq_id{a_seq_id} {}
 
         bool is_leaf() const { return subtree.empty() && !seq_id.empty(); }
 
@@ -50,27 +71,31 @@ namespace acmacs::tal::inline v3
 
         const Node& first_leaf() const;
 
-        SeqId seq_id;
+        // all nodes
         EdgeLength edge_length{0.0};
         mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
-        Subtree subtree;
-
         bool hidden{false};
+
+        // leaf node only
+        SeqId seq_id;
         acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
         std::string_view date;
         std::string_view continent;
         std::string_view country;
         std::vector<std::string_view> hi_names;
-        std::vector<std::string_view> aa_substs;
         std::vector<std::string_view> clades;
+        Color color_tree_label{BLACK}; // -> export
+        Color color_time_series_dash{BLACK}; // -> export
+
+        // middle node only
+        Subtree subtree;
+        std::vector<std::string_view> aa_substs;
 
         // -------------------- not exported --------------------
-
-        mutable size_t number_strains_in_subtree_{1};
-
-        using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
+        mutable size_t number_leaves_in_subtree_{1};
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
-
+        // middle node only
+        mutable CommonAA common_aa_;
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
 
@@ -142,11 +167,14 @@ namespace acmacs::tal::inline v3
         void re_root(SeqId new_root);
         void re_root(const NodePath& new_root);
 
-        void number_strains_in_subtree() const;
+        void number_leaves_in_subtree() const;
 
         Counter<std::string_view> stat_by_month() const;
         std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
         std::string report_time_series() const;
+
+        void update_common_aa() const;
+        void report_common_aa() const;
 
       private:
         std::string data_buffer_;

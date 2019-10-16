@@ -13,7 +13,7 @@ namespace
 } // namespace
 
 using prefix_t = std::vector<std::string>;
-static void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, double edge_scale, prefix_t& prefix, bool last);
+static void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, const acmacs::tal::v3::Node& parent, double edge_scale, prefix_t& prefix, bool last);
 
 // ----------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
     fmt::memory_buffer html;
     fmt::format_to(html, sHeader, fmt::arg("title", fmt::format("{} {}", tree.virus_type(), tree.lineage())));
     prefix_t prefix;
-    add_nodes(html, tree, edge_scale, prefix, false);
+    add_nodes(html, tree, tree, edge_scale, prefix, false);
     fmt::format_to(html, sFooter);
     return fmt::to_string(html);
 
@@ -34,24 +34,32 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
 
 // ----------------------------------------------------------------------
 
-void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, double edge_scale, prefix_t& prefix, bool last)
+void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, const acmacs::tal::v3::Node& parent, double edge_scale, prefix_t& prefix, bool last)
 {
     if (node.is_leaf()) {
-        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td><td class='seq-name'>{seq_id}</td></tr></table></li>",
+        fmt::format_to(html,
+                       "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td><td class='seq-name' style='color: "
+                       "{color_tree_label}'>{seq_id}</td></tr></table></li>\n",
                        fmt::arg("prefix", ::string::join("", prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""),
-                       fmt::arg("edge", static_cast<int>(node.edge_length.as_number() * edge_scale)), fmt::arg("seq_id", node.seq_id));
+                       fmt::arg("edge", static_cast<int>(node.edge_length.as_number() * edge_scale)), fmt::arg("seq_id", node.seq_id),
+                       fmt::arg("color_tree_label", node.color_tree_label.to_hex_string()));
     }
     else {
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);
-        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td></tr></table></li>",
-                       fmt::arg("prefix", ::string::join("", prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""), fmt::arg("edge", edge));
+        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", ::string::join("", prefix)),
+                       fmt::arg("node_edge_last", last ? "node-edge-last" : ""), fmt::arg("edge", edge));
+        if (node.number_leaves_in_subtree_ >= 20) {
+            if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
+                fmt::format_to(html, "<td class='common-aa'>leaves:{} {}</td>", node.number_leaves_in_subtree_, rep);
+        }
+        fmt::format_to(html, "</tr></table></li>\n");
         prefix.push_back(fmt::format("<td class='subnode subnode-middle'><div style='width: {edge}px;'></div></td>", fmt::arg("edge", edge)));
         for (auto subnode = std::begin(node.subtree); subnode != std::end(node.subtree); ++subnode) {
             if (subnode->children_are_shown()) {
                 const auto sub_last = std::next(subnode) == std::end(node.subtree);
                 if (sub_last)
                     prefix.back() = ::string::replace(prefix.back(), "subnode-middle", "subnode-last");
-                add_nodes(html, *subnode, edge_scale, prefix, sub_last);
+                add_nodes(html, *subnode, node, edge_scale, prefix, sub_last);
             }
         }
         prefix.pop_back();
@@ -75,6 +83,7 @@ namespace
    ul.tree td {{ padding: 0; vertical-align: top; }}
    ul.tree td.subnode-middle {{ border-right: 1px solid black; }}
    ul.tree td.subnode-last {{ border-right: none; }}
+   ul.tree td.common-aa {{ color: blue; font-size: 0.8em; }}
    ul.tree div.node-edge {{ height: 0.5em; border-bottom: 1px solid black; }}
    ul.tree div.node-edge-last {{ border-left: 1px solid black; }}
   </style>

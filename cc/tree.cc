@@ -142,30 +142,30 @@ template <typename F> inline void select_update(acmacs::tal::v3::NodeSet& nodes,
 void acmacs::tal::v3::Tree::select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent)
 {
     cumulative_calculate();
-    select_update(nodes, update, descent, *this, [cumulative_min=EdgeLength{cumulative_min}](Node& node) { return node.cumulative_edge_length >= cumulative_min; });
+    select_update(nodes, update, descent, *this, [cumulative_min=EdgeLength{cumulative_min}](Node& node) { return !node.hidden && node.cumulative_edge_length >= cumulative_min; });
 
 } // acmacs::tal::v3::Tree::select_cumulative
 
 void acmacs::tal::v3::Tree::select_all(NodeSet& nodes, Select update)
 {
-    select_update(nodes, update, Descent::yes, *this, [](Node& node) { return node.is_leaf(); });
+    select_update(nodes, update, Descent::yes, *this, [](Node& node) { return node.is_leaf() && !node.hidden; });
 }
 
 void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end)
 {
-    select_update(nodes, update, Descent::yes, *this, [start,end](Node& node) { return node.is_leaf() && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
+    select_update(nodes, update, Descent::yes, *this, [start,end](Node& node) { return node.is_leaf() && !node.hidden && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
 
 } // acmacs::tal::v3::Tree::select_by_date
 
 void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp)
 {
     std::regex re{std::begin(regexp), std::end(regexp), std::regex_constants::ECMAScript|std::regex_constants::icase|std::regex_constants::optimize};
-    select_update(nodes, update, Descent::yes, *this, [&re](Node& node) {return node.is_leaf() && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
+    select_update(nodes, update, Descent::yes, *this, [&re](Node& node) {return node.is_leaf() && !node.hidden && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
 }
 
 void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1)
 {
-    select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](Node& node) {return node.is_leaf() && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
+    select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](Node& node) {return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
 }
 
 // ----------------------------------------------------------------------
@@ -226,10 +226,10 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
     };
 
     const auto reorder_by_number_of_leaves = [reorder_by_max_edge_length](const Node& node1, const Node& node2) -> bool {
-        if (node1.number_strains_in_subtree_ == node2.number_strains_in_subtree_)
+        if (node1.number_leaves_in_subtree_ == node2.number_leaves_in_subtree_)
             return reorder_by_max_edge_length(node1, node2);
         else
-            return node1.number_strains_in_subtree_ < node2.number_strains_in_subtree_;
+            return node1.number_leaves_in_subtree_ < node2.number_leaves_in_subtree_;
     };
 
     switch (method) {
@@ -239,7 +239,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
           break;
       case Ladderize::NumberOfLeaves:
           fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
-          number_strains_in_subtree();
+          number_leaves_in_subtree();
           tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
           break;
       case Ladderize::None:
@@ -251,13 +251,13 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::number_strains_in_subtree() const
+void acmacs::tal::v3::Tree::number_leaves_in_subtree() const
 {
-    if (number_strains_in_subtree_ <= subtree.size()) {
+    if (number_leaves_in_subtree_ <= subtree.size()) {
         const auto set_number_strains = [](const Node& node) {
-            node.number_strains_in_subtree_ = std::accumulate(std::begin(node.subtree), std::end(node.subtree), 0UL, [](size_t sum, const auto& subnode) {
+            node.number_leaves_in_subtree_ = std::accumulate(std::begin(node.subtree), std::end(node.subtree), 0UL, [](size_t sum, const auto& subnode) {
                 if (!subnode.hidden)
-                    return sum + subnode.number_strains_in_subtree_;
+                    return sum + subnode.number_leaves_in_subtree_;
                 else
                     return sum;
             });
@@ -265,7 +265,7 @@ void acmacs::tal::v3::Tree::number_strains_in_subtree() const
         tree::iterate_post(*this, set_number_strains);
     }
 
-} // acmacs::tal::v3::Tree::number_strains_in_subtree
+} // acmacs::tal::v3::Tree::number_leaves_in_subtree
 
 // ----------------------------------------------------------------------
 
@@ -397,6 +397,101 @@ std::string acmacs::tal::v3::Tree::report_time_series() const
                        date::display(first, date::allow_incomplete::yes), date::display(last, date::allow_incomplete::yes), fmt::to_string(out));
 
 } // acmacs::tal::v3::Tree::report_time_series
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::CommonAA::update(acmacs::seqdb::sequence_aligned_ref_t seq)
+{
+    if (empty()) {
+        get().assign(*seq);
+    }
+    else {
+        if (seq.size() < size())
+            get().resize(seq.size());
+        for (size_t pos = 0; pos < size(); ++pos)
+            check_common(pos, seq[pos]);
+    }
+
+} // acmacs::tal::v3::CommonAA::update
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
+{
+    if (empty()) {
+        *this = subtree;
+    }
+    else {
+        if (subtree.size() < size())
+            get().resize(subtree.size());
+        for (size_t pos = 0; pos < size(); ++pos)
+            check_common(pos, subtree[pos]);
+    }
+
+} // acmacs::tal::v3::CommonAA::update
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::CommonAA::report() const
+{
+    fmt::memory_buffer out;
+    for (size_t pos = 0; pos < size(); ++pos) {
+        if (is_common(pos))
+            fmt::format_to(out, " {}{}", pos + 1, get().at(pos));
+    }
+    return fmt::format("common:{} {}", num_common(), fmt::to_string(out));
+
+} // acmacs::tal::v3::CommonAA::report
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent) const
+{
+    fmt::memory_buffer out;
+    size_t num_common = 0;
+    for (size_t pos = 0; pos < size(); ++pos) {
+        if (is_common(pos) && !parent.is_common(pos)) {
+            fmt::format_to(out, " {}{}", pos + 1, get().at(pos));
+            ++num_common;
+        }
+    }
+    if (num_common == 0)
+        return std::string{};
+    else
+        return fmt::format("common:{} {}", num_common, fmt::to_string(out));
+
+} // acmacs::tal::v3::CommonAA::report
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::update_common_aa() const
+{
+    tree::iterate_post(*this, [](const Node& node) {
+        for (const auto& child : node.subtree) {
+            if (!child.hidden) {
+                if (child.is_leaf())
+                    node.common_aa_.update(child.aa_sequence);
+                else
+                    node.common_aa_.update(child.common_aa_);
+            }
+        }
+    });
+
+} // acmacs::tal::v3::Tree::update_common_aa
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::report_common_aa() const
+{
+    number_leaves_in_subtree();
+    tree::iterate_pre_parent(*this, [](const Node& node, const Node& parent) {
+        if (node.number_leaves_in_subtree_ >= 100) {
+            if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
+                fmt::print("(children:{} leaves:{}) {}\n", node.subtree.size(), node.number_leaves_in_subtree_, rep);
+        }
+    });
+
+} // acmacs::tal::v3::Tree::report_common_aa
 
 // ----------------------------------------------------------------------
 
