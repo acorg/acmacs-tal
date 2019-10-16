@@ -99,7 +99,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             tree().select_all(selected, update);
         }
         else if (key == "aa") {
-            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1(val));
+            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(val));
         }
         else if (key == "cumulative >=") {
             tree().select_if_cumulative_more_than(selected, update, val.to<double>());
