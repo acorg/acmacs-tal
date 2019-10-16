@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include "acmacs-base/named-type.hh"
+#include "acmacs-base/counter.hh"
+#include "acmacs-base/date.hh"
 #include "seqdb-3/aa-at-pos.hh"
 
 // ----------------------------------------------------------------------
@@ -142,12 +144,16 @@ namespace acmacs::tal::inline v3
 
         void number_strains_in_subtree() const;
 
+        Counter<std::string_view> stat_by_month() const;
+        std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
         std::string report_time_series() const;
 
       private:
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
+
+
     };
 
     // ----------------------------------------------------------------------
