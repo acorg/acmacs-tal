@@ -42,11 +42,11 @@ namespace acmacs::tal::inline v3
     {
       public:
         constexpr static const char NotCommon{'.'};
-        constexpr CommonAA() = default;
+        CommonAA() = default;
 
         void update(acmacs::seqdb::sequence_aligned_ref_t seq);
         void update(const CommonAA& subtree);
-        constexpr bool is_common(size_t pos) const { return pos < size() && get()[pos] != NotCommon; }
+        bool is_common(size_t pos) const { return pos < size() && get()[pos] != NotCommon; }
         ssize_t num_common() const { return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NotCommon; }); }
         void set_to_not_common(size_t pos) { get().at(pos) = NotCommon; }
         void check_common(size_t pos, char aa) { if (aa == NotCommon || pos >= size() || (aa != 'X' && get()[pos] != aa)) set_to_not_common(pos); }
