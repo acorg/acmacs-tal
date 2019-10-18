@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-16 17:48:43 eu>
+# Time-stamp: <2019-10-18 12:38:52 eu>
 
 * Command line defines
 
@@ -14,7 +14,6 @@
 {"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}, {"or": ["{xxx}", {"not": "{yyy}"}]}]}, "then": [{"N": ...}], "else": [{"N": ...}]}
 
 * Node modifications
-
 
 ** hide
 {"N": "nodes", "select": {"[[Select Nodes][Select Nodes]]"}, "apply": "hide"}
@@ -47,7 +46,7 @@
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
 
-{"N": "update-common-aa", "report": false} -- use upon hiding nodes
+{"N": "aa-transitions", "report": false} -- use upon hiding nodes
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 

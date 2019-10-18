@@ -10,6 +10,7 @@
 #include "acmacs-base/date.hh"
 #include "acmacs-base/color.hh"
 #include "seqdb-3/aa-at-pos.hh"
+#include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
 
@@ -35,24 +36,6 @@ namespace acmacs::tal::inline v3
     using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
 
     constexpr const EdgeLength EdgeLengthNotSet{-1.0};
-
-    // ----------------------------------------------------------------------
-
-    class CommonAA : public acmacs::named_string_t<struct acmacs_tal_CommonAA_tag>
-    {
-      public:
-        constexpr static const char NotCommon{'.'};
-        CommonAA() = default;
-
-        void update(acmacs::seqdb::sequence_aligned_ref_t seq);
-        void update(const CommonAA& subtree);
-        bool is_common(size_t pos) const { return pos < size() && get()[pos] != NotCommon; }
-        ssize_t num_common() const { return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NotCommon; }); }
-        void set_to_not_common(size_t pos) { get().at(pos) = NotCommon; }
-        void check_common(size_t pos, char aa) { if (aa == NotCommon || pos >= size() || (aa != 'X' && get()[pos] != aa)) set_to_not_common(pos); }
-        std::string report() const;
-        std::string report(const CommonAA& parent) const;
-    };
 
     // ----------------------------------------------------------------------
 
@@ -96,8 +79,12 @@ namespace acmacs::tal::inline v3
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
         // middle node only
         mutable CommonAA common_aa_;
+        mutable AA_Transitions aa_transitions_;
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
+        void remove_aa_transition(seqdb::pos0_t pos, char right) const;
+
+        // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
         // double distance_from_previous = -1; // for hz sections auto-detection
         // std::string continent;
@@ -175,6 +162,7 @@ namespace acmacs::tal::inline v3
 
         void update_common_aa() const;
         void report_common_aa() const;
+        void update_aa_transitions() const;
 
       private:
         std::string data_buffer_;

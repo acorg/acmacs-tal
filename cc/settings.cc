@@ -35,8 +35,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         else if (name == "re-root") {
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
         }
-        else if (name == "update-common-aa") {
+        else if (name == "aa-transitions") {
             tree().update_common_aa();
+            tree().update_aa_transitions();
             if (getenv("report", false))
                 tree().report_common_aa();
         }
