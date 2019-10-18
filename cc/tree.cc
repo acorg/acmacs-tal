@@ -446,11 +446,13 @@ void acmacs::tal::v3::Tree::report_common_aa() const
 
 void acmacs::tal::v3::Tree::update_aa_transitions() const
 {
+    cumulative_calculate();
+
     tree::iterate_post(*this, [](const Node& node) {
         for (seqdb::pos0_t pos{0}; *pos < node.common_aa_.size(); ++pos) {
             if (!node.common_aa_.is_common(pos)) {
                 CounterChar counter;
-                for (const auto& child: node.subtree) {
+                for (const auto& child : node.subtree) {
                     if (const auto aa = child.common_aa_.at(pos); CommonAA::is_common(aa)) {
                         child.aa_transitions_.add(pos, aa);
                         counter.count(aa);
@@ -471,14 +473,18 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
     tree::iterate_leaf(*this, [&sorted_leaf_nodes](const Node& node) { sorted_leaf_nodes.push_back(&node); });
     std::sort(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [](const auto* n1, const auto* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; });
 
-      // add left part to aa transitions (Derek's algorithm)
+    // add left part to aa transitions (Derek's algorithm)
     auto add_left_part = [&sorted_leaf_nodes](const Node& node) {
         if (!node.aa_transitions_.empty()) {
             const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
 
-            if (const auto node_for_left = std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length < node_left_edge; }); node_for_left != std::end(sorted_leaf_nodes)) {
+            if (const auto node_for_left =
+                    std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length < node_left_edge; });
+                node_for_left != std::end(sorted_leaf_nodes)) {
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
             }
+            // else
+            //     fmt::print(stderr, "DEBUG: no node_for_left {} = {} - {}\n", node_left_edge, node.cumulative_edge_length, node.edge_length);
 
             // auto lb = sorted_leaf_nodes.begin();
             // for (auto ln = sorted_leaf_nodes.begin() + 1; ln != sorted_leaf_nodes.end(); ++ln) {
@@ -498,17 +504,6 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
         }
 
         node.aa_transitions_.remove_left_right_same();
-
-          // add transition labels information to settings
-        // if (node.aa_transitions_) {
-        //     std::vector<std::string> labels;
-        //     node.aa_transitions_.make_labels(labels);
-        //       // std::cerr << labels << std::endl;
-
-        //       // std::vector<std::pair<std::string, const Node*>> labels;
-        //       // node.aa_transitions_.make_labels(labels);
-        //       // settings().draw_tree.aa_transition.add(node.branch_id, labels);
-        // }
     };
     tree::iterate_leaf_pre(*this, add_left_part, add_left_part);
 

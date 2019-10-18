@@ -83,7 +83,7 @@ std::string acmacs::tal::v3::AA_Transitions::display(bool show_empty_left) const
 {
     fmt::memory_buffer output;
     for (const auto& en : data_) {
-        // if (show_empty_left || !en.empty_left())
+        if (show_empty_left || !en.empty_left())
             fmt::format_to(output, " {}", en);
     }
     if (const auto result = fmt::to_string(output); result.size() > 1)
