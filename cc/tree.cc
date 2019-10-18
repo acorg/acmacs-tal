@@ -467,7 +467,66 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
         }
     });
 
+    std::vector<const Node*> sorted_leaf_nodes;
+    tree::iterate_leaf(*this, [&sorted_leaf_nodes](const Node& node) { sorted_leaf_nodes.push_back(&node); });
+    std::sort(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [](const auto* n1, const auto* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; });
+
+      // add left part to aa transitions (Derek's algorithm)
+    auto add_left_part = [&sorted_leaf_nodes](const Node& node) {
+        if (!node.aa_transitions_.empty()) {
+            const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
+
+            if (const auto node_for_left = std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length < node_left_edge; }); node_for_left != std::end(sorted_leaf_nodes)) {
+                node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
+            }
+
+            // auto lb = sorted_leaf_nodes.begin();
+            // for (auto ln = sorted_leaf_nodes.begin() + 1; ln != sorted_leaf_nodes.end(); ++ln) {
+            //     if ((*ln)->cumulative_edge_length < node_left_edge) {
+            //         lb = ln;
+            //         break;
+            //     }
+            // }
+
+            // const Node* node_for_left = lb == sorted_leaf_nodes.begin() ? nullptr : *(lb - 1);
+            // for (const auto& transition : node.aa_transitions_) {
+            //     if (node_for_left && node_for_left->data.amino_acids().size() > transition.pos) { // node_for_left can have shorter aa
+            //         transition.left = node_for_left->data.amino_acids()[transition.pos];
+            //         transition.for_left = node_for_left;
+            //     }
+            // }
+        }
+
+        node.aa_transitions_.remove_left_right_same();
+
+          // add transition labels information to settings
+        // if (node.aa_transitions_) {
+        //     std::vector<std::string> labels;
+        //     node.aa_transitions_.make_labels(labels);
+        //       // std::cerr << labels << std::endl;
+
+        //       // std::vector<std::pair<std::string, const Node*>> labels;
+        //       // node.aa_transitions_.make_labels(labels);
+        //       // settings().draw_tree.aa_transition.add(node.branch_id, labels);
+        // }
+    };
+    tree::iterate_leaf_pre(*this, add_left_part, add_left_part);
+
 } // acmacs::tal::v3::Tree::update_aa_transitions
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::report_aa_transitions() const
+{
+    number_leaves_in_subtree();
+    tree::iterate_pre(*this, [](const Node& node) {
+        if (node.number_leaves_in_subtree_ >= 20) {
+            if (const auto rep = node.aa_transitions_.display(); !rep.empty())
+                fmt::print("(children:{} leaves:{}) {}\n", node.subtree.size(), node.number_leaves_in_subtree_, rep);
+        }
+    });
+
+} // acmacs::tal::v3::Tree::report_aa_transitions
 
 // ----------------------------------------------------------------------
 

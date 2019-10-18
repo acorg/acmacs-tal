@@ -39,7 +39,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
             tree().update_common_aa();
             tree().update_aa_transitions();
             if (getenv("report", false))
-                tree().report_common_aa();
+                tree().report_aa_transitions();
         }
         else if (name == "report-cumulative") {
             if (const auto output_filename = getenv("output", ""); !output_filename.empty())

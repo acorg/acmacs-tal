@@ -73,10 +73,11 @@ namespace acmacs::tal::inline v3
         }
 
       public:
+        bool empty() const { return data_.empty(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
-
         bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }
         bool remove(seqdb::pos0_t pos, char right) { return remove_if([pos,right](const auto& en) { return en.pos == pos && en.right == right; }); }
+        void remove_left_right_same() { remove_if([](const auto& en) { return en.left_right_same(); }); }
 
         const AA_Transition* find(seqdb::pos0_t pos) const
         {
@@ -93,6 +94,12 @@ namespace acmacs::tal::inline v3
         bool contains(std::string_view label) const
         {
             return std::find_if(std::begin(data_), std::end(data_), [label](const auto& en) { return en.display() == label; }) != std::end(data_);
+        }
+
+        void set_left(seqdb::sequence_aligned_ref_t seq)
+        {
+            for (auto& tr : data_)
+                tr.left = seq.at(tr.pos);
         }
 
       private:
