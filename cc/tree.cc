@@ -448,12 +448,19 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
 {
     cumulative_calculate();
 
-    tree::iterate_post(*this, [](const Node& node) {
+    const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
+        if (node.is_leaf())
+            return node.aa_sequence.at(pos);
+        else
+            return node.common_aa_.at(pos);
+    };
+
+    tree::iterate_post(*this, [aa_at](const Node& node) {
         for (seqdb::pos0_t pos{0}; *pos < node.common_aa_.size(); ++pos) {
-            if (!node.common_aa_.is_common(pos)) {
+            if (node.common_aa_.is_no_common(pos)) {
                 CounterChar counter;
                 for (const auto& child : node.subtree) {
-                    if (const auto aa = child.common_aa_.at(pos); CommonAA::is_common(aa)) {
+                    if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
                         child.aa_transitions_.add(pos, aa);
                         counter.count(aa);
                     }
@@ -461,6 +468,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                         counter.count(found->right);
                     }
                 }
+                if ((node.number_leaves_in_subtree_ == 36 || node.number_leaves_in_subtree_ == (2124 - 36) || node.number_leaves_in_subtree_ == (2124 - 37) || node.number_leaves_in_subtree_ == 2124 || node.number_leaves_in_subtree_ == 2125) && pos == seqdb::pos1_t{91})
+                    fmt::print(stderr, "DEBUG: leaves:{} pos:{} counter: {}\n", node.number_leaves_in_subtree_, pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);

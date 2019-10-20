@@ -17,6 +17,7 @@ namespace acmacs::tal::inline v3
         char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
         constexpr static bool is_common(char aa) { return aa != NoCommon && aa != Any; }
         bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
+        bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
         ssize_t num_common() const
         {
             return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NoCommon; });
