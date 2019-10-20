@@ -47,7 +47,7 @@ namespace acmacs::tal::inline v3
         Node() = default;
         Node(SeqId a_seq_id, EdgeLength a_edge) : edge_length{a_edge}, seq_id{a_seq_id} {}
 
-        bool is_leaf() const { return subtree.empty() && !seq_id.empty(); }
+        bool is_leaf() const { return subtree.empty(); } // seq_id may contain generated node name used for debugging
 
         Node& add_leaf(SeqId a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
         Node& add_subtree() { return subtree.emplace_back(); }
@@ -160,6 +160,7 @@ namespace acmacs::tal::inline v3
         std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
         std::string report_time_series() const;
 
+        void set_middle_node_names(); // for debugging
         void update_common_aa() const;
         void report_common_aa() const;
         void update_aa_transitions() const;

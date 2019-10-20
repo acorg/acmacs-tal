@@ -1,5 +1,8 @@
 #pragma once
 
+#include "acmacs-base/enumerate.hh"
+#include "acmacs-base/fmt.hh"
+
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3::tree
@@ -91,6 +94,15 @@ namespace acmacs::tal::inline v3::tree
         }
     }
 
+    // template <typename N, typename F3> inline void iterate_pre(N&& node, F3 f_subtree_pre, size_t index)
+    // {
+    //     if (!node.is_leaf()) {
+    //         f_subtree_pre(std::forward<N>(node), index);
+    //         for (auto [no, subnode] : acmacs::enumerate(node.subtree))
+    //             iterate_pre(subnode, f_subtree_pre, no);
+    //     }
+    // }
+
     // ----------------------------------------------------------------------
 
     template <typename N, typename P, typename F1> inline void iterate_pre_parent(N&& node, P&& parent, F1 f_subtree_pre)
@@ -129,6 +141,16 @@ namespace acmacs::tal::inline v3::tree
     //         }
     //     }
     // }
+
+    template <typename N, typename F3> inline void iterate_pre_path(N&& node, F3 f_subtree_pre, std::string path = std::string{})
+    {
+        if (!node.is_leaf()) {
+            f_subtree_pre(std::forward<N>(node), path);
+            for (auto [no, subnode] : acmacs::enumerate(node.subtree)) {
+                iterate_pre_path(node, f_subtree_pre, fmt::format("{}-{}", path, no));
+            }
+        }
+    }
 
     // ----------------------------------------------------------------------
 

@@ -48,12 +48,12 @@ void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, cons
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);
         fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", ::string::join("", prefix)),
                        fmt::arg("node_edge_last", last ? "node-edge-last" : ""), fmt::arg("edge", edge));
-        if (node.number_leaves_in_subtree_ >= 20) {
+        // if (node.number_leaves_in_subtree_ >= 20) {
             // if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
             //     fmt::format_to(html, "<td class='common-aa'>leaves:{} {}</td>", node.number_leaves_in_subtree_, rep);
-            if (const auto rep = node.aa_transitions_.display(); !rep.empty())
-                fmt::format_to(html, "<td class='common-aa'>leaves:{} {}</td>", node.number_leaves_in_subtree_, rep);
-        }
+        if (const auto rep = node.aa_transitions_.display(); !rep.empty())
+            fmt::format_to(html, "<td class='common-aa'>{}leaves:{} {}</td>", node.seq_id.empty() ? std::string{} : fmt::format("[{}] ", node.seq_id), node.number_leaves_in_subtree_, rep);
+        // }
         fmt::format_to(html, "</tr></table></li>\n");
         prefix.push_back(fmt::format("<td class='subnode subnode-middle'><div style='width: {edge}px;'></div></td>", fmt::arg("edge", edge)));
         for (auto subnode = std::begin(node.subtree); subnode != std::end(node.subtree); ++subnode) {

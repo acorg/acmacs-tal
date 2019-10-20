@@ -155,6 +155,7 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
     catch (TokenizerError& err) {
         throw NewickImportError{fmt::format("newick import error: {}", err)};
     }
+    tree.set_middle_node_names();
     return tree;
 
 } // acmacs::tal::v3::newick_import
@@ -177,7 +178,10 @@ std::string export_node(const acmacs::tal::v3::Node& node)
 {
     std::string result;
     if (!node.hidden) {
-        if (!node.subtree.empty()) {
+        if (node.is_leaf()) {
+            result.append(node.seq_id);
+        }
+        else {
             result.append(1, '(');
             for (const auto& sub_node : node.subtree) {
                 if (result.back() != '(')
@@ -186,8 +190,6 @@ std::string export_node(const acmacs::tal::v3::Node& node)
             }
             result.append(1, ')');
         }
-        if (!node.seq_id.empty())
-            result.append(node.seq_id);
         if (!node.edge_length.is_zero()) {
             result.append(1, ':');
             result.append(node.edge_length.as_string());

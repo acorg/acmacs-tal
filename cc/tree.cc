@@ -534,6 +534,14 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::set_middle_node_names() // for debugging
+{
+//    tree::iterate_pre_path(*this, [](Node& node, const std::string& path) { node.seq_id = SeqId{path}; });
+
+} // acmacs::tal::v3::Tree::set_middle_node_names
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

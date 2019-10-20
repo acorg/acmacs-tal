@@ -25,7 +25,7 @@ std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
 to_json::object export_node(const acmacs::tal::v3::Node& node)
 {
     to_json::object result;
-    if (!node.seq_id.empty()) {
+    if (node.is_leaf()) {
         result << to_json::key_val("n", *node.seq_id)
                << to_json::key_val_if_true("H", node.hidden)
                << to_json::key_val_if_not_empty("a", *node.aa_sequence)
