@@ -206,7 +206,6 @@ acmacs::tal::v3::Tree acmacs::tal::v3::json_import(std::string_view filename)
     catch (in_json::parse_error& err) {
         throw JsonImportError{fmt::format("tree in json format import error: {}", err)};
     }
-    tree.set_middle_node_names();
     return tree;
 
 } // acmacs::tal::v3::json_import

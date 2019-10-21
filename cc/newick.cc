@@ -155,7 +155,6 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
     catch (TokenizerError& err) {
         throw NewickImportError{fmt::format("newick import error: {}", err)};
     }
-    tree.set_middle_node_names();
     return tree;
 
 } // acmacs::tal::v3::newick_import

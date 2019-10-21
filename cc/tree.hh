@@ -80,6 +80,7 @@ namespace acmacs::tal::inline v3
         // middle node only
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
+        mutable const Node* node_for_left_aa_transitions_{nullptr};
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;
@@ -160,7 +161,6 @@ namespace acmacs::tal::inline v3
         std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
         std::string report_time_series() const;
 
-        void set_middle_node_names(); // for debugging
         void update_common_aa() const;
         void report_common_aa() const;
         void update_aa_transitions() const;

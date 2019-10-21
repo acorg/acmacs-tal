@@ -491,6 +491,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                     std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length < node_left_edge; });
                 node_for_left != std::end(sorted_leaf_nodes)) {
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
+                node.node_for_left_aa_transitions_ = *node_for_left;
             }
             // else
             //     fmt::print(stderr, "DEBUG: no node_for_left {} = {} - {}\n", node_left_edge, node.cumulative_edge_length, node.edge_length);
@@ -531,14 +532,6 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
     });
 
 } // acmacs::tal::v3::Tree::report_aa_transitions
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Tree::set_middle_node_names() // for debugging
-{
-//    tree::iterate_pre_path(*this, [](Node& node, const std::string& path) { node.seq_id = SeqId{path}; });
-
-} // acmacs::tal::v3::Tree::set_middle_node_names
 
 // ----------------------------------------------------------------------
 
