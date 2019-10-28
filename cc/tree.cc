@@ -517,6 +517,18 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::set_clade(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name)
+{
+    if (name.empty())
+        throw error{"invalid clade definition: empty name"};
+    if (display_name.empty())
+        display_name = name;
+    fmt::print(stderr, "DEBUG: set clade \"{}\" (\"{}\"): {}\n", name, display_name, substitutions);
+
+} // acmacs::tal::v3::Tree::set_clade
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

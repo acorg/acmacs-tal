@@ -25,6 +25,7 @@ namespace acmacs::tal::inline v3
 
         void apply_nodes() const;
         void update_env();
+        void clade() const;
     };
 
 } // namespace acmacs::tal::inlinev3

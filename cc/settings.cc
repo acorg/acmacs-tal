@@ -1,4 +1,5 @@
 #include "acmacs-base/read-file.hh"
+#include "acmacs-base/string-split.hh"
 #include "acmacs-tal/settings.hh"
 
 // ----------------------------------------------------------------------
@@ -26,12 +27,14 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
 {
     try {
         // printenv();
-        if (name == "nodes") {
-            apply_nodes();
+        if (name == "aa-transitions") {
+            tree().update_common_aa();
+            tree().update_aa_transitions();
+            if (getenv("report", false))
+                tree().report_aa_transitions();
         }
-        else if (name == "seqdb") {
-            tree().match_seqdb(getenv("filename", ""));
-            update_env();
+        else if (name == "clade") {
+            clade();
         }
         else if (name == "ladderize") {
             if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
@@ -41,14 +44,11 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             else
                 throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
         }
+        else if (name == "nodes") {
+            apply_nodes();
+        }
         else if (name == "re-root") {
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
-        }
-        else if (name == "aa-transitions") {
-            tree().update_common_aa();
-            tree().update_aa_transitions();
-            if (getenv("report", false))
-                tree().report_aa_transitions();
         }
         else if (name == "report-cumulative") {
             if (const auto output_filename = getenv("output", ""); !output_filename.empty())
@@ -57,6 +57,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "report-time-series") {
             if (const auto output_filename = getenv("output", ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_time_series());
+        }
+        else if (name == "seqdb") {
+            tree().match_seqdb(getenv("filename", ""));
+            update_env();
         }
         else
             return acmacs::settings::Settings::apply_built_in(name);
@@ -156,6 +160,37 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
     return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::clade() const
+{
+    using namespace std::string_view_literals;
+
+    if (const auto& substitutions = getenv("substitutions"); !substitutions.is_null())
+        std::visit(
+            [this]<typename T>(T && arg) {
+                if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                    tree().set_clade(getenv("name", ""), acmacs::string::split(std::forward<T>(arg), " "sv), getenv("display_name", ""));
+                }
+                else if constexpr (std::is_same_v<std::decay_t<T>, rjson::array>) {
+                    std::vector<std::string_view> substs;
+                    try {
+                        arg.copy_to(substs);
+                    }
+                    catch (rjson::error& /*err*/) {
+                        throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
+                    }
+                    tree().set_clade(getenv("name", ""), substs, getenv("display_name", ""));
+                }
+                else
+                    throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
+            },
+            substitutions.val_());
+    else
+        throw error{"no \"substitutions\" provided"};
+
+} // acmacs::tal::v3::Settings::clade
 
 // ----------------------------------------------------------------------
 

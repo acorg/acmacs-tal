@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-18 12:38:52 eu>
+# Time-stamp: <2019-10-28 15:26:06 eu>
 
 * Command line defines
 
@@ -11,7 +11,7 @@
 
 * Settings features
 
-{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}, {"or": ["{xxx}", {"not": "{yyy}"}]}]}, "then": [{"N": ...}], "else": [{"N": ...}]}
+{"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}, {"or": ["{xxx}", {"not": "{yyy}"}]}, {"not-empty": "{virus-type}"}]}, "then": [{"N": ...}], "else": [{"N": ...}]}
 
 * Node modifications
 
@@ -49,6 +49,8 @@
 {"N": "aa-transitions", "report": false} -- use upon hiding nodes
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
+
+{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": true}
 
 ** Report
 

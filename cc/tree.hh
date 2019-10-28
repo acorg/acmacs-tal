@@ -166,6 +166,8 @@ namespace acmacs::tal::inline v3
         void update_aa_transitions() const;
         void report_aa_transitions() const;
 
+        void set_clade(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name);
+
       private:
         std::string data_buffer_;
         std::string virus_type_;
