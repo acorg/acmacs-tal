@@ -544,15 +544,20 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
     set_row_no();
 
     size_t num = 0;
+    std::vector<std::pair<const Node*, const Node*>> sections;
     const std::string name_s{name};
-    tree::iterate_leaf(*this, [&substitutions,name_s,&num](Node& node) {
+    tree::iterate_leaf(*this, [&substitutions,name_s,&num,&sections](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
+            if (sections.empty() || (node.row_no_ - sections.back().second->row_no_) > 1)
+                sections.emplace_back(&node, &node);
+            else
+                sections.back().second = &node;
         }
     });
 
-    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves\n", name, display_name, num);
+    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves, {} sections\n", name, display_name, num, sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
