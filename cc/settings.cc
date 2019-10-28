@@ -84,8 +84,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         [this, &selected]<typename T>(T && arg) {
             if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
                 if (arg == "hide") {
-                    for (Node* node : selected)
-                        node->hidden = true;
+                    tree().hide(selected);
                 }
                 else if (arg == "color") {
                     fmt::print(stderr, "DEBUG: apply color {}\n", getenv("tree-label", ""));

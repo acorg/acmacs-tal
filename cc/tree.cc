@@ -183,6 +183,16 @@ void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const ac
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
+{
+    for (Node* node : nodes)
+        node->hidden = true;
+    row_no_set_ = false;
+
+} // acmacs::tal::v3::Tree::hide
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
 {
     acmacs::seqdb::setup(seqdb_filename);
@@ -259,6 +269,8 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
           fmt::print(stderr, "WARNING: no ladderizing\n");
           break;
     }
+
+    row_no_set_ = false;
 
 } // acmacs::tal::v3::Tree::ladderize
 
@@ -346,6 +358,8 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
 
     if (cumulative_edge_length != EdgeLengthNotSet)
         cumulative_calculate(true);
+
+    row_no_set_ = false;
 
 } // acmacs::tal::v3::Tree::re_root
 
@@ -527,10 +541,12 @@ void acmacs::tal::v3::Tree::clades_reset()
 
 void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name)
 {
+    set_row_no();
+
     size_t num = 0;
     const std::string name_s{name};
     tree::iterate_leaf(*this, [&substitutions,name_s,&num](Node& node) {
-        if (acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
+        if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
         }
@@ -546,6 +562,21 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
 {
 
 } // acmacs::tal::v3::Tree::clade_report
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::set_row_no() const
+{
+    if (!row_no_set_) {
+        size_t row_no = 0;
+        tree::iterate_leaf(*this, [&row_no](const Node& node) {
+            if (!node.hidden)
+                node.row_no_ = row_no++;
+        });
+        row_no_set_ = true;
+    }
+
+} // acmacs::tal::v3::Tree::set_row_no
 
 // ----------------------------------------------------------------------
 

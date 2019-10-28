@@ -77,8 +77,11 @@ namespace acmacs::tal::inline v3
         std::vector<std::string_view> aa_substs;
 
         // -------------------- not exported --------------------
+        // all nodes
         mutable size_t number_leaves_in_subtree_{1};
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
+        // leaf node only
+        mutable size_t row_no_;
         // middle node only
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
@@ -150,6 +153,8 @@ namespace acmacs::tal::inline v3
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
 
+        void hide(const NodeSet& nodes);
+
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
 
@@ -176,8 +181,9 @@ namespace acmacs::tal::inline v3
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
+        mutable bool row_no_set_{false};
 
-
+        void set_row_no() const;
     };
 
     // ----------------------------------------------------------------------
