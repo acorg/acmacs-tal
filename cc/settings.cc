@@ -171,9 +171,11 @@ void acmacs::tal::v3::Settings::clade() const
         throw error{"empty clade name"};
     const auto display_name = getenv("display_name", clade_name);
     const auto report = getenv("report", false);
+    const auto inclusion_tolerance = getenv("inclusion_tolerance", 0UL);
+    const auto exclusion_tolerance = getenv("exclusion_tolerance", 0UL);
 
     if (const auto& substitutions = getenv("substitutions"); !substitutions.is_null())
-        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name);
+        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name, inclusion_tolerance, exclusion_tolerance);
     else
         throw error{"no \"substitutions\" provided"};
 

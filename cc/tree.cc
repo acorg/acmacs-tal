@@ -543,25 +543,31 @@ void acmacs::tal::v3::Tree::clades_reset()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name, size_t inclusion_tolerance,
+                                      size_t exclusion_tolerance)
 {
     set_row_no();
 
     size_t num = 0;
     const std::string name_s{name};
     auto& clade_sections = clades_.emplace(name_s, clade_sections_t{}).first->second;
-    tree::iterate_leaf(*this, [&substitutions,name_s,&num,&clade_sections](Node& node) {
+    tree::iterate_leaf(*this, [&substitutions, name_s, &num, &clade_sections, inclusion_tolerance](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
-            if (clade_sections.empty() || (node.row_no_ - clade_sections.back().last->row_no_) > 1)
-                clade_sections.emplace_back(&node);
-            else
+            if (!clade_sections.empty() && (node.row_no_ - clade_sections.back().last->row_no_) <= inclusion_tolerance)
                 clade_sections.back().last = &node;
+            else
+                clade_sections.emplace_back(&node);
         }
     });
 
-    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves, {} sections\n", name, display_name, num, clade_sections.size());
+    // // remove small sections
+    // clade_sections.erase(
+    //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last - section.first) < static_cast<ssize_t>(exclusion_tolerance); }),
+    //     std::end(clade_sections));
+
+    fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
