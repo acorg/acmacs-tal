@@ -11,6 +11,7 @@
   {"?N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
   {"N": "ladderize", "method": "{ladderize-method}"},
-  {"N": "update-common-aa", "report": false}
+  {"?N": "update-common-aa", "report": false},
+  {"N": "aa-transitions", "report": false}
  ]
 }

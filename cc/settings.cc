@@ -6,15 +6,23 @@
 void acmacs::tal::v3::Settings::tree(Tree& tree)
 {
     tree_ = &tree;
-    setenv("virus-type", tree.virus_type());
-    setenv("lineage", tree.lineage());
-    setenv("tree-has-sequences", tree.has_sequences());
+    update_env();
 
 } // acmacs::tal::v3::Settings::tree
 
 // ----------------------------------------------------------------------
 
-bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
+void acmacs::tal::v3::Settings::update_env()
+{
+    setenv_toplevel("virus-type", tree_->virus_type());
+    setenv_toplevel("lineage", tree_->lineage());
+    setenv_toplevel("tree-has-sequences", tree_->has_sequences());
+
+} // acmacs::tal::v3::Settings::update_env
+
+// ----------------------------------------------------------------------
+
+bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
 {
     try {
         // printenv();
@@ -23,6 +31,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name) const
         }
         else if (name == "seqdb") {
             tree().match_seqdb(getenv("filename", ""));
+            update_env();
         }
         else if (name == "ladderize") {
             if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")

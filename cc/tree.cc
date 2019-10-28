@@ -493,24 +493,6 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
                 node.node_for_left_aa_transitions_ = *node_for_left;
             }
-            // else
-            //     fmt::print(stderr, "DEBUG: no node_for_left {} = {} - {}\n", node_left_edge, node.cumulative_edge_length, node.edge_length);
-
-            // auto lb = sorted_leaf_nodes.begin();
-            // for (auto ln = sorted_leaf_nodes.begin() + 1; ln != sorted_leaf_nodes.end(); ++ln) {
-            //     if ((*ln)->cumulative_edge_length < node_left_edge) {
-            //         lb = ln;
-            //         break;
-            //     }
-            // }
-
-            // const Node* node_for_left = lb == sorted_leaf_nodes.begin() ? nullptr : *(lb - 1);
-            // for (const auto& transition : node.aa_transitions_) {
-            //     if (node_for_left && node_for_left->data.amino_acids().size() > transition.pos) { // node_for_left can have shorter aa
-            //         transition.left = node_for_left->data.amino_acids()[transition.pos];
-            //         transition.for_left = node_for_left;
-            //     }
-            // }
         }
 
         node.aa_transitions_.remove_left_right_same();
