@@ -12,6 +12,7 @@
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
-  {"N": "aa-transitions", "report": false}
+  {"N": "aa-transitions", "report": false},
+  {"N": "if", "condition": {"and": ["{whocc}", "{virus-type}"]}, "then": ["clades-{virus-type}{lineage}"]}
  ]
 }

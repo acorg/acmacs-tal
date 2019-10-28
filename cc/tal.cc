@@ -48,7 +48,6 @@ int main(int argc, const char *argv[])
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
 
-
         acmacs::tal::Settings settings;
         for (const auto settings_file_name : {"tal.json", "clades.json"}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
