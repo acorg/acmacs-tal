@@ -1,5 +1,4 @@
 #include "acmacs-base/read-file.hh"
-#include "acmacs-base/string-split.hh"
 #include "acmacs-tal/settings.hh"
 
 // ----------------------------------------------------------------------
@@ -168,8 +167,6 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
 
 void acmacs::tal::v3::Settings::clade() const
 {
-    using namespace std::string_view_literals;
-
     const auto clade_name = getenv("name", "");
     if (clade_name.empty())
         throw error{"empty clade name"};
@@ -177,25 +174,7 @@ void acmacs::tal::v3::Settings::clade() const
     const auto report = getenv("report", false);
 
     if (const auto& substitutions = getenv("substitutions"); !substitutions.is_null())
-        std::visit(
-            [this,clade_name,display_name]<typename T>(T && arg) {
-                if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                    tree().clade_set(clade_name, acmacs::string::split(std::forward<T>(arg), " "sv), display_name);
-                }
-                else if constexpr (std::is_same_v<std::decay_t<T>, rjson::array>) {
-                    std::vector<std::string_view> substs;
-                    try {
-                        arg.copy_to(substs);
-                    }
-                    catch (rjson::error& /*err*/) {
-                        throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
-                    }
-                    tree().clade_set(clade_name, substs, display_name);
-                }
-                else
-                    throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
-            },
-            substitutions.val_());
+        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name);
     else
         throw error{"no \"substitutions\" provided"};
 

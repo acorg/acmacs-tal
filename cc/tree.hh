@@ -169,7 +169,7 @@ namespace acmacs::tal::inline v3
         void report_aa_transitions() const;
 
         void clades_reset();
-        void clade_set(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name);
+        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name);
         void clade_report(std::string_view name) const;
 
       private:

@@ -525,13 +525,18 @@ void acmacs::tal::v3::Tree::clades_reset()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name)
 {
-    tree::iterate_leaf(*this, [](Node& node) {
-
+    size_t num = 0;
+    const std::string name_s{name};
+    tree::iterate_leaf(*this, [&substitutions,name_s,&num](Node& node) {
+        if (acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
+            node.clades.add(name_s);
+            ++num;
+        }
     });
 
-    // fmt::print(stderr, "DEBUG: set clade \"{}\" (\"{}\"): {}\n", name, display_name, substitutions);
+    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves\n", name, display_name, num);
 
 } // acmacs::tal::v3::Tree::clade_set
 
