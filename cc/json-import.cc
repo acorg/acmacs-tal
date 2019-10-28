@@ -118,7 +118,7 @@ namespace
                     node_.aa_substs.push_back(data);
                     break;
                 case array_processing::clades:
-                    node_.clades.push_back(data);
+                    node_.clades.add(std::string{data});
                     break;
                 case array_processing::subnodes:
                     throw in_json::parse_error(fmt::format("unsupported string \"{}\" for key \"{}\"", data, key_));

@@ -9,6 +9,7 @@
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/date.hh"
 #include "acmacs-base/color.hh"
+#include "acmacs-base/flat-set.hh"
 #include "seqdb-3/aa-at-pos.hh"
 #include "acmacs-tal/aa-transition.hh"
 
@@ -66,7 +67,8 @@ namespace acmacs::tal::inline v3
         std::string_view continent;
         std::string_view country;
         std::vector<std::string_view> hi_names;
-        std::vector<std::string_view> clades;
+        acmacs::flat_set_t<std::string> clades;
+
         Color color_tree_label{BLACK}; // -> export
         Color color_time_series_dash{BLACK}; // -> export
 
@@ -166,7 +168,9 @@ namespace acmacs::tal::inline v3
         void update_aa_transitions() const;
         void report_aa_transitions() const;
 
-        void set_clade(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name);
+        void clades_reset();
+        void clade_set(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name);
+        void clade_report(std::string_view name) const;
 
       private:
         std::string data_buffer_;

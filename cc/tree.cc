@@ -517,15 +517,30 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::set_clade(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name)
+void acmacs::tal::v3::Tree::clades_reset()
 {
-    if (name.empty())
-        throw error{"invalid clade definition: empty name"};
-    if (display_name.empty())
-        display_name = name;
-    fmt::print(stderr, "DEBUG: set clade \"{}\" (\"{}\"): {}\n", name, display_name, substitutions);
+    tree::iterate_leaf(*this, [](Node& node) { node.clades.clear(); });
 
-} // acmacs::tal::v3::Tree::set_clade
+} // acmacs::tal::v3::Tree::clades_reset
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const std::vector<std::string_view>& substitutions, std::string_view display_name)
+{
+    tree::iterate_leaf(*this, [](Node& node) {
+
+    });
+
+    // fmt::print(stderr, "DEBUG: set clade \"{}\" (\"{}\"): {}\n", name, display_name, substitutions);
+
+} // acmacs::tal::v3::Tree::clade_set
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
+{
+
+} // acmacs::tal::v3::Tree::clade_report
 
 // ----------------------------------------------------------------------
 

@@ -33,6 +33,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             if (getenv("report", false))
                 tree().report_aa_transitions();
         }
+        else if (name == "clades-reset") {
+            tree().clades_reset();
+        }
         else if (name == "clade") {
             clade();
         }
@@ -167,11 +170,17 @@ void acmacs::tal::v3::Settings::clade() const
 {
     using namespace std::string_view_literals;
 
+    const auto clade_name = getenv("name", "");
+    if (clade_name.empty())
+        throw error{"empty clade name"};
+    const auto display_name = getenv("display_name", clade_name);
+    const auto report = getenv("report", false);
+
     if (const auto& substitutions = getenv("substitutions"); !substitutions.is_null())
         std::visit(
-            [this]<typename T>(T && arg) {
+            [this,clade_name,display_name]<typename T>(T && arg) {
                 if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                    tree().set_clade(getenv("name", ""), acmacs::string::split(std::forward<T>(arg), " "sv), getenv("display_name", ""));
+                    tree().clade_set(clade_name, acmacs::string::split(std::forward<T>(arg), " "sv), display_name);
                 }
                 else if constexpr (std::is_same_v<std::decay_t<T>, rjson::array>) {
                     std::vector<std::string_view> substs;
@@ -181,7 +190,7 @@ void acmacs::tal::v3::Settings::clade() const
                     catch (rjson::error& /*err*/) {
                         throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
                     }
-                    tree().set_clade(getenv("name", ""), substs, getenv("display_name", ""));
+                    tree().clade_set(clade_name, substs, display_name);
                 }
                 else
                     throw error{fmt::format("invalid \"substitutions\" value: {}", arg)};
@@ -189,6 +198,9 @@ void acmacs::tal::v3::Settings::clade() const
             substitutions.val_());
     else
         throw error{"no \"substitutions\" provided"};
+
+    if (report)
+        tree().clade_report(clade_name);
 
 } // acmacs::tal::v3::Settings::clade
 

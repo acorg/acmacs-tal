@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-28 15:26:06 eu>
+# Time-stamp: <2019-10-28 15:37:39 eu>
 
 * Command line defines
 
@@ -50,6 +50,7 @@
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 
+{"N": "clades-reset"}
 {"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": true}
 
 ** Report
