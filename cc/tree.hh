@@ -175,13 +175,24 @@ namespace acmacs::tal::inline v3
 
         void clades_reset();
         void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name);
-        void clade_report(std::string_view name) const;
+        void clade_report(std::string_view name={}) const;
 
       private:
+        struct clade_section_t
+        {
+            clade_section_t(const Node* node) : first{node}, last{node} {}
+            const Node* first;
+            const Node* last;
+        };
+
+        using clade_sections_t = std::vector<clade_section_t>;
+        using clades_t = std::map<std::string, clade_sections_t, std::less<>>;
+
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
         mutable bool row_no_set_{false};
+        clades_t clades_;
 
         void set_row_no() const;
     };

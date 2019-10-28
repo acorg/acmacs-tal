@@ -188,6 +188,7 @@ void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
     for (Node* node : nodes)
         node->hidden = true;
     row_no_set_ = false;
+    clades_reset();
 
 } // acmacs::tal::v3::Tree::hide
 
@@ -271,6 +272,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
     }
 
     row_no_set_ = false;
+    clades_reset();
 
 } // acmacs::tal::v3::Tree::ladderize
 
@@ -360,6 +362,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
         cumulative_calculate(true);
 
     row_no_set_ = false;
+    clades_reset();
 
 } // acmacs::tal::v3::Tree::re_root
 
@@ -534,6 +537,7 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 void acmacs::tal::v3::Tree::clades_reset()
 {
     tree::iterate_leaf(*this, [](Node& node) { node.clades.clear(); });
+    clades_.clear();
 
 } // acmacs::tal::v3::Tree::clades_reset
 
@@ -544,20 +548,20 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
     set_row_no();
 
     size_t num = 0;
-    std::vector<std::pair<const Node*, const Node*>> sections;
     const std::string name_s{name};
-    tree::iterate_leaf(*this, [&substitutions,name_s,&num,&sections](Node& node) {
+    auto& clade_sections = clades_.emplace(name_s, clade_sections_t{}).first->second;
+    tree::iterate_leaf(*this, [&substitutions,name_s,&num,&clade_sections](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
-            if (sections.empty() || (node.row_no_ - sections.back().second->row_no_) > 1)
-                sections.emplace_back(&node, &node);
+            if (clade_sections.empty() || (node.row_no_ - clade_sections.back().last->row_no_) > 1)
+                clade_sections.emplace_back(&node);
             else
-                sections.back().second = &node;
+                clade_sections.back().last = &node;
         }
     });
 
-    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves, {} sections\n", name, display_name, num, sections.size());
+    fmt::print(stderr, "DEBUG: clade \"{}\" (\"{}\"): {} leaves, {} sections\n", name, display_name, num, clade_sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
@@ -565,6 +569,24 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
 
 void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
 {
+    const auto report = [](std::string_view clade_name, const auto& sections) {
+        fmt::print("Clade \"{}\" ({})\n", clade_name, sections.size());
+        for (auto it = std::begin(sections); it != std::end(sections); ++it) {
+            if (it != std::begin(sections))
+                fmt::print("    gap {}\n", it->first->row_no_ - std::prev(it)->last->row_no_ - 1);
+            fmt::print(" ({}) {} {} .. {} {}\n", it->last->row_no_ - it->first->row_no_ + 1, it->first->row_no_, it->first->seq_id, it->last->row_no_, it->last->seq_id);
+        }
+        fmt::print("\n");
+    };
+
+    if (name.empty()) {
+        for (const auto& [clade_name, clade_sections] : clades_)
+            report(clade_name, clade_sections);
+    }
+    else if (const auto found = clades_.find(name); found != clades_.end())
+        report(name, found->second);
+    else
+        fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", name);
 
 } // acmacs::tal::v3::Tree::clade_report
 
