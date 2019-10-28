@@ -1,5 +1,6 @@
 #include "acmacs-base/argv.hh"
 #include "acmacs-base/acmacsd.hh"
+#include "acmacs-base/filesystem.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/settings.hh"
@@ -41,13 +42,20 @@ struct Options : public argv
 
 int main(int argc, const char *argv[])
 {
+    using namespace std::string_view_literals;
+
     try {
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
 
 
         acmacs::tal::Settings settings;
-        settings.load(fmt::format("{}/share/conf/tal.json", acmacs::acmacsd_root()));
+        for (const auto settings_file_name : {"tal.json", "clades.json"}) {
+            if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
+                settings.load(filename);
+            else
+                fmt::print(stderr, "WARNING: cannot load \"{}\": file not found\n", filename);
+        }
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
             if (const auto pos = def.find('='); pos != std::string_view::npos)
