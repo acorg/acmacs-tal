@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-28 13:54:23 eu>
+# Time-stamp: <2019-10-29 10:09:23 eu>
 
 * Settings
 - layout
@@ -39,7 +39,7 @@
 *** DONE Stat by month for time series
 *** SOMETHING Infer AA subst for subrees ("to" part of AA)
 *** SOMETHING Infer "from" part of AA subst --> aa-transition.hh
-*** Infer clades
+*** SOMETHING Infer clades
 - regular clades
   - remove small clades
 - H1 183P subclades
