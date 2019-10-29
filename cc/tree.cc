@@ -550,24 +550,24 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
 
     size_t num = 0;
     const std::string name_s{name};
-    auto& clade_sections = clades_.emplace(name_s, clade_sections_t{}).first->second;
+    auto& clade_sections = find_clade(name, display_name).sections;
     tree::iterate_leaf(*this, [&substitutions, name_s, &num, &clade_sections, inclusion_tolerance](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
-            if (!clade_sections.empty() && (node.row_no_ - clade_sections.back().last->row_no_) <= inclusion_tolerance)
-                clade_sections.back().last = &node;
-            else
+            if (clade_sections.empty() || (node.row_no_ - clade_sections.back().last->row_no_) > inclusion_tolerance)
                 clade_sections.emplace_back(&node);
+            else
+                clade_sections.back().last = &node;
         }
     });
 
-    // // remove small sections
-    // clade_sections.erase(
-    //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last - section.first) < static_cast<ssize_t>(exclusion_tolerance); }),
-    //     std::end(clade_sections));
+    // remove small sections
+    clade_sections.erase(
+        std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->row_no_ - section.first->row_no_) < exclusion_tolerance; }),
+        std::end(clade_sections));
 
-    fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
+    // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
@@ -586,11 +586,11 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
     };
 
     if (name.empty()) {
-        for (const auto& [clade_name, clade_sections] : clades_)
-            report(clade_name, clade_sections);
+        for (const auto& clade : clades_)
+            report(clade.name, clade.sections);
     }
-    else if (const auto found = clades_.find(name); found != clades_.end())
-        report(name, found->second);
+    else if (const auto* found = find_clade(name); found)
+        report(name, found->sections);
     else
         fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", name);
 

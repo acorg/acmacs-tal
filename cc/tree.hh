@@ -185,8 +185,31 @@ namespace acmacs::tal::inline v3
             const Node* last;
         };
 
-        using clade_sections_t = std::vector<clade_section_t>;
-        using clades_t = std::map<std::string, clade_sections_t, std::less<>>;
+        struct clade_t
+        {
+            clade_t(std::string_view nam, std::string_view disp) : name{nam}, display_name{disp.empty() ? nam : disp} {}
+            std::string name;
+            std::string display_name;
+            std::vector<clade_section_t> sections;
+        };
+
+        using clades_t = std::vector<clade_t>;
+
+        const clade_t* find_clade(std::string_view name) const
+        {
+            if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+                return &*found;
+            else
+                return nullptr;
+        }
+
+        clade_t& find_clade(std::string_view name, std::string_view display_name = {})
+        {
+            if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+                return *found;
+            else
+                return clades_.emplace_back(name, display_name);
+        }
 
         std::string data_buffer_;
         std::string virus_type_;
