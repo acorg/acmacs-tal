@@ -26,6 +26,7 @@ namespace acmacs::tal::inline v3
         void apply_nodes() const;
         void update_env();
         void clade() const;
+        void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
     };
 
 } // namespace acmacs::tal::inlinev3

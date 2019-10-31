@@ -11,6 +11,7 @@
 #include "acmacs-base/color.hh"
 #include "acmacs-base/flat-set.hh"
 #include "seqdb-3/aa-at-pos.hh"
+#include "seqdb-3/seq-id.hh"
 #include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
@@ -114,6 +115,9 @@ namespace acmacs::tal::inline v3
     {
       public:
         NodeSetT() = default;
+
+        void add(const NodeSetT<N>& another) { std::copy(std::begin(another), std::end(another), std::back_inserter(*this)); }
+        void filter(const NodeSetT<N>& another) { this->erase(std::remove_if(this->begin(), this->end(), [&another](const auto& en) { return std::find(std::begin(another), std::end(another), en) == std::end(another); }), this->end()); }
     };
 
     using NodeSet = NodeSetT<Node*>;

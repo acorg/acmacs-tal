@@ -1,4 +1,8 @@
 #include "acmacs-base/read-file.hh"
+#include "acmacs-base/range-v3.hh"
+#include "acmacs-base/string.hh"
+#include "acmacs-virus/virus-name.hh"
+#include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-tal/settings.hh"
 
 // ----------------------------------------------------------------------
@@ -151,6 +155,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         else if (key == "report") {
             report = val.to<bool>();
         }
+        else if (key == "vaccine") {
+            select_vaccine(selected, update, val);
+        }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
         if (key != "report")
@@ -183,6 +190,50 @@ void acmacs::tal::v3::Settings::clade() const
         tree().clade_report(clade_name);
 
 } // acmacs::tal::v3::Settings::clade
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const
+{
+    const auto names = ranges::to<std::vector<std::string>>(
+        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv("virus-type", "")}, acmacs::virus::lineage_t{getenv("lineage", "")})
+        | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::get_or(criteria, "type", "any"))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
+        | ranges::views::transform([](const auto& en) { return en.name; }));
+
+    fmt::print(stderr, "DEBUG: select_vaccine {}\n", names);
+    NodeSet selected_nodes;
+    for (const auto& name : names) {
+        NodeSet some_nodes;
+        tree().select_by_seq_id(some_nodes, Tree::Select::init, *acmacs::seqdb::make_seq_id(name));
+        selected_nodes.add(some_nodes);
+    }
+
+    if (const auto passage = ::string::lower(rjson::get_or(criteria, "passage", "")); !passage.empty()) {
+        const auto exclude_by_passage = [&passage](const auto* node) {
+            const auto& name_parts = acmacs::virus::parse_name(node->seq_id, acmacs::virus::parse_name_f::none);
+            if (passage == "cell")
+                return !name_parts.passage.is_cell();
+            else if (passage == "egg")
+                return !name_parts.passage.is_egg();
+            else if (passage == "reassortant")
+                return name_parts.reassortant.empty();
+            else
+                return false;
+        };
+        selected_nodes.erase(std::remove_if(std::begin(selected_nodes), std::end(selected_nodes), exclude_by_passage), std::end(selected_nodes));
+    }
+
+    switch (update) {
+      case Tree::Select::init:
+          nodes = selected_nodes;
+          break;
+      case Tree::Select::update:
+          nodes.filter(selected_nodes);
+          break;
+    }
+    // report_nodes(fmt::format("INFO: select_vaccine: {} selected nodes {}\n", nodes.size(), criteria), "  ", nodes);
+
+} // acmacs::tal::v3::Settings::select_vaccine
 
 // ----------------------------------------------------------------------
 

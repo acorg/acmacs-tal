@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-29 10:19:17 eu>
+# Time-stamp: <2019-10-31 15:16:49 eu>
 
 * Command line defines
 
@@ -67,6 +67,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"cumulative >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 {"seq_id": "regexp", "report": true}
+{"vaccine": {"type": "current", "passage": "cell"}, "report": true}
 
 * COMMENT ====== local vars
 :PROPERTIES:
