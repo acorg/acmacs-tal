@@ -169,6 +169,12 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             tree().match(chart());
             tree().select_matches_chart_antigens(selected, update);
         }
+        else if (key == "matches-chart-serum") {
+            if (!chart_)
+                throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
+            tree().match(chart());
+            tree().select_matches_chart_sera(selected, update, val.to<std::string_view>());
+        }
         else if (key == "seq_id") {
             tree().select_by_seq_id(selected, update, val.to<std::string_view>());
         }
