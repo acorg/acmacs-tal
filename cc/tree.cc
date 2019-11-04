@@ -188,9 +188,28 @@ void acmacs::tal::v3::Tree::select_matches_chart_antigens(NodeSet& nodes, Select
     select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && node.antigen_index_in_chart_.has_value(); });
 }
 
-void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select update, std::string_view match_type)
+void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select update, serum_match_t match_type)
 {
-    select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && !node.serum_index_in_chart_.empty(); });
+    const auto serum_matches = [match_type](const Node& node) -> bool {
+        if (!node.is_leaf())
+            return false;
+        for (const auto& [serum_index, reassortant_matches, passage_type_matches] : node.serum_index_in_chart_) {
+            switch (match_type) {
+              case serum_match_t::name:
+                  return true;
+              case serum_match_t::reassortant:
+                  if (reassortant_matches)
+                      return true;
+                  break;
+              case serum_match_t::passage_type:
+                  if (reassortant_matches && passage_type_matches)
+                      return true;
+                  break;
+            }
+        }
+        return false;
+    };
+    select_update(nodes, update, Descent::yes, *this, serum_matches);
 }
 
 // ----------------------------------------------------------------------
@@ -634,21 +653,20 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
         std::map<acmacs::virus::name_t, std::vector<size_t>, std::less<>> serum_names;
         for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
             antigen_names[antigens->at(ag_no)->full_name()] = ag_no;
-        for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no) {
-            fmt::print(stderr, "DEBUG: serum name \"{}\": {}\n", sera->at(sr_no)->name(), sr_no);
+        for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
             serum_names[sera->at(sr_no)->name()].push_back(sr_no);
-        }
-        tree::iterate_leaf(*this, [&antigen_names,&serum_names](const Node& node) {
+        tree::iterate_leaf(*this, [&antigen_names,&serum_names,&sera](const Node& node) {
             for (const auto& hi_name : node.hi_names) {
                 if (const auto found = antigen_names.find(hi_name); found != std::end(antigen_names)) {
                     node.antigen_index_in_chart_ = found->second;
                     break;
                 }
             }
-            const auto parsed = acmacs::virus::parse_name(node.seq_id);
-            fmt::print(stderr, "DEBUG: node parsed name \"{}\"\n", parsed.name);
-            if (const auto found = serum_names.find(parsed.name); found != std::end(serum_names))
-                node.serum_index_in_chart_ = found->second;
+            const auto parsed_seq_id = acmacs::virus::parse_name(node.seq_id);
+            if (const auto found = serum_names.find(parsed_seq_id.name); found != std::end(serum_names)) {
+                for (auto serum_index : found->second)
+                    node.serum_index_in_chart_.emplace_back(serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant, sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg());
+            }
         });
         chart_matched_ = true;
     }

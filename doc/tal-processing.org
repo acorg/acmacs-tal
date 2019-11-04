@@ -1,4 +1,4 @@
-# Time-stamp: <2019-11-04 12:44:46 eu>
+# Time-stamp: <2019-11-04 15:01:41 eu>
 
 * Settings
 - layout
@@ -37,8 +37,6 @@
 *** DONE Re-root
 *** DONE Continents and countries
 *** DONE Stat by month for time series
-*** SOMETHING Infer AA subst for subrees ("to" part of AA)
-*** SOMETHING Infer "from" part of AA subst --> aa-transition.hh
 *** DONE Infer clades
 - regular clades
   - remove small clades
@@ -48,10 +46,6 @@
 please use the earliest cell based isolate from a cc.  as when
 looking in trees we are looking at what eveolved from what, and how
 the evolution might have gone, and do not care about egg adaptions.
-*** Infer hz sections
-- infer all as substitute for section
-- AA subst for a section (to be shown in the map title)
-- hide/show sections
 *** Hide subtrees and leaves
 **** DONE hide if cumulative edge length bigger than
 **** DONE hide isolated before
@@ -59,15 +53,22 @@ the evolution might have gone, and do not care about egg adaptions.
 **** DONE hide by aa
 **** hide between
 **** hide not found in chart
+*** DONE Match antigens and sera from chart
+**** DONE tracked antigens
+**** DONE tracked sera
+- egg/cell/reasortant matched, all matched by antigen name without passage
+*** SOMETHING Infer AA subst for subrees ("to" part of AA)
+*** SOMETHING Infer "from" part of AA subst --> aa-transition.hh
+*** Infer hz sections
+**** infer all as substitute for section
+**** AA subst for a section (to be shown in the map title)
+**** hide/show sections
+**** tracked antigens for each section
+**** tracked sera for each section
+**** infer all aa substitutions for a panel, find all sequenced ags in chart that have those aa substitutions and find all Sera in chart with names of those antigens and draw circles
 *** AAAtPosDraw
 - find_most_diverse_positions
 - infer sections: make_aa_pos_sections
-*** SOMETHING Match antigens and sera from chart
-**** DONE tracked antigens for each section
-**** tracked sera for each section
-  - egg/cell/reasortant matched
-  - all matched by antigen name without passage
-  - infer all as substitute for a panel, find all sequenced ags in chart that have those aa substitutions and find all Sera in chart with names of those antigens and draw circles
 
 
 * Draw

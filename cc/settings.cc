@@ -173,7 +173,14 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             if (!chart_)
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(chart());
-            tree().select_matches_chart_sera(selected, update, val.to<std::string_view>());
+            Tree::serum_match_t mt{Tree::serum_match_t::name};
+            if (const auto match_type = val.to<std::string_view>(); match_type == "reassortant")
+                mt = Tree::serum_match_t::reassortant;
+            else if (match_type == "passage")
+                mt = Tree::serum_match_t::passage_type;
+            else if (match_type != "name")
+                fmt::print(stderr, "WARNING: unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed\n", match_type);
+            tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id") {
             tree().select_by_seq_id(selected, update, val.to<std::string_view>());

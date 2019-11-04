@@ -90,7 +90,7 @@ namespace acmacs::tal::inline v3
         // leaf node only
         mutable size_t row_no_;
         mutable std::optional<size_t> antigen_index_in_chart_;
-        mutable std::vector<size_t> serum_index_in_chart_;
+        mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
         // middle node only
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
@@ -165,7 +165,9 @@ namespace acmacs::tal::inline v3
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
         void select_matches_chart_antigens(NodeSet& nodes, Select update);
-        void select_matches_chart_sera(NodeSet& nodes, Select update, std::string_view match_type); // match_type: name, reassortant, passage
+
+        enum class serum_match_t { name, reassortant, passage_type };
+        void select_matches_chart_sera(NodeSet& nodes, Select update, serum_match_t match_type);
 
         void hide(const NodeSet& nodes);
 
