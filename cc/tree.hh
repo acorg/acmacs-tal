@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <optional>
 #include <algorithm>
 
 #include "acmacs-base/named-type.hh"
@@ -15,6 +16,11 @@
 #include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
+
+namespace acmacs::chart
+{
+    class Chart;
+}
 
 namespace acmacs::tal::inline v3
 {
@@ -83,6 +89,7 @@ namespace acmacs::tal::inline v3
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
         // leaf node only
         mutable size_t row_no_;
+        mutable std::optional<size_t> antigen_index_in_chart_;
         // middle node only
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
@@ -156,6 +163,7 @@ namespace acmacs::tal::inline v3
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
+        void select_matches_chart_antigens(NodeSet& nodes, Select update);
 
         void hide(const NodeSet& nodes);
 
@@ -180,6 +188,8 @@ namespace acmacs::tal::inline v3
         void clades_reset();
         void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name, size_t inclusion_tolerance, size_t exclusion_tolerance);
         void clade_report(std::string_view name={}) const;
+
+        void match(const acmacs::chart::Chart& chart) const;
 
       private:
         struct clade_section_t
@@ -220,6 +230,7 @@ namespace acmacs::tal::inline v3
         std::string lineage_;
         mutable bool row_no_set_{false};
         clades_t clades_;
+        mutable bool chart_matched_{false};
 
         void set_row_no() const;
     };

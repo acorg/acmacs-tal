@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <regex>
+#include <set>
 
 #include "seqdb-3/seqdb.hh"
+#include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
@@ -161,24 +163,29 @@ void acmacs::tal::v3::Tree::select_if_cumulative_more_than(NodeSet& nodes, Selec
 
 void acmacs::tal::v3::Tree::select_all(NodeSet& nodes, Select update)
 {
-    select_update(nodes, update, Descent::yes, *this, [](Node& node) { return node.is_leaf() && !node.hidden; });
+    select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && !node.hidden; });
 }
 
 void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end)
 {
-    select_update(nodes, update, Descent::yes, *this, [start,end](Node& node) { return node.is_leaf() && !node.hidden && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
+    select_update(nodes, update, Descent::yes, *this, [start,end](const Node& node) { return node.is_leaf() && !node.hidden && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
 
 } // acmacs::tal::v3::Tree::select_by_date
 
 void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp)
 {
     std::regex re{std::begin(regexp), std::end(regexp), std::regex_constants::ECMAScript|std::regex_constants::icase|std::regex_constants::optimize};
-    select_update(nodes, update, Descent::yes, *this, [&re](Node& node) {return node.is_leaf() && !node.hidden && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
+    select_update(nodes, update, Descent::yes, *this, [&re](const Node& node) { return node.is_leaf() && !node.hidden && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
 }
 
 void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1)
 {
-    select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](Node& node) {return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
+    select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](const Node& node) { return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
+}
+
+void acmacs::tal::v3::Tree::select_matches_chart_antigens(NodeSet& nodes, Select update)
+{
+    select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && node.antigen_index_in_chart_.has_value(); });
 }
 
 // ----------------------------------------------------------------------
@@ -610,6 +617,28 @@ void acmacs::tal::v3::Tree::set_row_no() const
     }
 
 } // acmacs::tal::v3::Tree::set_row_no
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
+{
+    if (!chart_matched_) {
+        auto antigens = chart.antigens();
+        std::map<std::string, size_t, std::less<>> chart_names;
+        for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
+            chart_names[antigens->at(ag_no)->full_name()] = ag_no;
+        tree::iterate_leaf(*this, [&chart_names](const Node& node) {
+            for (const auto& hi_name : node.hi_names) {
+                if (const auto found = chart_names.find(hi_name); found != std::end(chart_names)) {
+                    node.antigen_index_in_chart_ = found->second;
+                    break;
+                }
+            }
+        });
+        chart_matched_ = true;
+    }
+
+} // acmacs::tal::v3::Tree::match
 
 // ----------------------------------------------------------------------
 

@@ -3,6 +3,7 @@
 #include "acmacs-base/string.hh"
 #include "acmacs-virus/virus-name.hh"
 #include "acmacs-whocc-data/vaccines.hh"
+#include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/settings.hh"
 
 // ----------------------------------------------------------------------
@@ -16,11 +17,24 @@ void acmacs::tal::v3::Settings::tree(Tree& tree)
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::chart(const acmacs::chart::ChartP& chart)
+{
+    chart_ = chart;
+    update_env();
+
+} // acmacs::tal::v3::Settings::chart
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::update_env()
 {
     setenv_toplevel("virus-type", tree_->virus_type());
     setenv_toplevel("lineage", tree_->lineage());
     setenv_toplevel("tree-has-sequences", tree_->has_sequences());
+    setenv_toplevel("chart-present", static_cast<bool>(chart_));
+    if (chart_) {
+        setenv_toplevel("chart-assay", chart_->info()->assay().hi_or_neut());
+    }
 
 } // acmacs::tal::v3::Settings::update_env
 
@@ -148,6 +162,12 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "date") {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
+        }
+        else if (key == "matches-chart-antigen") {
+            if (!chart_)
+                throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
+            tree().match(chart());
+            tree().select_matches_chart_antigens(selected, update);
         }
         else if (key == "seq_id") {
             tree().select_by_seq_id(selected, update, val.to<std::string_view>());

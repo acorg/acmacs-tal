@@ -3,6 +3,7 @@
 #include "acmacs-base/filesystem.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
+#include "acmacs-chart-2/factory-import.hh"
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/import-export.hh"
 
@@ -18,7 +19,7 @@ struct Options : public argv
 
     option<str_array> settings_files{*this, 's'};
     option<str_array> defines{*this, 'D', "--define", desc{"see $ACMACSD_ROOT/share/doc/tal-conf.org"}};
-    option<str>       chart{*this, "chart", desc{"path to a chart for the signature page"}};
+    option<str>       chart_file{*this, "chart", desc{"path to a chart for the signature page"}};
     option<bool>      open{*this, "open"};
     option<bool>      ql{*this, "ql"};
     option<bool>      verbose{*this, 'v', "verbose"};
@@ -65,13 +66,10 @@ int main(int argc, const char *argv[])
 
         auto tree = acmacs::tal::import_tree(opt.tree_file);
         settings.tree(tree);
+        if (opt.chart_file)
+          settings.chart(acmacs::chart::import_from_file(opt.chart_file));
 
         settings.apply("main", acmacs::verbose::yes);
-
-        // if (opt.chart)
-        //     settings.apply("main-integrated");
-        // else
-        //     settings.apply("main-tree");
 
         for (const auto& output : *opt.outputs)
             acmacs::tal::export_tree(tree, output);

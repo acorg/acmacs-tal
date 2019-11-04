@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-29 11:15:28 eu>
+# Time-stamp: <2019-11-04 12:42:50 eu>
 
 * Settings
 - layout
@@ -44,7 +44,7 @@
   - remove small clades
 - H1 183P subclades
 - B/Vic 2del and 3del
-*** Infer vaccines
+*** DONE Infer vaccines
 please use the earliest cell based isolate from a cc.  as when
 looking in trees we are looking at what eveolved from what, and how
 the evolution might have gone, and do not care about egg adaptions.
@@ -62,8 +62,8 @@ the evolution might have gone, and do not care about egg adaptions.
 *** AAAtPosDraw
 - find_most_diverse_positions
 - infer sections: make_aa_pos_sections
-*** Match antigens from chart
-- tracked antigens for each section
+*** SOMETHING Match antigens and sera from chart
+- DONE tracked antigens for each section
 - tracked sera for each section
   - egg/cell/reasortant matched
   - all matched by antigen name without passage
