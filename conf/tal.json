@@ -13,7 +13,7 @@
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
   {"N": "aa-transitions", "report": false},
-  {"N": "if", "condition": {"and": ["{whocc}", "{virus-type}"]}, "then": ["clades-{virus-type}{lineage}"]},
+  {"?N": "if", "condition": {"and": ["{whocc}", "{virus-type}"]}, "then": ["clades-{virus-type}{lineage}"]},
   {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]},
    "then": [{"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
