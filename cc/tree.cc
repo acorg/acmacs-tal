@@ -147,10 +147,10 @@ std::string acmacs::tal::v3::Tree::report_cumulative(verbose verb, CumulativeRep
         result.append(after_cut->format(true));
     }
     result.append(1, '\n');
-    if (verb == verbose::yes) {
-        fmt::print(result);
-        fmt::print("{{\"N\": \"nodes\", \"select\": {{\"cumulative >=\": {:.10f}, \"report\": true}}, \"apply\": \"hide\"}}\n", to_cut->cumulative_edge_length.as_number());
-    }
+    // if (verb == verbose::yes) {
+    //     fmt::print(result);
+    //     fmt::print("{{\"N\": \"nodes\", \"select\": {{\"cumulative >=\": {:.10f}, \"report\": true}}, \"apply\": \"hide\"}}\n", to_cut->cumulative_edge_length.as_number());
+    // }
     result.append("Top nodes sorted by gap to next\n");
     result.append(CumulativeEntry::header(true));
     for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
@@ -171,26 +171,53 @@ std::string acmacs::tal::v3::Tree::report_cumulative(verbose verb, CumulativeRep
 
 void acmacs::tal::v3::Tree::branches_by_edge() const
 {
+    using Entry = std::tuple<const Node*, double, double>; // seq_id, edge_length, cumulative_edge_length, sd_chunk, sd_diff
+    constexpr size_t i_sd = 1, i_sd_diff = 2;
+    using ListEntries = std::vector<Entry>;
+
+    const auto seq_id = [](const Entry& en) -> std::string { if (const auto& sid = std::get<const Node*>(en)->seq_id; sid.empty()) return fmt::format("[{}]", std::get<const Node*>(en)->number_leaves_in_subtree_); else return fmt::format("{}", sid); };
+    const auto edge = [](const Entry& en) -> double { return std::get<const Node*>(en)->edge_length.as_number(); };
+    const auto cumulative = [](const Entry& en) -> double { return std::get<const Node*>(en)->cumulative_edge_length.as_number(); };
+    const auto sd_cumulative = [](const Entry& en) -> double { return std::get<i_sd>(en); };
+    const auto sd_diff = [](const Entry& en) -> double { return std::get<i_sd_diff>(en); };
+    const auto sort_by_edge = [edge](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [edge](const auto& en1, const auto& en2) { return edge(en1) > edge(en2); }); };
+    const auto sort_by_cumulative = [cumulative](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [cumulative](const auto& en1, const auto& en2) { return cumulative(en1) > cumulative(en2); }); };
+    // const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}  {:.10f} {:.10f}  {}\n", edge(en), cumulative(en), sd_cumulative(en), sd_diff(en), seq_id(en)); };
+    const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}   {}\n", edge(en), cumulative(en), seq_id(en)); };
+
     cumulative_calculate();
+    fmt::print("max cumulative: {}\n", max_cumulative_shown().as_number());
 
-    std::vector<CumulativeEntry> nodes;
-    tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.emplace_back(node.seq_id, node.edge_length, node.cumulative_edge_length); });
-    std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.edge_length > en2.edge_length; });
-    for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it)
-        it->set_gap(*std::next(it), false);
-    // const size_t twenty_percent = nodes.size() / 5;
+    ListEntries nodes;
 
-    const auto mean_gap_to_next = std::accumulate(std::begin(nodes), std::prev(std::end(nodes)), 0.0, [](double acc, const auto& en) { return acc + en.gap_to_next.as_number(); }) / (nodes.size() - 1);
-    fmt::print("mean_gap_to_next: {}\n", mean_gap_to_next);
-    const auto mean_edge = std::accumulate(std::begin(nodes), std::end(nodes), 0.0, [](double acc, const auto& en) { return acc + en.edge_length.as_number(); }) / nodes.size();
-    fmt::print("mean_edge: {}\n", mean_edge);
+    const auto collect = [&nodes](const Node& node) { nodes.emplace_back(&node, 0.0, 0.0); };
+    tree::iterate_leaf_pre(*this, collect, collect);
+    // sort_by_cumulative(nodes);
+    sort_by_edge(nodes);
 
-    fmt::print("Nodes by edge\n");
-    fmt::print(CumulativeEntry::header(false));
+    fmt::print("mean edge {}\n", acmacs::statistics::mean(std::begin(nodes), std::end(nodes), edge));
+    fmt::print("mean edge (top 20%  ) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 5), edge));
+    fmt::print("mean edge (top 10%  ) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 10), edge));
+    fmt::print("mean edge (top  5%  ) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 20), edge));
+    fmt::print("mean edge (top  1%  ) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 100), edge));
+    fmt::print("mean edge (top  0.5%) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 200), edge));
+    fmt::print("HINT: hide by edge, if edge > mean of top 1%\n\n");
+
+    // const auto chunk_size = static_cast<ssize_t>(nodes.size() / 10);
+    // for (auto it = std::begin(nodes); it != std::prev(std::end(nodes), chunk_size); ++it) {
+    //     const auto end = std::next(it, chunk_size);
+    //     std::get<i_sd>(*it) = acmacs::statistics::standard_deviation(it, end, acmacs::statistics::mean(it, end, cumulative), cumulative).population_sd();
+    // }
+    // for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it) {
+    //     std::get<i_sd_diff>(*it) = sd_cumulative(*it) - sd_cumulative(*std::next(it));
+    // }
+
+    sort_by_edge(nodes);
+    //std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
     for (auto [no, entry] : acmacs::enumerate(nodes)) {
-        fmt::print(entry.format(false));
-        // if (no == twenty_percent)
-        //     fmt::print("\n");
+        report(entry);
+        if (no > nodes.size() / 50)
+            break;
     }
     fmt::print("\n");
 
