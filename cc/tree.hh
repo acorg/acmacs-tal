@@ -6,6 +6,7 @@
 #include <optional>
 #include <algorithm>
 
+#include "acmacs-base/debug.hh"
 #include "acmacs-base/named-type.hh"
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/date.hh"
@@ -151,7 +152,7 @@ namespace acmacs::tal::inline v3
         void match_seqdb(std::string_view seqdb_filename);
 
         enum class CumulativeReport { clusters, all };
-        std::string report_cumulative(CumulativeReport report) const;
+        std::string report_cumulative(verbose verb, CumulativeReport report) const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
 
