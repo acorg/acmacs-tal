@@ -155,6 +155,7 @@ namespace acmacs::tal::inline v3
         std::string report_cumulative(verbose verb, CumulativeReport report) const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
+        void branches_by_edge() const;
 
         enum class Select { init, update };
         enum class Descent { no, yes };

@@ -71,6 +71,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
         }
         else if (name == "report-cumulative") {
+            tree().branches_by_edge();
             const auto output_filename = getenv("output", "");
             const auto report = tree().report_cumulative(output_filename.empty() ? verbose::yes : verbose::no, getenv("all", false) ? Tree::CumulativeReport::all : Tree::CumulativeReport::clusters);
             if (!output_filename.empty())
