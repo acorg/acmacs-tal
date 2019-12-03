@@ -43,20 +43,20 @@ struct Options : public argv
 
 int main(int argc, const char *argv[])
 {
-    using namespace std::string_view_literals;
-
     try {
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
+        const acmacs::verbose verbose{opt.verbose ? acmacs::verbose::yes : acmacs::verbose::no};
 
         acmacs::tal::Settings settings;
+        using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
-                settings.load(filename);
+                settings.load(filename, verbose);
             else
                 fmt::print(stderr, "WARNING: cannot load \"{}\": file not found\n", filename);
         }
-        settings.load(opt.settings_files);
+        settings.load(opt.settings_files, verbose);
         for (const auto& def : *opt.defines) {
             if (const auto pos = def.find('='); pos != std::string_view::npos)
                 settings.setenv_from_string(def.substr(0, pos), def.substr(pos + 1));
@@ -69,7 +69,7 @@ int main(int argc, const char *argv[])
         if (opt.chart_file)
           settings.chart(acmacs::chart::import_from_file(opt.chart_file));
 
-        settings.apply("main", acmacs::verbose::yes);
+        settings.apply("main"sv, verbose);
 
         for (const auto& output : *opt.outputs)
             acmacs::tal::export_tree(tree, output);

@@ -26,7 +26,7 @@ namespace acmacs::tal::inline v3
         void chart(const acmacs::chart::ChartP& chart);
         const acmacs::chart::Chart& chart() const { if (!chart_) throw error{"chart was not set"}; return *chart_; }
 
-        bool apply_built_in(std::string_view name) override; // returns true if built-in command with that name found and applied
+        bool apply_built_in(std::string_view name, verbose verb) override; // returns true if built-in command with that name found and applied
 
         void report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const;
         NodeSet select_nodes(const rjson::value& criteria) const;

@@ -40,7 +40,7 @@ void acmacs::tal::v3::Settings::update_env()
 
 // ----------------------------------------------------------------------
 
-bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
+bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose verb)
 {
     try {
         // printenv();
@@ -83,7 +83,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             update_env();
         }
         else
-            return acmacs::settings::Settings::apply_built_in(name);
+            return acmacs::settings::Settings::apply_built_in(name, verb);
         return true;
     }
     catch (std::exception& err) {
@@ -267,9 +267,6 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
     // report_nodes(fmt::format("INFO: select_vaccine: {} selected nodes {}\n", nodes.size(), criteria), "  ", nodes);
 
 } // acmacs::tal::v3::Settings::select_vaccine
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:
