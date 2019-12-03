@@ -2,14 +2,15 @@
  "init": [
   {"N": "set",
    "?report-cumulative-output": "",
+   "?report-time-series-output": "",
    "whocc": false,
    "ladderize-method": "number-of-leaves"
   }
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
-  {"?N": "seqdb", "apply": "{whocc}", "filename": "{seqdb-filename}"},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
+  {"N": "report-time-series", "output": "{report-time-series-output}"},
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
   {"N": "aa-transitions", "report": false},
