@@ -2,6 +2,21 @@
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Draw::prepare()
+{
+    set_width_to_height_ratio();
+} // acmacs::tal::v3::Draw::prepare
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Draw::set_width_to_height_ratio()
+{
+    width_to_height_ratio_ = (layout().width_relative_to_height() + margins().left + margins().right) / (1.0 + margins().top + margins().bottom);
+
+} // acmacs::tal::v3::Draw::set_width_to_height_ratio
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Draw::export_pdf(std::string_view filename) const
 {
     acmacs::surface::PdfCairo pdf{filename, height_ * width_to_height_ratio_, height_, width_to_height_ratio_};

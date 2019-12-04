@@ -9,6 +9,7 @@
  ],
  "layout": [
   {"N": "margins", "?left": 0.1, "outline": true, "outline_color": "cyan", "?outline_width": 10},
+  {"N": "tree"},
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},

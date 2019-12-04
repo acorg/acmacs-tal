@@ -6,10 +6,20 @@
 
 namespace acmacs::tal::inline v3
 {
+    enum class Position { normal, absolute };
+
     class LayoutElement
     {
       public:
+        LayoutElement(double width_to_height_ratio) : width_to_height_ratio_{width_to_height_ratio} {}
         virtual ~LayoutElement() = default;
+
+        constexpr double width_to_height_ratio() const { return width_to_height_ratio_; }
+        constexpr void width_to_height_ratio(double whr) { width_to_height_ratio_ = whr; }
+        virtual Position position() const { return Position::normal; }
+
+      private:
+        double width_to_height_ratio_;
     };
 
     // ----------------------------------------------------------------------

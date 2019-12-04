@@ -12,8 +12,12 @@ void acmacs::tal::v3::Layout::add(std::unique_ptr<LayoutElement> element)
 
 double acmacs::tal::v3::Layout::width_relative_to_height() const
 {
+    double width = 0.0;
     for (const auto& element : elements_) {
+        if (element->position() == Position::normal)
+            width += element->width_to_height_ratio();
     }
+    return width;
 
 } // acmacs::tal::v3::Layout::width_relative_to_height
 

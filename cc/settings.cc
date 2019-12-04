@@ -5,6 +5,7 @@
 #include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/settings.hh"
+#include "acmacs-tal/draw-tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -57,6 +58,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().match_seqdb(getenv("filename", ""));
             update_env();
         }
+        else if (name == "tree")
+            draw().layout().add(std::make_unique<DrawTree>());
         else
             return acmacs::settings::Settings::apply_built_in(name, verb);
         return true;

@@ -22,6 +22,8 @@ namespace acmacs::tal::inline v3
         void export_pdf(std::string_view filename) const;
 
         Margins& margins() { return margins_; }
+        Layout& layout() { return layout_; }
+        void prepare();
 
       private:
         double height_{1000.0};
@@ -29,6 +31,7 @@ namespace acmacs::tal::inline v3
         Margins margins_;
         Layout layout_;
 
+        void set_width_to_height_ratio();
         void draw_outline(acmacs::surface::Surface& surface) const;
     };
 }
