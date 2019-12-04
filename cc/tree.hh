@@ -151,8 +151,7 @@ namespace acmacs::tal::inline v3
 
         void match_seqdb(std::string_view seqdb_filename);
 
-        enum class CumulativeReport { clusters, all };
-        std::string report_cumulative(verbose verb, CumulativeReport report) const;
+        std::string report_cumulative() const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
         void branches_by_edge() const;

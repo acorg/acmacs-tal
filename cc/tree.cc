@@ -74,114 +74,132 @@ acmacs::tal::v3::EdgeLength acmacs::tal::v3::Tree::max_cumulative_shown() const
 
 // ----------------------------------------------------------------------
 
-struct CumulativeEntry
-{
-    acmacs::tal::SeqId seq_id;
-    acmacs::tal::EdgeLength edge_length;
-    acmacs::tal::EdgeLength cumulative_edge_length;
-    acmacs::tal::EdgeLength gap_to_next{acmacs::tal::EdgeLengthNotSet};
-
-    CumulativeEntry(const acmacs::tal::SeqId& a_seq_id, acmacs::tal::EdgeLength a_edge, acmacs::tal::EdgeLength a_cumulative)
-        : seq_id{a_seq_id}, edge_length{a_edge}, cumulative_edge_length{a_cumulative}
-    {
-    }
-
-    void set_gap(const CumulativeEntry& next, bool cumulative)
-    {
-        if (cumulative)
-            gap_to_next = cumulative_edge_length - next.cumulative_edge_length;
-        else
-            gap_to_next = edge_length - next.edge_length;
-    }
-
-    static std::string header(bool cumulative_first)
-    {
-        if (cumulative_first)
-            return " cumulative       edge      gap to next   seq id\n";
-        else
-            return "    edge       cumulative   gap to next   seq id\n";
-    }
-
-    std::string format(bool cumulative_first) const
-    {
-        if (cumulative_first)
-            return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", cumulative_edge_length.as_number(), edge_length.as_number(), gap_to_next.as_number(), seq_id);
-        else
-            return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", edge_length.as_number(), cumulative_edge_length.as_number(), gap_to_next.as_number(), seq_id);
-    }
-};
-
-std::string acmacs::tal::v3::Tree::report_cumulative(verbose verb, CumulativeReport report) const
+std::string acmacs::tal::v3::Tree::report_cumulative() const
 {
     cumulative_calculate();
 
-    std::vector<CumulativeEntry> nodes;
-    tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.emplace_back(node.seq_id, node.edge_length, node.cumulative_edge_length); });
-    std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
-    for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it)
-        it->set_gap(*std::next(it), true);
-    // const auto gap_average = std::accumulate(std::begin(nodes), std::prev(std::end(nodes)), EdgeLength{0.0}, [](EdgeLength sum, const auto& en) { return sum + en.gap_to_next; }) / (nodes.size() -
-    // 1);
+    std::vector<const Node*> nodes;
+    tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.push_back(&node); });
+    std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1->cumulative_edge_length > en2->cumulative_edge_length; });
 
-    std::sort(std::begin(nodes), std::end(nodes), [](const auto& e1, const auto& e2) { return e1.gap_to_next > e2.gap_to_next; });
-
-    EdgeLength sum_gap_top{0.0};
-    const auto top_size = std::min(20L, static_cast<ssize_t>(nodes.size()));
-    for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
-        sum_gap_top += it->gap_to_next;
-    const EdgeLength ave_gap_top = sum_gap_top / top_size;
-    const EdgeLength gap_cut = (nodes.front().gap_to_next - ave_gap_top) * 0.1 + ave_gap_top;
-    auto to_cut = nodes.begin();
-    for (auto it = std::next(std::begin(nodes)); it != std::next(std::begin(nodes), top_size); ++it) {
-        if (it->gap_to_next > gap_cut && it->edge_length < to_cut->edge_length)
-            to_cut = it;
-    }
-
-    std::string result{"Cumulative edges and cut suggestion\n\n"};
-    // result.append(fmt::format("Ave Gap: {}\n", gap_average.as_number()));
-    // result.append(fmt::format("Ave Top Gap: {}\n", ave_gap_top.as_number()));
-    result.append(CumulativeEntry::header(true));
-    result.append(to_cut->format(true));
-    if (to_cut != nodes.begin()) {
-        const auto after_cut = std::prev(to_cut);
-        result.append(after_cut->format(true));
-    }
-    result.append(1, '\n');
-    // if (verb == verbose::yes) {
-    //     fmt::print(result);
-    //     fmt::print("{{\"N\": \"nodes\", \"select\": {{\"cumulative >=\": {:.10f}, \"report\": true}}, \"apply\": \"hide\"}}\n", to_cut->cumulative_edge_length.as_number());
-    // }
-    result.append("Top nodes sorted by gap to next\n");
-    result.append(CumulativeEntry::header(true));
-    for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
-        result.append(it->format(true));
-
-    if (report == CumulativeReport::all) {
-        std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
-        result.append("\nAll nodes sorted by cumulative\n");
-        result.append(CumulativeEntry::header(true));
-        for (const auto& entry : nodes)
-            result.append(entry.format(true));
-    }
+    std::string result{"All nodes sorted by cumulative\n Cumulative       Edge       Seq id\n"};
+    for (const auto* node : nodes)
+        result.append(fmt::format("{:.10f}  {:.10f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id));
     return result;
 
 } // acmacs::tal::v3::Tree::report_cumulative
 
 // ----------------------------------------------------------------------
 
+// enum class CumulativeReport { clusters, all };
+// std::string x_report_cumulative(acmacs::verbose verb, CumulativeReport report)
+// {
+//     struct CumulativeEntry
+//     {
+//         acmacs::tal::SeqId seq_id;
+//         acmacs::tal::EdgeLength edge_length;
+//         acmacs::tal::EdgeLength cumulative_edge_length;
+//         acmacs::tal::EdgeLength gap_to_next{acmacs::tal::EdgeLengthNotSet};
+
+//         CumulativeEntry(const acmacs::tal::SeqId& a_seq_id, acmacs::tal::EdgeLength a_edge, acmacs::tal::EdgeLength a_cumulative)
+//             : seq_id{a_seq_id}, edge_length{a_edge}, cumulative_edge_length{a_cumulative}
+//         {
+//         }
+
+//         void set_gap(const CumulativeEntry& next, bool cumulative)
+//         {
+//             if (cumulative)
+//                 gap_to_next = cumulative_edge_length - next.cumulative_edge_length;
+//             else
+//                 gap_to_next = edge_length - next.edge_length;
+//         }
+
+//         static std::string header(bool cumulative_first)
+//         {
+//             if (cumulative_first)
+//                 return " cumulative       edge      gap to next   seq id\n";
+//             else
+//                 return "    edge       cumulative   gap to next   seq id\n";
+//         }
+
+//         std::string format(bool cumulative_first) const
+//         {
+//             if (cumulative_first)
+//                 return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", cumulative_edge_length.as_number(), edge_length.as_number(), gap_to_next.as_number(), seq_id);
+//             else
+//                 return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", edge_length.as_number(), cumulative_edge_length.as_number(), gap_to_next.as_number(), seq_id);
+//         }
+//     };
+
+//     cumulative_calculate();
+
+//     std::vector<CumulativeEntry> nodes;
+//     tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.emplace_back(node.seq_id, node.edge_length, node.cumulative_edge_length); });
+//     std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
+//     for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it)
+//         it->set_gap(*std::next(it), true);
+//     // const auto gap_average = std::accumulate(std::begin(nodes), std::prev(std::end(nodes)), EdgeLength{0.0}, [](EdgeLength sum, const auto& en) { return sum + en.gap_to_next; }) / (nodes.size() -
+//     // 1);
+
+//     std::sort(std::begin(nodes), std::end(nodes), [](const auto& e1, const auto& e2) { return e1.gap_to_next > e2.gap_to_next; });
+
+//     EdgeLength sum_gap_top{0.0};
+//     const auto top_size = std::min(20L, static_cast<ssize_t>(nodes.size()));
+//     for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
+//         sum_gap_top += it->gap_to_next;
+//     const EdgeLength ave_gap_top = sum_gap_top / top_size;
+//     const EdgeLength gap_cut = (nodes.front().gap_to_next - ave_gap_top) * 0.1 + ave_gap_top;
+//     auto to_cut = nodes.begin();
+//     for (auto it = std::next(std::begin(nodes)); it != std::next(std::begin(nodes), top_size); ++it) {
+//         if (it->gap_to_next > gap_cut && it->edge_length < to_cut->edge_length)
+//             to_cut = it;
+//     }
+
+//     std::string result{"Cumulative edges and cut suggestion\n\n"};
+//     // result.append(fmt::format("Ave Gap: {}\n", gap_average.as_number()));
+//     // result.append(fmt::format("Ave Top Gap: {}\n", ave_gap_top.as_number()));
+//     result.append(CumulativeEntry::header(true));
+//     result.append(to_cut->format(true));
+//     if (to_cut != nodes.begin()) {
+//         const auto after_cut = std::prev(to_cut);
+//         result.append(after_cut->format(true));
+//     }
+//     result.append(1, '\n');
+//     // if (verb == verbose::yes) {
+//     //     fmt::print(result);
+//     //     fmt::print("{{\"N\": \"nodes\", \"select\": {{\"cumulative >=\": {:.10f}, \"report\": true}}, \"apply\": \"hide\"}}\n", to_cut->cumulative_edge_length.as_number());
+//     // }
+//     result.append("Top nodes sorted by gap to next\n");
+//     result.append(CumulativeEntry::header(true));
+//     for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
+//         result.append(it->format(true));
+
+//     if (report == CumulativeReport::all) {
+//         std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
+//         result.append("\nAll nodes sorted by cumulative\n");
+//         result.append(CumulativeEntry::header(true));
+//         for (const auto& entry : nodes)
+//             result.append(entry.format(true));
+//     }
+//     return result;
+
+// } // x_report_cumulative
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::branches_by_edge() const
 {
     using Entry = std::tuple<const Node*, double, double>; // seq_id, edge_length, cumulative_edge_length, sd_chunk, sd_diff
-    constexpr size_t i_sd = 1, i_sd_diff = 2;
+    // constexpr size_t i_sd = 1, i_sd_diff = 2;
     using ListEntries = std::vector<Entry>;
 
     const auto seq_id = [](const Entry& en) -> std::string { if (const auto& sid = std::get<const Node*>(en)->seq_id; sid.empty()) return fmt::format("[{}]", std::get<const Node*>(en)->number_leaves_in_subtree_); else return fmt::format("{}", sid); };
     const auto edge = [](const Entry& en) -> double { return std::get<const Node*>(en)->edge_length.as_number(); };
     const auto cumulative = [](const Entry& en) -> double { return std::get<const Node*>(en)->cumulative_edge_length.as_number(); };
-    const auto sd_cumulative = [](const Entry& en) -> double { return std::get<i_sd>(en); };
-    const auto sd_diff = [](const Entry& en) -> double { return std::get<i_sd_diff>(en); };
+    // const auto sd_cumulative = [](const Entry& en) -> double { return std::get<i_sd>(en); };
+    // const auto sd_diff = [](const Entry& en) -> double { return std::get<i_sd_diff>(en); };
     const auto sort_by_edge = [edge](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [edge](const auto& en1, const auto& en2) { return edge(en1) > edge(en2); }); };
-    const auto sort_by_cumulative = [cumulative](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [cumulative](const auto& en1, const auto& en2) { return cumulative(en1) > cumulative(en2); }); };
+    // const auto sort_by_cumulative = [cumulative](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [cumulative](const auto& en1, const auto& en2) { return cumulative(en1) > cumulative(en2); }); };
     // const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}  {:.10f} {:.10f}  {}\n", edge(en), cumulative(en), sd_cumulative(en), sd_diff(en), seq_id(en)); };
     const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}   {}\n", edge(en), cumulative(en), seq_id(en)); };
 
