@@ -137,6 +137,8 @@ namespace acmacs::tal::inline v3
     class Tree : public Node
     {
       public:
+        void erase();
+
         void data_buffer(std::string&& data) { data_buffer_ = std::move(data); }
         std::string_view data_buffer() const { return data_buffer_; }
 

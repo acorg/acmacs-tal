@@ -1,18 +1,21 @@
 #pragma once
 
-#include "acmacs-tal/tree.hh"
+#include <string_view>
 
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
-    class ImportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
-    class ExportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
+    class Tal;
+    class Tree;
 
-    Tree import_tree(std::string_view filename);
+    struct ImportError : public std::runtime_error { using std::runtime_error::runtime_error; };
+    struct ExportError : public std::runtime_error { using std::runtime_error::runtime_error; };
 
-    void export_tree(const Tree& tree, std::string_view filename);
-}
+    void import_tree(std::string_view filename, Tree& tree);
+    void export_tree(std::string_view filename, const Tree& tree);
+
+} // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------
 /// Local Variables:

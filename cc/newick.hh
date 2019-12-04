@@ -1,15 +1,17 @@
 #pragma once
 
-#include "acmacs-tal/tree.hh"
+#include <string_view>
 
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
+    class Tree;
+
     class NewickImportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
     class NewickExportError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
 
-    Tree newick_import(std::string_view filename);
+    void newick_import(std::string_view filename, Tree& tree);
     std::string newick_export(const Tree& tree);
 }
 

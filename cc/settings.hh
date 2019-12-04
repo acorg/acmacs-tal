@@ -3,28 +3,16 @@
 #include <memory>
 
 #include "acmacs-base/settings.hh"
-#include "acmacs-tal/tree.hh"
+#include "acmacs-tal/tal-data.hh"
 
 // ----------------------------------------------------------------------
-
-namespace acmacs::chart
-{
-    class Chart;
-    using ChartP = std::shared_ptr<Chart>;
-}
 
 namespace acmacs::tal::inline v3
 {
     class Settings : public acmacs::settings::Settings
     {
       public:
-        Settings() = default;
-
-        void tree(Tree& tree);
-        Tree& tree() const { if (!tree_) throw error{"tree was not set"}; return *tree_; }
-
-        void chart(const acmacs::chart::ChartP& chart);
-        const acmacs::chart::Chart& chart() const { if (!chart_) throw error{"chart was not set"}; return *chart_; }
+        Settings(Tal& tal) : tal_{tal} { update_env(); }
 
         bool apply_built_in(std::string_view name, verbose verb) override; // returns true if built-in command with that name found and applied
 
@@ -32,8 +20,9 @@ namespace acmacs::tal::inline v3
         NodeSet select_nodes(const rjson::value& criteria) const;
 
       private:
-        Tree* tree_;
-        acmacs::chart::ChartP chart_;
+        Tal& tal_;
+
+        Tree& tree() const { return tal_.tree(); }
 
         void apply_nodes() const;
         void update_env();

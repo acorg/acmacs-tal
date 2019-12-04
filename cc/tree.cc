@@ -34,6 +34,15 @@ void acmacs::tal::v3::Node::remove_aa_transition(seqdb::pos0_t pos, char right) 
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::erase()
+{
+    *this = Tree();
+    // data_buffer_.erase();
+
+} // acmacs::tal::v3::Tree::erase
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::cumulative_calculate(bool recalculate) const
 {
     if (recalculate || cumulative_edge_length == EdgeLengthNotSet) {

@@ -8,32 +8,14 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::tree(Tree& tree)
-{
-    tree_ = &tree;
-    update_env();
-
-} // acmacs::tal::v3::Settings::tree
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Settings::chart(const acmacs::chart::ChartP& chart)
-{
-    chart_ = chart;
-    update_env();
-
-} // acmacs::tal::v3::Settings::chart
-
-// ----------------------------------------------------------------------
-
 void acmacs::tal::v3::Settings::update_env()
 {
-    setenv_toplevel("virus-type", tree_->virus_type());
-    setenv_toplevel("lineage", tree_->lineage());
-    setenv_toplevel("tree-has-sequences", tree_->has_sequences());
-    setenv_toplevel("chart-present", static_cast<bool>(chart_));
-    if (chart_) {
-        setenv_toplevel("chart-assay", chart_->info()->assay().hi_or_neut());
+    setenv_toplevel("virus-type", tal_.tree().virus_type());
+    setenv_toplevel("lineage", tal_.tree().lineage());
+    setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
+    setenv_toplevel("chart-present", tal_.chart_present());
+    if (tal_.chart_present()) {
+        setenv_toplevel("chart-assay", tal_.chart().info()->assay().hi_or_neut());
     }
 
 } // acmacs::tal::v3::Settings::update_env
@@ -165,15 +147,15 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
         else if (key == "matches-chart-antigen") {
-            if (!chart_)
+            if (!tal_.chart_present())
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
-            tree().match(chart());
+            tree().match(tal_.chart());
             tree().select_matches_chart_antigens(selected, update);
         }
         else if (key == "matches-chart-serum") {
-            if (!chart_)
+            if (!tal_.chart_present())
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
-            tree().match(chart());
+            tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
             if (const auto match_type = val.to<std::string_view>(); match_type == "reassortant")
                 mt = Tree::serum_match_t::reassortant;

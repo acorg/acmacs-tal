@@ -5,7 +5,7 @@ TARGETS = \
   $(DIST)/tal
 
 SOURCES = \
-  tal.cc tree.cc aa-transition.cc \
+  tal.cc tal-data.cc tree.cc aa-transition.cc \
   settings.cc \
   import-export.cc json-export.cc json-import.cc newick.cc html-export.cc
 

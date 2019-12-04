@@ -1,4 +1,5 @@
 #include "acmacs-base/read-file.hh"
+#include "acmacs-base/fmt.hh"
 #include "acmacs-tal/import-export.hh"
 #include "acmacs-tal/newick.hh"
 #include "acmacs-tal/json-import.hh"
@@ -7,7 +8,7 @@
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::Tree acmacs::tal::v3::import_tree(std::string_view filename)
+void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
 {
     fs::path filepath{filename};
     auto ext = filepath.extension();
@@ -15,7 +16,7 @@ acmacs::tal::v3::Tree acmacs::tal::v3::import_tree(std::string_view filename)
         ext = filepath.stem().extension();
     if (ext == ".newick") {
         try {
-            return newick_import(filename);
+            return newick_import(filename, tree);
         }
         catch (NewickImportError& err) {
             throw ImportError{fmt::format("cannot import from newick: {}", err)};
@@ -23,7 +24,7 @@ acmacs::tal::v3::Tree acmacs::tal::v3::import_tree(std::string_view filename)
     }
     else if (filename == "-" || ext == ".json") {
         try {
-            return json_import(filename);
+            return json_import(filename, tree);
         }
         catch (JsonImportError& err) {
             throw ImportError{fmt::format("cannot import from json: {}", err)};
@@ -36,7 +37,7 @@ acmacs::tal::v3::Tree acmacs::tal::v3::import_tree(std::string_view filename)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::export_tree(const Tree& tree, std::string_view filename)
+void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
 {
     fs::path filepath{filename};
     auto ext = filepath.extension();

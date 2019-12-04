@@ -3,6 +3,7 @@
 
 #include "acmacs-base/read-file.hh"
 #include "acmacs-tal/newick.hh"
+#include "acmacs-tal/tree.hh"
 
 // https://en.wikipedia.org/wiki/Newick_format
 
@@ -121,9 +122,8 @@ class Tokenizer
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
+void acmacs::tal::v3::newick_import(std::string_view filename, Tree& tree)
 {
-    Tree tree;
     tree.data_buffer(acmacs::file::read(filename));
     Tokenizer tokenizer{tree.data_buffer()};
     try {
@@ -155,7 +155,6 @@ acmacs::tal::v3::Tree acmacs::tal::v3::newick_import(std::string_view filename)
     catch (TokenizerError& err) {
         throw NewickImportError{fmt::format("newick import error: {}", err)};
     }
-    return tree;
 
 } // acmacs::tal::v3::newick_import
 

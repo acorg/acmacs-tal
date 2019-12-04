@@ -1,6 +1,7 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/in-json-parser.hh"
 #include "acmacs-tal/json-import.hh"
+#include "acmacs-tal/tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -195,9 +196,8 @@ namespace
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::Tree acmacs::tal::v3::json_import(std::string_view filename)
+void acmacs::tal::v3::json_import(std::string_view filename, Tree& tree)
 {
-    Tree tree;
     tree.data_buffer(acmacs::file::read(filename));
     sink sink{tree};
     try {
@@ -206,7 +206,6 @@ acmacs::tal::v3::Tree acmacs::tal::v3::json_import(std::string_view filename)
     catch (in_json::parse_error& err) {
         throw JsonImportError{fmt::format("tree in json format import error: {}", err)};
     }
-    return tree;
 
 } // acmacs::tal::v3::json_import
 

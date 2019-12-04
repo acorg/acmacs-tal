@@ -3,9 +3,8 @@
 #include "acmacs-base/filesystem.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
-#include "acmacs-chart-2/factory-import.hh"
+#include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/settings.hh"
-#include "acmacs-tal/import-export.hh"
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +47,11 @@ int main(int argc, const char *argv[])
         acmacs::seqdb::setup(opt.seqdb);
         const acmacs::verbose verbose{opt.verbose ? acmacs::verbose::yes : acmacs::verbose::no};
 
-        acmacs::tal::Settings settings;
+        acmacs::tal::Tal tal;
+        tal.import_tree(opt.tree_file);
+        tal.import_chart(opt.chart_file);
+
+        acmacs::tal::Settings settings{tal};
         using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
@@ -64,15 +67,10 @@ int main(int argc, const char *argv[])
                 settings.setenv(def, true);
         }
 
-        auto tree = acmacs::tal::import_tree(opt.tree_file);
-        settings.tree(tree);
-        if (opt.chart_file)
-          settings.chart(acmacs::chart::import_from_file(opt.chart_file));
-
         settings.apply("main"sv, verbose);
 
         for (const auto& output : *opt.outputs)
-            acmacs::tal::export_tree(tree, output);
+            tal.export_tree(output);
 
         return 0;
     }
