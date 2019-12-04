@@ -1,6 +1,7 @@
 #include "acmacs-base/argv.hh"
 #include "acmacs-base/acmacsd.hh"
 #include "acmacs-base/filesystem.hh"
+#include "acmacs-base/quicklook.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -71,6 +72,13 @@ int main(int argc, const char *argv[])
 
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
+
+        if (opt.open || opt.ql) {
+            for (const auto& output : *opt.outputs) {
+                if (output.substr(output.size() - 4) == ".pdf")
+                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
+            }
+        }
 
         return 0;
     }

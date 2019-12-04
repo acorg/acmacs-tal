@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-03 10:53:53 eu>
+# Time-stamp: <2019-12-04 12:59:01 eu>
 
 * Command line defines
 
@@ -11,6 +11,10 @@
 -D report-time-series-output=filename  write time-series report to filename
 
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
+
+* TODO
+- drawing area margins draw.hh Margins
+- drawing area outline (for debugging)
 
 * Settings features
 

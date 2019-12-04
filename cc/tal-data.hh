@@ -1,6 +1,7 @@
 #pragma once
 
 #include "acmacs-tal/tree.hh"
+#include "acmacs-tal/draw.hh"
 
 // ----------------------------------------------------------------------
 
@@ -27,10 +28,13 @@ namespace acmacs::tal::inline v3
         const Tree& tree() const { return tree_; }
         bool chart_present() const { return static_cast<bool>(chart_); }
         const acmacs::chart::Chart& chart() const { return *chart_; }
+        Draw& draw() { return draw_; }
+        const Draw& draw() const { return draw_; }
 
       private:
         Tree tree_;
         acmacs::chart::ChartP chart_;
+        Draw draw_;
     };
 } // namespace acmacs
 
