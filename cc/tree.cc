@@ -189,26 +189,18 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
 
 void acmacs::tal::v3::Tree::branches_by_edge() const
 {
-    using Entry = std::tuple<const Node*, double, double>; // seq_id, edge_length, cumulative_edge_length, sd_chunk, sd_diff
-    // constexpr size_t i_sd = 1, i_sd_diff = 2;
-    using ListEntries = std::vector<Entry>;
-
-    const auto seq_id = [](const Entry& en) -> std::string { if (const auto& sid = std::get<const Node*>(en)->seq_id; sid.empty()) return fmt::format("[{}]", std::get<const Node*>(en)->number_leaves_in_subtree_); else return fmt::format("{}", sid); };
-    const auto edge = [](const Entry& en) -> double { return std::get<const Node*>(en)->edge_length.as_number(); };
-    const auto cumulative = [](const Entry& en) -> double { return std::get<const Node*>(en)->cumulative_edge_length.as_number(); };
-    // const auto sd_cumulative = [](const Entry& en) -> double { return std::get<i_sd>(en); };
-    // const auto sd_diff = [](const Entry& en) -> double { return std::get<i_sd_diff>(en); };
-    const auto sort_by_edge = [edge](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [edge](const auto& en1, const auto& en2) { return edge(en1) > edge(en2); }); };
-    // const auto sort_by_cumulative = [cumulative](ListEntries& nods) { std::sort(std::begin(nods), std::end(nods), [cumulative](const auto& en1, const auto& en2) { return cumulative(en1) > cumulative(en2); }); };
-    // const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}  {:.10f} {:.10f}  {}\n", edge(en), cumulative(en), sd_cumulative(en), sd_diff(en), seq_id(en)); };
-    const auto report = [=](const Entry& en) { fmt::print("{:.10f}  {:.10f}   {}\n", edge(en), cumulative(en), seq_id(en)); };
+    const auto sort_by_edge = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->edge_length > n2->edge_length; }); };
+    // const auto sort_by_cumulative = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; }); };
+    const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
 
     cumulative_calculate();
+    number_leaves_in_subtree();
+
     fmt::print("max cumulative: {}\n", max_cumulative_shown().as_number());
 
-    ListEntries nodes;
+    std::vector<const Node*> nodes;
 
-    const auto collect = [&nodes](const Node& node) { nodes.emplace_back(&node, 0.0, 0.0); };
+    const auto collect = [&nodes](const Node& node) { nodes.push_back(&node); };
     tree::iterate_leaf_pre(*this, collect, collect);
     // sort_by_cumulative(nodes);
     sort_by_edge(nodes);
@@ -221,19 +213,10 @@ void acmacs::tal::v3::Tree::branches_by_edge() const
     fmt::print("mean edge (top  0.5%) {}\n", acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), nodes.size() / 200), edge));
     fmt::print("HINT: hide by edge, if edge > mean of top 1%\n\n");
 
-    // const auto chunk_size = static_cast<ssize_t>(nodes.size() / 10);
-    // for (auto it = std::begin(nodes); it != std::prev(std::end(nodes), chunk_size); ++it) {
-    //     const auto end = std::next(it, chunk_size);
-    //     std::get<i_sd>(*it) = acmacs::statistics::standard_deviation(it, end, acmacs::statistics::mean(it, end, cumulative), cumulative).population_sd();
-    // }
-    // for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it) {
-    //     std::get<i_sd_diff>(*it) = sd_cumulative(*it) - sd_cumulative(*std::next(it));
-    // }
-
     sort_by_edge(nodes);
-    //std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
-    for (auto [no, entry] : acmacs::enumerate(nodes)) {
-        report(entry);
+    fmt::print("    Edge       Cumulative     Seq Id\n");
+    for (auto [no, node] : acmacs::enumerate(nodes)) {
+        fmt::print("{:.10f}  {:.10f}   {} [{}]\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id, node->number_leaves_in_subtree_);
         if (no > nodes.size() / 50)
             break;
     }
