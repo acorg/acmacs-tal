@@ -1,12 +1,21 @@
 #pragma once
 
-#include "acmacs-draw/surface-cairo.hh"
+#include "acmacs-draw/surface.hh"
 
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
     enum class Position { normal, absolute };
+
+    struct DrawOutline
+    {
+        bool outline{false};
+        Color outline_color{PINK};
+        Pixels outline_width{2};
+
+        void draw(acmacs::surface::Surface& surface) const;
+    };
 
     class LayoutElement
     {
@@ -16,11 +25,15 @@ namespace acmacs::tal::inline v3
 
         constexpr double width_to_height_ratio() const { return width_to_height_ratio_; }
         constexpr void width_to_height_ratio(double whr) { width_to_height_ratio_ = whr; }
+        constexpr DrawOutline& outline() { return outline_; }
+        constexpr const DrawOutline& outline() const { return outline_; }
+
         virtual Position position() const { return Position::normal; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
       private:
         double width_to_height_ratio_;
+        DrawOutline outline_;
     };
 
     // ----------------------------------------------------------------------
@@ -28,7 +41,7 @@ namespace acmacs::tal::inline v3
     class Layout
     {
       public:
-        void add(std::unique_ptr<LayoutElement> element);
+        LayoutElement& add(std::unique_ptr<LayoutElement> element);
 
         double width_relative_to_height() const;
         void draw(acmacs::surface::Surface& surface) const;

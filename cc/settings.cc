@@ -58,8 +58,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().match_seqdb(getenv("filename", ""));
             update_env();
         }
-        else if (name == "tree")
-            draw().layout().add(std::make_unique<DrawTree>());
+        else if (name == "tree") {
+            auto& element = draw().layout().add(std::make_unique<DrawTree>());
+            outline(element.outline());
+        }
         else
             return acmacs::settings::Settings::apply_built_in(name, verb);
         return true;
@@ -130,11 +132,20 @@ void acmacs::tal::v3::Settings::margins()
     getenv("right"sv, draw().margins().right);
     getenv("top"sv, draw().margins().top);
     getenv("bottom"sv, draw().margins().bottom);
-    getenv_copy_if_present("outline"sv, draw().margins().outline);
-    getenv_extract_copy_if_present<double>("outline_width"sv, draw().margins().outline_width);
-    getenv_extract_copy_if_present<std::string_view>("outline_color"sv, draw().margins().outline_color);
+    outline(draw().outline());
 
 } // acmacs::tal::v3::Settings::margins
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
+{
+    using namespace std::string_view_literals;
+    getenv_copy_if_present("outline"sv, draw_outline.outline);
+    getenv_extract_copy_if_present<double>("outline_width"sv, draw_outline.outline_width);
+    getenv_extract_copy_if_present<std::string_view>("outline_color"sv, draw_outline.outline_color);
+
+} // acmacs::tal::v3::Settings::outline
 
 // ----------------------------------------------------------------------
 

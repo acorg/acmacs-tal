@@ -31,6 +31,7 @@ namespace acmacs::tal::inline v3
         void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
         void ladderize();
         void margins();
+        void outline(DrawOutline& draw_outline);
     };
 
 } // namespace acmacs::tal::inlinev3
