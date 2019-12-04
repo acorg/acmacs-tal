@@ -7,6 +7,9 @@
    "ladderize-method": "number-of-leaves"
   }
  ],
+ "layout": [
+  {"N": "margins", "?left": 0.1, "outline": true, "outline_color": "cyan", "?outline_width": 10},
+ ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
   {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
@@ -18,6 +21,7 @@
   {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]},
    "then": [{"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
-  {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]}
+  {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
+  "layout"
  ]
 }

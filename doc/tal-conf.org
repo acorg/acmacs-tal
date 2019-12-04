@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-04 12:59:01 eu>
+# Time-stamp: <2019-12-04 15:29:13 eu>
 
 * Command line defines
 
@@ -13,8 +13,7 @@
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
 
 * TODO
-- drawing area margins draw.hh Margins
-- drawing area outline (for debugging)
+
 
 * Settings features
 
@@ -45,6 +44,8 @@
 
 * Settings
 
+** Tree
+
 {"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}]}
 {"N": "seqdb", "filename": "{seqdb-filename}"}
 
@@ -64,6 +65,10 @@
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-time-series", "output": "{report-time-series-output}"}
+
+** Draw
+
+{"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "outline": true, "outline_color": "pink", "outline_width": 2},
 
 * Select Nodes
 

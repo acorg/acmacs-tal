@@ -10,6 +10,7 @@ void acmacs::tal::v3::Draw::export_pdf(std::string_view filename) const
     auto& drawing_area = pdf.subsurface({margins_.left, margins_.top}, Scaled{width_to_height_ratio_ - margins_.left - margins_.right},
                                         Size{(width_to_height_ratio_ - margins_.left - margins_.right) / (1.0 - margins_.top - margins_.bottom), 1.0}, false);
     draw_outline(drawing_area);
+    layout_.draw(drawing_area);
 
 } // acmacs::tal::v3::Draw::export_pdf
 

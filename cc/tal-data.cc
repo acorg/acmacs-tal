@@ -26,6 +26,13 @@ void acmacs::tal::v3::Tal::import_chart(std::string_view filename)
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tal::prepare()
+{
+
+} // acmacs::tal::v3::Tal::prepare
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tal::export_tree(std::string_view filename)
 {
     const fs::path filepath{filename};

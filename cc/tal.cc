@@ -69,7 +69,7 @@ int main(int argc, const char *argv[])
         }
 
         settings.apply("main"sv, verbose);
-
+        tal.prepare();
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
 

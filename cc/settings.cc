@@ -32,26 +32,18 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             if (getenv("report", false))
                 tree().report_aa_transitions();
         }
-        else if (name == "clades-reset") {
+        else if (name == "clades-reset")
             tree().clades_reset();
-        }
-        else if (name == "clade") {
+        else if (name == "clade")
             clade();
-        }
-        else if (name == "ladderize") {
-            if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
-                tree().ladderize(Tree::Ladderize::NumberOfLeaves);
-            else if (method == "max-edge-length")
-                tree().ladderize(Tree::Ladderize::MaxEdgeLength);
-            else
-                throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
-        }
-        else if (name == "nodes") {
+        else if (name == "ladderize")
+            ladderize();
+        else if (name == "margins")
+            margins();
+        else if (name == "nodes")
             apply_nodes();
-        }
-        else if (name == "re-root") {
+        else if (name == "re-root")
             tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
-        }
         else if (name == "report-cumulative") {
             tree().branches_by_edge();
             if (const auto output_filename = getenv("output", ""); !output_filename.empty())
@@ -112,6 +104,34 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         getenv("apply").val_());
 
 } // acmacs::tal::v3::Settings::apply_nodes
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::ladderize()
+{
+    if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
+        tree().ladderize(Tree::Ladderize::NumberOfLeaves);
+    else if (method == "max-edge-length")
+        tree().ladderize(Tree::Ladderize::MaxEdgeLength);
+    else
+        throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
+
+} // acmacs::tal::v3::Settings::ladderize
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::margins()
+{
+    using namespace std::string_view_literals;
+    getenv_copy_if_present("left"sv, draw().margins().left);
+    getenv("right"sv, draw().margins().right);
+    getenv("top"sv, draw().margins().top);
+    getenv("bottom"sv, draw().margins().bottom);
+    getenv_copy_if_present("outline"sv, draw().margins().outline);
+    getenv_extract_copy_if_present<double>("outline_width"sv, draw().margins().outline_width);
+    getenv_extract_copy_if_present<std::string_view>("outline_color"sv, draw().margins().outline_color);
+
+} // acmacs::tal::v3::Settings::margins
 
 // ----------------------------------------------------------------------
 

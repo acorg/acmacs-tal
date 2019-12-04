@@ -23,11 +23,14 @@ namespace acmacs::tal::inline v3
         Tal& tal_;
 
         Tree& tree() const { return tal_.tree(); }
+        Draw& draw() { return tal_.draw(); }
 
         void apply_nodes() const;
         void update_env();
         void clade() const;
         void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
+        void ladderize();
+        void margins();
     };
 
 } // namespace acmacs::tal::inlinev3

@@ -22,6 +22,7 @@ namespace acmacs::tal::inline v3
 
         void import_tree(std::string_view filename);
         void import_chart(std::string_view filename);
+        void prepare();
         void export_tree(std::string_view filename);
 
         Tree& tree() { return tree_; }
