@@ -25,40 +25,46 @@ void acmacs::tal::v3::Settings::update_env()
 
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose verb)
 {
+    using namespace std::string_view_literals;
     try {
         // printenv();
-        if (name == "aa-transitions") {
+        if (name == "aa-transitions"sv) {
             tree().update_common_aa();
             tree().update_aa_transitions();
-            if (getenv("report", false))
+            if (getenv("report"sv, false))
                 tree().report_aa_transitions();
         }
-        else if (name == "clades-reset")
+        else if (name == "clades-reset"sv)
             tree().clades_reset();
-        else if (name == "clade")
+        else if (name == "clade"sv)
             clade();
-        else if (name == "ladderize")
+        else if (name == "gap"sv) {
+            auto& element = draw().layout().add(std::make_unique<Gap>());
+            getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
+            outline(element.outline());
+        }
+        else if (name == "ladderize"sv)
             ladderize();
-        else if (name == "margins")
+        else if (name == "margins"sv)
             margins();
-        else if (name == "nodes")
+        else if (name == "nodes"sv)
             apply_nodes();
-        else if (name == "re-root")
-            tree().re_root(SeqId{getenv("new-root", "re-root: new-root not specified")});
-        else if (name == "report-cumulative") {
+        else if (name == "re-root"sv)
+            tree().re_root(SeqId{getenv("new-root"sv, "re-root: new-root not specified")});
+        else if (name == "report-cumulative"sv) {
             tree().branches_by_edge();
-            if (const auto output_filename = getenv("output", ""); !output_filename.empty())
+            if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
-        else if (name == "report-time-series") {
-            if (const auto output_filename = getenv("output", ""); !output_filename.empty())
+        else if (name == "report-time-series"sv) {
+            if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_time_series());
         }
-        else if (name == "seqdb") {
-            tree().match_seqdb(getenv("filename", ""));
+        else if (name == "seqdb"sv) {
+            tree().match_seqdb(getenv("filename"sv, ""));
             update_env();
         }
-        else if (name == "tree") {
+        else if (name == "tree"sv) {
             auto& element = draw().layout().add(std::make_unique<DrawTree>());
             outline(element.outline());
         }

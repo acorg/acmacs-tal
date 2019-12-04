@@ -10,6 +10,7 @@
  "layout": [
   {"N": "margins", "?left": 0.1, "outline": true, "outline_color": "cyan", "?outline_width": 10},
   {"N": "tree", "outline": true},
+  {"N": "gap", "outline": true, "width_to_height_ratio": 0.1},
   {"N": "tree", "outline": true},
  ],
  "main": [

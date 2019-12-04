@@ -24,7 +24,8 @@ namespace acmacs::tal::inline v3
         virtual ~LayoutElement() = default;
 
         constexpr double width_to_height_ratio() const { return width_to_height_ratio_; }
-        constexpr void width_to_height_ratio(double whr) { width_to_height_ratio_ = whr; }
+        constexpr double& width_to_height_ratio() { return width_to_height_ratio_; }
+        // constexpr void width_to_height_ratio(double whr) { width_to_height_ratio_ = whr; }
         constexpr DrawOutline& outline() { return outline_; }
         constexpr const DrawOutline& outline() const { return outline_; }
 
@@ -49,6 +50,15 @@ namespace acmacs::tal::inline v3
       private:
         std::vector<std::unique_ptr<LayoutElement>> elements_;
 
+    };
+
+    // ----------------------------------------------------------------------
+
+    class Gap : public LayoutElement
+    {
+      public:
+        Gap() : LayoutElement(0.05) {}
+        void draw(acmacs::surface::Surface& /*surface*/) const override {}
     };
 }
 
