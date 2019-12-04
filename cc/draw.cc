@@ -5,6 +5,7 @@
 void acmacs::tal::v3::Draw::prepare()
 {
     set_width_to_height_ratio();
+
 } // acmacs::tal::v3::Draw::prepare
 
 // ----------------------------------------------------------------------

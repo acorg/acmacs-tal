@@ -11,6 +11,8 @@ namespace acmacs::tal::inline v3
       public:
         DrawTree() : LayoutElement(0.7) {}
 
+        void draw(acmacs::surface::Surface& surface) const override;
+
       private:
     };
 

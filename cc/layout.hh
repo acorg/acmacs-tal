@@ -17,6 +17,7 @@ namespace acmacs::tal::inline v3
         constexpr double width_to_height_ratio() const { return width_to_height_ratio_; }
         constexpr void width_to_height_ratio(double whr) { width_to_height_ratio_ = whr; }
         virtual Position position() const { return Position::normal; }
+        virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
       private:
         double width_to_height_ratio_;
