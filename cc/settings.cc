@@ -9,6 +9,17 @@
 
 // ----------------------------------------------------------------------
 
+template <typename ElementType, typename ... Args> void acmacs::tal::v3::Settings::add_element(Args&& ... args)
+{
+    using namespace std::string_view_literals;
+    auto& element = draw().layout().add(std::make_unique<ElementType>(std::forward<Args>(args) ...));
+    getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
+    outline(element.outline());
+
+} // acmacs::tal::v3::Settings::add_element
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::update_env()
 {
     setenv_toplevel("virus-type", tal_.tree().virus_type());
@@ -38,11 +49,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().clades_reset();
         else if (name == "clade"sv)
             clade();
-        else if (name == "gap"sv) {
-            auto& element = draw().layout().add(std::make_unique<Gap>());
-            getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
-            outline(element.outline());
-        }
+        else if (name == "gap"sv)
+            add_element<Gap>();
         else if (name == "ladderize"sv)
             ladderize();
         else if (name == "margins"sv)
@@ -64,10 +72,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().match_seqdb(getenv("filename"sv, ""));
             update_env();
         }
-        else if (name == "tree"sv) {
-            auto& element = draw().layout().add(std::make_unique<DrawTree>());
-            outline(element.outline());
-        }
+        else if (name == "tree"sv)
+            add_element<DrawTree>(tal_);
         else
             return acmacs::settings::Settings::apply_built_in(name, verb);
         return true;
@@ -147,9 +153,28 @@ void acmacs::tal::v3::Settings::margins()
 void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
 {
     using namespace std::string_view_literals;
-    getenv_copy_if_present("outline"sv, draw_outline.outline);
-    getenv_extract_copy_if_present<double>("outline_width"sv, draw_outline.outline_width);
-    getenv_extract_copy_if_present<std::string_view>("outline_color"sv, draw_outline.outline_color);
+    if (const auto debug_outline = getenv("debug_outline"sv); !debug_outline.is_null()) {
+        std::visit(
+            [&draw_outline]<typename T>(T && val) {
+                if constexpr (std::is_same_v<std::decay_t<T>, bool>) {
+                    draw_outline.outline = val;
+                }
+                else if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                    draw_outline.outline = true;
+                    draw_outline.outline_color = Color{val};
+                }
+                else if constexpr (std::is_same_v<std::decay_t<T>, rjson::object>) {
+                    draw_outline.outline = rjson::get_or(val.get("show"sv), true);
+                    rjson::copy_if_not_null(val.get("color"sv), draw_outline.outline_color);
+                    if (const auto& wid = val.get("width"sv); !wid.is_null())
+                        draw_outline.outline_width = Pixels{wid.template to<double>()};
+                }
+                else {
+                    fmt::print(stderr, "WARNING: unrecognized debug_outline value: {}\n", val);
+                }
+            },
+            debug_outline.val_());
+    }
 
 } // acmacs::tal::v3::Settings::outline
 

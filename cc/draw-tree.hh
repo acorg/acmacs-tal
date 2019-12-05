@@ -6,14 +6,18 @@
 
 namespace acmacs::tal::inline v3
 {
+    class Tal;
+
     class DrawTree : public LayoutElement
     {
       public:
-        DrawTree() : LayoutElement(0.7) {}
+        DrawTree(Tal& tal) : LayoutElement(0.7), tal_{tal} {}
 
         void draw(acmacs::surface::Surface& surface) const override;
 
       private:
+        Tal& tal_;
+
     };
 
     // ----------------------------------------------------------------------

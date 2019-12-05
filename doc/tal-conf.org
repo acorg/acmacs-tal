@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-04 19:02:53 eu>
+# Time-stamp: <2019-12-05 10:07:44 eu>
 
 * Command line defines
 
@@ -68,10 +68,10 @@
 
 ** Draw
 
-{"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "outline": true, "outline_color": "pink", "outline_width": 2},
+{"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug_outline": <[[Debug outline][debug-outline]]>},
 
-{"N": "tree", "outline": true},
-{"N": "gap", "outline": true, "width_to_height_ratio": 0.1},
+{"N": "tree", "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 * Select Nodes
 
@@ -85,6 +85,13 @@ If multiple criteria specified within single "select" object, they all used (con
 {"vaccine": {"type": "current", "passage": "cell"}, "report": true}
 {"matches-chart-antigen": true, "report": true}
 {"matches-chart-serum": "name|reassortant|passage", "report": true} -- name only, name+reassortant, name+reassortant+passage_type
+
+* Debug outline
+
+"debug_outline": true
+"debug_outline": false
+"debug_outline": "pink"
+"debug_outline": {"show": true, "color": "pink", "width": 2}
 
 * COMMENT ====== local vars
 :PROPERTIES:
