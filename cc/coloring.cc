@@ -25,14 +25,24 @@ Color acmacs::tal::v3::ColoringByContinent::color(const Node& node) const
 
 // ----------------------------------------------------------------------
 
-Color acmacs::tal::v3::ColoringByPos::color(const Node& /*node*/) const
+Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
 {
-    static bool reported{false};
-    if (!reported) {
-        fmt::print(stderr, "WARNING: ColoringByPos not implemented\n");
-        reported = true;
-    }
-    return PINK;
+    const auto aa = node.aa_sequence.at(pos_);
+    if (aa == 'X')
+        return BLACK;
+    if (auto found = colors_.find(aa); found != colors_.end())
+        return found->second;
+    const auto color = Color::distinct(colors_.size());
+    fmt::print(stderr, "DEBUG: ColoringByPos {} {}: {}\n", pos_, aa, color.to_string());
+    colors_.emplace(aa, color);
+    return color;
+
+    // static bool reported{false};
+    // if (!reported) {
+    //     fmt::print(stderr, "WARNING: ColoringByPos not implemented\n");
+    //     reported = true;
+    // }
+    // return PINK;
 
 } // acmacs::tal::v3::ColoringByPos::color
 

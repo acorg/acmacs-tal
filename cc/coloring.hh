@@ -57,6 +57,7 @@ namespace acmacs::tal::inline v3
 
       private:
         acmacs::seqdb::pos1_t pos_;
+        mutable acmacs::flat_map_t<char, Color> colors_;
     };
 
     // ----------------------------------------------------------------------
