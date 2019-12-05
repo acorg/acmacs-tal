@@ -8,10 +8,10 @@
   }
  ],
  "layout": [
-  {"N": "margins", "?left": 0.1, "debug_outline": "cyan"},
-  {"N": "tree", "width_to_height_ratio": 0.3, "debug_outline": true},
-  {"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": {"color": "green", "width": 5}},
-  {"N": "tree", "debug_outline": true},
+  {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
+  {"N": "tree", "width_to_height_ratio": 0.3, "debug_outline": false},
+  {"N": "gap", "width_to_height_ratio": 0.03, "?debug_outline": {"color": "green", "width": 5}},
+  {"N": "tree", "color_by": "continent", "debug_outline": false},
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
@@ -25,6 +25,7 @@
    "then": [{"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
+  {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
   "layout"
  ]
 }
