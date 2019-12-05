@@ -88,10 +88,12 @@ namespace acmacs::tal::inline v3
         // all nodes
         mutable size_t number_leaves_in_subtree_{1};
         ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
+        mutable double cumulative_vertical_offset_{0.0};
         // leaf node only
         mutable size_t row_no_;
         mutable std::optional<size_t> antigen_index_in_chart_;
         mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
+        mutable double vertical_offset_{1.0}; // vertical gap maker will adjust
         // middle node only
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
@@ -99,6 +101,7 @@ namespace acmacs::tal::inline v3
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;
+        std::vector<const Node*> shown_children() const;
 
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
@@ -197,6 +200,9 @@ namespace acmacs::tal::inline v3
         void clade_report(std::string_view name={}) const;
 
         void match(const acmacs::chart::Chart& chart) const;
+
+        // drawing support
+        double compute_cumulative_vertical_offsets(); // returns tree height
 
       private:
         struct clade_section_t

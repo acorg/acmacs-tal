@@ -35,6 +35,15 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Layout::prepare()
+{
+    for (auto& element : elements_)
+        element->prepare();
+
+} // acmacs::tal::v3::Layout::prepare
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
 {
     double normal_left = 0.0;

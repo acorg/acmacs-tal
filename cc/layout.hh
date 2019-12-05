@@ -30,6 +30,7 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         virtual Position position() const { return Position::normal; }
+        virtual void prepare() {}
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
       private:
@@ -45,6 +46,7 @@ namespace acmacs::tal::inline v3
         LayoutElement& add(std::unique_ptr<LayoutElement> element);
 
         double width_relative_to_height() const;
+        void prepare();
         void draw(acmacs::surface::Surface& surface) const;
 
       private:

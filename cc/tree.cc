@@ -34,6 +34,19 @@ void acmacs::tal::v3::Node::remove_aa_transition(seqdb::pos0_t pos, char right) 
 
 // ----------------------------------------------------------------------
 
+std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Node::shown_children() const
+{
+    std::vector<const Node*> children;
+    for (const auto& child : subtree) {
+        if (!child.hidden)
+            children.push_back(&child);
+    }
+    return children;
+
+} // acmacs::tal::v3::Node::shown_children
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::erase()
 {
     *this = Tree();
@@ -779,6 +792,26 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
     }
 
 } // acmacs::tal::v3::Tree::match
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
+{
+    double height{0.0};
+    tree::iterate_leaf_post(*this,
+                            [&height](Node& leaf) {
+                                if (!leaf.hidden) {
+                                    height += leaf.vertical_offset_;
+                                    leaf.cumulative_vertical_offset_ = height;
+                                }
+                            },
+                            [](Node& node) {
+                                if (const auto& shown_children = node.shown_children(); !shown_children.empty())
+                                    node.cumulative_vertical_offset_ = (shown_children.front()->cumulative_vertical_offset_ + shown_children.back()->cumulative_vertical_offset_) / 2.0;
+                            });
+    return height;
+
+} // acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets
 
 // ----------------------------------------------------------------------
 
