@@ -9,12 +9,13 @@
 
 // ----------------------------------------------------------------------
 
-template <typename ElementType, typename ... Args> void acmacs::tal::v3::Settings::add_element(Args&& ... args)
+template <typename ElementType, typename ... Args> acmacs::tal::v3::LayoutElement& acmacs::tal::v3::Settings::add_element(Args&& ... args)
 {
     using namespace std::string_view_literals;
     auto& element = draw().layout().add(std::make_unique<ElementType>(std::forward<Args>(args) ...));
     getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
     outline(element.outline());
+    return element;
 
 } // acmacs::tal::v3::Settings::add_element
 
@@ -73,7 +74,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             update_env();
         }
         else if (name == "tree"sv)
-            add_element<DrawTree>(tal_);
+            add_tree();
         else
             return acmacs::settings::Settings::apply_built_in(name, verb);
         return true;
@@ -254,15 +255,16 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
 
 void acmacs::tal::v3::Settings::clade() const
 {
-    const auto clade_name = getenv("name", "");
+    using namespace std::string_view_literals;
+    const auto clade_name = getenv("name"sv, "");
     if (clade_name.empty())
         throw error{"empty clade name"};
-    const auto display_name = getenv("display_name", clade_name);
-    const auto report = getenv("report", false);
-    const auto inclusion_tolerance = getenv("inclusion_tolerance", getenv("clade_section_inclusion_tolerance", 10UL));
-    const auto exclusion_tolerance = getenv("exclusion_tolerance", getenv("clade_section_exclusion_tolerance",  5UL));
+    const auto display_name = getenv("display_name"sv, clade_name);
+    const auto report = getenv("report"sv, false);
+    const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
+    const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
 
-    if (const auto& substitutions = getenv("substitutions"); !substitutions.is_null())
+    if (const auto& substitutions = getenv("substitutions"sv); !substitutions.is_null())
         tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name, inclusion_tolerance, exclusion_tolerance);
     else
         throw error{"no \"substitutions\" provided"};
@@ -271,6 +273,50 @@ void acmacs::tal::v3::Settings::clade() const
         tree().clade_report(clade_name);
 
 } // acmacs::tal::v3::Settings::clade
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_tree()
+{
+    using namespace std::string_view_literals;
+    const auto color_by = [](std::string_view key, const rjson::value& fields) -> std::unique_ptr<Coloring> {
+        if (key == "continent") {
+            auto cb = std::make_unique<ColoringByContinent>();
+            for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
+                if (const auto& val = fields.get(continent); val.is_string())
+                    cb->set(continent, Color{val.to<std::string>()});
+            }
+            return cb;
+        }
+        else if (key == "uniform") {
+            return std::make_unique<ColoringUniform>(Color{rjson::get_or(fields, "color", "black")});
+        }
+        else {
+            fmt::print(stderr, "WARNING: unrecognized \"color_by\": {}, uniform(PINK) assumed\n", key);
+            return std::make_unique<ColoringUniform>(PINK);
+        }
+    };
+
+    auto& element = dynamic_cast<DrawTree&>(add_element<DrawTree>(tal_));
+    const auto& cb_val = getenv("color_by"sv);
+    auto coloring = std::visit(
+        [color_by,&cb_val]<typename T>(T && arg) -> std::unique_ptr<Coloring> {
+            if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                return color_by(arg, rjson::object{});
+            }
+            else if constexpr (std::is_same_v<std::decay_t<T>, rjson::object>) {
+                return color_by(rjson::get_or(cb_val, "N", "uniform"), cb_val);
+            }
+            else if constexpr (!std::is_same_v<std::decay_t<T>, rjson::null> && !std::is_same_v<std::decay_t<T>, rjson::const_null>)
+                throw error{"unsupported value type for \"color_by\""};
+            else
+                return {};
+        },
+        cb_val.val_());
+    if (coloring)
+        element.coloring(std::move(coloring));
+
+} // acmacs::tal::v3::Settings::add_tree
 
 // ----------------------------------------------------------------------
 

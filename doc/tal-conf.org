@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-05 10:07:44 eu>
+# Time-stamp: <2019-12-05 18:26:51 eu>
 
 * Command line defines
 
@@ -70,7 +70,7 @@
 
 {"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug_outline": <[[Debug outline][debug-outline]]>},
 
-{"N": "tree", "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 {"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 * Select Nodes
@@ -92,6 +92,15 @@ If multiple criteria specified within single "select" object, they all used (con
 "debug_outline": false
 "debug_outline": "pink"
 "debug_outline": {"show": true, "color": "pink", "width": 2}
+
+* Color by
+
+"color_by": "uniform"
+"color_by": {"N": "uniform", "color": "red"}
+
+"color_by": "continent"
+"color_by": {"N": "continent", "EUROPE": "#00A800", "CENTRAL-AMERICA": "#70A4A8", "MIDDLE-EAST": "#8000FF", "NORTH-AMERICA": "#00008B", "AFRICA": "#FF8000", "ASIA": "#FF0000", "RUSSIA": "#B03060", "AUSTRALIA-OCEANIA": "#FF69B4", "SOUTH-AMERICA": "#40E0D0", "ANTARCTICA": "#808080", "CHINA-SOUTH": "#FF0000", "CHINA-NORTH": "#6495ED", "CHINA-UNKNOWN": "#808080", "UNKNOWN": "#808080"}
+
 
 * COMMENT ====== local vars
 :PROPERTIES:

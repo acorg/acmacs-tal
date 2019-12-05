@@ -16,6 +16,7 @@ namespace acmacs::tal::inline v3
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
+        void coloring(std::unique_ptr<Coloring> coloring) { coloring_ = std::move(coloring); }
 
       private:
         Tal& tal_;
