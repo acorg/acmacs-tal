@@ -2,6 +2,7 @@
 
 #include "acmacs-base/color.hh"
 #include "acmacs-base/flat-map.hh"
+#include "seqdb-3/sequence.hh"
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,18 @@ namespace acmacs::tal::inline v3
 
       private:
         acmacs::flat_map_t<std::string, Color> colors_;
+    };
+
+    // ----------------------------------------------------------------------
+
+    class ColoringByPos : public Coloring
+    {
+      public:
+        ColoringByPos(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
+        Color color(const Node& node) const override;
+
+      private:
+        acmacs::seqdb::pos1_t pos_;
     };
 
     // ----------------------------------------------------------------------

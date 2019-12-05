@@ -25,6 +25,19 @@ Color acmacs::tal::v3::ColoringByContinent::color(const Node& node) const
 
 // ----------------------------------------------------------------------
 
+Color acmacs::tal::v3::ColoringByPos::color(const Node& /*node*/) const
+{
+    static bool reported{false};
+    if (!reported) {
+        fmt::print(stderr, "WARNING: ColoringByPos not implemented\n");
+        reported = true;
+    }
+    return PINK;
+
+} // acmacs::tal::v3::ColoringByPos::color
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

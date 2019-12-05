@@ -288,6 +288,9 @@ void acmacs::tal::v3::Settings::add_tree()
             }
             return cb;
         }
+        else if (key == "pos") {
+            return std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::get_or(fields, "pos", 192)});
+        }
         else if (key == "uniform") {
             return std::make_unique<ColoringUniform>(Color{rjson::get_or(fields, "color", "black")});
         }
