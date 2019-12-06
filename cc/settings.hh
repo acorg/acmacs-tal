@@ -9,6 +9,8 @@
 
 namespace acmacs::tal::inline v3
 {
+    class TimeSeries;
+
     class Settings : public acmacs::settings::Settings
     {
       public:
@@ -37,6 +39,7 @@ namespace acmacs::tal::inline v3
         void process_color_by(LayoutElementWithColoring& element);
         void add_tree();
         void add_time_series();
+        void read_time_series_parameters(TimeSeries& time_series);
     };
 
 } // namespace acmacs::tal::inlinev3

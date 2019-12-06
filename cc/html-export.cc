@@ -34,7 +34,7 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
 
 // ----------------------------------------------------------------------
 
-void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, const acmacs::tal::v3::Node& parent, double edge_scale, prefix_t& prefix, bool last)
+void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, const acmacs::tal::v3::Node& /*parent*/, double edge_scale, prefix_t& prefix, bool last)
 {
     if (node.is_leaf()) {
         fmt::format_to(html,
