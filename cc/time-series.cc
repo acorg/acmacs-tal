@@ -19,7 +19,7 @@ void acmacs::tal::v3::TimeSeries::prepare()
         if (last_ == date::invalid_date())
             last_ = date::next_month(last);
     }
-    const auto number_of_months = date::months_between_dates(first_, last_);
+    const auto number_of_months = date::calendar_months_between_dates(first_, last_);
     if (width_to_height_ratio() <= 0.0)
         width_to_height_ratio() = number_of_months * parameters_.slot.width;
     fmt::print(stderr, "DEBUG: months in time series: {} [{} .. {})\n", number_of_months, first_, last_);
@@ -40,10 +40,13 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
         if (!leaf.date.empty()) {
             if (const auto leaf_date = date::from_string(leaf.date); leaf_date >= first_ && leaf_date < last_) {
                 const auto month_no = date::calendar_months_between_dates(first_, leaf_date);
+                // if (month_no == 4)
+                    fmt::print(stderr, "DEBUG: {} {} {}\n", first_, leaf_date, month_no);
                 const auto dash_offset_x = dash_pos_x + month_no * parameters_.slot.width;
                 if (!leaf.hidden) {
                     surface.line({dash_offset_x, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_},
-                                 {dash_offset_x + parameters_.slot.width * parameters_.dash.width, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_}, color(leaf), parameters_.dash.line_width, surface::LineCap::Round);
+                                 {dash_offset_x + parameters_.slot.width * parameters_.dash.width, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_},
+                                 color(leaf), parameters_.dash.line_width, surface::LineCap::Round);
                 }
             }
         }
