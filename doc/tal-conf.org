@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-05 18:40:50 eu>
+# Time-stamp: <2019-12-06 15:04:41 eu>
 
 * Command line defines
 
@@ -70,8 +70,19 @@
 
 {"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug_outline": <[[Debug outline][debug-outline]]>},
 
-{"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 {"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+{"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+{"N": "time_series", "color_by": <[[Color by][color-by]]>, 
+ "start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
+ "period": {"month": 1}, "?": "month, week, year"
+ "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
+ "slot": {"width": 0.01, "?": "relative to the time series area height",
+          "separator": {"width_pixels": 0.5, "color": "black"},
+          "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
+         },
+ "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 * Select Nodes
 

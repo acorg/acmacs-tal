@@ -17,28 +17,63 @@ namespace acmacs::tal::inline v3
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
 
+        // ----------------------------------------------------------------------
+
+        enum class Period { week, month, year };
+        struct PeriodParameters
+        {
+            Period period{Period::month};
+            size_t number{1};
+        };
+
+        struct DashParameters
+        {
+            double width{0.5}; // relative to parameters_.slot.width
+            Pixels line_width{0.5};
+        };
+
+        struct SlotSeparatorParameters
+        {
+            Pixels width{0.5};
+            Color color{BLACK};
+        };
+
+        struct SlotLabelParameters
+        {
+            Rotation rotation{Rotation90DegreesAnticlockwise}; // Rotation90DegreesAnticlockwise, Rotation90DegreesClockwise
+            Color color{BLACK};
+            double scale{0.7};                         // relative to parameters_.slot.width
+            double offset{0.002}; // relative to the time series area height
+        };
+
+        struct SlotParameters
+        {
+            double width{0.01}; // relative to the time series area height
+            SlotSeparatorParameters separator;
+            SlotLabelParameters label;
+        };
+
+        struct Parameters
+        {
+            PeriodParameters period;
+            SlotParameters slot;
+            DashParameters dash;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+
       private:
         Tal& tal_;
         date::year_month_day first_{date::invalid_date()}, last_{date::invalid_date()}; // inclusive
-        date::period_diff_t number_of_months_{0};
-        double month_width_{0.01}; // relative to time series area height
-
-        double dash_width_{0.5}; // relative to month_width_
-        Pixels dash_line_width_{0.5};
-
-        Pixels month_separator_line_width_{0.5};
-        Color month_separator_line_color_{BLACK};
-        Rotation month_label_rotation_{Rotation90DegreesAnticlockwise}; // Rotation90DegreesAnticlockwise, Rotation90DegreesClockwise
-        Color month_label_color_{BLACK};
-        double month_label_scale_{0.7}; // relative to month_width_
-        double month_label_offset_from_time_series_area{0.002}; // relative to time series area height
+        // date::period_diff_t number_of_months_{0};
+        Parameters parameters_;
 
         void draw_labels(acmacs::surface::Surface& surface) const;
     };
 
     // ----------------------------------------------------------------------
 
-}
+} // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------
 /// Local Variables:
