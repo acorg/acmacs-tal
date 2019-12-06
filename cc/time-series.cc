@@ -1,6 +1,7 @@
 #include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
+#include "acmacs-tal/tree-iterate.hh"
 
 // ----------------------------------------------------------------------
 
@@ -16,18 +17,43 @@ void acmacs::tal::v3::TimeSeries::prepare()
         if (first_ == date::invalid_date())
             first_ = first;
         if (last_ == date::invalid_date())
-            last_ = last;
+            last_ = date::next_month(last);
     }
-    number_of_months_ = date::months_between_dates(first_, last_) + 1;
+    number_of_months_ = date::months_between_dates(first_, last_);
     if (width_to_height_ratio() <= 0.0)
         width_to_height_ratio() = number_of_months_ * month_width_;
-    fmt::print(stderr, "DEBUG: months in time series: {} {}..{}\n", number_of_months_, first_, last_);
+    fmt::print(stderr, "DEBUG: months in time series: {} [{} .. {})\n", number_of_months_, first_, last_);
 
 } // acmacs::tal::v3::TimeSeries::prepare
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
+{
+    draw_labels(surface);
+
+    const auto& draw_tree = tal_.draw().layout().draw_tree();
+    const auto& viewport = surface.viewport();
+    const auto dash_pos_x = viewport.origin.x() + month_width_ * (1.0 - dash_width_) * 0.5;
+
+    tree::iterate_leaf(tal_.tree(), [&, this, dash_pos_x](const Node& leaf) {
+        if (!leaf.date.empty()) {
+            if (const auto leaf_date = date::from_string(leaf.date); leaf_date >= first_ && leaf_date < last_) {
+                const auto month_no = date::calendar_months_between_dates(first_, leaf_date);
+                const auto dash_offset_x = dash_pos_x + month_no * month_width_;
+                if (!leaf.hidden) {
+                    surface.line({dash_offset_x, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_},
+                                 {dash_offset_x + month_width_ * dash_width_, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_}, color(leaf), dash_line_width_, surface::LineCap::Round);
+                }
+            }
+        }
+    });
+
+} // acmacs::tal::v3::TimeSeries::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface) const
 {
     const auto& viewport = surface.viewport();
 
@@ -56,7 +82,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     }
 
     double line_offset_x = viewport.origin.x();
-    for (auto month = first_; month <= last_; month = date::next_month(month)) {
+    for (auto month = first_; month < last_; month = date::next_month(month)) {
         surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, month_separator_line_color_, month_separator_line_width_);
 
         const auto month_label = date::month_3(month);
@@ -70,7 +96,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     }
     surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, month_separator_line_color_, month_separator_line_width_);
 
-} // acmacs::tal::v3::TimeSeries::draw
+} // acmacs::tal::v3::TimeSeries::draw_labels
 
 // ----------------------------------------------------------------------
 

@@ -11,7 +11,7 @@
   {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
-  {"N": "time_series", "?debug_outline": "lightblue"},
+  {"N": "time_series", "color_by": "continent", "?debug_outline": "lightblue"},
   {"?N": "tree", "color_by": {"N": "continent", "EUROPE": "magenta"}, "debug_outline": false},
  ],
  "main": [
