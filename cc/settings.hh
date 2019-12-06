@@ -25,7 +25,7 @@ namespace acmacs::tal::inline v3
         Tree& tree() const { return tal_.tree(); }
         Draw& draw() { return tal_.draw(); }
 
-        template <typename ElementType, typename ... Args> LayoutElement& add_element(Args&& ... args);
+        template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args);
 
         void apply_nodes() const;
         void update_env();
@@ -34,7 +34,9 @@ namespace acmacs::tal::inline v3
         void ladderize();
         void margins();
         void outline(DrawOutline& draw_outline);
+        void process_color_by(LayoutElementWithColoring& element);
         void add_tree();
+        void add_time_series();
     };
 
 } // namespace acmacs::tal::inlinev3

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "acmacs-tal/layout.hh"
-#include "acmacs-tal/coloring.hh"
 
 // ----------------------------------------------------------------------
 
@@ -9,18 +8,18 @@ namespace acmacs::tal::inline v3
 {
     class Tal;
 
-    class DrawTree : public LayoutElement
+    class DrawTree : public LayoutElementWithColoring
     {
       public:
-        DrawTree(Tal& tal);
+        DrawTree(Tal& tal) : LayoutElementWithColoring(0.7), tal_{tal} {}
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
-        void coloring(std::unique_ptr<Coloring> coloring) { coloring_ = std::move(coloring); }
+        DrawTree* draw_tree() override { return this; }
 
       private:
         Tal& tal_;
-        std::unique_ptr<Coloring> coloring_;
+        bool prepared_{false};
         const double height_{1.0};
         double vertical_step_{0};
         double horizontal_step_{0};

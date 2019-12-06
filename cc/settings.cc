@@ -6,13 +6,16 @@
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/draw-tree.hh"
+#include "acmacs-tal/time-series.hh"
 
 // ----------------------------------------------------------------------
 
-template <typename ElementType, typename ... Args> acmacs::tal::v3::LayoutElement& acmacs::tal::v3::Settings::add_element(Args&& ... args)
+template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&& ... args)
 {
     using namespace std::string_view_literals;
-    auto& element = draw().layout().add(std::make_unique<ElementType>(std::forward<Args>(args) ...));
+    auto element_p = std::make_unique<ElementType>(std::forward<Args>(args) ...);
+    auto& element = *element_p;
+    draw().layout().add(std::move(element_p));
     getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
     outline(element.outline());
     return element;
@@ -73,6 +76,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().match_seqdb(getenv("filename"sv, ""));
             update_env();
         }
+        else if (name == "time_series"sv)
+            add_time_series();
         else if (name == "tree"sv)
             add_tree();
         else
@@ -276,9 +281,10 @@ void acmacs::tal::v3::Settings::clade() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::add_tree()
+void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& element)
 {
     using namespace std::string_view_literals;
+
     const auto color_by = [](std::string_view key, const rjson::value& fields) -> std::unique_ptr<Coloring> {
         if (key == "continent") {
             auto cb = std::make_unique<ColoringByContinent>();
@@ -300,7 +306,6 @@ void acmacs::tal::v3::Settings::add_tree()
         }
     };
 
-    auto& element = dynamic_cast<DrawTree&>(add_element<DrawTree>(tal_));
     const auto& cb_val = getenv("color_by"sv);
     auto coloring = std::visit(
         [color_by,&cb_val]<typename T>(T && arg) -> std::unique_ptr<Coloring> {
@@ -319,7 +324,25 @@ void acmacs::tal::v3::Settings::add_tree()
     if (coloring)
         element.coloring(std::move(coloring));
 
+} // acmacs::tal::v3::Settings::process_color_by
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_tree()
+{
+    auto& element = add_element<DrawTree>(tal_);
+    process_color_by(element);
+
 } // acmacs::tal::v3::Settings::add_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_time_series()
+{
+    auto& element = add_element<TimeSeries>(tal_);
+    process_color_by(element);
+
+} // acmacs::tal::v3::Settings::add_time_series
 
 // ----------------------------------------------------------------------
 

@@ -35,6 +35,18 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
+acmacs::tal::v3::DrawTree& acmacs::tal::v3::Layout::draw_tree()
+{
+    for (auto& element : elements_) {
+        if (auto* dt = element->draw_tree(); dt)
+            return *dt;
+    }
+    throw std::runtime_error("No DrawTree element in layout");
+
+} // acmacs::tal::v3::Layout::draw_tree
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Layout::prepare()
 {
     for (auto& element : elements_)
