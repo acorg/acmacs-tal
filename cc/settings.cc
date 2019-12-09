@@ -350,19 +350,9 @@ void acmacs::tal::v3::Settings::add_time_series()
 void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_series)
 {
     using namespace std::string_view_literals;
-
-    if (const auto& first = getenv("start"sv); !first.is_const_null())
-        time_series.first(date::from_string(first.to<std::string>(), date::allow_incomplete::yes));
-    if (const auto& last = getenv("end"sv); !last.is_const_null())
-        time_series.last(date::from_string(last.to<std::string>(), date::allow_incomplete::yes));
-
-    // getenv_copy_if_present("left"sv, draw().margins().left);
-    // getenv("right"sv, draw().margins().right);
-
     auto& param = time_series.parameters();
+    acmacs::time_series::update(getenv("time_series"sv), param.time_series);
 
-     // "start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
-     // "period": {"month": 1}, "?": "month, week, year"
      // "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
      // "slot": {"width": 0.01, "?": "relative to the time series area height",
      //      "separator": {"width_pixels": 0.5, "color": "black"},

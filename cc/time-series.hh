@@ -1,6 +1,6 @@
 #pragma once
 
-#include "acmacs-base/date.hh"
+#include "acmacs-base/time-series.hh"
 #include "acmacs-tal/layout.hh"
 
 // ----------------------------------------------------------------------
@@ -19,12 +19,12 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        enum class Period { week, month, year };
-        struct PeriodParameters
-        {
-            Period period{Period::month};
-            size_t number{1};
-        };
+        // enum class Period { week, month, year };
+        // struct PeriodParameters
+        // {
+        //     Period period{Period::month};
+        //     size_t number{1};
+        // };
 
         struct DashParameters
         {
@@ -55,20 +55,19 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
-            PeriodParameters period;
+            acmacs::time_series::parameters time_series;
             SlotParameters slot;
             DashParameters dash;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
-        constexpr void first(date::year_month_day&& date) { first_ = std::move(date); }
-        constexpr void last(date::year_month_day&& date) { last_ = std::move(date); }
+        // constexpr void first(date::year_month_day&& date) { first_ = std::move(date); }
+        // constexpr void last(date::year_month_day&& date) { last_ = std::move(date); }
 
       private:
         Tal& tal_;
-        date::year_month_day first_{date::invalid_date()}, last_{date::invalid_date()}; // inclusive
-        // date::period_diff_t number_of_months_{0};
         Parameters parameters_;
+        acmacs::time_series::series series_;
 
         void draw_labels(acmacs::surface::Surface& surface) const;
     };
