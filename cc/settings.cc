@@ -351,7 +351,7 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
 {
     using namespace std::string_view_literals;
     auto& param = time_series.parameters();
-    acmacs::time_series::update(getenv("time_series"sv), param.time_series);
+    acmacs::time_series::update(rjson::object{{"start"sv, getenv("start"sv)}, {"end"sv, getenv("end"sv)}, {"interval"sv, getenv("interval"sv)}}, param.time_series);
 
      // "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
      // "slot": {"width": 0.01, "?": "relative to the time series area height",
