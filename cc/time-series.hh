@@ -19,13 +19,6 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        // enum class Period { week, month, year };
-        // struct PeriodParameters
-        // {
-        //     Period period{Period::month};
-        //     size_t number{1};
-        // };
-
         struct DashParameters
         {
             double width{0.5}; // relative to parameters_.slot.width
@@ -70,6 +63,8 @@ namespace acmacs::tal::inline v3
         acmacs::time_series::series series_;
 
         void draw_labels(acmacs::surface::Surface& surface) const;
+        std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
+
     };
 
     // ----------------------------------------------------------------------

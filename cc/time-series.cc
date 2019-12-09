@@ -87,9 +87,7 @@ void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface)
     for (const auto& slot : series_) {
         surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters_.slot.separator.color, parameters_.slot.separator.width);
 
-        const auto name_fields = acmacs::string::split(acmacs::time_series::text_name(slot), " ");
-        const auto& month_label = name_fields[0];
-        const auto& year_label = name_fields.size() > 1 ? name_fields[1] : name_fields[0];
+        const auto [year_label, month_label] = labels(slot);
         const auto label_offset_x = line_offset_x + month_label_offset_x;
         surface.text({label_offset_x, month_top}, month_label, parameters_.slot.label.color, month_label_size, text_style, parameters_.slot.label.rotation);
         surface.text({label_offset_x, year_top}, year_label, parameters_.slot.label.color, month_label_size, text_style, parameters_.slot.label.rotation);
@@ -100,6 +98,23 @@ void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface)
     surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters_.slot.separator.color, parameters_.slot.separator.width);
 
 } // acmacs::tal::v3::TimeSeries::draw_labels
+
+// ----------------------------------------------------------------------
+
+std::pair<std::string, std::string> acmacs::tal::v3::TimeSeries::labels(const acmacs::time_series::slot& slot) const
+{
+    switch (parameters_.time_series.intervl) {
+        case acmacs::time_series::v2::interval::year:
+            return {date::year_2(slot.first), {}};
+        case acmacs::time_series::v2::interval::month:
+            return {date::year_2(slot.first), date::month_3(slot.first)};
+        case acmacs::time_series::v2::interval::week:
+            return {{}, date::year4_month2_day2(slot.first)};
+        case acmacs::time_series::v2::interval::day:
+            return {{}, date::year4_month2_day2(slot.first)};
+    }
+
+} // acmacs::tal::v3::TimeSeries::labels
 
 // ----------------------------------------------------------------------
 
