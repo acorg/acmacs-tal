@@ -1,12 +1,16 @@
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
+#include "acmacs-tal/time-series.hh"
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Clades::prepare()
 {
     if (!prepared_) {
+        auto& layout = tal_.draw().layout();
+        time_series_to_the_left_ = layout.index_of(layout.find<TimeSeries>()) < layout.index_of(this);
+
         make_clades();
         if (width_to_height_ratio() <= 0.0)
             width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
@@ -50,6 +54,7 @@ void acmacs::tal::v3::Clades::make_sections()
                 auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
                 section.label = clade_param.label;
                 section.arrow = clade_param.arrow;
+                section.horizontal_line = clade_param.horizontal_line;
                 if (!clade_param.display_name.empty())
                     section.display_name = clade_param.display_name;
             }
@@ -150,15 +155,21 @@ size_t acmacs::tal::v3::Clades::number_of_slots() const
 
 void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 {
-    const auto& draw_tree = tal_.draw().layout().draw_tree();
-    const auto vertical_step = draw_tree.vertical_step();
+    const auto* draw_tree = tal_.draw().layout().find<DrawTree>();
+    if (!draw_tree) {
+        fmt::print(stderr, "WARNING: No tree section in layout, cannot draw clades\n");
+        return;
+    }
+    const auto vertical_step = draw_tree->vertical_step();
     const auto& viewport = surface.viewport();
 
     const TextStyle text_style{};
 
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
-            const auto pos_x = viewport.left() + parameters_.slot.width * (*section.slot_no + 1);
+            const auto pos_x = time_series_to_the_left_ ?
+                    (viewport.left() + parameters_.slot.width * (*section.slot_no + 1)) :
+                    (viewport.right() - parameters_.slot.width * (*section.slot_no + 1));
             // arrow
             surface.double_arrow({pos_x, vertical_step * section.first->cumulative_vertical_offset_},
                                  {pos_x, vertical_step * section.last->cumulative_vertical_offset_},
@@ -179,15 +190,18 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                     vertical_pos = vertical_step * section.last->cumulative_vertical_offset_;
                     break;
             }
-            surface.text({pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
+            const auto text_pos_x = time_series_to_the_left_ ? (pos_x + section.label.horizontal_offset) : (pos_x - text_size.width - section.label.horizontal_offset);
+            surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
 
             // horizontal lines
-            surface.line({viewport.left(), vertical_step * section.first->cumulative_vertical_offset_},
-                         {viewport.right(), vertical_step * section.first->cumulative_vertical_offset_},
-                         RED, Pixels{1});
-            surface.line({viewport.left(), vertical_step * section.last->cumulative_vertical_offset_},
-                         {viewport.right(), vertical_step * section.last->cumulative_vertical_offset_},
-                         MAGENTA, Pixels{1});
+            const auto left = time_series_to_the_left_ ? viewport.left() : pos_x;
+            const auto right = time_series_to_the_left_ ? pos_x : viewport.right();
+            surface.line({left, vertical_step * section.first->cumulative_vertical_offset_},
+                         {right, vertical_step * section.first->cumulative_vertical_offset_},
+                         section.horizontal_line.color, section.horizontal_line.line_width);
+            surface.line({left, vertical_step * section.last->cumulative_vertical_offset_},
+                         {right, vertical_step * section.last->cumulative_vertical_offset_},
+                         section.horizontal_line.color, section.horizontal_line.line_width);
         }
     }
 

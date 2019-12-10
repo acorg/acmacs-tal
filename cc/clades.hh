@@ -17,8 +17,6 @@ namespace acmacs::tal::inline v3
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
 
-        bool is_clades() override { return true; }
-
         // ----------------------------------------------------------------------
 
         using slot_no_t = acmacs::named_size_t<struct acmacs_tal_Clades_slot_no_tag>;
@@ -33,13 +31,17 @@ namespace acmacs::tal::inline v3
             double scale{0.5};                         // relative to parameters_.slot.width
             vertical_position position{vertical_position::middle};
             double vertical_offset{0}; // relative to the area height
-            double horizonltal_offset{0}; // relative to the area height
+            double horizontal_offset{0.002}; // relative to the area height
         };
 
-        struct arrow_t
+        struct line_t
         {
             Color color{BLACK};
             Pixels line_width{1.0};
+        };
+
+        struct arrow_t : public line_t
+        {
             Pixels arrow_width{3.0};
         };
 
@@ -51,6 +53,7 @@ namespace acmacs::tal::inline v3
             slot_no_t slot_no{0};
             label_t label;
             arrow_t arrow;
+            line_t horizontal_line;
 
             clade_section_t(const Node* frst, const Node* lst, std::string_view disp) : first{frst}, last{lst}, display_name{disp} {}
             constexpr node_id_t::value_type size() const
@@ -88,6 +91,7 @@ namespace acmacs::tal::inline v3
             slot_no_t slot_no{NoSlot};
             label_t label;
             arrow_t arrow;
+            line_t horizontal_line{GREY, Pixels{0.5}};
             double tree_top_gap{10.0}, tree_bottom_gap{10.0};
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };
@@ -107,6 +111,7 @@ namespace acmacs::tal::inline v3
         Tal& tal_;
         Parameters parameters_;
         clades_t clades_;
+        bool time_series_to_the_left_{false};
 
         void make_clades();
         void make_sections();

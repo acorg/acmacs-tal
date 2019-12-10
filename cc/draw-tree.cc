@@ -7,7 +7,7 @@
 void acmacs::tal::v3::DrawTree::prepare()
 {
     if (!prepared_) {
-        tal_.draw().layout().prepare_clades();
+        tal_.draw().layout().prepare_element<Clades>();
 
         const auto tree_height = tal_.tree().compute_cumulative_vertical_offsets();
         tal_.tree().number_leaves_in_subtree();

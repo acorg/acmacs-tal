@@ -1,5 +1,7 @@
 #include "acmacs-tal/layout.hh"
 #include "acmacs-tal/draw-tree.hh"
+#include "acmacs-tal/time-series.hh"
+#include "acmacs-tal/clades.hh"
 
 // ----------------------------------------------------------------------
 
@@ -45,37 +47,45 @@ void acmacs::tal::v3::Layout::prepare()
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::DrawTree& acmacs::tal::v3::Layout::draw_tree()
+template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
 {
     for (auto& element : elements_) {
-        if (element->is_draw_tree())
-            return dynamic_cast<DrawTree&>(*element);
+        if (auto* found = dynamic_cast<Element*>(element.get()); found)
+            return found;
     }
-    throw std::runtime_error("No DrawTree element in layout");
+    return nullptr;
+}
 
-} // acmacs::tal::v3::Layout::draw_tree
+template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>();
+template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>();
+template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>();
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::prepare_draw_tree()
+template <typename Element> void acmacs::tal::v3::Layout::prepare_element()
 {
     for (auto& element : elements_) {
-        if (element->is_draw_tree())
-            element->prepare();
+        if (auto* found = dynamic_cast<Element*>(element.get()); found)
+            found->prepare();
     }
 
 } // acmacs::tal::v3::Layout::prepare_tree
 
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>();
+
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::prepare_clades()
+size_t acmacs::tal::v3::Layout::index_of(const LayoutElement* look_for) const
 {
-    for (auto& element : elements_) {
-        if (element->is_clades())
-            element->prepare();
+    for (size_t index = 0; index < elements_.size(); ++index) {
+        if (elements_[index].get() == look_for)
+            return index;
     }
+    return static_cast<size_t>(-1);
 
-} // acmacs::tal::v3::Layout::prepare_clades
+} // acmacs::tal::v3::Layout::index_of
 
 // ----------------------------------------------------------------------
 

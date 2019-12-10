@@ -15,7 +15,6 @@ namespace acmacs::tal::inline v3
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
-        bool is_draw_tree() override { return true; }
 
         constexpr double vertical_step() const { return vertical_step_; }
 

@@ -9,7 +9,7 @@
 void acmacs::tal::v3::TimeSeries::prepare()
 {
     if (!prepared_) {
-        tal_.draw().layout().prepare_draw_tree();
+        tal_.draw().layout().prepare_element<DrawTree>();
 
         if (parameters_.time_series.first == date::invalid_date() || parameters_.time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal_.tree().stat_by_month();
@@ -35,8 +35,12 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 {
     draw_labels(surface);
 
-    const auto& draw_tree = tal_.draw().layout().draw_tree();
-    const auto vertical_step = draw_tree.vertical_step();
+    const auto* draw_tree = tal_.draw().layout().find<DrawTree>();
+    if (!draw_tree) {
+        fmt::print(stderr, "WARNING: No tree section in layout, cannot draw time series\n");
+        return;
+    }
+    const auto vertical_step = draw_tree->vertical_step();
     const auto& viewport = surface.viewport();
     const auto dash_pos_x = viewport.origin.x() + parameters_.slot.width * (1.0 - parameters_.dash.width) * 0.5;
 

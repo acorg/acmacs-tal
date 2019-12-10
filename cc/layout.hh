@@ -13,6 +13,8 @@ namespace acmacs::tal::inline v3
 
     class LayoutElement;
     class DrawTree;
+    class TimeSeries;
+    class Clades;
 
     class Layout
     {
@@ -23,14 +25,21 @@ namespace acmacs::tal::inline v3
         void prepare();
         void draw(acmacs::surface::Surface& surface) const;
 
-        void prepare_draw_tree();
-        void prepare_clades();
-        DrawTree& draw_tree();
+        template <typename Element> Element* find();
+        template <typename Element> void prepare_element();
+        size_t index_of(const LayoutElement* look_for) const;
 
       private:
         std::vector<std::unique_ptr<LayoutElement>> elements_;
-
     };
+
+    extern template DrawTree* Layout::find<DrawTree>();
+    extern template TimeSeries* Layout::find<TimeSeries>();
+    extern template Clades* Layout::find<Clades>();
+
+    extern template void Layout::prepare_element<DrawTree>();
+    extern template void Layout::prepare_element<TimeSeries>();
+    extern template void Layout::prepare_element<Clades>();
 
     // ======================================================================
 
@@ -60,9 +69,6 @@ namespace acmacs::tal::inline v3
         virtual Position position() const { return Position::normal; }
         virtual void prepare() { prepared_ = true; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
-
-        virtual bool is_draw_tree() { return false; }
-        virtual bool is_clades() { return false; }
 
       protected:
         bool prepared_{false};
