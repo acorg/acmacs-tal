@@ -54,8 +54,6 @@ namespace acmacs::tal::inline v3
         };
 
         constexpr Parameters& parameters() { return parameters_; }
-        // constexpr void first(date::year_month_day&& date) { first_ = std::move(date); }
-        // constexpr void last(date::year_month_day&& date) { last_ = std::move(date); }
 
       private:
         Tal& tal_;

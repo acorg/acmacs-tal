@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-09 16:09:23 eu>
+# Time-stamp: <2019-12-10 10:33:50 eu>
 
 * Command line defines
 
@@ -59,7 +59,8 @@
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 
 {"N": "clades-reset"}
-{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": true, "inclusion_tolerance": "{clade_section_inclusion_tolerance}", "exclusion_tolerance": "{clade_section_exclusion_tolerance}"}
+{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false} 
+-- "inclusion_tolerance": "{clade_section_inclusion_tolerance}", "exclusion_tolerance": "{clade_section_exclusion_tolerance}"}
 
 ** Report
 
@@ -82,6 +83,9 @@
           "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
          },
  "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+{"N": "clades", 
+ "?width_to_height_ratio": 0.3, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 * Select Nodes
 

@@ -216,16 +216,8 @@ namespace acmacs::tal::inline v3
         void update_aa_transitions() const;
         void report_aa_transitions() const;
 
-        void clades_reset();
-        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name);
-        void clade_report(std::string_view name={}) const;
+        // ----------------------------------------------------------------------
 
-        void match(const acmacs::chart::Chart& chart) const;
-
-        // drawing support
-        double compute_cumulative_vertical_offsets(); // returns tree height
-
-      private:
         struct clade_section_t
         {
             clade_section_t(const Node* node) : first{node}, last{node} {}
@@ -243,6 +235,21 @@ namespace acmacs::tal::inline v3
 
         using clades_t = std::vector<clade_t>;
 
+        // constexpr clades_t& clades() { return clades_; }
+        constexpr const clades_t& clades() const { return clades_; }
+
+        void clades_reset();
+        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name);
+        void clade_report(std::string_view name={}) const;
+
+        // ----------------------------------------------------------------------
+
+        void match(const acmacs::chart::Chart& chart) const;
+
+        // drawing support
+        double compute_cumulative_vertical_offsets(); // returns tree height
+
+      private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
 

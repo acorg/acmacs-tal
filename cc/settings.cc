@@ -7,6 +7,7 @@
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
+#include "acmacs-tal/clades.hh"
 
 // ----------------------------------------------------------------------
 
@@ -53,6 +54,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().clades_reset();
         else if (name == "clade"sv)
             clade();
+        else if (name == "clades"sv)
+            add_clades();
         else if (name == "gap"sv)
             add_element<Gap>();
         else if (name == "ladderize"sv)
@@ -389,6 +392,14 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
     }
 
 } // acmacs::tal::v3::Settings::read_time_series_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_clades()
+{
+    auto& element = add_element<Clades>(tal_);
+
+} // acmacs::tal::v3::Settings::add_clades
 
 // ----------------------------------------------------------------------
 

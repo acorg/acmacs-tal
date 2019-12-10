@@ -40,6 +40,7 @@ namespace acmacs::tal::inline v3
         void add_tree();
         void add_time_series();
         void read_time_series_parameters(TimeSeries& time_series);
+        void add_clades();
     };
 
 } // namespace acmacs::tal::inlinev3

@@ -13,7 +13,8 @@
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
   {"N": "time_series", "color_by": "continent", "start": "2019-01-01", "end": "2019-12-31", "interval": {"month": 1},
    "?debug_outline": "lightblue"},
-  {"?N": "tree", "color_by": {"N": "continent", "EUROPE": "magenta"}, "debug_outline": false},
+  {"N": "clades", "debug_outline": "lightblue"},
+  {"?N": "tree", "color_by": {"N": "continent", "EUROPE": "magenta"}, "debug_outline": false}
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},
@@ -22,7 +23,7 @@
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
   {"N": "aa-transitions", "report": false},
-  {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [{"N": "clades-{virus-type}{lineage}", "report": true}]},
+  {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [{"N": "clades-{virus-type}{lineage}", "report": false}]},
   {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]},
    "then": [{"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},

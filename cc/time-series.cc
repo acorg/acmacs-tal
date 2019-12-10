@@ -23,7 +23,7 @@ void acmacs::tal::v3::TimeSeries::prepare()
     series_ = acmacs::time_series::make(parameters_.time_series);
     if (width_to_height_ratio() <= 0.0)
         width_to_height_ratio() = series_.size() * parameters_.slot.width;
-    fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
+    // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
 
 } // acmacs::tal::v3::TimeSeries::prepare
 
@@ -34,6 +34,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     draw_labels(surface);
 
     const auto& draw_tree = tal_.draw().layout().draw_tree();
+    const auto vertical_step = draw_tree.vertical_step();
     const auto& viewport = surface.viewport();
     const auto dash_pos_x = viewport.origin.x() + parameters_.slot.width * (1.0 - parameters_.dash.width) * 0.5;
 
@@ -43,8 +44,8 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
             if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
                 const auto dash_offset_x = dash_pos_x + slot_no * parameters_.slot.width;
                 if (!leaf.hidden) {
-                    surface.line({dash_offset_x, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_},
-                                 {dash_offset_x + parameters_.slot.width * parameters_.dash.width, draw_tree.vertical_step() * leaf.cumulative_vertical_offset_},
+                    surface.line({dash_offset_x, vertical_step * leaf.cumulative_vertical_offset_},
+                                 {dash_offset_x + parameters_.slot.width * parameters_.dash.width, vertical_step * leaf.cumulative_vertical_offset_},
                                  color(leaf), parameters_.dash.line_width, surface::LineCap::Round);
                 }
             }
