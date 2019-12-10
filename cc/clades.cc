@@ -9,6 +9,13 @@ bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
 {
     return true;
 
+    // for (const auto& sec_lhs : sections) {
+    //     for (const auto& sec_rhs : rhs.sections) {
+    //         const bool first_between  = sec_lhs
+    //     }
+    // }
+    // return false;
+
 } // acmacs::tal::v3::Clades::clade_t::intersects
 
 // ----------------------------------------------------------------------
