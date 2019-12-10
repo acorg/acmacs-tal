@@ -207,10 +207,15 @@ namespace acmacs::tal::inline v3
         void re_root(const NodePath& new_root);
 
         void number_leaves_in_subtree() const;
+        const Node* next_leaf(const Node* node) const;
+
+        // ----------------------------------------------------------------------
 
         Counter<std::string_view> stat_by_month() const;
         std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
         std::string report_time_series() const;
+
+        // ----------------------------------------------------------------------
 
         void update_common_aa() const;
         void report_common_aa() const;

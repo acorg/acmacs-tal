@@ -463,6 +463,25 @@ void acmacs::tal::v3::Tree::number_leaves_in_subtree() const
 
 // ----------------------------------------------------------------------
 
+const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::next_leaf(const Node* initial) const
+{
+    const Node* result{nullptr};
+    bool initial_found{false};
+    tree::iterate_leaf_stop(*this, [initial, &result, &initial_found](const Node& node) -> bool {
+        if (initial_found && !node.hidden) {
+            result = &node;
+            return true;
+        }
+        if (&node == initial)
+            initial_found = true;
+        return false;
+    });
+    return result;
+
+} // acmacs::tal::v3::Tree::next_leaf
+
+// ----------------------------------------------------------------------
+
 acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_name(SeqId look_for) const
 {
     NodePath path;
