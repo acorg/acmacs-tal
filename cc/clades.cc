@@ -5,6 +5,14 @@
 
 // ----------------------------------------------------------------------
 
+bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
+{
+    return true;
+
+} // acmacs::tal::v3::Clades::clade_t::intersects
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Clades::prepare()
 {
     if (!prepared_) {
@@ -92,10 +100,11 @@ void acmacs::tal::v3::Clades::set_slots()
         return std::max_element(std::begin(c1->sections), std::end(c1->sections), cmp)->size() < std::max_element(std::begin(c2->sections), std::end(c2->sections), cmp)->size();
     });
     size_t slot_no{0};
-    for (auto& clade_ref : clade_refs) {
-        for (auto& section : clade_ref->sections)
+    for (size_t clade_no = 0; clade_no < clade_refs.size(); ++clade_no) {
+        if (clade_no > 0 && clade_refs[clade_no]->intersects(*clade_refs[clade_no - 1]))
+            ++slot_no;
+        for (auto& section : clade_refs[clade_no]->sections)
             section.slot_no = slot_no_t{slot_no};
-        ++slot_no;
     }
 
 } // acmacs::tal::v3::Clades::set_slots

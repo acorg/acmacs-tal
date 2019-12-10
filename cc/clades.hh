@@ -67,9 +67,11 @@ namespace acmacs::tal::inline v3
 
         struct clade_t
         {
-            clade_t(std::string_view nam) : name{nam} {}
-            std::string name;
+            const std::string name;
             std::vector<clade_section_t> sections;
+
+            clade_t(std::string_view nam) : name{nam} {}
+            bool intersects(const clade_t& rhs) const;
         };
 
         using clades_t = std::vector<clade_t>;
