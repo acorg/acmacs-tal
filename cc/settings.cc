@@ -266,11 +266,11 @@ void acmacs::tal::v3::Settings::clade() const
         throw error{"empty clade name"};
     const auto display_name = getenv("display_name"sv, clade_name);
     const auto report = getenv("report"sv, false);
-    const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
-    const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
+    // const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
+    // const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
 
     if (const auto& substitutions = getenv("substitutions"sv); !substitutions.is_null())
-        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name, inclusion_tolerance, exclusion_tolerance);
+        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name);
     else
         throw error{"no \"substitutions\" provided"};
 

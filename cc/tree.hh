@@ -106,7 +106,6 @@ namespace acmacs::tal::inline v3
         ladderize_helper_t ladderize_helper_;
         node_id_t node_id_;
         // leaf node only
-        mutable size_t row_no_;
         mutable std::optional<size_t> antigen_index_in_chart_;
         mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
 
@@ -218,7 +217,7 @@ namespace acmacs::tal::inline v3
         void report_aa_transitions() const;
 
         void clades_reset();
-        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name, size_t inclusion_tolerance, size_t exclusion_tolerance);
+        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name);
         void clade_report(std::string_view name={}) const;
 
         void match(const acmacs::chart::Chart& chart) const;
@@ -244,31 +243,16 @@ namespace acmacs::tal::inline v3
 
         using clades_t = std::vector<clade_t>;
 
-        const clade_t* find_clade(std::string_view name) const
-        {
-            if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
-                return &*found;
-            else
-                return nullptr;
-        }
-
-        clade_t& find_clade(std::string_view name, std::string_view display_name = {})
-        {
-            if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
-                return *found;
-            else
-                return clades_.emplace_back(name, display_name);
-        }
+        const clade_t* find_clade(std::string_view name) const;
+        clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
 
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
-        mutable bool row_no_set_{false};
         clades_t clades_;
         mutable bool chart_matched_{false};
 
-        void set_row_no() const;
-    };
+    }; // class Tree
 
     // ----------------------------------------------------------------------
 

@@ -54,7 +54,7 @@ int main(int argc, const char *argv[])
 
         acmacs::tal::Settings settings{tal};
         using namespace std::string_view_literals;
-        for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv}) {
+        for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
                 settings.load(filename, verbose);
             else

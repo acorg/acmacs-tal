@@ -338,7 +338,6 @@ void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
 {
     for (Node* node : nodes)
         node->hidden = true;
-    row_no_set_ = false;
     clades_reset();
 
 } // acmacs::tal::v3::Tree::hide
@@ -439,7 +438,6 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
             break;
     }
 
-    row_no_set_ = false;
     clades_reset();
     set_node_id();
 
@@ -530,7 +528,6 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
     if (cumulative_edge_length != EdgeLengthNotSet)
         cumulative_calculate(true);
 
-    row_no_set_ = false;
     clades_reset();
     set_node_id();
 
@@ -713,29 +710,48 @@ void acmacs::tal::v3::Tree::clades_reset()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name, size_t inclusion_tolerance,
-                                      size_t exclusion_tolerance)
+const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::string_view name) const
 {
-    set_row_no();
+    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+        return &*found;
+    else
+        return nullptr;
 
+} // acmacs::tal::v3::Tree::find_clade
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::string_view name, std::string_view display_name)
+{
+    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+        return *found;
+    else
+        return clades_.emplace_back(name, display_name);
+
+} // acmacs::tal::v3::Tree::find_or_add_clade
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name)
+{
     size_t num = 0;
     const std::string name_s{name};
-    auto& clade_sections = find_clade(name, display_name).sections;
-    tree::iterate_leaf(*this, [&substitutions, name_s, &num, &clade_sections, inclusion_tolerance](Node& node) {
+    auto& clade_sections = find_or_add_clade(name, display_name).sections;
+    tree::iterate_leaf(*this, [&substitutions, name_s, &num, &clade_sections](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
             node.clades.add(name_s);
             ++num;
-            if (clade_sections.empty() || (node.row_no_ - clade_sections.back().last->row_no_) > inclusion_tolerance)
+            if (clade_sections.empty() || (node.node_id_.vertical - clade_sections.back().last->node_id_.vertical) > 1)
                 clade_sections.emplace_back(&node);
             else
                 clade_sections.back().last = &node;
         }
     });
 
-    // remove small sections
-    clade_sections.erase(
-        std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->row_no_ - section.first->row_no_) < exclusion_tolerance; }),
-        std::end(clade_sections));
+    // // remove small sections
+    // clade_sections.erase(
+    //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->node_id_.vertical - section.first->node_id_.vertical) < exclusion_tolerance; }),
+    //     std::end(clade_sections));
 
     // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
 
@@ -749,8 +765,8 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
         fmt::print("Clade \"{}\" ({})\n", clade_name, sections.size());
         for (auto it = std::begin(sections); it != std::end(sections); ++it) {
             if (it != std::begin(sections))
-                fmt::print("    gap {}\n", it->first->row_no_ - std::prev(it)->last->row_no_ - 1);
-            fmt::print(" ({}) {} {} .. {} {}\n", it->last->row_no_ - it->first->row_no_ + 1, it->first->row_no_, it->first->seq_id, it->last->row_no_, it->last->seq_id);
+                fmt::print("    gap {}\n", it->first->node_id_.vertical - std::prev(it)->last->node_id_.vertical - 1);
+            fmt::print(" ({}) {} {} .. {} {}\n", it->last->node_id_.vertical - it->first->node_id_.vertical + 1, it->first->node_id_, it->first->seq_id, it->last->node_id_, it->last->seq_id);
         }
         fmt::print("\n");
     };
@@ -765,21 +781,6 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
         fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", name);
 
 } // acmacs::tal::v3::Tree::clade_report
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Tree::set_row_no() const
-{
-    if (!row_no_set_) {
-        size_t row_no = 0;
-        tree::iterate_leaf(*this, [&row_no](const Node& node) {
-            if (!node.hidden)
-                node.row_no_ = row_no++;
-        });
-        row_no_set_ = true;
-    }
-
-} // acmacs::tal::v3::Tree::set_row_no
 
 // ----------------------------------------------------------------------
 
