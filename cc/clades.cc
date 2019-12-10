@@ -6,13 +6,13 @@
 
 void acmacs::tal::v3::Clades::prepare()
 {
-    auto& draw_tree = tal_.draw().layout().draw_tree();
-    draw_tree.prepare();
+    if (!prepared_) {
+        make_clades();
 
-    make_clades();
-
-    if (width_to_height_ratio() <= 0.0)
-        width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
+        if (width_to_height_ratio() <= 0.0)
+            width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
+    }
+    LayoutElement::prepare();
 
 } // acmacs::tal::v3::Clades::prepare
 
@@ -30,6 +30,17 @@ const acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::paramet
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Clades::make_clades()
+{
+    make_sections();
+    set_slots();
+    add_gaps_to_the_tree();
+    report_clades();
+
+} // acmacs::tal::v3::Clades::make_clades
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Clades::make_sections()
 {
     const auto& tree_clades = tal_.tree().clades();
     for (const auto& tree_clade : tree_clades) {
@@ -58,12 +69,17 @@ void acmacs::tal::v3::Clades::make_clades()
 
             // remove small sections
             const auto is_section_small = [tol = clade_param.section_exclusion_tolerance](const auto& sec) { return sec.size() <= tol; };
-            if (const auto num_small_sections = std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small); num_small_sections < clade.sections.size())
+            if (const size_t num_small_sections = static_cast<size_t>(std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small)); num_small_sections < clade.sections.size())
                 clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), is_section_small), std::end(clade.sections));
         }
     }
 
-    // set slots
+} // acmacs::tal::v3::Clades::make_sections
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Clades::set_slots()
+{
     std::vector<clade_t*> clade_refs(clades_.size());
     std::transform(std::begin(clades_), std::end(clades_), std::begin(clade_refs), [](auto& clad) { return &clad; });
     // smallest clade first (by its longest section)
@@ -78,20 +94,41 @@ void acmacs::tal::v3::Clades::make_clades()
         ++slot_no;
     }
 
+} // acmacs::tal::v3::Clades::set_slots
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Clades::add_gaps_to_the_tree()
+{
+    const auto& tree = tal_.tree();
+    for (const auto& clade : clades_) {
+        const auto& clade_param = parameters_for_clade(clade.name);
+        for (const auto& section : clade.sections) {
+            if (clade_param.tree_top_gap > 0.0 && section.first->vertical_offset_ <= Node::default_vertical_offset)
+                section.first->vertical_offset_ += clade_param.tree_top_gap;
+        }
+    }
+
+} // acmacs::tal::v3::Clades::add_gaps_to_the_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Clades::report_clades()
+{
     if (parameters_.report) {
         for (const auto& clade : clades_) {
             fmt::print("Clade {} ({})\n", clade.name, clade.sections.size());
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no,
-                           section.first->node_id_, section.first->seq_id, section.last->node_id_, section.last->seq_id);
+                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id_, section.first->seq_id, section.last->node_id_,
+                           section.last->seq_id);
                 if (section_no < (clade.sections.size() - 1))
-                    fmt::print("   gap {}\n", clade.sections[section_no+1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
+                    fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
             }
         }
     }
 
-} // acmacs::tal::v3::Clades::make_clades
+} // acmacs::tal::v3::Clades::report_clades
 
 // ----------------------------------------------------------------------
 
@@ -118,7 +155,7 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
-            const auto pos_x = viewport.origin.x() + parameters_.slot.width * (*section.slot_no + 1);
+            const auto pos_x = viewport.left() + parameters_.slot.width * (*section.slot_no + 1);
             // arrow
             surface.double_arrow({pos_x, vertical_step * section.first->cumulative_vertical_offset_},
                                  {pos_x, vertical_step * section.last->cumulative_vertical_offset_},
@@ -140,6 +177,14 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                     break;
             }
             surface.text({pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
+
+            // horizontal lines
+            surface.line({viewport.left(), vertical_step * section.first->cumulative_vertical_offset_},
+                         {viewport.right(), vertical_step * section.first->cumulative_vertical_offset_},
+                         RED, Pixels{1});
+            surface.line({viewport.left(), vertical_step * section.last->cumulative_vertical_offset_},
+                         {viewport.right(), vertical_step * section.last->cumulative_vertical_offset_},
+                         MAGENTA, Pixels{1});
         }
     }
 

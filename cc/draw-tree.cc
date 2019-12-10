@@ -7,14 +7,15 @@
 void acmacs::tal::v3::DrawTree::prepare()
 {
     if (!prepared_) {
+        tal_.draw().layout().prepare_clades();
+
         const auto tree_height = tal_.tree().compute_cumulative_vertical_offsets();
         tal_.tree().number_leaves_in_subtree();
 
         vertical_step_ = height_ / tree_height;
         horizontal_step_ = width_to_height_ratio() * height_ / tal_.tree().max_cumulative_shown().as_number();
-
-        prepared_ = true;
     }
+    LayoutElementWithColoring::prepare();
 
 } // acmacs::tal::v3::DrawTree::prepare
 

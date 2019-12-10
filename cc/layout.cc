@@ -1,4 +1,5 @@
 #include "acmacs-tal/layout.hh"
+#include "acmacs-tal/draw-tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -35,11 +36,20 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Layout::prepare()
+{
+    for (auto& element : elements_)
+        element->prepare();
+
+} // acmacs::tal::v3::Layout::prepare
+
+// ----------------------------------------------------------------------
+
 acmacs::tal::v3::DrawTree& acmacs::tal::v3::Layout::draw_tree()
 {
     for (auto& element : elements_) {
-        if (auto* dt = element->draw_tree(); dt)
-            return *dt;
+        if (element->is_draw_tree())
+            return dynamic_cast<DrawTree&>(*element);
     }
     throw std::runtime_error("No DrawTree element in layout");
 
@@ -47,12 +57,25 @@ acmacs::tal::v3::DrawTree& acmacs::tal::v3::Layout::draw_tree()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::prepare()
+void acmacs::tal::v3::Layout::prepare_draw_tree()
 {
-    for (auto& element : elements_)
-        element->prepare();
+    for (auto& element : elements_) {
+        if (element->is_draw_tree())
+            element->prepare();
+    }
 
-} // acmacs::tal::v3::Layout::prepare
+} // acmacs::tal::v3::Layout::prepare_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Layout::prepare_clades()
+{
+    for (auto& element : elements_) {
+        if (element->is_clades())
+            element->prepare();
+    }
+
+} // acmacs::tal::v3::Layout::prepare_clades
 
 // ----------------------------------------------------------------------
 

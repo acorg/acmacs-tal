@@ -116,7 +116,8 @@ namespace acmacs::tal::inline v3
 
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
-        double vertical_offset_{1.0}; // vertical gap maker will adjust
+        constexpr static const double default_vertical_offset{1.0};
+        mutable double vertical_offset_{default_vertical_offset}; // vertical gap maker will adjust, mutalbe for adjusting via const Node* in clade sections
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;

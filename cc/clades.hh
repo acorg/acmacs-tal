@@ -17,6 +17,8 @@ namespace acmacs::tal::inline v3
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
 
+        bool is_clades() override { return true; }
+
         // ----------------------------------------------------------------------
 
         using slot_no_t = acmacs::named_size_t<struct acmacs_tal_Clades_slot_no_tag>;
@@ -86,6 +88,8 @@ namespace acmacs::tal::inline v3
             slot_no_t slot_no{NoSlot};
             label_t label;
             arrow_t arrow;
+            double tree_top_gap{10.0}, tree_bottom_gap{10.0};
+            bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };
 
         struct Parameters
@@ -105,6 +109,10 @@ namespace acmacs::tal::inline v3
         clades_t clades_;
 
         void make_clades();
+        void make_sections();
+        void report_clades();
+        void set_slots();
+        void add_gaps_to_the_tree();
         size_t number_of_slots() const;
     };
 

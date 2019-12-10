@@ -23,6 +23,8 @@ namespace acmacs::tal::inline v3
         void prepare();
         void draw(acmacs::surface::Surface& surface) const;
 
+        void prepare_draw_tree();
+        void prepare_clades();
         DrawTree& draw_tree();
 
       private:
@@ -56,10 +58,14 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         virtual Position position() const { return Position::normal; }
-        virtual void prepare() {}
+        virtual void prepare() { prepared_ = true; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
-        virtual DrawTree* draw_tree() { return nullptr; }
+        virtual bool is_draw_tree() { return false; }
+        virtual bool is_clades() { return false; }
+
+      protected:
+        bool prepared_{false};
 
       private:
         double width_to_height_ratio_;

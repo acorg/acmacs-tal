@@ -8,22 +8,24 @@
 
 void acmacs::tal::v3::TimeSeries::prepare()
 {
-    auto& draw_tree = tal_.draw().layout().draw_tree();
-    draw_tree.prepare();
+    if (!prepared_) {
+        tal_.draw().layout().prepare_draw_tree();
 
-    if (parameters_.time_series.first == date::invalid_date() || parameters_.time_series.after_last == date::invalid_date()) {
-        const auto month_stat = tal_.tree().stat_by_month();
-        const auto [first, last] = tal_.tree().suggest_time_series_start_end(month_stat);
-        fmt::print(stderr, "DEBUG: suggested: {} {}\n", first, last);
-        if (parameters_.time_series.first == date::invalid_date())
-            parameters_.time_series.first = first;
-        if (parameters_.time_series.after_last == date::invalid_date())
-            parameters_.time_series.after_last = date::next_month(last);
+        if (parameters_.time_series.first == date::invalid_date() || parameters_.time_series.after_last == date::invalid_date()) {
+            const auto month_stat = tal_.tree().stat_by_month();
+            const auto [first, last] = tal_.tree().suggest_time_series_start_end(month_stat);
+            fmt::print(stderr, "DEBUG: suggested: {} {}\n", first, last);
+            if (parameters_.time_series.first == date::invalid_date())
+                parameters_.time_series.first = first;
+            if (parameters_.time_series.after_last == date::invalid_date())
+                parameters_.time_series.after_last = date::next_month(last);
+        }
+        series_ = acmacs::time_series::make(parameters_.time_series);
+        if (width_to_height_ratio() <= 0.0)
+            width_to_height_ratio() = series_.size() * parameters_.slot.width;
+        // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
     }
-    series_ = acmacs::time_series::make(parameters_.time_series);
-    if (width_to_height_ratio() <= 0.0)
-        width_to_height_ratio() = series_.size() * parameters_.slot.width;
-    // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
+    LayoutElementWithColoring::prepare();
 
 } // acmacs::tal::v3::TimeSeries::prepare
 
