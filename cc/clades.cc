@@ -43,6 +43,7 @@ void acmacs::tal::v3::Clades::make_clades()
                 if (!clade_param.display_name.empty())
                     section.display_name = clade_param.display_name;
             }
+
             // merge sections
             size_t merge_to = 0;
             for (size_t sec_no = 0; sec_no < (clade.sections.size() - 1); ++sec_no) {
@@ -54,7 +55,11 @@ void acmacs::tal::v3::Clades::make_clades()
                     merge_to = sec_no + 1;
             }
             clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), [](const auto& sec) { return sec.first == nullptr; }), std::end(clade.sections));
+
             // remove small sections
+            const auto is_section_small = [tol = clade_param.section_exclusion_tolerance](const auto& sec) { return sec.size() <= tol; };
+            if (const auto num_small_sections = std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small); num_small_sections < clade.sections.size())
+                clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), is_section_small), std::end(clade.sections));
         }
     }
 
