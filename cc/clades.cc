@@ -18,25 +18,65 @@ void acmacs::tal::v3::Clades::prepare()
 
 // ----------------------------------------------------------------------
 
+const acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::parameters_for_clade(std::string_view name) const
+{
+    if (auto found = std::find_if(std::begin(parameters_.per_clade), std::end(parameters_.per_clade), [name](const auto& for_clade) { return for_clade.name == name; }); found != std::end(parameters_.per_clade))
+        return *found;
+    else
+        return parameters_.all_clades;
+
+} // acmacs::tal::v3::Clades::parameters_for_clade
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Clades::make_clades()
 {
     const auto& tree_clades = tal_.tree().clades();
     for (const auto& tree_clade : tree_clades) {
-        auto& clade = clades_.emplace_back(tree_clade.name);
-        for (const auto& tree_section : tree_clade.sections) {
-            auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
+        const auto& clade_param = parameters_for_clade(tree_clade.name);
+        if (!clade_param.hidden) {
+            auto& clade = clades_.emplace_back(tree_clade.name);
+            for (const auto& tree_section : tree_clade.sections) {
+                auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
+                section.label = clade_param.label;
+                section.arrow = clade_param.arrow;
+                if (!clade_param.display_name.empty())
+                    section.display_name = clade_param.display_name;
+            }
+            // merge sections
+            size_t merge_to = 0;
+            for (size_t sec_no = 0; sec_no < (clade.sections.size() - 1); ++sec_no) {
+                if ((clade.sections[sec_no + 1].first->node_id_.vertical - clade.sections[sec_no].last->node_id_.vertical) <= clade_param.section_inclusion_tolerance) {
+                    clade.sections[merge_to].last = clade.sections[sec_no + 1].last;
+                    clade.sections[sec_no + 1].first = nullptr;
+                }
+                else
+                    merge_to = sec_no + 1;
+            }
+            clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), [](const auto& sec) { return sec.first == nullptr; }), std::end(clade.sections));
+            // remove small sections
         }
-        // merge sections
-        // remove small sections
     }
-    // hide clades according to settings
 
     // set slots
     size_t slot_no{0};
     for (auto& clade : clades_) {
         for (auto& section : clade.sections) {
             section.slot_no = slot_no_t{slot_no};
-            ++slot_no;
+        }
+        ++slot_no;
+    }
+
+    if (parameters_.report) {
+        for (const auto& clade : clades_) {
+            fmt::print("Clade {} ({})\n", clade.name, clade.sections.size());
+            for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
+                const auto& section = clade.sections[section_no];
+                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.last->node_id_.vertical - section.first->node_id_.vertical + 1, section.slot_no,
+                           section.first->node_id_, section.first->seq_id, section.last->node_id_, section.last->seq_id);
+                if (section_no < (clade.sections.size() - 1))
+                    fmt::print("   gap {}\n", clade.sections[section_no+1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
+            }
         }
     }
 
@@ -68,12 +108,27 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
             const auto pos_x = viewport.origin.x() + parameters_.slot.width * (*section.slot_no + 1);
-            surface.line({pos_x, vertical_step * section.first->cumulative_vertical_offset_},
-                         {pos_x, vertical_step * section.last->cumulative_vertical_offset_},
-                         section.arrow.color, section.arrow.line_width);
-            surface.text({pos_x, vertical_step * section.first->cumulative_vertical_offset_},
-                         section.display_name, section.label.color, Scaled{parameters_.slot.width * section.label.scale},
-                         text_style, section.label.rotation);
+            // arrow
+            surface.double_arrow({pos_x, vertical_step * section.first->cumulative_vertical_offset_},
+                                 {pos_x, vertical_step * section.last->cumulative_vertical_offset_},
+                                 section.arrow.color, section.arrow.line_width, section.arrow.arrow_width);
+
+            // label
+            const Scaled label_size{parameters_.slot.width * section.label.scale};
+            const auto text_size = surface.text_size(section.display_name, label_size, text_style);
+            double vertical_pos;
+            switch (section.label.position) {
+                case vertical_position::top:
+                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + text_size.height;
+                    break;
+                case vertical_position::middle:
+                    vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + text_size.height / 2.0;
+                    break;
+                case vertical_position::bottom:
+                    vertical_pos = vertical_step * section.last->cumulative_vertical_offset_;
+                    break;
+            }
+            surface.text({pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
         }
     }
 

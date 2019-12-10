@@ -20,19 +20,25 @@ namespace acmacs::tal::inline v3
         // ----------------------------------------------------------------------
 
         using slot_no_t = acmacs::named_size_t<struct acmacs_tal_Clades_slot_no_tag>;
+        constexpr static const slot_no_t NoSlot{static_cast<size_t>(-1)};
+
+        enum class vertical_position { top, middle, bottom };
 
         struct label_t
         {
             Rotation rotation{NoRotation};
             Color color{BLACK};
-            double scale{1.0};                         // relative to parameters_.slot.width
-            // double offset{0.002}; // relative to the time series area height
+            double scale{0.5};                         // relative to parameters_.slot.width
+            vertical_position position{vertical_position::middle};
+            double vertical_offset{0}; // relative to the area height
+            double horizonltal_offset{0}; // relative to the area height
         };
 
         struct arrow_t
         {
             Color color{BLACK};
-            Pixels line_width{1};
+            Pixels line_width{1.0};
+            Pixels arrow_width{3.0};
         };
 
         struct clade_section_t
@@ -70,12 +76,28 @@ namespace acmacs::tal::inline v3
             double width{0.02}; // relative to the clades area height
         };
 
+        struct CladeParameters
+        {
+            std::string name;
+            bool hidden{false};
+            size_t section_inclusion_tolerance{10};
+            size_t section_exclusion_tolerance{5};
+            std::string display_name;
+            slot_no_t slot_no{NoSlot};
+            label_t label;
+            arrow_t arrow;
+        };
+
         struct Parameters
         {
+            bool report{true};
             SlotParameters slot;
+            CladeParameters all_clades;
+            std::vector<CladeParameters> per_clade;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
+        const CladeParameters& parameters_for_clade(std::string_view name) const;
 
       private:
         Tal& tal_;
