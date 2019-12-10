@@ -59,11 +59,17 @@ void acmacs::tal::v3::Clades::make_clades()
     }
 
     // set slots
+    std::vector<clade_t*> clade_refs(clades_.size());
+    std::transform(std::begin(clades_), std::end(clades_), std::begin(clade_refs), [](auto& clad) { return &clad; });
+    // smallest clade first (by its longest section)
+    std::sort(std::begin(clade_refs), std::end(clade_refs), [](const clade_t* c1, const clade_t* c2) {
+        const auto cmp = [](const auto& s1, const auto& s2) { return s1.size() < s2.size(); };
+        return std::max_element(std::begin(c1->sections), std::end(c1->sections), cmp)->size() < std::max_element(std::begin(c2->sections), std::end(c2->sections), cmp)->size();
+    });
     size_t slot_no{0};
-    for (auto& clade : clades_) {
-        for (auto& section : clade.sections) {
+    for (auto& clade_ref : clade_refs) {
+        for (auto& section : clade_ref->sections)
             section.slot_no = slot_no_t{slot_no};
-        }
         ++slot_no;
     }
 
@@ -72,7 +78,7 @@ void acmacs::tal::v3::Clades::make_clades()
             fmt::print("Clade {} ({})\n", clade.name, clade.sections.size());
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.last->node_id_.vertical - section.first->node_id_.vertical + 1, section.slot_no,
+                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no,
                            section.first->node_id_, section.first->seq_id, section.last->node_id_, section.last->seq_id);
                 if (section_no < (clade.sections.size() - 1))
                     fmt::print("   gap {}\n", clade.sections[section_no+1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
