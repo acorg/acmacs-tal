@@ -42,9 +42,25 @@ namespace acmacs::tal::inline v3
 
     using NodePath = acmacs::named_vector_t<const Node*, struct acmacs_tal_NodePath_tag>;
 
-    using ladderize_helper_t = std::tuple<EdgeLength, std::string_view, SeqId>; // edge, date, name
-
     constexpr const EdgeLength EdgeLengthNotSet{-1.0};
+
+    struct ladderize_helper_t
+    {
+        EdgeLength edge{EdgeLengthNotSet};
+        std::string_view date;
+        SeqId seq_id;
+        constexpr bool operator<(const ladderize_helper_t& rhs) const { return edge == rhs.edge ? (date == rhs.date ? seq_id < rhs.seq_id : date < rhs.date) : edge < rhs.edge; }
+    };
+
+    struct node_id_t
+    {
+        using value_type = unsigned short;
+        constexpr static const value_type NotSet{static_cast<value_type>(-1)};
+
+        value_type vertical{NotSet};
+        value_type horizontal{NotSet};
+        constexpr bool empty() const { return vertical == NotSet; }
+    };
 
     // ----------------------------------------------------------------------
 
@@ -87,7 +103,8 @@ namespace acmacs::tal::inline v3
         // -------------------- not exported --------------------
         // all nodes
         mutable size_t number_leaves_in_subtree_{1};
-        ladderize_helper_t ladderize_helper_{EdgeLengthNotSet,{}, {}};
+        ladderize_helper_t ladderize_helper_;
+        node_id_t node_id_;
         // leaf node only
         mutable size_t row_no_;
         mutable std::optional<size_t> antigen_index_in_chart_;
@@ -180,6 +197,8 @@ namespace acmacs::tal::inline v3
 
         void hide(const NodeSet& nodes);
 
+        void set_node_id();
+
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
 
@@ -254,6 +273,13 @@ namespace acmacs::tal::inline v3
     // ----------------------------------------------------------------------
 
 } // namespace acmacs::tal::inlinev3
+
+// ======================================================================
+
+template <> struct fmt::formatter<acmacs::tal::node_id_t> {
+    template <typename ParseContext> constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) { return format_to(ctx.out(), "{}.{}", node_id.vertical, node_id.horizontal); }
+};
 
 // ----------------------------------------------------------------------
 /// Local Variables:

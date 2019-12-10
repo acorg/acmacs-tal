@@ -5,6 +5,7 @@
 #include "acmacs-tal/json-import.hh"
 #include "acmacs-tal/json-export.hh"
 #include "acmacs-tal/html-export.hh"
+#include "acmacs-tal/tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -16,7 +17,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
         ext = filepath.stem().extension();
     if (ext == ".newick") {
         try {
-            return newick_import(filename, tree);
+            newick_import(filename, tree);
         }
         catch (NewickImportError& err) {
             throw ImportError{fmt::format("cannot import from newick: {}", err)};
@@ -24,7 +25,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
     }
     else if (filename == "-" || ext == ".json") {
         try {
-            return json_import(filename, tree);
+            json_import(filename, tree);
         }
         catch (JsonImportError& err) {
             throw ImportError{fmt::format("cannot import from json: {}", err)};
@@ -32,6 +33,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
     }
     else
         throw ImportError{fmt::format("cannot infer import method from filename: {}", filename)};
+    tree.set_node_id();
 
 } // acmacs::tal::v3::import_tree
 

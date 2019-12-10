@@ -376,29 +376,46 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::ladderize(Ladderize method)
+void acmacs::tal::v3::Tree::set_node_id()
 {
-    const auto set_leaf = [](Node& node) {
-        node.ladderize_helper_ = {node.edge_length, node.date, node.seq_id};
+    node_id_t::value_type vertical{0};
+    const auto set_leaf = [&vertical](Node& node) {
+        node.node_id_.vertical = vertical;
+        ++vertical;
+        node.node_id_.horizontal = 0;
     };
 
     const auto set_parent = [](Node& node) {
-        const auto max_subtree_edge_node = std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return std::get<EdgeLength>(node1.ladderize_helper_) < std::get<EdgeLength>(node2.ladderize_helper_); });
-        const auto max_subtree_date_node = std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return std::get<1>(node1.ladderize_helper_) < std::get<1>(node2.ladderize_helper_); });
-        const auto max_subtree_name_node = std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return std::get<2>(node1.ladderize_helper_) < std::get<2>(node2.ladderize_helper_); });
-        node.ladderize_helper_ = {
-            node.edge_length + std::get<EdgeLength>(max_subtree_edge_node->ladderize_helper_),
-            std::get<1>(max_subtree_date_node->ladderize_helper_),
-            std::get<2>(max_subtree_name_node->ladderize_helper_)
-        };
+        node.node_id_.vertical = (node.subtree.front().node_id_.vertical + node.subtree.back().node_id_.vertical) / 2;
+        node.node_id_.horizontal = std::max(node.subtree.front().node_id_.horizontal, node.subtree.back().node_id_.horizontal) + 1;
     };
 
-      // set max_edge_length field for every node
     tree::iterate_leaf_post(*this, set_leaf, set_parent);
 
-    const auto reorder_by_max_edge_length = [](const Node& node1, const Node& node2) -> bool {
-        return node1.ladderize_helper_ < node2.ladderize_helper_;
+} // acmacs::tal::v3::Tree::set_node_id
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::ladderize(Ladderize method)
+{
+    const auto set_leaf = [](Node& node) { node.ladderize_helper_ = ladderize_helper_t{node.edge_length, node.date, node.seq_id}; };
+
+    const auto set_parent = [](Node& node) {
+        const auto max_subtree_edge_node =
+            std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return node1.ladderize_helper_.edge < node2.ladderize_helper_.edge; });
+        const auto max_subtree_date_node =
+            std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return node1.ladderize_helper_.date < node2.ladderize_helper_.date; });
+        const auto max_subtree_name_node =
+            std::max_element(node.subtree.begin(), node.subtree.end(), [](const auto& node1, const auto& node2) { return node1.ladderize_helper_.seq_id < node2.ladderize_helper_.seq_id; });
+        node.ladderize_helper_.edge = node.edge_length + max_subtree_edge_node->ladderize_helper_.edge;
+        node.ladderize_helper_.date = max_subtree_date_node->ladderize_helper_.date;
+        node.ladderize_helper_.seq_id = max_subtree_name_node->ladderize_helper_.seq_id;
     };
+
+    // set max_edge_length field for every node
+    tree::iterate_leaf_post(*this, set_leaf, set_parent);
+
+    const auto reorder_by_max_edge_length = [](const Node& node1, const Node& node2) -> bool { return node1.ladderize_helper_ < node2.ladderize_helper_; };
 
     const auto reorder_by_number_of_leaves = [reorder_by_max_edge_length](const Node& node1, const Node& node2) -> bool {
         if (node1.number_leaves_in_subtree_ == node2.number_leaves_in_subtree_)
@@ -408,22 +425,23 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
     };
 
     switch (method) {
-      case Ladderize::MaxEdgeLength:
-          fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
-          tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
-          break;
-      case Ladderize::NumberOfLeaves:
-          fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
-          number_leaves_in_subtree();
-          tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
-          break;
-      case Ladderize::None:
-          fmt::print(stderr, "WARNING: no ladderizing\n");
-          break;
+        case Ladderize::MaxEdgeLength:
+            fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
+            tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
+            break;
+        case Ladderize::NumberOfLeaves:
+            fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
+            number_leaves_in_subtree();
+            tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
+            break;
+        case Ladderize::None:
+            fmt::print(stderr, "WARNING: no ladderizing\n");
+            break;
     }
 
     row_no_set_ = false;
     clades_reset();
+    set_node_id();
 
 } // acmacs::tal::v3::Tree::ladderize
 
@@ -514,6 +532,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
 
     row_no_set_ = false;
     clades_reset();
+    set_node_id();
 
 } // acmacs::tal::v3::Tree::re_root
 
@@ -677,7 +696,7 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
     tree::iterate_pre(*this, [](const Node& node) {
         if (node.number_leaves_in_subtree_ >= 20) {
             if (const auto rep = node.aa_transitions_.display(); !rep.empty())
-                fmt::print("(children:{} leaves:{}) {}\n", node.subtree.size(), node.number_leaves_in_subtree_, rep);
+                fmt::print("{} (children:{} leaves:{}) {}\n", node.node_id_, node.subtree.size(), node.number_leaves_in_subtree_, rep);
         }
     });
 
