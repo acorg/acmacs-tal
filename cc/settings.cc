@@ -407,8 +407,8 @@ void acmacs::tal::v3::Settings::add_clades()
         // label
         // arrow
         // horizontal_line
-        rjson::copy_if_not_null(source.get("tree_top_gap"sv), clade_paramters.tree_top_gap);
-        rjson::copy_if_not_null(source.get("tree_bottom_gap"sv), clade_paramters.tree_bottom_gap);
+        rjson::copy_if_not_null(source.get("top_gap"sv), clade_paramters.tree_top_gap);
+        rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_paramters.tree_bottom_gap);
         // rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
         // rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
         // rjson::copy_if_not_null(source.get(""sv), clade_paramters.);
