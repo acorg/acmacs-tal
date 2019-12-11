@@ -26,7 +26,7 @@
                   "top_gap": 10.0, "bottom_gap": 10.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-                  "label": {"rotation_degrees": 0, "color": "black", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "label": {"rotation_degrees": 0, "color": "magenta", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
                   "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
                   "horizontal_line": {"color": "grey", "width": 0.5}, "?horizontal_line?": "width in pixels"
                  },

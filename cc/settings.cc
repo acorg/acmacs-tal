@@ -404,9 +404,16 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
         rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
         rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
-        // label
+
+        // rjson::copy_if_not_null(source.get("label"sv, "rotation"sv), clade_paramters.label.);
+        rjson::copy_if_not_null(source.get("label"sv, "color"sv), clade_paramters.label.color);
+        rjson::copy_if_not_null(source.get("label"sv, "scale"sv), clade_paramters.label.scale);
+        // rjson::copy_if_not_null(source.get("label"sv, "position"sv), clade_paramters.label.position);
+        // rjson::copy_if_not_null(source.get("label"sv, "offset"sv), clade_paramters.label.offset);
+
         // arrow
         // horizontal_line
+
         rjson::copy_if_not_null(source.get("top_gap"sv), clade_paramters.tree_top_gap);
         rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_paramters.tree_bottom_gap);
         rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
