@@ -137,11 +137,11 @@ void acmacs::tal::v3::Clades::add_gaps_to_the_tree()
     for (const auto& clade : clades_) {
         const auto& clade_param = parameters_for_clade(clade.name);
         for (const auto& section : clade.sections) {
-            if (clade_param.tree_top_gap > 0.0 && section.first->vertical_offset_ <= Node::default_vertical_offset)
-                section.first->vertical_offset_ += clade_param.tree_top_gap;
+            if (clade_param.tree_top_gap > 0.0 && section.first->vertical_offset_ < clade_param.tree_top_gap)
+                section.first->vertical_offset_ = clade_param.tree_top_gap;
             if (clade_param.tree_bottom_gap > 0.0) {
-                if (const auto next_leaf = tal().tree().next_leaf(section.last); next_leaf && next_leaf->vertical_offset_ <= Node::default_vertical_offset) {
-                    next_leaf->vertical_offset_ += clade_param.tree_bottom_gap;
+                if (const auto next_leaf = tal().tree().next_leaf(section.last); next_leaf && next_leaf->vertical_offset_ < clade_param.tree_bottom_gap) {
+                    next_leaf->vertical_offset_ = clade_param.tree_bottom_gap;
                 }
             }
         }
