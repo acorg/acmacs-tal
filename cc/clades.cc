@@ -218,16 +218,16 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
             double vertical_pos;
             switch (section.label.position) {
                 case vertical_position::top:
-                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + text_size.height;
+                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1] + text_size.height;
                     break;
                 case vertical_position::middle:
-                    vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + text_size.height / 2.0;
+                    vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1] + text_size.height / 2.0;
                     break;
                 case vertical_position::bottom:
-                    vertical_pos = vertical_step * section.last->cumulative_vertical_offset_;
+                    vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
                     break;
             }
-            const auto text_pos_x = time_series_to_the_left_ ? (pos_x + section.label.horizontal_offset) : (pos_x - text_size.width - section.label.horizontal_offset);
+            const auto text_pos_x = time_series_to_the_left_ ? (pos_x + section.label.offset[0]) : (pos_x - text_size.width - section.label.offset[0]);
             surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
 
         }

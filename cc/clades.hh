@@ -28,8 +28,7 @@ namespace acmacs::tal::inline v3
             Color color{BLACK};
             double scale{0.5};                         // relative to parameters_.slot.width
             vertical_position position{vertical_position::middle};
-            double vertical_offset{0}; // relative to the area height
-            double horizontal_offset{0.002}; // relative to the area height
+            std::array<double, 2> offset{0, 0.002}; // relative to the area height
         };
 
         struct line_t
@@ -84,10 +83,10 @@ namespace acmacs::tal::inline v3
         struct CladeParameters
         {
             std::string name;
+            std::string display_name;
             bool hidden{false};
             size_t section_inclusion_tolerance{10};
             size_t section_exclusion_tolerance{5};
-            std::string display_name;
             slot_no_t slot_no{NoSlot};
             label_t label;
             arrow_t arrow;

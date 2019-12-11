@@ -11,10 +11,27 @@
   {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
-  {"N": "clades", "?debug_outline": "lightblue"},
   {"N": "time_series", "color_by": "continent", "start": "2019-01-01", "end": "2019-12-31", "interval": {"month": 1},
+   "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
+   "slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
+            "label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
+           },
    "?debug_outline": "lightblue"},
-  {"?N": "tree", "color_by": {"N": "continent", "EUROPE": "magenta"}, "debug_outline": false}
+
+  {"N": "clades", "report": true,
+   "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
+   "all_clades": {"name": "183P-1", "display_name": "183P-1",
+                  "hidden": false, "shown": true,
+                  "slot": 1,
+                  "top_gap": 10.0, "bottom_gap": 10.0,
+                  "time_series_top_separator": true, "time_series_bottom_separator": true,
+                  "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+                  "label": {"rotation_degrees": 0, "color": "black", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+                  "horizontal_line": {"color": "grey", "width": 0.5}, "?horizontal_line?": "width in pixels"
+                 },
+   "?debug_outline": "lightblue"}
+
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}], "else": []},

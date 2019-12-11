@@ -98,7 +98,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
 void acmacs::tal::v3::Settings::apply_nodes() const
 {
     const auto selected = select_nodes(getenv("select"));
-    fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
+    // fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
     std::visit(
         [this, &selected]<typename T>(T && arg) {
             if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
@@ -358,36 +358,24 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
     acmacs::time_series::update(rjson::object{{"start"sv, getenv("start"sv)}, {"end"sv, getenv("end"sv)}, {"interval"sv, getenv("interval"sv)}}, param.time_series);
 
     if (const auto& dash_val = getenv("dash"sv); !dash_val.is_null()) {
-        if (const auto& width = dash_val.get("width"sv); !width.is_null())
-            param.dash.width = width.to<double>();
-        if (const auto& line_width_pixels = dash_val.get("line_width_pixels"sv); !line_width_pixels.is_null())
-            param.dash.line_width = Pixels{line_width_pixels.to<double>()};
+        rjson::copy_if_not_null(dash_val.get("width"sv), param.dash.width);
+        rjson::copy_if_not_null(dash_val.get("line_width_pixels"sv), param.dash.line_width);
     }
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
-        if (const auto& width = slot_val.get("width"sv); !width.is_null())
-            param.slot.width = width.to<double>();
-        if (const auto& separator_val = slot_val.get("separator"sv); !separator_val.is_null()) {
-            if (const auto& width = separator_val.get("width_pixels"sv); !width.is_null())
-                param.slot.separator.width = width.to<double>();
-            if (const auto& color = separator_val.get("color"sv); !color.is_null())
-                param.slot.separator.color = Color{color.to<std::string_view>()};
-        }
-        if (const auto& label_val = slot_val.get("label"sv); !label_val.is_null()) {
-            if (const auto& rotation = label_val.get("rotation"sv); !rotation.is_null()) {
-                if (const auto rot = rotation.to<std::string_view>(); rot == "clockwise")
-                    param.slot.label.rotation = Rotation90DegreesClockwise;
-                else if (rot == "anticlockwise" || rot == "counterclockwise")
-                    param.slot.label.rotation = Rotation90DegreesAnticlockwise;
-                else
-                    fmt::print(stderr, "WARNING: unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
-            }
-            if (const auto& color = label_val.get("color"sv); !color.is_null())
-                param.slot.label.color = Color{color.to<std::string_view>()};
-            if (const auto& scale = label_val.get("scale"sv); !scale.is_null())
-                param.slot.label.scale = scale.to<double>();
-            if (const auto& offset = label_val.get("offset"sv); !offset.is_null())
-                param.slot.label.offset = offset.to<double>();
+        rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
+        rjson::copy_if_not_null(slot_val.get("separator"sv, "width_pixels"sv), param.slot.separator.width);
+        rjson::copy_if_not_null(slot_val.get("separator"sv, "color"sv), param.slot.separator.color);
+        rjson::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
+        rjson::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
+        rjson::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);
+        if (const auto& rotation = slot_val.get("label"sv, "rotation"sv); !rotation.is_null()) {
+            if (const auto rot = rotation.to<std::string_view>(); rot == "clockwise")
+                param.slot.label.rotation = Rotation90DegreesClockwise;
+            else if (rot == "anticlockwise" || rot == "counterclockwise")
+                param.slot.label.rotation = Rotation90DegreesAnticlockwise;
+            else
+                fmt::print(stderr, "WARNING: unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
         }
     }
 
@@ -397,7 +385,16 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
 
 void acmacs::tal::v3::Settings::add_clades()
 {
+    using namespace std::string_view_literals;
+
     auto& element = add_element<Clades>();
+    auto& param = element.parameters();
+
+    getenv_copy_if_present("report"sv, param.report);
+
+    if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
+        rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
+    }
 
 } // acmacs::tal::v3::Settings::add_clades
 

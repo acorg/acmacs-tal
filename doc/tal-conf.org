@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-10 10:33:50 eu>
+# Time-stamp: <2019-12-11 11:18:55 eu>
 
 * Command line defines
 
@@ -59,7 +59,7 @@
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 
 {"N": "clades-reset"}
-{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false} 
+{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false}
 -- "inclusion_tolerance": "{clade_section_inclusion_tolerance}", "exclusion_tolerance": "{clade_section_exclusion_tolerance}"}
 
 ** Report
@@ -75,7 +75,7 @@
 
 {"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 
-{"N": "time_series", "color_by": <[[Color by][color-by]]>, 
+{"N": "time_series", "color_by": <[[Color by][color-by]]>,
  <[[Time series][time-series]]>,
  "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
  "slot": {"width": 0.01, "?": "relative to the time series area height",
@@ -84,7 +84,10 @@
          },
  "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 
-{"N": "clades", 
+{"N": "clades", "report": true,
+ "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
+ "all_clades": {<[[Clade parameters]]>},
+ "per_clade": [{<[[Clade parameters]]>}, ...],
  "?width_to_height_ratio": 0.3, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 * Select Nodes
@@ -122,6 +125,19 @@ If multiple criteria specified within single "select" object, they all used (con
 {"start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
  "interval": {"month": 1}, "?": "month, week, year, day",
  "interval": "month"
+}
+
+* Clade parameters
+
+{"name": "183P-1", "display_name": "183P-1",
+ "hidden": false, "shown": true,
+ "slot": 1,
+ "top_gap": 10.0, "bottom_gap": 10.0,
+ "time_series_top_separator": true, "time_series_bottom_separator": true,
+ "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+ "label": {"rotation_degrees": 0, "color": "black", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+ "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+ "horizontal_line": {"color": "grey", "width": 0.5}, "?horizontal_line?": "width in pixels",
 }
 
 * COMMENT ====== local vars
