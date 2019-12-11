@@ -14,7 +14,7 @@
   {"N": "time_series", "color_by": "continent", "start": "2019-01-01", "end": "2019-12-31", "interval": {"month": 1},
    "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
    "slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
-            "label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
+            "?label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
            },
    "?debug_outline": "lightblue"},
 

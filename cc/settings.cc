@@ -396,6 +396,27 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
     }
 
+    const auto read_clade_parameters = [](const rjson::value& source, Clades::CladeParameters& clade_paramters) {
+        rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
+        rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
+        // rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
+        //rjson::copy_if_not_null(source.get("shown"sv), !clade_paramters.hidden);
+        // rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
+        // rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
+        // rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
+        // label
+        // arrow
+        // horizontal_line
+        rjson::copy_if_not_null(source.get("tree_top_gap"sv), clade_paramters.tree_top_gap);
+        rjson::copy_if_not_null(source.get("tree_bottom_gap"sv), clade_paramters.tree_bottom_gap);
+        // rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
+        // rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
+        // rjson::copy_if_not_null(source.get(""sv), clade_paramters.);
+    };
+
+    if (const auto& all_clades_val = getenv("all_clades"sv); !all_clades_val.is_null())
+        read_clade_parameters(all_clades_val, param.all_clades);
+
 } // acmacs::tal::v3::Settings::add_clades
 
 // ----------------------------------------------------------------------
