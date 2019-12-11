@@ -20,6 +20,7 @@ namespace acmacs::tal::inline v3
 
         constexpr Margins& margins() { return margins_; }
         constexpr Layout& layout() { return layout_; }
+        constexpr const Layout& layout() const { return layout_; }
         constexpr DrawOutline& outline() { return outline_; }
         constexpr const DrawOutline& outline() const { return outline_; }
 

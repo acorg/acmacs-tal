@@ -25,12 +25,12 @@ namespace acmacs::tal::inline v3
         void prepare();
         void export_tree(std::string_view filename);
 
-        Tree& tree() { return tree_; }
-        const Tree& tree() const { return tree_; }
-        bool chart_present() const { return static_cast<bool>(chart_); }
-        const acmacs::chart::Chart& chart() const { return *chart_; }
-        Draw& draw() { return draw_; }
-        const Draw& draw() const { return draw_; }
+        constexpr Tree& tree() { return tree_; }
+        constexpr const Tree& tree() const { return tree_; }
+        constexpr bool chart_present() const { return static_cast<bool>(chart_); }
+        constexpr const acmacs::chart::Chart& chart() const { return *chart_; }
+        constexpr Draw& draw() { return draw_; }
+        constexpr const Draw& draw() const { return draw_; }
 
       private:
         Tree tree_;

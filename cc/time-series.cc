@@ -9,11 +9,11 @@
 void acmacs::tal::v3::TimeSeries::prepare()
 {
     if (!prepared_) {
-        tal_.draw().layout().prepare_element<DrawTree>();
+        tal().draw().layout().prepare_element<DrawTree>();
 
         if (parameters_.time_series.first == date::invalid_date() || parameters_.time_series.after_last == date::invalid_date()) {
-            const auto month_stat = tal_.tree().stat_by_month();
-            const auto [first, last] = tal_.tree().suggest_time_series_start_end(month_stat);
+            const auto month_stat = tal().tree().stat_by_month();
+            const auto [first, last] = tal().tree().suggest_time_series_start_end(month_stat);
             fmt::print(stderr, "DEBUG: suggested: {} {}\n", first, last);
             if (parameters_.time_series.first == date::invalid_date())
                 parameters_.time_series.first = first;
@@ -35,7 +35,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 {
     draw_labels(surface);
 
-    const auto* draw_tree = tal_.draw().layout().find<DrawTree>();
+    const auto* draw_tree = tal().draw().layout().find<DrawTree>();
     if (!draw_tree) {
         fmt::print(stderr, "WARNING: No tree section in layout, cannot draw time series\n");
         return;
@@ -44,7 +44,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     const auto& viewport = surface.viewport();
     const auto dash_pos_x = viewport.origin.x() + parameters_.slot.width * (1.0 - parameters_.dash.width) * 0.5;
 
-    tree::iterate_leaf(tal_.tree(), [&, this, dash_pos_x](const Node& leaf) {
+    tree::iterate_leaf(tal().tree(), [&, this, dash_pos_x](const Node& leaf) {
         if (!leaf.date.empty()) {
             const auto leaf_date = date::from_string(leaf.date);
             if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {

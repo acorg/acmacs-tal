@@ -11,7 +11,7 @@ namespace acmacs::tal::inline v3
     class DrawTree : public LayoutElementWithColoring
     {
       public:
-        DrawTree(Tal& tal) : LayoutElementWithColoring(0.7), tal_{tal} {}
+        DrawTree(Tal& tal) : LayoutElementWithColoring(tal, 0.7) {}
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -19,7 +19,6 @@ namespace acmacs::tal::inline v3
         constexpr double vertical_step() const { return vertical_step_; }
 
       private:
-        Tal& tal_;
         const double height_{1.0};
         double vertical_step_{0};
         double horizontal_step_{0};

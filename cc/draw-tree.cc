@@ -7,13 +7,13 @@
 void acmacs::tal::v3::DrawTree::prepare()
 {
     if (!prepared_) {
-        tal_.draw().layout().prepare_element<Clades>();
+        tal().draw().layout().prepare_element<Clades>();
 
-        const auto tree_height = tal_.tree().compute_cumulative_vertical_offsets();
-        tal_.tree().number_leaves_in_subtree();
+        const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
+        tal().tree().number_leaves_in_subtree();
 
         vertical_step_ = height_ / tree_height;
-        horizontal_step_ = width_to_height_ratio() * height_ / tal_.tree().max_cumulative_shown().as_number();
+        horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
     }
     LayoutElementWithColoring::prepare();
 
@@ -27,7 +27,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
     const Scaled text_size{vertical_step() * 0.8};
 
     tree::iterate_leaf_pre(
-        tal_.tree(),
+        tal().tree(),
         // leaf
         [=, this, &surface](const Node& leaf) {
             if (!leaf.hidden) {

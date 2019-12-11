@@ -14,7 +14,7 @@
 template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&& ... args)
 {
     using namespace std::string_view_literals;
-    auto element_p = std::make_unique<ElementType>(std::forward<Args>(args) ...);
+    auto element_p = std::make_unique<ElementType>(tal_, std::forward<Args>(args) ...);
     auto& element = *element_p;
     draw().layout().add(std::move(element_p));
     getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
@@ -333,7 +333,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 
 void acmacs::tal::v3::Settings::add_tree()
 {
-    auto& element = add_element<DrawTree>(tal_);
+    auto& element = add_element<DrawTree>();
     process_color_by(element);
 
 } // acmacs::tal::v3::Settings::add_tree
@@ -342,7 +342,7 @@ void acmacs::tal::v3::Settings::add_tree()
 
 void acmacs::tal::v3::Settings::add_time_series()
 {
-    auto& element = add_element<TimeSeries>(tal_);
+    auto& element = add_element<TimeSeries>();
     process_color_by(element);
     read_time_series_parameters(element);
 
@@ -397,7 +397,7 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
 
 void acmacs::tal::v3::Settings::add_clades()
 {
-    auto& element = add_element<Clades>(tal_);
+    auto& element = add_element<Clades>();
 
 } // acmacs::tal::v3::Settings::add_clades
 

@@ -12,7 +12,7 @@ namespace acmacs::tal::inline v3
     class TimeSeries : public LayoutElementWithColoring
     {
       public:
-        TimeSeries(Tal& tal) : LayoutElementWithColoring(0.0), tal_{tal} {}
+        TimeSeries(Tal& tal) : LayoutElementWithColoring(tal, 0.0) {}
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -56,7 +56,6 @@ namespace acmacs::tal::inline v3
         constexpr Parameters& parameters() { return parameters_; }
 
       private:
-        Tal& tal_;
         Parameters parameters_;
         acmacs::time_series::series series_;
 

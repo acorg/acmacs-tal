@@ -2,6 +2,7 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/clades.hh"
+#include "acmacs-tal/tal-data.hh"
 
 // ----------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ void acmacs::tal::v3::Layout::prepare()
 
 // ----------------------------------------------------------------------
 
-template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
+template <typename Element> inline const Element* acmacs::tal::v3::Layout::find() const
 {
     for (auto& element : elements_) {
         if (auto* found = dynamic_cast<Element*>(element.get()); found)
@@ -56,9 +57,9 @@ template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
     return nullptr;
 }
 
-template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>();
-template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>();
-template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>();
+template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>() const;
+template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>() const;
+template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>() const;
 
 // ----------------------------------------------------------------------
 
@@ -107,6 +108,25 @@ void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
     }
 
 } // acmacs::tal::v3::Layout::draw
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::LayoutElement::pos_y_above(const Node& node, double vertical_step) const
+{
+    return vertical_step * (node.cumulative_vertical_offset_ - node.vertical_offset_ / 2.0);
+
+} // acmacs::tal::v3::LayoutElement::pos_y_above
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::LayoutElement::pos_y_below(const Node& node, double vertical_step) const
+{
+    if (const auto next_leaf = tal().tree().next_leaf(&node); next_leaf) // if node is not the last leaf
+        return vertical_step * (next_leaf->cumulative_vertical_offset_ - next_leaf->vertical_offset_ / 2.0);
+    else // last leaf
+        return vertical_step * node.cumulative_vertical_offset_;
+
+} // acmacs::tal::v3::LayoutElement::pos_y_below
 
 // ----------------------------------------------------------------------
 

@@ -11,6 +11,7 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
+    class Tal;
     class LayoutElement;
     class DrawTree;
     class TimeSeries;
@@ -25,7 +26,7 @@ namespace acmacs::tal::inline v3
         void prepare();
         void draw(acmacs::surface::Surface& surface) const;
 
-        template <typename Element> Element* find();
+        template <typename Element> const Element* find() const;
         template <typename Element> void prepare_element();
         size_t index_of(const LayoutElement* look_for) const;
 
@@ -33,9 +34,9 @@ namespace acmacs::tal::inline v3
         std::vector<std::unique_ptr<LayoutElement>> elements_;
     };
 
-    extern template DrawTree* Layout::find<DrawTree>();
-    extern template TimeSeries* Layout::find<TimeSeries>();
-    extern template Clades* Layout::find<Clades>();
+    extern template const DrawTree* Layout::find<DrawTree>() const;
+    extern template const TimeSeries* Layout::find<TimeSeries>() const;
+    extern template const Clades* Layout::find<Clades>() const;
 
     extern template void Layout::prepare_element<DrawTree>();
     extern template void Layout::prepare_element<TimeSeries>();
@@ -57,7 +58,7 @@ namespace acmacs::tal::inline v3
     class LayoutElement
     {
       public:
-        LayoutElement(double width_to_height_ratio) : width_to_height_ratio_{width_to_height_ratio} {}
+        LayoutElement(Tal& tal, double width_to_height_ratio) : tal_{tal}, width_to_height_ratio_{width_to_height_ratio} {}
         virtual ~LayoutElement() = default;
 
         constexpr double width_to_height_ratio() const { return width_to_height_ratio_; }
@@ -70,10 +71,16 @@ namespace acmacs::tal::inline v3
         virtual void prepare() { prepared_ = true; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
+        double pos_y_above(const Node& node, double vertical_step) const;
+        double pos_y_below(const Node& node, double vertical_step) const;
+
       protected:
         bool prepared_{false};
+        constexpr const Tal& tal() const { return tal_; }
+        constexpr Tal& tal() { return tal_; }
 
       private:
+        Tal& tal_;
         double width_to_height_ratio_;
         DrawOutline outline_;
     };
@@ -83,7 +90,8 @@ namespace acmacs::tal::inline v3
     class Gap : public LayoutElement
     {
       public:
-        Gap() : LayoutElement(0.05) {}
+        Gap(Tal& tal) : LayoutElement(tal, 0.05) {}
+
         void draw(acmacs::surface::Surface& /*surface*/) const override {}
     };
 
@@ -92,7 +100,7 @@ namespace acmacs::tal::inline v3
     class LayoutElementWithColoring : public LayoutElement
     {
       public:
-        LayoutElementWithColoring(double width_to_height_ratio) : LayoutElement(width_to_height_ratio), coloring_{std::make_unique<ColoringUniform>(CYAN)} {}
+        LayoutElementWithColoring(Tal& tal, double width_to_height_ratio) : LayoutElement(tal, width_to_height_ratio), coloring_{std::make_unique<ColoringUniform>(CYAN)} {}
 
         void coloring(std::unique_ptr<Coloring> coloring) { coloring_ = std::move(coloring); }
 

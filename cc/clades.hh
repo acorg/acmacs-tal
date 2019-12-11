@@ -7,12 +7,10 @@
 
 namespace acmacs::tal::inline v3
 {
-    class Tal;
-
     class Clades : public LayoutElement
     {
       public:
-        Clades(Tal& tal) : LayoutElement(0.0), tal_{tal} {}
+        Clades(Tal& tal) : LayoutElement(tal, 0.0) {}
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -110,7 +108,6 @@ namespace acmacs::tal::inline v3
         const CladeParameters& parameters_for_clade(std::string_view name) const;
 
       private:
-        Tal& tal_;
         Parameters parameters_;
         clades_t clades_;
         bool time_series_to_the_left_{false};
