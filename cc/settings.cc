@@ -175,8 +175,7 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
                 else if constexpr (std::is_same_v<std::decay_t<T>, rjson::object>) {
                     draw_outline.outline = rjson::get_or(val.get("show"sv), true);
                     rjson::copy_if_not_null(val.get("color"sv), draw_outline.outline_color);
-                    if (const auto& wid = val.get("width"sv); !wid.is_null())
-                        draw_outline.outline_width = Pixels{wid.template to<double>()};
+                    rjson::copy_if_not_null(val.get("width"sv), draw_outline.outline_width);
                 }
                 else {
                     fmt::print(stderr, "WARNING: unrecognized debug_outline value: {}\n", val);
@@ -399,18 +398,19 @@ void acmacs::tal::v3::Settings::add_clades()
     const auto read_clade_parameters = [](const rjson::value& source, Clades::CladeParameters& clade_paramters) {
         rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
         rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
-        // rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
-        //rjson::copy_if_not_null(source.get("shown"sv), !clade_paramters.hidden);
-        // rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
-        // rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
-        // rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
+        if (const auto& shown = source.get("shown"sv); !shown.is_null())
+            clade_paramters.hidden = !shown.template to<bool>();
+        rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
+        rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
+        rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
+        rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
         // label
         // arrow
         // horizontal_line
         rjson::copy_if_not_null(source.get("top_gap"sv), clade_paramters.tree_top_gap);
         rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_paramters.tree_bottom_gap);
-        // rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
-        // rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
+        rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
+        rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
         // rjson::copy_if_not_null(source.get(""sv), clade_paramters.);
     };
 

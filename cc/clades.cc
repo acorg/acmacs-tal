@@ -67,6 +67,7 @@ void acmacs::tal::v3::Clades::make_sections()
             auto& clade = clades_.emplace_back(tree_clade.name);
             for (const auto& tree_section : tree_clade.sections) {
                 auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
+                section.slot_no = clade_param.slot_no;
                 section.label = clade_param.label;
                 section.arrow = clade_param.arrow;
                 section.horizontal_line = clade_param.horizontal_line;
@@ -99,33 +100,37 @@ void acmacs::tal::v3::Clades::make_sections()
 
 void acmacs::tal::v3::Clades::set_slots()
 {
-    std::vector<clade_t*> clade_refs(clades_.size());
-    std::transform(std::begin(clades_), std::end(clades_), std::begin(clade_refs), [](auto& clad) { return &clad; });
-    // smallest clade first (by its longest section)
-    std::sort(std::begin(clade_refs), std::end(clade_refs), [](const clade_t* c1, const clade_t* c2) {
-        const auto cmp = [](const auto& s1, const auto& s2) { return s1.size() < s2.size(); };
-        const auto longest1 = std::max_element(std::begin(c1->sections), std::end(c1->sections), cmp)->size();
-        const auto longest2 = std::max_element(std::begin(c2->sections), std::end(c2->sections), cmp)->size();
-        if (longest1 == longest2) {
-            const auto sum = [](size_t acc, const auto& sec) { return acc + sec.size(); };
-            const auto total1 = std::accumulate(std::begin(c1->sections), std::end(c1->sections), 0UL, sum);
-            const auto total2 = std::accumulate(std::begin(c2->sections), std::end(c2->sections), 0UL, sum);
-            return total1 < total2;
-        }
-        else
-            return longest1 < longest2;
-    });
+    if (!clades_.empty()) {
+        std::vector<clade_t*> clade_refs(clades_.size());
+        std::transform(std::begin(clades_), std::end(clades_), std::begin(clade_refs), [](auto& clad) { return &clad; });
+        // smallest clade first (by its longest section)
+        std::sort(std::begin(clade_refs), std::end(clade_refs), [](const clade_t* c1, const clade_t* c2) {
+            const auto cmp = [](const auto& s1, const auto& s2) { return s1.size() < s2.size(); };
+            const auto longest1 = std::max_element(std::begin(c1->sections), std::end(c1->sections), cmp)->size();
+            const auto longest2 = std::max_element(std::begin(c2->sections), std::end(c2->sections), cmp)->size();
+            if (longest1 == longest2) {
+                const auto sum = [](size_t acc, const auto& sec) { return acc + sec.size(); };
+                const auto total1 = std::accumulate(std::begin(c1->sections), std::end(c1->sections), 0UL, sum);
+                const auto total2 = std::accumulate(std::begin(c2->sections), std::end(c2->sections), 0UL, sum);
+                return total1 < total2;
+            }
+            else
+                return longest1 < longest2;
+        });
 
-    slot_no_t slot_no{0};
-    for (auto clade = std::next(std::begin(clade_refs)); clade != std::end(clade_refs); ++clade) {
-        for (auto prev_clade = std::begin(clade_refs); prev_clade != clade; ++prev_clade) {
-            if ((*clade)->intersects(**prev_clade) && (*prev_clade)->sections.front().slot_no == slot_no) {
-                ++slot_no;
-                break;
+        slot_no_t slot_no{0};
+        for (auto clade = std::begin(clade_refs); clade != std::end(clade_refs); ++clade) {
+            if ((*clade)->sections.front().slot_no == NoSlot) {
+                for (auto prev_clade = std::begin(clade_refs); prev_clade != clade; ++prev_clade) {
+                    if ((*clade)->intersects(**prev_clade) && (*prev_clade)->sections.front().slot_no == slot_no) {
+                        ++slot_no;
+                        break;
+                    }
+                }
+                for (auto& section : (*clade)->sections)
+                    section.slot_no = slot_no;
             }
         }
-        for (auto& section : (*clade)->sections)
-            section.slot_no = slot_no;
     }
 
 } // acmacs::tal::v3::Clades::set_slots

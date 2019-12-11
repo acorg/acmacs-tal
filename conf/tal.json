@@ -22,7 +22,7 @@
    "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
    "all_clades": {"name": "183P-1", "display_name": "183P-1",
                   "hidden": false, "shown": true,
-                  "slot": 1,
+                  "?slot": 5,
                   "top_gap": 10.0, "bottom_gap": 10.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
