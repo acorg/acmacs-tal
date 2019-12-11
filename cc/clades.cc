@@ -10,14 +10,10 @@ bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
     for (const auto& sec_lhs : sections) {
         for (const auto& sec_rhs : rhs.sections) {
             const auto& [upper, lower] = sec_lhs.first->node_id_.vertical < sec_rhs.first->node_id_.vertical ? std::pair{sec_lhs, sec_rhs} : std::pair{sec_rhs, sec_lhs};
-            // fmt::print(stderr, "DEBUG: upper: {}..{}  lower: {}..{}\n", upper.first->node_id_.vertical, upper.last->node_id_.vertical, lower.first->node_id_.vertical, lower.last->node_id_.vertical);
-            if (upper.last->node_id_.vertical > lower.first->node_id_.vertical) {
-                // fmt::print(stderr, "DEBUG: Intersection {} vs {}\n", name, rhs.name);
+            if (upper.last->node_id_.vertical > lower.first->node_id_.vertical)
                 return true;
-            }
         }
     }
-    // fmt::print(stderr, "DEBUG: no intersection {} vs {}\n", name, rhs.name);
     return false;
 
 } // acmacs::tal::v3::Clades::clade_t::intersects
@@ -124,7 +120,7 @@ void acmacs::tal::v3::Clades::set_slots()
     for (auto clade = std::next(std::begin(clade_refs)); clade != std::end(clade_refs); ++clade) {
         for (auto prev_clade = std::begin(clade_refs); prev_clade != clade; ++prev_clade) {
             if ((*clade)->intersects(**prev_clade) && (*prev_clade)->sections.front().slot_no == slot_no) {
-                slot_no += 1UL;
+                ++slot_no;
                 break;
             }
         }
