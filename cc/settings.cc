@@ -101,40 +101,104 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 {
     const auto selected = select_nodes(getenv("select"));
     // fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
-    std::visit(
-        [this, &selected]<typename T>(T && arg) {
-            if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                if (arg == "hide") {
-                    tree().hide(selected);
-                }
-                else if (arg == "color") {
-                    fmt::print(stderr, "DEBUG: apply color {}\n", getenv("tree-label", ""));
-                    if (const auto tree_label = getenv("tree-label", ""); !tree_label.empty()) {
-                        const Color color{tree_label};
-                        for (Node* node : selected)
-                            node->color_tree_label = color;
-                    }
-                    if (const auto time_series_dash = getenv("time-series-dash", ""); !time_series_dash.empty()) {
-                        const Color color{time_series_dash};
-                        for (Node* node : selected)
-                            node->color_time_series_dash = color;
-                    }
-                    if (const auto tree_edge_line = getenv("tree-edge-line", ""); !tree_edge_line.empty()) {
-                        const Color color{tree_edge_line};
-                        for (Node* node : selected)
-                            node->color_edge_line = color;
-                    }
-                }
-                else if (arg == "report") {
-                    report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
-                }
-                else
-                    throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+
+    const auto apply_one = [this, &selected](std::string_view key, const rjson::value& value) {
+        if (key == "hide") {
+            if (value.is_bool()) {
+                if (value.to<bool>())
+                tree().hide(selected);
             }
             else
-                throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+                throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
+        }
+        else if (key == "tree-label") {
+            const Color color{value.to<std::string_view>()};
+            for (Node* node : selected)
+                node->color_tree_label = color;
+        }
+        else if (key == "time-series-dash") {
+            const Color color{value.to<std::string_view>()};
+            for (Node* node : selected)
+                node->color_time_series_dash = color;
+        }
+        else if (key == "tree-edge-line") {
+            const Color color{value.to<std::string_view>()};
+            for (Node* node : selected)
+                node->color_edge_line = color;
+        }
+        else if (key == "tree-edge-line-width") {
+            const auto line_width_scale = value.to<double>();
+            for (Node* node : selected)
+                node->edge_line_width_scale = line_width_scale;
+        }
+        else if (key == "report") {
+            report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
+        }
+    };
+
+    const auto apply_value = [apply_one](const rjson::value& value_val) {
+        std::visit(
+            [apply_one]<typename ArgX>(ArgX && arg) {
+                using Arg = std::decay_t<ArgX>;
+                if constexpr (std::is_same_v<Arg, std::string>)
+                    apply_one(arg, true);
+                else if constexpr (std::is_same_v<Arg, rjson::object>)
+                    arg.for_each([apply_one](std::string_view key, const rjson::value& val) { apply_one(key, val); });
+                else
+                    throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+            },
+            value_val.val_());
+    };
+
+    const rjson::value& to_apply = getenv("apply");
+    std::visit(
+        [apply_value,&to_apply]<typename ArgX>(ArgX && arg) {
+            using Arg = std::decay_t<ArgX>;
+            if constexpr (std::is_same_v<Arg, rjson::array>)
+                arg.for_each([apply_value](const rjson::value& elt) { apply_value(elt); });
+            else
+                apply_value(to_apply);
         },
-        getenv("apply").val_());
+        to_apply.val_());
+
+    // if constexpr (std::is_same_v<Arg, std::string>) {
+    //     apply_one(selected, std::forward<ArgX>(arg));
+    // }
+
+    // }
+
+    // if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+    //     if (arg == "hide") {
+    //         tree().hide(selected);
+    //     }
+    //     else if (arg == "color") {
+    //         fmt::print(stderr, "DEBUG: apply color {}\n", getenv("tree-label", ""));
+    //         if (const auto tree_label = getenv("tree-label", ""); !tree_label.empty()) {
+    //             const Color color{tree_label};
+    //             for (Node* node : selected)
+    //                 node->color_tree_label = color;
+    //         }
+    //         if (const auto time_series_dash = getenv("time-series-dash", ""); !time_series_dash.empty()) {
+    //             const Color color{time_series_dash};
+    //             for (Node* node : selected)
+    //                 node->color_time_series_dash = color;
+    //         }
+    //         if (const auto tree_edge_line = getenv("tree-edge-line", ""); !tree_edge_line.empty()) {
+    //             const Color color{tree_edge_line};
+    //             for (Node* node : selected)
+    //                 node->color_edge_line = color;
+    //         }
+    //     }
+    //     else if (arg == "report") {
+    //         report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
+    //     }
+    //     else
+    //         throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+    // }
+    //     else
+    //         throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
+    // },
+    // to_apply.val_());
 
 } // acmacs::tal::v3::Settings::apply_nodes
 
@@ -213,7 +277,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
 {
     NodeSet selected;
     bool report = false;
-    rjson::for_each(criteria, [&selected, this, update = Tree::Select::init, &report](const std::string& key, const rjson::value& val) mutable {
+    rjson::for_each(criteria, [&selected, this, update = Tree::Select::init, &report](std::string_view key, const rjson::value& val) mutable {
         if (key == "all") {
             tree().select_all(selected, update);
         }

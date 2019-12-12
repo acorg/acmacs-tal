@@ -63,7 +63,7 @@
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 
   {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
-  {"N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": "color", "tree-edge-line": "green"},
+  {"N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
 
   "layout"
  ]
