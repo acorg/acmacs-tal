@@ -231,12 +231,12 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     // sort_by_cumulative(nodes);
     sort_by_edge(nodes);
 
-    fmt::print("mean edge {}\n", mean_edge(1.0));
-    fmt::print("mean edge (top 20%  ) {}\n", mean_edge(0.2));
-    fmt::print("mean edge (top 10%  ) {}\n", mean_edge(0.1));
-    fmt::print("mean edge (top  5%  ) {}\n", mean_edge(0.05));
-    fmt::print("mean edge (top  1%  ) {}\n", mean_edge(0.01));
-    fmt::print("mean edge (top  0.5%) {}\n", mean_edge(0.005));
+    fmt::print("mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge(1.0));
+    fmt::print("mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge(0.2));
+    fmt::print("mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge(0.1));
+    fmt::print("mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge(0.05));
+    fmt::print("mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge(0.01));
+    fmt::print("mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge(0.005));
     fmt::print("HINT: hide by edge, if edge > mean of top 1%\n\n");
 
     sort_by_edge(nodes);
@@ -351,10 +351,27 @@ void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select upd
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Node::hide()
+{
+    hidden = true;
+    for (auto& child : subtree)
+        child.hide();
+
+} // acmacs::tal::v3::Node::hide
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
 {
     for (Node* node : nodes)
-        node->hidden = true;
+        node->hide();
+
+    // if all children are hidden, hide parent too
+    tree::iterate_post(*this, [](Node& node) {
+        if (const auto shown_children = node.shown_children(); shown_children.empty())
+            node.hidden = true;
+    });
+
     clades_reset();
 
 } // acmacs::tal::v3::Tree::hide

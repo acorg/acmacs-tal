@@ -126,6 +126,8 @@ namespace acmacs::tal::inline v3
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;
         std::vector<const Node*> shown_children() const;
 
+        void hide();
+
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
         // double distance_from_previous = -1; // for hz sections auto-detection

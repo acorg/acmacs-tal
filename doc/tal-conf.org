@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-12 15:43:05 eu>
+# Time-stamp: <2019-12-12 16:15:34 eu>
 
 * Command line defines
 
@@ -59,6 +59,13 @@ If multiple criteria specified within single "select" object, they all used (con
 
 ***** hide if cumulative edge length bigger than
 {"N": "nodes", "select": {"cumulative >=": 0.01, "report": true}, "apply": "hide"}
+
+***** hide if edge length bigger than
+{"N": "nodes", "select": {"edge >=": 0.01, "report": true}, "apply": "hide"}
+
+***** hide if edge length bigger than the mean edge length of longest (by edge) N (fraction or absolute) nodes
+{"N": "nodes", "select": {"edge >= mean_edge of": 0.01, "report": true}, "apply": "hide"}
+{"N": "nodes", "select": {"edge >= mean_edge of": 100, "report": true}, "apply": "hide"}
 
 ***** hide isolated before
 {"N": "nodes", "select": {"date": ["", "2017"], "report": true}, "apply": "hide"}

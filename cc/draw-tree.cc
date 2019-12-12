@@ -40,11 +40,15 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
         // pre
         [&surface, this, line_width, vertical_additon = line_width.value() / 2.0](const Node& node) {
             if (!node.hidden) {
+                if (const auto shown_children = node.shown_children(); !shown_children.empty()) {
                 surface.line({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number(), vertical_step() * node.cumulative_vertical_offset_},
                              {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * node.cumulative_vertical_offset_}, node.color_edge_line, line_width * node.edge_line_width_scale);
-                const auto shown_children = node.shown_children();
+
                 surface.line({horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.front()->cumulative_vertical_offset_ - vertical_additon},
                              {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.back()->cumulative_vertical_offset_ + vertical_additon}, BLACK, line_width);
+                }
+                else
+                    fmt::print(stderr, "WARNING: node is not hidden but all ist children are hidden {} total children: {}\n", node.node_id_, node.subtree.size());
             }
         });
 
