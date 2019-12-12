@@ -73,7 +73,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         }
         else if (name == "report-time-series"sv) {
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
-                acmacs::file::write(output_filename, tree().report_time_series());
+                acmacs::file::write(output_filename, tree().report_time_series(Tree::report_size::detailed));
+            else
+                fmt::print("INFO: {}\n", tree().report_time_series(Tree::report_size::brief));
         }
         else if (name == "seqdb"sv) {
             tree().match_seqdb(getenv("filename"sv, ""));

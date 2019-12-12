@@ -59,7 +59,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 
     tree::iterate_leaf(tal().tree(), [&, this, dash_pos_x](const Node& leaf) {
         if (!leaf.date.empty()) {
-            const auto leaf_date = date::from_string(leaf.date);
+            const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
             if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
                 const auto dash_offset_x = dash_pos_x + slot_no * parameters_.slot.width;
                 if (!leaf.hidden) {

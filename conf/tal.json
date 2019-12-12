@@ -11,7 +11,7 @@
   {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
-  {"N": "time_series", "color_by": "continent", "start": "2019-01-01", "end": "2019-12-31", "interval": {"month": 1},
+  {"N": "time_series", "color_by": "continent", "?start": "2019-01-01", "?end": "2019-12-31", "interval": {"month": 1},
    "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
    "slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
             "?label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
@@ -29,7 +29,7 @@
                   "?arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
                   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
-   "per_clade": [
+   "?per_clade": [
     {"name": "183P-5A", "display_name": "183P-5a",
                   "hidden": false, "shown": true,
                   "?slot": 2,

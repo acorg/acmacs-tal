@@ -77,14 +77,14 @@ void acmacs::tal::v3::Clades::make_sections()
             }
 
             // merge sections
-            size_t merge_to = 0;
-            for (size_t sec_no = 0; sec_no < (clade.sections.size() - 1); ++sec_no) {
-                if ((clade.sections[sec_no + 1].first->node_id_.vertical - clade.sections[sec_no].last->node_id_.vertical) <= clade_param.section_inclusion_tolerance) {
-                    clade.sections[merge_to].last = clade.sections[sec_no + 1].last;
-                    clade.sections[sec_no + 1].first = nullptr;
+            for (auto section = std::begin(clade.sections), merge_to = section; section != std::end(clade.sections) && std::next(section) != std::end(clade.sections); ++section) {
+                const auto next_section = std::next(section);
+                if ((next_section->first->node_id_.vertical - section->last->node_id_.vertical) <= clade_param.section_inclusion_tolerance) {
+                    merge_to->last = next_section->last;
+                    next_section->first = nullptr;
                 }
                 else
-                    merge_to = sec_no + 1;
+                    merge_to = next_section;
             }
             clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), [](const auto& sec) { return sec.first == nullptr; }), std::end(clade.sections));
 
@@ -92,6 +92,9 @@ void acmacs::tal::v3::Clades::make_sections()
             const auto is_section_small = [tol = clade_param.section_exclusion_tolerance](const auto& sec) { return sec.size() <= tol; };
             if (const size_t num_small_sections = static_cast<size_t>(std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small)); num_small_sections < clade.sections.size())
                 clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), is_section_small), std::end(clade.sections));
+
+            if (clade.sections.empty())
+                clades_.erase(std::prev(clades_.end()));
         }
     }
 
@@ -106,6 +109,9 @@ void acmacs::tal::v3::Clades::set_slots()
         std::transform(std::begin(clades_), std::end(clades_), std::begin(clade_refs), [](auto& clad) { return &clad; });
         // smallest clade first (by its longest section)
         std::sort(std::begin(clade_refs), std::end(clade_refs), [](const clade_t* c1, const clade_t* c2) {
+            if (c1->sections.empty() || c2->sections.empty())
+                return true;
+
             const auto cmp = [](const auto& s1, const auto& s2) { return s1.size() < s2.size(); };
             const auto longest1 = std::max_element(std::begin(c1->sections), std::end(c1->sections), cmp)->size();
             const auto longest2 = std::max_element(std::begin(c2->sections), std::end(c2->sections), cmp)->size();

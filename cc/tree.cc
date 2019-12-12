@@ -425,11 +425,11 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 
     switch (method) {
         case Ladderize::MaxEdgeLength:
-            fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
+            // fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
             tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
             break;
         case Ladderize::NumberOfLeaves:
-            fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
+            // fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
             number_leaves_in_subtree();
             tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
             break;
@@ -602,15 +602,19 @@ std::pair<date::year_month_day, date::year_month_day> acmacs::tal::v3::Tree::sug
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::Tree::report_time_series() const
+std::string acmacs::tal::v3::Tree::report_time_series(report_size rs) const
 {
     const auto by_month = stat_by_month();
+    const auto [first, last] = suggest_time_series_start_end(by_month);
+    const auto brief = fmt::format("Months total:{} Suggested:{} {} .. {}", by_month.size(), date::months_between_dates(first, last) + 1,
+                                   date::display(first, date::allow_incomplete::yes), date::display(last, date::allow_incomplete::yes));
+    if (rs == report_size::brief)
+        return brief;
+
     fmt::memory_buffer out;
     for (auto [month, count] : by_month.counter())
         fmt::format_to(out, "  {} {}\n", month, count);
-    const auto [first, last] = suggest_time_series_start_end(by_month);
-    return fmt::format("INFO: Months total:{} Suggested:{} {} .. {}\n{}", by_month.size(), date::months_between_dates(first, last) + 1,
-                       date::display(first, date::allow_incomplete::yes), date::display(last, date::allow_incomplete::yes), fmt::to_string(out));
+    return fmt::format("{}\n{}", brief, fmt::to_string(out));
 
 } // acmacs::tal::v3::Tree::report_time_series
 

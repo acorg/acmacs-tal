@@ -58,7 +58,7 @@ namespace acmacs::tal::inline v3
 
         struct clade_t
         {
-            const std::string name;
+            std::string name;
             std::vector<clade_section_t> sections;
 
             clade_t(std::string_view nam) : name{nam} {}

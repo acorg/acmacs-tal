@@ -213,7 +213,9 @@ namespace acmacs::tal::inline v3
 
         Counter<std::string_view> stat_by_month() const;
         std::pair<date::year_month_day, date::year_month_day> suggest_time_series_start_end(const Counter<std::string_view>& stat) const;
-        std::string report_time_series() const;
+
+        enum class report_size { brief, detailed };
+        std::string report_time_series(report_size rs) const;
 
         // ----------------------------------------------------------------------
 
