@@ -95,6 +95,7 @@ namespace acmacs::tal::inline v3
 
         Color color_tree_label{BLACK}; // -> export
         Color color_time_series_dash{BLACK}; // -> export
+        Color color_edge_line{BLACK}; // -> export
 
         // middle node only
         Subtree subtree;
@@ -179,11 +180,12 @@ namespace acmacs::tal::inline v3
         std::string report_cumulative() const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
-        void branches_by_edge() const;
+        void branches_by_edge();
 
         enum class Select { init, update };
         enum class Descent { no, yes };
         void select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent = Descent::no);
+        void select_if_edge_more_than(NodeSet& nodes, Select update, double edge_min);
         EdgeLength max_cumulative_shown() const;
 
         void select_all(NodeSet& nodes, Select update);

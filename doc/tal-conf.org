@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-12 09:55:10 eu>
+# Time-stamp: <2019-12-12 12:55:37 eu>
 
 * Command line defines
 
@@ -22,7 +22,7 @@
 * Node modifications
 
 ** hide
-{"N": "nodes", "select": {"[[Select Nodes][Select Nodes]]"}, "apply": "hide"}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "hide"}
 
 *** hide if cumulative edge length bigger than
 {"N": "nodes", "select": {"cumulative >=": 0.01, "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
@@ -37,7 +37,7 @@
 {"N": "nodes", "select": {"aa": "159F", "report": true}, "apply": "hide"} -- see [[Select Nodes][Select Nodes]]
 
 ** color
-{"N": "nodes", "select": {"[[Select Nodes][Select Nodes]]"}, "apply": "color", "tree-label": "red", "time-series-dash": "red"}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "color", "tree-label": "red", "time-series-dash": "red", "tree-edge-line": "red"}
 
 ** just report selected
 {"N": "nodes", "select": {}, "apply": "report"} -- see [[Select Nodes][Select Nodes]]
@@ -71,6 +71,8 @@
 
 {"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug_outline": <[[Debug outline][debug-outline]]>},
 
+** Layout
+
 {"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
 
 {"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
@@ -97,6 +99,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"all": true}
 {"aa": ["192Q", "!123E"]}
 {"cumulative >=": 0.01, "report": true}
+{"edge >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 {"seq_id": "regexp", "report": true}
 {"vaccine": {"type": "current", "passage": "cell"}, "report": true}

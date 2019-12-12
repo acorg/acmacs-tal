@@ -67,7 +67,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         else if (name == "re-root"sv)
             tree().re_root(SeqId{getenv("new-root"sv, "re-root: new-root not specified")});
         else if (name == "report-cumulative"sv) {
-            // tree().branches_by_edge();
+            tree().branches_by_edge();
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
@@ -118,6 +118,11 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                         const Color color{time_series_dash};
                         for (Node* node : selected)
                             node->color_time_series_dash = color;
+                    }
+                    if (const auto tree_edge_line = getenv("tree-edge-line", ""); !tree_edge_line.empty()) {
+                        const Color color{tree_edge_line};
+                        for (Node* node : selected)
+                            node->color_edge_line = color;
                     }
                 }
                 else if (arg == "report") {
@@ -195,9 +200,9 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
     fmt::print("{}", prefix);
     for (const auto* node : nodes) {
         if (node->is_leaf())
-            fmt::print("{}{} [{}] cumul:{:.6f}\n", indent, node->seq_id, node->date, node->cumulative_edge_length.as_number());
+            fmt::print("{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id_, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
         else
-            fmt::print("{}(children: {}) cumul:{:.6f}\n", indent, node->subtree.size(), node->cumulative_edge_length.as_number());
+            fmt::print("{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id_, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
     }
 
 } // acmacs::tal::v3::Settings::report_nodes
@@ -220,6 +225,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "date") {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
+        }
+        else if (key == "edge >=") {
+            tree().select_if_edge_more_than(selected, update, val.to<double>());
         }
         else if (key == "matches-chart-antigen") {
             if (!tal_.chart_present())
