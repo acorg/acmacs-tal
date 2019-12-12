@@ -408,8 +408,17 @@ void acmacs::tal::v3::Settings::add_clades()
         // rjson::copy_if_not_null(source.get("label"sv, "rotation_degrees"sv), clade_paramters.label.rotation?);
         rjson::copy_if_not_null(source.get("label"sv, "color"sv), clade_paramters.label.color);
         rjson::copy_if_not_null(source.get("label"sv, "scale"sv), clade_paramters.label.scale);
-        // rjson::copy_if_not_null(source.get("label"sv, "position"sv), clade_paramters.label.position);
-        // rjson::copy_if_not_null(source.get("label"sv, "offset"sv), clade_paramters.label.offset);
+        if (const auto& position_v = source.get("label"sv, "position"sv); !position_v.is_null()) {
+            if (const auto position = position_v.to<std::string_view>(); position == "middle")
+                clade_paramters.label.position = Clades::vertical_position::middle;
+            else if (position == "top")
+                clade_paramters.label.position = Clades::vertical_position::top;
+            else if (position == "bottom")
+                clade_paramters.label.position = Clades::vertical_position::bottom;
+            else
+                fmt::print(stderr, "WARNING: unrecognized clade label position {}\n", position_v);
+        }
+        rjson::copy_if_not_null(source.get("label"sv, "offset"sv), clade_paramters.label.offset);
 
         // arrow
         // horizontal_line
