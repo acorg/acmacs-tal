@@ -42,6 +42,7 @@ namespace acmacs::tal::inline v3
         void read_time_series_parameters(TimeSeries& time_series);
         void add_clades();
         void add_title();
+        void add_legend();
     };
 
 } // namespace acmacs::tal::inlinev3

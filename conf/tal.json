@@ -47,7 +47,7 @@
 
   {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
 
-  {"?N": "legend", "type": "world_map", "offset": [0.1, 0.9], "size": 0.1}
+  {"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
 
  ],
  "main": [

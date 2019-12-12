@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-12 17:47:44 eu>
+# Time-stamp: <2019-12-12 18:38:03 eu>
 
 * Command line defines
 
@@ -163,6 +163,10 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Title
 
 {"N": "title", "display_name": "{virus-type/lineage}", "offset": [0.1, 0.1], "color": "black", "size": 0.05}
+
+*** Legend
+
+{"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
 
 * Debug outline
 

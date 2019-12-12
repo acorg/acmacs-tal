@@ -8,24 +8,21 @@ namespace acmacs::tal::inline v3
 {
     class Tal;
 
-    class Title : public LayoutElement
+    class Legend : public LayoutElement
     {
       public:
-        Title(Tal& tal) : LayoutElement(tal, 0.0) {}
+        Legend(Tal& tal) : LayoutElement(tal, 0.0) {}
 
         Position position() const override { return Position::absolute; }
 
         void prepare() override;
-        void draw(acmacs::surface::Surface& surface) const override;
 
         // ----------------------------------------------------------------------
 
         struct Parameters
         {
-            std::string display_name;
-            PointCoordinates offset{0.0, -0.005};
-            Color color{BLACK};
-            Scaled size{0.015};
+            PointCoordinates offset{0.0, 0.9};
+            Scaled size{0.1};
         };
 
         constexpr Parameters& parameters() { return parameters_; }
@@ -37,6 +34,15 @@ namespace acmacs::tal::inline v3
     };
 
     // ----------------------------------------------------------------------
+
+    class LegendWorldMap : public Legend
+    {
+      public:
+        using Legend::Legend;
+
+        void draw(acmacs::surface::Surface& surface) const override;
+
+    };
 
 } // namespace acmacs::tal::inlinev3
 

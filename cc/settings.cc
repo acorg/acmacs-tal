@@ -9,6 +9,7 @@
 #include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/title.hh"
+#include "acmacs-tal/legend.hh"
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +68,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             add_element<Gap>();
         else if (name == "ladderize"sv)
             ladderize();
+        else if (name == "legend"sv)
+            add_legend();
         else if (name == "margins"sv)
             margins();
         else if (name == "nodes"sv)
@@ -500,7 +503,6 @@ void acmacs::tal::v3::Settings::add_title()
     auto& element = add_element<Title>();
     auto& param = element.parameters();
 
-    fmt::print(stderr, "DEBUG: title display_name \"{}\"\n", getenv("display_name"sv, "???"));
     getenv_copy_if_present("display_name"sv, param.display_name);
     rjson::copy(getenv("offset"sv), param.offset);
     getenv_extract_copy_if_present<std::string_view>("color"sv, param.color);
@@ -508,6 +510,26 @@ void acmacs::tal::v3::Settings::add_title()
 
 
 } // acmacs::tal::v3::Settings::add_title
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_legend()
+{
+    using namespace std::string_view_literals;
+
+    std::string_view legend_type{"world-map"};
+    getenv_copy_if_present("type"sv, legend_type);
+
+    if (legend_type == "world-map") {
+        auto& element = add_element<LegendWorldMap>();
+        auto& param = element.parameters();
+        rjson::copy(getenv("offset"sv), param.offset);
+        getenv_extract_copy_if_present<double>("size"sv, param.size);
+    }
+    else
+        fmt::print(stderr, "WARNING: unrecognized legend type: \"{}\"\n", legend_type);
+
+} // acmacs::tal::v3::Settings::add_legend
 
 // ----------------------------------------------------------------------
 
