@@ -21,8 +21,8 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
-            PointCoordinates offset{0.0, 0.9};
-            Scaled size{0.1};
+            PointCoordinates offset{0.0, 0.93};
+            Scaled size{0.15};
         };
 
         constexpr Parameters& parameters() { return parameters_; }
@@ -35,7 +35,7 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
-    class LegendWorldMap : public Legend
+    class LegendContinentMap : public Legend
     {
       public:
         using Legend::Legend;

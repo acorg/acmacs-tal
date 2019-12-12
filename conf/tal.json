@@ -47,7 +47,13 @@
 
   {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
 
-  {"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
+  {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+
+  {"?N": "b/vic deletion mutants"},
+  {"?N": "H1 183P"},
+  {"?N": "AA substitutions"},
+  {"?N": "vaccine, most recent cell"},
+  {"?N": ""},
 
  ],
  "main": [

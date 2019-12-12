@@ -521,7 +521,7 @@ void acmacs::tal::v3::Settings::add_legend()
     getenv_copy_if_present("type"sv, legend_type);
 
     if (legend_type == "world-map") {
-        auto& element = add_element<LegendWorldMap>();
+        auto& element = add_element<LegendContinentMap>();
         auto& param = element.parameters();
         rjson::copy(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);

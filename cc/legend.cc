@@ -1,3 +1,4 @@
+#include "acmacs-draw/continent-map.hh"
 #include "acmacs-tal/legend.hh"
 
 // ----------------------------------------------------------------------
@@ -9,11 +10,11 @@ void acmacs::tal::v3::Legend::prepare()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::LegendWorldMap::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface) const
 {
-    surface.text(parameters().offset, "LegendWorldMap", RED, parameters().size, TextStyle{}, RotationDegrees(30));
+    continent_map_draw(surface.subsurface(parameters().offset, parameters().size, continent_map_size(), false));
 
-} // acmacs::tal::v3::LegendWorldMap::draw
+} // acmacs::tal::v3::LegendContinentMap::draw
 
 // ----------------------------------------------------------------------
 /// Local Variables:
