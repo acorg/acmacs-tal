@@ -209,6 +209,31 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
 
 // ----------------------------------------------------------------------
 
+std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_edge() const
+{
+    std::vector<const Node*> sorted;
+    const auto collect = [&sorted](const Node& node) { sorted.push_back(&node); };
+    tree::iterate_leaf_pre(*this, collect, collect);
+    std::sort(std::begin(sorted), std::end(sorted), [](const Node* n1, const Node* n2) { return n1->edge_length > n2->edge_length; });
+    return sorted;
+
+} // acmacs::tal::v3::Tree::sorted_by_edge
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::Tree::mean_edge_of(double fraction_or_number) const
+{
+    const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
+    std::vector<const Node*> nodes = sorted_by_edge();
+    if (fraction_or_number <= 1.0)
+        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(nodes.size() * fraction_or_number)), edge);
+    else
+        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(fraction_or_number)), edge);
+
+} // acmacs::tal::v3::Tree::mean_edge_of
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::branches_by_edge()
 {
     cumulative_calculate();
@@ -216,30 +241,30 @@ void acmacs::tal::v3::Tree::branches_by_edge()
 
     fmt::print("max cumulative: {}\n", max_cumulative_shown().as_number());
 
-    std::vector<const Node*> nodes;
 
-    const auto collect = [&nodes](const Node& node) { nodes.push_back(&node); };
-    tree::iterate_leaf_pre(*this, collect, collect);
+    // const auto collect = [&nodes](const Node& node) { nodes.push_back(&node); };
+    // tree::iterate_leaf_pre(*this, collect, collect);
 
-    const auto sort_by_edge = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->edge_length > n2->edge_length; }); };
+    // const auto sort_by_edge = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->edge_length > n2->edge_length; }); };
     // const auto sort_by_cumulative = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; }); };
-    const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
-    const auto mean_edge = [&nodes, edge](double fraction) {
-        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(nodes.size() * fraction)), edge);
-    };
+    // const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
+    // const auto mean_edge = [&nodes, edge](double fraction) {
+    //     return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(nodes.size() * fraction)), edge);
+    // };
 
     // sort_by_cumulative(nodes);
-    sort_by_edge(nodes);
+    // sort_by_edge(nodes);
 
-    fmt::print("mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge(1.0));
-    fmt::print("mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge(0.2));
-    fmt::print("mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge(0.1));
-    fmt::print("mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge(0.05));
-    fmt::print("mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge(0.01));
-    fmt::print("mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge(0.005));
+    std::vector<const Node*> nodes = sorted_by_edge();
+
+    fmt::print("mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0));
+    fmt::print("mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge_of(0.2));
+    fmt::print("mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge_of(0.1));
+    fmt::print("mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge_of(0.05));
+    fmt::print("mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge_of(0.01));
+    fmt::print("mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge_of(0.005));
     fmt::print("HINT: hide by edge, if edge > mean of top 1%\n\n");
 
-    sort_by_edge(nodes);
     fmt::print("    Edge       Cumulative     Seq Id\n");
     for (auto [no, node] : acmacs::enumerate(nodes)) {
         fmt::print("{:.10f}  {:.10f}   {} [{}]\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id, node->number_leaves_in_subtree_);
@@ -249,7 +274,7 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     fmt::print("\n");
 
     NodeSet selected;
-    select_if_edge_more_than(selected, Select::init, mean_edge(0.01));
+    select_if_edge_more_than(selected, Select::init, mean_edge_of(0.01));
     for (Node* node : selected) {
         fmt::print(stderr, "DEBUG: long edge {} {} {}\n", node->edge_length, node->node_id_, node->seq_id);
         node->color_edge_line = RED;
@@ -297,6 +322,12 @@ void acmacs::tal::v3::Tree::select_if_edge_more_than(NodeSet& nodes, Select upda
     select_update(nodes, update, Descent::yes, *this, [edge_min=EdgeLength{edge_min}](Node& node) { return !node.hidden && node.edge_length >= edge_min; });
 
 } // acmacs::tal::v3::Tree::select_if_edge_more_than
+
+void acmacs::tal::v3::Tree::select_if_edge_more_than_mean_edge_of(NodeSet& nodes, Select update, double fraction_or_number)
+{
+    select_update(nodes, update, Descent::yes, *this, [edge_min=EdgeLength{mean_edge_of(fraction_or_number)}](Node& node) { return !node.hidden && node.edge_length >= edge_min; });
+
+} // acmacs::tal::v3::Tree::select_if_edge_more_than_mean_edge_of
 
 void acmacs::tal::v3::Tree::select_all(NodeSet& nodes, Select update)
 {

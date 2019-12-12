@@ -67,7 +67,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         else if (name == "re-root"sv)
             tree().re_root(SeqId{getenv("new-root"sv, "re-root: new-root not specified")});
         else if (name == "report-cumulative"sv) {
-            tree().branches_by_edge();
+            // tree().branches_by_edge();
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
@@ -292,6 +292,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "edge >=") {
             tree().select_if_edge_more_than(selected, update, val.to<double>());
+        }
+        else if (key == "edge >= mean_edge of") {
+            tree().select_if_edge_more_than_mean_edge_of(selected, update, val.to<double>());
         }
         else if (key == "matches-chart-antigen") {
             if (!tal_.chart_present())

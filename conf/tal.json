@@ -55,16 +55,18 @@
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
   {"N": "aa-transitions", "report": false},
-  {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-   {"N": "clades-{virus-type}{lineage}", "report": false},
-   {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
-  ]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 
   {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
-  {"?N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
+  {"?N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0, "report": true}},
+  {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
 
+  {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+   {"N": "clades-{virus-type}{lineage}", "report": false},
+   {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
+  ]},
+  
   "layout"
  ]
 }

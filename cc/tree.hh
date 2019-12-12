@@ -190,6 +190,7 @@ namespace acmacs::tal::inline v3
         enum class Descent { no, yes };
         void select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent = Descent::no);
         void select_if_edge_more_than(NodeSet& nodes, Select update, double edge_min);
+        void select_if_edge_more_than_mean_edge_of(NodeSet& nodes, Select update, double fraction_or_number);
         EdgeLength max_cumulative_shown() const;
 
         void select_all(NodeSet& nodes, Select update);
@@ -266,6 +267,8 @@ namespace acmacs::tal::inline v3
       private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
+        std::vector<const Node*> sorted_by_edge() const;
+        double mean_edge_of(double fraction_or_number) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
 
         std::string data_buffer_;
         std::string virus_type_;
