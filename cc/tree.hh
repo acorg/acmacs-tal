@@ -120,7 +120,7 @@ namespace acmacs::tal::inline v3
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
         constexpr static const double default_vertical_offset{1.0};
-        mutable double vertical_offset_{default_vertical_offset}; // vertical gap maker will adjust, mutalbe for adjusting via const Node* in clade sections
+        mutable double vertical_offset_{default_vertical_offset}; // mutalbe for adjusting via const Node* in clade sections
 
         bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;
@@ -131,13 +131,9 @@ namespace acmacs::tal::inline v3
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
         // double distance_from_previous = -1; // for hz sections auto-detection
-        // std::string continent;
         // std::string aa_at;          // see make_aa_at()
         // AA_Transitions aa_transitions;
-        // bool shown = true;
-        // size_t line_no = 0;
         // size_t hz_section_index = HzSectionNoIndex;
-        // double vertical_pos = -1;
         // Color mark_with_line = ColorNoChange;
         // Pixels mark_with_line_width{0};
         // std::optional<size_t> chart_antigen_index;

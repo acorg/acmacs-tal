@@ -115,7 +115,7 @@ void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
                 normal_left += element->width_to_height_ratio();
             } break;
             case Position::absolute:
-                fmt::print(stderr, "WARNING: Drawing elements with Position::absolute not yet implemented\n");
+                element->draw(surface);
                 break;
         }
     }

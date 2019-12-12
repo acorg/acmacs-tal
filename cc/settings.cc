@@ -8,6 +8,7 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/clades.hh"
+#include "acmacs-tal/title.hh"
 
 // ----------------------------------------------------------------------
 
@@ -27,8 +28,14 @@ template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3:
 
 void acmacs::tal::v3::Settings::update_env()
 {
-    setenv_toplevel("virus-type", tal_.tree().virus_type());
-    setenv_toplevel("lineage", tal_.tree().lineage());
+    const auto virus_type = tal_.tree().virus_type();
+    const auto lineage = tal_.tree().lineage();
+    setenv_toplevel("virus-type", virus_type);
+    setenv_toplevel("lineage", lineage);
+    if (lineage.empty())
+        setenv_toplevel("virus-type/lineage", virus_type);
+    else
+        setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
     setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
     setenv_toplevel("chart-present", tal_.chart_present());
     if (tal_.chart_present()) {
@@ -83,6 +90,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         }
         else if (name == "time_series"sv)
             add_time_series();
+        else if (name == "title"sv)
+            add_title();
         else if (name == "tree"sv)
             add_tree();
         else
@@ -106,7 +115,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         if (key == "hide") {
             if (value.is_bool()) {
                 if (value.to<bool>())
-                tree().hide(selected);
+                    tree().hide(selected);
             }
             else
                 throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
@@ -152,7 +161,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
     const rjson::value& to_apply = getenv("apply");
     std::visit(
-        [apply_value,&to_apply]<typename ArgX>(ArgX && arg) {
+        [apply_value, &to_apply]<typename ArgX>(ArgX && arg) {
             using Arg = std::decay_t<ArgX>;
             if constexpr (std::is_same_v<Arg, rjson::array>)
                 arg.for_each([apply_value](const rjson::value& elt) { apply_value(elt); });
@@ -160,45 +169,6 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 apply_value(to_apply);
         },
         to_apply.val_());
-
-    // if constexpr (std::is_same_v<Arg, std::string>) {
-    //     apply_one(selected, std::forward<ArgX>(arg));
-    // }
-
-    // }
-
-    // if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-    //     if (arg == "hide") {
-    //         tree().hide(selected);
-    //     }
-    //     else if (arg == "color") {
-    //         fmt::print(stderr, "DEBUG: apply color {}\n", getenv("tree-label", ""));
-    //         if (const auto tree_label = getenv("tree-label", ""); !tree_label.empty()) {
-    //             const Color color{tree_label};
-    //             for (Node* node : selected)
-    //                 node->color_tree_label = color;
-    //         }
-    //         if (const auto time_series_dash = getenv("time-series-dash", ""); !time_series_dash.empty()) {
-    //             const Color color{time_series_dash};
-    //             for (Node* node : selected)
-    //                 node->color_time_series_dash = color;
-    //         }
-    //         if (const auto tree_edge_line = getenv("tree-edge-line", ""); !tree_edge_line.empty()) {
-    //             const Color color{tree_edge_line};
-    //             for (Node* node : selected)
-    //                 node->color_edge_line = color;
-    //         }
-    //     }
-    //     else if (arg == "report") {
-    //         report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
-    //     }
-    //     else
-    //         throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
-    // }
-    //     else
-    //         throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
-    // },
-    // to_apply.val_());
 
 } // acmacs::tal::v3::Settings::apply_nodes
 
@@ -520,6 +490,24 @@ void acmacs::tal::v3::Settings::add_clades()
     });
 
 } // acmacs::tal::v3::Settings::add_clades
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_title()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<Title>();
+    auto& param = element.parameters();
+
+    fmt::print(stderr, "DEBUG: title display_name \"{}\"\n", getenv("display_name"sv, "???"));
+    getenv_copy_if_present("display_name"sv, param.display_name);
+    rjson::copy(getenv("offset"sv), param.offset);
+    getenv_extract_copy_if_present<std::string_view>("color"sv, param.color);
+    getenv_extract_copy_if_present<double>("size"sv, param.size);
+
+
+} // acmacs::tal::v3::Settings::add_title
 
 // ----------------------------------------------------------------------
 

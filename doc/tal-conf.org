@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-12 16:15:34 eu>
+# Time-stamp: <2019-12-12 17:47:44 eu>
 
 * Command line defines
 
@@ -118,24 +118,51 @@ If multiple criteria specified within single "select" object, they all used (con
 
 ** Layout
 
+*** Gap
+
 {"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+*** Tree
 
 {"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
 
+*** Time series
+
 {"N": "time_series", "color_by": <[[Color by][color-by]]>,
- <[[Time series][time-series]]>,
- "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
- "slot": {"width": 0.01, "?": "relative to the time series area height",
+ "start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
+ "interval": {"month": 1}, "?": "month, week, year, day",
+ "?interval": "month"
+ "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
+ "slot": {"width": 0.01, "?": "fraction of the time series area height",
           "separator": {"width_pixels": 0.5, "color": "black"},
           "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
          },
  "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+*** Clade
 
 {"N": "clades", "report": true,
  "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
  "all_clades": {<[[Clade parameters]]>},
  "per_clade": [{<[[Clade parameters]]>}, ...],
  "?width_to_height_ratio": 0.3, "debug_outline": <[[Debug outline][debug-outline]]>},
+
+**** Clade parameters
+
+{"name": "183P-1", "display_name": "183P-1",
+ "hidden": false, "shown": true,
+ "slot": 1,
+ "top_gap": 0.05, "bottom_gap": 0.05, "?top_gap?": "fraction of area height",
+ "time_series_top_separator": true, "time_series_bottom_separator": true,
+ "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+ "label": {"rotation_degrees": 0, "color": "black", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+ "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+ "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
+}
+
+*** Title
+
+{"N": "title", "display_name": "{virus-type/lineage}", "offset": [0.1, 0.1], "color": "black", "size": 0.05}
 
 * Debug outline
 
@@ -153,26 +180,6 @@ If multiple criteria specified within single "select" object, they all used (con
 "color_by": {"N": "continent", "EUROPE": "#00A800", "CENTRAL-AMERICA": "#70A4A8", "MIDDLE-EAST": "#8000FF", "NORTH-AMERICA": "#00008B", "AFRICA": "#FF8000", "ASIA": "#FF0000", "RUSSIA": "#B03060", "AUSTRALIA-OCEANIA": "#FF69B4", "SOUTH-AMERICA": "#40E0D0", "ANTARCTICA": "#808080", "CHINA-SOUTH": "#FF0000", "CHINA-NORTH": "#6495ED", "CHINA-UNKNOWN": "#808080", "UNKNOWN": "#808080"}
 
 "color_by": {"N": "pos", "pos": 192}
-
-* Time series
-
-{"start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
- "interval": {"month": 1}, "?": "month, week, year, day",
- "interval": "month"
-}
-
-* Clade parameters
-
-{"name": "183P-1", "display_name": "183P-1",
- "hidden": false, "shown": true,
- "slot": 1,
- "top_gap": 10.0, "bottom_gap": 10.0,
- "time_series_top_separator": true, "time_series_bottom_separator": true,
- "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
- "label": {"rotation_degrees": 0, "color": "black", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
- "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
- "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
-}
 
 * COMMENT ====== local vars
 :PROPERTIES:

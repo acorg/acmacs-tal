@@ -6,7 +6,7 @@ TARGETS = \
 
 SOURCES = \
   tal.cc tal-data.cc tree.cc aa-transition.cc \
-  draw.cc layout.cc coloring.cc draw-tree.cc time-series.cc clades.cc \
+  draw.cc layout.cc coloring.cc draw-tree.cc time-series.cc clades.cc title.cc \
   settings.cc \
   import-export.cc json-export.cc json-import.cc newick.cc html-export.cc
 

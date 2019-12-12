@@ -85,7 +85,7 @@ namespace acmacs::tal::inline v3
             label_t label;
             arrow_t arrow;
             line_t horizontal_line{GREY, Pixels{0.5}};
-            double tree_top_gap{10.0}, tree_bottom_gap{10.0};
+            double tree_top_gap{50.0}, tree_bottom_gap{50.0};
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };
 
