@@ -85,8 +85,8 @@ namespace acmacs::tal::inline v3
             std::string name;
             std::string display_name;
             bool hidden{false};
-            size_t section_inclusion_tolerance{10};
-            size_t section_exclusion_tolerance{5};
+            unsigned short section_inclusion_tolerance{10};
+            unsigned short section_exclusion_tolerance{5};
             slot_no_t slot_no{NoSlot};
             label_t label;
             arrow_t arrow;

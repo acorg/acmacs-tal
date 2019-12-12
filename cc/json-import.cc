@@ -81,6 +81,7 @@ namespace
               case array_processing::none:
                   throw in_json::parse_error(fmt::format("unsupported object for key \"{}\"", key_));
             }
+            throw in_json::parse_error(fmt::format("unsupported object for key \"{}\"", key_)); // g++9 wants this
         }
 
         void injson_put_string(std::string_view data) override

@@ -120,6 +120,7 @@ std::pair<std::string, std::string> acmacs::tal::v3::TimeSeries::labels(const ac
         case acmacs::time_series::v2::interval::day:
             return {{}, date::year4_month2_day2(slot.first)};
     }
+    return {date::year_2(slot.first), date::month_3(slot.first)}; // g++9 wants this
 
 } // acmacs::tal::v3::TimeSeries::labels
 

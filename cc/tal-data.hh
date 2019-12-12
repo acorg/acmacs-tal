@@ -27,7 +27,7 @@ namespace acmacs::tal::inline v3
 
         constexpr Tree& tree() { return tree_; }
         constexpr const Tree& tree() const { return tree_; }
-        constexpr bool chart_present() const { return static_cast<bool>(chart_); }
+        bool chart_present() const { return static_cast<bool>(chart_); } // gcc9 does not like constexpr here
         constexpr const acmacs::chart::Chart& chart() const { return *chart_; }
         constexpr Draw& draw() { return draw_; }
         constexpr const Draw& draw() const { return draw_; }

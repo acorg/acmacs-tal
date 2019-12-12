@@ -405,7 +405,7 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
         rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
 
-        // rjson::copy_if_not_null(source.get("label"sv, "rotation"sv), clade_paramters.label.);
+        // rjson::copy_if_not_null(source.get("label"sv, "rotation_degrees"sv), clade_paramters.label.rotation?);
         rjson::copy_if_not_null(source.get("label"sv, "color"sv), clade_paramters.label.color);
         rjson::copy_if_not_null(source.get("label"sv, "scale"sv), clade_paramters.label.scale);
         // rjson::copy_if_not_null(source.get("label"sv, "position"sv), clade_paramters.label.position);
