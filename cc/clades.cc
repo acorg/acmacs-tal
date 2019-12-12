@@ -51,7 +51,8 @@ void acmacs::tal::v3::Clades::make_clades()
 {
     make_sections();
     set_slots();
-    add_gaps_to_the_tree();
+    add_gaps_to_tree();
+    add_separators_to_time_series();
     report_clades();
 
 } // acmacs::tal::v3::Clades::make_clades
@@ -137,7 +138,7 @@ void acmacs::tal::v3::Clades::set_slots()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Clades::add_gaps_to_the_tree()
+void acmacs::tal::v3::Clades::add_gaps_to_tree()
 {
     for (const auto& clade : clades_) {
         const auto& clade_param = parameters_for_clade(clade.name);
@@ -152,7 +153,23 @@ void acmacs::tal::v3::Clades::add_gaps_to_the_tree()
         }
     }
 
-} // acmacs::tal::v3::Clades::add_gaps_to_the_tree
+} // acmacs::tal::v3::Clades::add_gaps_to_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Clades::add_separators_to_time_series()
+{
+    for (const auto& clade : clades_) {
+        const auto& clade_param = parameters_for_clade(clade.name);
+        for (const auto& section : clade.sections) {
+            if (clade_param.time_series_top_separator)
+                ;
+            if (clade_param.time_series_bottom_separator)
+                ;
+        }
+    }
+
+} // acmacs::tal::v3::Clades::add_separators_to_time_series
 
 // ----------------------------------------------------------------------
 

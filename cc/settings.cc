@@ -368,14 +368,14 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
         rjson::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
         rjson::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
         rjson::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);
-        if (const auto& rotation = slot_val.get("label"sv, "rotation"sv); !rotation.is_null()) {
-            if (const auto rot = rotation.to<std::string_view>(); rot == "clockwise")
+        rjson::call_if_not_null<std::string_view>(slot_val.get("label"sv, "rotation"sv), [&param](auto rot) {
+            if (rot == "clockwise")
                 param.slot.label.rotation = Rotation90DegreesClockwise;
             else if (rot == "anticlockwise" || rot == "counterclockwise")
                 param.slot.label.rotation = Rotation90DegreesAnticlockwise;
             else
                 fmt::print(stderr, "WARNING: unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
-        }
+        });
     }
 
 } // acmacs::tal::v3::Settings::read_time_series_parameters
@@ -395,8 +395,10 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
     }
 
-    const auto read_clade_parameters = [](const rjson::value& source, Clades::CladeParameters& clade_paramters) {
-        rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
+    enum class ignore_name { no, yes };
+    const auto read_clade_parameters = [](const rjson::value& source, Clades::CladeParameters& clade_paramters, ignore_name ign) {
+        if (ign == ignore_name::no)
+            rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
         rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
         if (const auto& shown = source.get("shown"sv); !shown.is_null())
             clade_paramters.hidden = !shown.template to<bool>();
@@ -405,33 +407,40 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
         rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
 
-        // rjson::copy_if_not_null(source.get("label"sv, "rotation_degrees"sv), clade_paramters.label.rotation?);
+        rjson::call_if_not_null<double>(source.get("label"sv, "rotation_degrees"sv), [&clade_paramters](auto rotation_degrees) { clade_paramters.label.rotation = RotationDegrees(rotation_degrees); });
         rjson::copy_if_not_null(source.get("label"sv, "color"sv), clade_paramters.label.color);
         rjson::copy_if_not_null(source.get("label"sv, "scale"sv), clade_paramters.label.scale);
-        if (const auto& position_v = source.get("label"sv, "position"sv); !position_v.is_null()) {
-            if (const auto position = position_v.to<std::string_view>(); position == "middle")
+        rjson::call_if_not_null<std::string_view>(source.get("label"sv, "position"sv), [&clade_paramters](auto position) {
+            if (position == "middle")
                 clade_paramters.label.position = Clades::vertical_position::middle;
             else if (position == "top")
                 clade_paramters.label.position = Clades::vertical_position::top;
             else if (position == "bottom")
                 clade_paramters.label.position = Clades::vertical_position::bottom;
             else
-                fmt::print(stderr, "WARNING: unrecognized clade label position {}\n", position_v);
-        }
+                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
+        });
         rjson::copy_if_not_null(source.get("label"sv, "offset"sv), clade_paramters.label.offset);
 
-        // arrow
-        // horizontal_line
+        rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_paramters.arrow.color);
+        rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_paramters.arrow.line_width);
+        rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_paramters.arrow.arrow_width);
+
+        rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_paramters.horizontal_line.color);
+        rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_paramters.horizontal_line.line_width);
 
         rjson::copy_if_not_null(source.get("top_gap"sv), clade_paramters.tree_top_gap);
         rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_paramters.tree_bottom_gap);
         rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
         rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
-        // rjson::copy_if_not_null(source.get(""sv), clade_paramters.);
     };
 
     if (const auto& all_clades_val = getenv("all_clades"sv); !all_clades_val.is_null())
-        read_clade_parameters(all_clades_val, param.all_clades);
+        read_clade_parameters(all_clades_val, param.all_clades, ignore_name::yes);
+    rjson::for_each(getenv("per_clade"sv), [&param,read_clade_parameters](const rjson::value& for_clade) {
+        param.per_clade.push_back(param.all_clades);
+        read_clade_parameters(for_clade, param.per_clade.back(), ignore_name::no);
+    });
 
 } // acmacs::tal::v3::Settings::add_clades
 

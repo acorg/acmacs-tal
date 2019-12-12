@@ -20,16 +20,27 @@
 
   {"N": "clades", "report": true,
    "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
-   "all_clades": {"name": "183P-1", "display_name": "183P-1",
-                  "hidden": false, "shown": true,
+   "all_clades": {"hidden": false, "shown": true,
                   "?slot": 5,
                   "top_gap": 10.0, "bottom_gap": 10.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-                  "label": {"rotation_degrees": 0, "color": "magenta", "scale": 0.5, "position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
-                  "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
-                  "horizontal_line": {"color": "grey", "width": 0.5}, "?horizontal_line?": "width in pixels"
+                  "?label": {"rotation_degrees": 45, "color": "magenta", "scale": 0.5, "?position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "?arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+                  "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
+   "per_clade": [
+    {"name": "183P-1", "display_name": "183P-1111",
+                  "hidden": false, "shown": true,
+                  "slot": 2,
+                  "top_gap": 10.0, "bottom_gap": 10.0,
+                  "time_series_top_separator": true, "time_series_bottom_separator": true,
+                  "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+                  "label": {"rotation_degrees": 45, "color": "magenta", "scale": 0.5, "?position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+                  "horizontal_line": {"color": "green3", "line_width": 1.7}, "?horizontal_line?": "width in pixels"
+                 }
+   ],
    "?debug_outline": "lightblue"}
 
  ],

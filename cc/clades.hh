@@ -115,7 +115,8 @@ namespace acmacs::tal::inline v3
         void make_sections();
         void report_clades();
         void set_slots();
-        void add_gaps_to_the_tree();
+        void add_gaps_to_tree();
+        void add_separators_to_time_series();
         size_t number_of_slots() const;
     };
 
