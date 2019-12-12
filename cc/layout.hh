@@ -27,6 +27,7 @@ namespace acmacs::tal::inline v3
         void draw(acmacs::surface::Surface& surface) const;
 
         template <typename Element> const Element* find() const;
+        template <typename Element> Element* find();
         template <typename Element> void prepare_element();
         size_t index_of(const LayoutElement* look_for) const;
 
@@ -37,6 +38,10 @@ namespace acmacs::tal::inline v3
     extern template const DrawTree* Layout::find<DrawTree>() const;
     extern template const TimeSeries* Layout::find<TimeSeries>() const;
     extern template const Clades* Layout::find<Clades>() const;
+
+    extern template DrawTree* Layout::find<DrawTree>();
+    extern template TimeSeries* Layout::find<TimeSeries>();
+    extern template Clades* Layout::find<Clades>();
 
     extern template void Layout::prepare_element<DrawTree>();
     extern template void Layout::prepare_element<TimeSeries>();
@@ -73,6 +78,12 @@ namespace acmacs::tal::inline v3
 
         double pos_y_above(const Node& node, double vertical_step) const;
         double pos_y_below(const Node& node, double vertical_step) const;
+
+        struct line_t
+        {
+            Color color{BLACK};
+            Pixels line_width{1.0};
+        };
 
       protected:
         bool prepared_{false};

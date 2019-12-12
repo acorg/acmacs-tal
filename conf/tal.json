@@ -20,7 +20,7 @@
 
   {"N": "clades", "report": true,
    "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
-   "all_clades": {"hidden": false, "shown": true,
+   "?all_clades": {"hidden": false, "shown": true,
                   "?slot": 5,
                   "top_gap": 10.0, "bottom_gap": 10.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
@@ -30,9 +30,9 @@
                   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
    "per_clade": [
-    {"name": "183P-1", "display_name": "183P-1111",
+    {"name": "183P-5A", "display_name": "183P-5a",
                   "hidden": false, "shown": true,
-                  "slot": 2,
+                  "?slot": 2,
                   "top_gap": 10.0, "bottom_gap": 10.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,

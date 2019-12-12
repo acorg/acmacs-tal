@@ -31,12 +31,6 @@ namespace acmacs::tal::inline v3
             std::array<double, 2> offset{0, 0.002}; // relative to the area height
         };
 
-        struct line_t
-        {
-            Color color{BLACK};
-            Pixels line_width{1.0};
-        };
-
         struct arrow_t : public line_t
         {
             Pixels arrow_width{3.0};

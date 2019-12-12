@@ -17,6 +17,8 @@ namespace acmacs::tal::inline v3
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
 
+        void add_horizontal_line_above(const Node* node, const line_t& line);
+
         // ----------------------------------------------------------------------
 
         struct DashParameters
@@ -56,11 +58,20 @@ namespace acmacs::tal::inline v3
         constexpr Parameters& parameters() { return parameters_; }
 
       private:
+        struct horizontal_line_t : public line_t
+        {
+            const Node* node;
+
+            constexpr horizontal_line_t(const Node* a_node, const line_t& a_line) : line_t(a_line), node(a_node) {}
+        };
+
         Parameters parameters_;
         acmacs::time_series::series series_;
+        std::vector<horizontal_line_t> horizontal_lines_;
 
         void draw_labels(acmacs::surface::Surface& surface) const;
         std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
+        void draw_horizontal_lines(acmacs::surface::Surface& surface, const DrawTree* draw_tree) const;
 
     };
 

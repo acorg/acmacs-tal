@@ -159,13 +159,16 @@ void acmacs::tal::v3::Clades::add_gaps_to_tree()
 
 void acmacs::tal::v3::Clades::add_separators_to_time_series()
 {
+    auto* time_series = tal().draw().layout().find<TimeSeries>();
     for (const auto& clade : clades_) {
         const auto& clade_param = parameters_for_clade(clade.name);
         for (const auto& section : clade.sections) {
             if (clade_param.time_series_top_separator)
-                ;
-            if (clade_param.time_series_bottom_separator)
-                ;
+                time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line);
+            if (clade_param.time_series_bottom_separator) {
+                if (const auto next_leaf = tal().tree().next_leaf(section.last); next_leaf)
+                    time_series->add_horizontal_line_above(next_leaf, clade_param.horizontal_line);
+            }
         }
     }
 

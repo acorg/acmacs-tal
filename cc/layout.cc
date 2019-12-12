@@ -50,8 +50,8 @@ void acmacs::tal::v3::Layout::prepare()
 
 template <typename Element> inline const Element* acmacs::tal::v3::Layout::find() const
 {
-    for (auto& element : elements_) {
-        if (auto* found = dynamic_cast<Element*>(element.get()); found)
+    for (const auto& element : elements_) {
+        if (const auto* found = dynamic_cast<const Element*>(element.get()); found)
             return found;
     }
     return nullptr;
@@ -60,6 +60,19 @@ template <typename Element> inline const Element* acmacs::tal::v3::Layout::find(
 template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>() const;
 template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>() const;
 template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>() const;
+
+template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
+{
+    for (auto& element : elements_) {
+        if (auto* found = dynamic_cast<Element*>(element.get()); found)
+            return found;
+    }
+    return nullptr;
+}
+
+template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>();
+template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>();
+template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>();
 
 // ----------------------------------------------------------------------
 

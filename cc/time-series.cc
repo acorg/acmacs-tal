@@ -31,6 +31,19 @@ void acmacs::tal::v3::TimeSeries::prepare()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const line_t& line)
+{
+    if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
+        if (found->color != line.color || found->line_width != line.line_width)
+            fmt::print(stderr, "WARNING: time series horizontal line above {} {} already added with different parameters\n", node->node_id_, node->seq_id);
+    }
+    else
+        horizontal_lines_.emplace_back(node, line);
+
+} // acmacs::tal::v3::TimeSeries::add_horizontal_line_above
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 {
     draw_labels(surface);
@@ -57,6 +70,8 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
             }
         }
     });
+
+    draw_horizontal_lines(surface, draw_tree);
 
 } // acmacs::tal::v3::TimeSeries::draw
 
@@ -123,6 +138,19 @@ std::pair<std::string, std::string> acmacs::tal::v3::TimeSeries::labels(const ac
     return {date::year_2(slot.first), date::month_3(slot.first)}; // g++9 wants this
 
 } // acmacs::tal::v3::TimeSeries::labels
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::draw_horizontal_lines(acmacs::surface::Surface& surface, const DrawTree* draw_tree) const
+{
+    tree::iterate_leaf(tal().tree(), [this, &surface, &draw_tree](const Node& leaf) {
+        if (auto hl_found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [leafp=&leaf](const auto& hl) { return hl.node == leafp; }); hl_found != std::end(horizontal_lines_)) {
+            const auto pos_y_top = pos_y_above(*hl_found->node, draw_tree->vertical_step());
+            surface.line({surface.viewport().left(), pos_y_top}, {surface.viewport().right(), pos_y_top}, hl_found->color, hl_found->line_width);
+        }
+    });
+
+} // acmacs::tal::v3::TimeSeries::draw_horizontal_lines
 
 // ----------------------------------------------------------------------
 
