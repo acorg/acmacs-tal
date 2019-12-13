@@ -12,15 +12,36 @@
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
 
-  {"N": "dash-bar-clades",
-   "width_to_height_ratio": 0.009,
-   "clades": [
-    {"name": "2DEL2017", "color": "#A0A0A0"},
-    {"name": "3DEL2017", "color": "#606060"}
-   ],
-   "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
-   "?debug_outline": "lightblue"},
-  {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"},
+  {"?N": "---------- H1 ----------"},
+  {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
+   {"N": "dash-bar-clades",
+    "width_to_height_ratio": 0.009,
+    "clades": [
+     {"name": "183P-1",   "color": "#a2b324"},
+     {"name": "183P-2",   "color": "#e72f27"},
+     {"name": "183P-3/6", "color": "#03569b"},
+     {"name": "183P-4",   "color": "#742f32"},
+     {"name": "183P-5",   "color": "#e9a390"},
+     {"name": "183P-5A",  "color": "#e9a390"},
+     {"name": "183P-7",   "color": "#a020f0"}
+    ],
+    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+    "?debug_outline": "lightblue"},
+   {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
+  ]},
+
+  {"?N": "---------- BVic ----------"},
+  {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": [
+   {"N": "dash-bar-clades",
+    "width_to_height_ratio": 0.009,
+    "clades": [
+     {"name": "2DEL2017", "color": "#A0A0A0"},
+     {"name": "3DEL2017", "color": "#606060"}
+    ],
+    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+    "?debug_outline": "lightblue"},
+   {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
+  ]},
 
   {"N": "time_series", "color_by": "continent",
    "?start": "2019-01-01", "?end": "2019-12-31", "interval": {"month": 1},
@@ -40,15 +61,27 @@
                   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
    "per_clade": [
-    {"?N": " -- H1 ---"},
-    {"?N": " -- H3 ---"},
-    {"?N": " -- BVic ---"},
+    {"?N": "---------- H1 ----------"},
+    {"name": "6B", "show": false},
+    {"name": "6B1", "show": false},
+    {"name": "6B1.A", "show": false},
+    {"name": "6B2", "show": false},
+    {"name": "183P", "show": false},
+    {"name": "183P-1", "show": false},
+    {"name": "183P-2", "show": false},
+    {"name": "183P-3/6", "show": false},
+    {"name": "183P-4", "show": false},
+    {"name": "183P-5", "show": false},
+    {"name": "183P-5A", "show": false},
+    {"name": "183P-7", "show": false},
+    {"?N": "---------- H3 ----------"},
+    {"?N": "---------- BVic ----------"},
     {"name": "V1B", "show": false},
     {"name": "V1A", "section_inclusion_tolerance": 20},
     {"name": "2DEL2017", "show": false, "section_inclusion_tolerance": 15},
     {"name": "3DEL2017", "show": false},
     {"name": "6DEL2019", "show": false},
-    {"?N": " -- BYam ---"},
+    {"?N": "---------- BYam ----------"},
    ],
    "?debug_outline": "lightblue"},
 
@@ -63,8 +96,7 @@
   {"?N": "vaccine, most recent cell"},
   {"?N": "legend", "type": "colored by AA at pos"},
   {"?N": "color bar for antigens colored by date"},
-  {"?N": ""},
-
+  {"?N": ""}
  ],
  "main": [
   {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [

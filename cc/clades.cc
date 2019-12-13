@@ -27,7 +27,7 @@ void acmacs::tal::v3::Clades::prepare()
         time_series_to_the_left_ = layout.index_of(layout.find<TimeSeries>()) < layout.index_of(this);
 
         make_clades();
-        if (width_to_height_ratio() <= 0.0)
+        if (width_to_height_ratio() <= 0.0 && number_of_slots())
             width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
     }
     LayoutElement::prepare();
@@ -203,6 +203,9 @@ void acmacs::tal::v3::Clades::report_clades()
 
 size_t acmacs::tal::v3::Clades::number_of_slots() const
 {
+    if (clades_.empty())
+        return 0;
+
     slot_no_t max_slot_no{0};
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections)
