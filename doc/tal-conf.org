@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-13 13:07:04 eu>
+# Time-stamp: <2019-12-13 17:02:40 eu>
 
 * Command line defines
 
@@ -125,7 +125,11 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Tree
 
 {"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
-{"N": "draw-aa-transitions"},
+{"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
+ "all": {"node_id": "", "label": {<[[Label parameters]]>}},
+ "per_node": [
+ ]
+},
 
 *** Time series
 
@@ -177,7 +181,8 @@ If multiple criteria specified within single "select" object, they all used (con
   "vertical_position": "middle|top|bottom",
   "horizontal_position": "left|middle|right",
   "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",
-  "tether": {"show": false, "color": "black"}
+  "tether": {"show": false, "color": "black", "line_width": 1.0},
+  "text_style": {"font": "monospace", "weight": "normal", "slant": "normal"}
 }
 
 * Debug outline
