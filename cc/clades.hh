@@ -26,9 +26,9 @@ namespace acmacs::tal::inline v3
         {
             Rotation rotation{NoRotation};
             Color color{BLACK};
-            double scale{0.5};                         // relative to parameters_.slot.width
+            double scale{0.7};                         // relative to parameters_.slot.width
             vertical_position position{vertical_position::middle};
-            std::array<double, 2> offset{0, 0.002}; // relative to the area height
+            std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
         };
 
         struct arrow_t : public line_t

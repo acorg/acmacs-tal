@@ -39,10 +39,12 @@ namespace acmacs::tal::inline v3
         void process_color_by(LayoutElementWithColoring& element);
         void add_tree();
         void add_time_series();
-        void read_time_series_parameters(TimeSeries& time_series);
         void add_clades();
+        void add_dash_bar_clades();
         void add_title();
         void add_legend();
+
+        void read_dash_parameters(LayoutElement::DashParameters& param);
     };
 
 } // namespace acmacs::tal::inlinev3

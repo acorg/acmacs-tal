@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-12 18:38:03 eu>
+# Time-stamp: <2019-12-13 08:38:30 eu>
 
 * Command line defines
 
@@ -150,7 +150,7 @@ If multiple criteria specified within single "select" object, they all used (con
 **** Clade parameters
 
 {"name": "183P-1", "display_name": "183P-1",
- "hidden": false, "shown": true,
+ "shown": true, "show": true, "hidden": false,
  "slot": 1,
  "top_gap": 0.05, "bottom_gap": 0.05, "?top_gap?": "fraction of area height",
  "time_series_top_separator": true, "time_series_bottom_separator": true,

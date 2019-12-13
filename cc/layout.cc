@@ -103,6 +103,21 @@ size_t acmacs::tal::v3::Layout::index_of(const LayoutElement* look_for) const
 
 // ----------------------------------------------------------------------
 
+const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool throw_error) const
+{
+    if (const auto* draw_tree = find<DrawTree>(); draw_tree)
+        return draw_tree;
+    else if (throw_error)
+        throw error{"No tree section in the layout"};
+    else {
+        fmt::print(stderr, "WARNING: No tree section in the layout\n");
+        return nullptr;
+    }
+
+} // acmacs::tal::v3::Layout::find_draw_tree
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
 {
     double normal_left = 0.0;

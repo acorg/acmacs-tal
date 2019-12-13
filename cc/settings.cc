@@ -10,6 +10,7 @@
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
+#include "acmacs-tal/dash-bar.hh"
 
 // ----------------------------------------------------------------------
 
@@ -64,6 +65,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             clade();
         else if (name == "clades"sv)
             add_clades();
+        else if (name == "dash-bar-clades"sv)
+            add_dash_bar_clades();
         else if (name == "gap"sv)
             add_element<Gap>();
         else if (name == "ladderize"sv)
@@ -391,25 +394,15 @@ void acmacs::tal::v3::Settings::add_tree()
 
 void acmacs::tal::v3::Settings::add_time_series()
 {
-    auto& element = add_element<TimeSeries>();
-    process_color_by(element);
-    read_time_series_parameters(element);
-
-} // acmacs::tal::v3::Settings::add_time_series
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_series)
-{
     using namespace std::string_view_literals;
 
-    auto& param = time_series.parameters();
-    acmacs::time_series::update(rjson::object{{"start"sv, getenv("start"sv)}, {"end"sv, getenv("end"sv)}, {"interval"sv, getenv("interval"sv)}}, param.time_series);
+    auto& element = add_element<TimeSeries>();
+    auto& param = element.parameters();
 
-    if (const auto& dash_val = getenv("dash"sv); !dash_val.is_null()) {
-        rjson::copy_if_not_null(dash_val.get("width"sv), param.dash.width);
-        rjson::copy_if_not_null(dash_val.get("line_width_pixels"sv), param.dash.line_width);
-    }
+    process_color_by(element);
+    read_dash_parameters(param.dash);
+
+    acmacs::time_series::update(rjson::object{{"start"sv, getenv("start"sv)}, {"end"sv, getenv("end"sv)}, {"interval"sv, getenv("interval"sv)}}, param.time_series);
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
         rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
@@ -428,7 +421,20 @@ void acmacs::tal::v3::Settings::read_time_series_parameters(TimeSeries& time_ser
         });
     }
 
-} // acmacs::tal::v3::Settings::read_time_series_parameters
+} // acmacs::tal::v3::Settings::add_time_series
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_dash_parameters(LayoutElement::DashParameters& param)
+{
+    using namespace std::string_view_literals;
+
+    if (const auto& dash_val = getenv("dash"sv); !dash_val.is_null()) {
+        rjson::copy_if_not_null(dash_val.get("width"sv), param.width);
+        rjson::copy_if_not_null(dash_val.get("line_width_pixels"sv), param.line_width);
+    }
+
+} // acmacs::tal::v3::Settings::read_dash_parameters
 
 // ----------------------------------------------------------------------
 
@@ -452,7 +458,10 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
         if (const auto& shown = source.get("shown"sv); !shown.is_null())
             clade_paramters.hidden = !shown.template to<bool>();
-        rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
+        else if (const auto& show = source.get("show"sv); !show.is_null())
+            clade_paramters.hidden = !show.template to<bool>();
+        else
+            rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
         rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
         rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
         rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
@@ -493,6 +502,25 @@ void acmacs::tal::v3::Settings::add_clades()
     });
 
 } // acmacs::tal::v3::Settings::add_clades
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_dash_bar_clades()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<DashBarClades>();
+    auto& param = element.parameters();
+
+    read_dash_parameters(param.dash);
+
+    rjson::for_each(getenv("clades"sv), [&param](const rjson::value& for_clade) {
+        auto& clade = param.clades.emplace_back();
+        rjson::copy_if_not_null(for_clade.get("name"sv), clade.name);
+        rjson::copy_if_not_null(for_clade.get("color"sv), clade.color);
+    });
+
+} // acmacs::tal::v3::Settings::add_dash_bar_clades
 
 // ----------------------------------------------------------------------
 

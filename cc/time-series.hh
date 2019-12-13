@@ -21,12 +21,6 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        struct DashParameters
-        {
-            double width{0.5}; // relative to parameters_.slot.width
-            Pixels line_width{0.5};
-        };
-
         struct SlotSeparatorParameters
         {
             Pixels width{0.5};
@@ -56,6 +50,7 @@ namespace acmacs::tal::inline v3
         };
 
         constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
 
       private:
         struct horizontal_line_t : public line_t

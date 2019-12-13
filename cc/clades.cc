@@ -216,11 +216,7 @@ size_t acmacs::tal::v3::Clades::number_of_slots() const
 
 void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 {
-    const auto* draw_tree = tal().draw().layout().find<DrawTree>();
-    if (!draw_tree) {
-        fmt::print(stderr, "WARNING: No tree section in layout, cannot draw clades\n");
-        return;
-    }
+    const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto vertical_step = draw_tree->vertical_step();
     const auto& viewport = surface.viewport();
 

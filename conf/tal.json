@@ -12,9 +12,19 @@
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
 
+  {"N": "dash-bar-clades",
+   "width_to_height_ratio": 0.009,
+   "clades": [
+    {"name": "2DEL2017", "color": "#A0A0A0"},
+    {"name": "3DEL2017", "color": "#606060"}
+   ],
+   "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+   "?debug_outline": "lightblue"},
+  {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"},
+
   {"N": "time_series", "color_by": "continent",
    "?start": "2019-01-01", "?end": "2019-12-31", "interval": {"month": 1},
-   "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is relative to slot_width",
+   "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is a fraction of slot_width",
    "?slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
             "?label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
            },
@@ -22,26 +32,23 @@
 
   {"N": "clades", "report": true,
    "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
-   "all_clades": {"hidden": false, "shown": true,
-                  "?slot": 5,
-                  "?top_gap": 100.0, "?bottom_gap": 100.0,
+   "all_clades": {"?top_gap": 100.0, "?bottom_gap": 100.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-                  "?label": {"rotation_degrees": 45, "color": "magenta", "scale": 0.5, "?position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "?label": {"?rotation_degrees": 45, "?color": "magenta", "scale": 0.7, "?position": "middle|top|bottom", "offset": [0.004, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
                   "?arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
                   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
-   "?per_clade": [
-    {"name": "183P-5A", "display_name": "183P-5a",
-                  "hidden": false, "shown": true,
-                  "?slot": 2,
-                  "?top_gap": 10.0, "?bottom_gap": 10.0,
-                  "time_series_top_separator": true, "time_series_bottom_separator": true,
-                  "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-                  "label": {"rotation_degrees": 45, "color": "magenta", "scale": 0.5, "?position": "middle|top|bottom", "offset": [0.002, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
-                  "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
-                  "horizontal_line": {"color": "green3", "line_width": 1.7}, "?horizontal_line?": "width in pixels"
-                 }
+   "per_clade": [
+    {"?N": " -- H1 ---"},
+    {"?N": " -- H3 ---"},
+    {"?N": " -- BVic ---"},
+    {"name": "V1B", "show": false},
+    {"name": "V1A", "section_inclusion_tolerance": 20},
+    {"name": "2DEL2017", "show": false, "section_inclusion_tolerance": 15},
+    {"name": "3DEL2017", "show": false},
+    {"name": "6DEL2019", "show": false},
+    {"?N": " -- BYam ---"},
    ],
    "?debug_outline": "lightblue"},
 
@@ -49,10 +56,13 @@
 
   {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
-  {"?N": "b/vic deletion mutants"},
+  {"?N": "hz lines"},
   {"?N": "H1 183P"},
+  {"?N": "AA at pos"},
   {"?N": "AA substitutions"},
   {"?N": "vaccine, most recent cell"},
+  {"?N": "legend", "type": "colored by AA at pos"},
+  {"?N": "color bar for antigens colored by date"},
   {"?N": ""},
 
  ],

@@ -31,6 +31,8 @@ namespace acmacs::tal::inline v3
         template <typename Element> void prepare_element();
         size_t index_of(const LayoutElement* look_for) const;
 
+        const DrawTree* find_draw_tree(bool throw_error = true) const; // throws error or prints warning if not found
+
       private:
         std::vector<std::unique_ptr<LayoutElement>> elements_;
     };
@@ -79,10 +81,18 @@ namespace acmacs::tal::inline v3
         double pos_y_above(const Node& node, double vertical_step) const;
         double pos_y_below(const Node& node, double vertical_step) const;
 
+        // ----------------------------------------------------------------------
+
         struct line_t
         {
             Color color{BLACK};
             Pixels line_width{1.0};
+        };
+
+        struct DashParameters
+        {
+            double width{0.5}; // fraction of slot width
+            Pixels line_width{0.5};
         };
 
       protected:
