@@ -10,7 +10,8 @@ void acmacs::tal::v3::DrawAATransitions::prepare()
 {
     tree::iterate_pre(tal().tree(), [this](const Node& node) {
         if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
-            transitions_.emplace_back(&node, LabelParameters{BLACK, 0.01, vertical_position::top, horizontal_position::middle, {-0.04, 0.02}, {}, NoRotation, LabelTetherParameters{true, {BLACK, Pixels{0.3}}}, TextStyle{"monospace"}});
+            const auto node_id = fmt::format("\"{}\"", node.node_id_);
+            transitions_.emplace_back(&node, parameters_for_node(node_id).label);
         }
     });
 
@@ -29,6 +30,17 @@ void acmacs::tal::v3::DrawAATransitions::prepare()
     LayoutElement::prepare();
 
 } // acmacs::tal::v3::Legend::prepare
+
+// ----------------------------------------------------------------------
+
+const acmacs::tal::v3::DrawAATransitions::TransitionParameters& acmacs::tal::v3::DrawAATransitions::parameters_for_node(std::string_view node_id) const
+{
+    if (auto found = std::find_if(std::begin(parameters_.per_node), std::end(parameters_.per_node), [node_id](const auto& for_node) { return for_node.node_id == node_id; }); found != std::end(parameters_.per_node))
+        return *found;
+    else
+        return parameters_.all_nodes;
+
+} // acmacs::tal::v3::DrawAATransitions::parameters_for_node
 
 // ----------------------------------------------------------------------
 

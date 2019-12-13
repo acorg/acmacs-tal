@@ -454,34 +454,36 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
     }
 
+    // ----------------------------------------------------------------------
+
     enum class ignore_name { no, yes };
-    const auto read_clade_parameters = [this](const rjson::value& source, Clades::CladeParameters& clade_paramters, ignore_name ign) {
+    const auto read_clade_parameters = [this](const rjson::value& source, Clades::CladeParameters& clade_parameters, ignore_name ign) {
         if (ign == ignore_name::no)
-            rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
-        rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
+            rjson::copy_if_not_null(source.get("name"sv), clade_parameters.name);
+        rjson::copy_if_not_null(source.get("display_name"sv), clade_parameters.display_name);
         if (const auto& shown = source.get("shown"sv); !shown.is_null())
-            clade_paramters.hidden = !shown.template to<bool>();
+            clade_parameters.hidden = !shown.template to<bool>();
         else if (const auto& show = source.get("show"sv); !show.is_null())
-            clade_paramters.hidden = !show.template to<bool>();
+            clade_parameters.hidden = !show.template to<bool>();
         else
-            rjson::copy_if_not_null(source.get("hidden"sv), clade_paramters.hidden);
-        rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_paramters.section_inclusion_tolerance);
-        rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
-        rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
+            rjson::copy_if_not_null(source.get("hidden"sv), clade_parameters.hidden);
+        rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_parameters.section_inclusion_tolerance);
+        rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_parameters.section_exclusion_tolerance);
+        rjson::copy_if_not_null(source.get("slot"sv), clade_parameters.slot_no);
 
-        read_label_parameters(source.get("label"sv), clade_paramters.label);
+        read_label_parameters(source.get("label"sv), clade_parameters.label);
 
-        rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_paramters.arrow.color);
-        rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_paramters.arrow.line_width);
-        rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_paramters.arrow.arrow_width);
+        rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
+        rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
+        rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
 
-        rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_paramters.horizontal_line.color);
-        rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_paramters.horizontal_line.line_width);
+        rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_parameters.horizontal_line.color);
+        rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_parameters.horizontal_line.line_width);
 
-        rjson::copy_if_not_null(source.get("top_gap"sv), clade_paramters.tree_top_gap);
-        rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_paramters.tree_bottom_gap);
-        rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_paramters.time_series_top_separator);
-        rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_paramters.time_series_bottom_separator);
+        rjson::copy_if_not_null(source.get("top_gap"sv), clade_parameters.tree_top_gap);
+        rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_parameters.tree_bottom_gap);
+        rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_parameters.time_series_top_separator);
+        rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_parameters.time_series_bottom_separator);
     };
 
     if (const auto& all_clades_val = getenv("all_clades"sv); !all_clades_val.is_null())
@@ -529,6 +531,10 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
         rjson::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
         rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
         rjson::copy_if_not_null(source.get("tether"sv, "line_width"sv), param.tether.line.line_width);
+
+        rjson::copy_if_not_null(source.get("text_style"sv, "font"sv), param.text_style.font_family);
+        rjson::copy_if_not_null(source.get("text_style"sv, "slant"sv), param.text_style.slant);
+        rjson::copy_if_not_null(source.get("text_style"sv, "weight"sv), param.text_style.weight);
     }
 
 } // acmacs::tal::v3::Settings::read_label_parameters
@@ -567,7 +573,6 @@ void acmacs::tal::v3::Settings::add_title()
     getenv_extract_copy_if_present<std::string_view>("color"sv, param.color);
     getenv_extract_copy_if_present<double>("size"sv, param.size);
 
-
 } // acmacs::tal::v3::Settings::add_title
 
 // ----------------------------------------------------------------------
@@ -599,6 +604,24 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     auto& element = add_element<DrawAATransitions>();
     auto& param = element.parameters();
 
+    getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
+    getenv_copy_if_present("text_line_interleave"sv, param.text_line_interleave);
+
+    // ----------------------------------------------------------------------
+
+    enum class ignore_name { no, yes };
+    const auto read_node_parameters = [this](const rjson::value& source, DrawAATransitions::TransitionParameters& parameters, ignore_name ign) {
+        if (ign == ignore_name::no)
+            rjson::copy_if_not_null(source.get("node_id"sv), parameters.node_id);
+        read_label_parameters(source.get("label"sv), parameters.label);
+    };
+
+    if (const auto& all_nodes_val = getenv("all_nodes"sv); !all_nodes_val.is_null())
+        read_node_parameters(all_nodes_val, param.all_nodes, ignore_name::yes);
+    rjson::for_each(getenv("per_node"sv), [&param,read_node_parameters](const rjson::value& for_node) {
+        param.per_node.push_back(param.all_nodes);
+        read_node_parameters(for_node, param.per_node.back(), ignore_name::no);
+    });
 
 } // acmacs::tal::v3::Settings::add_draw_aa_transitions
 

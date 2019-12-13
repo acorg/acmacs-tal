@@ -35,19 +35,21 @@ namespace acmacs::tal::inline v3
 
         struct TransitionParameters
         {
-            node_id_t node_id;
-            LabelParameters label;
+            std::string node_id;
+            LabelParameters label{BLACK, 0.01, vertical_position::top, horizontal_position::middle, {-0.04, 0.02}, {}, NoRotation, LabelTetherParameters{true, {BLACK, Pixels{0.3}}}, TextStyle{"monospace"}};
         };
 
         struct Parameters
         {
             size_t minimum_number_leaves_in_subtree{20};
             double text_line_interleave{0.3}; // fraction of the text height
-            std::vector<TransitionParameters> transitions;
+            TransitionParameters all_nodes;
+            std::vector<TransitionParameters> per_node;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
+        const TransitionParameters& parameters_for_node(std::string_view node_id) const;
 
       private:
         Parameters parameters_;
