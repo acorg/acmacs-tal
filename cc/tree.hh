@@ -60,6 +60,7 @@ namespace acmacs::tal::inline v3
         value_type vertical{NotSet};
         value_type horizontal{NotSet};
         constexpr bool empty() const { return vertical == NotSet; }
+        constexpr bool operator<(const node_id_t& rhs) const { return vertical < rhs.vertical; }
     };
 
     // ----------------------------------------------------------------------
