@@ -58,6 +58,7 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
 {
     const auto vertical_step = draw_tree.vertical_step();
     const auto horizontal_step = draw_tree.horizontal_step();
+    const auto text_line_interleave = parameters().text_line_interleave;
 
     for (const auto& transition : transitions_) {
         const auto names = transition.node->aa_transitions_.names();
@@ -68,24 +69,36 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
         Size box_size = std::accumulate(std::begin(name_sizes), std::end(name_sizes), Size{}, [](const Size& result, const Size& name_size) {
             return Size{std::max(result.width, name_size.width), result.height + name_size.height};
         });
-        box_size.height += (names.size() - 1) * parameters().text_line_interleave * name_sizes.front().height;
+        box_size.height += (names.size() - 1) * text_line_interleave * name_sizes.front().height;
 
         const PointCoordinates at_edge_line{horizontal_step * (transition.node->cumulative_edge_length.as_number() - transition.node->edge_length.as_number() / 2.0), vertical_step * transition.node->cumulative_vertical_offset_};
         const PointCoordinates box_top_left{at_edge_line.x() + transition.label.offset[0], at_edge_line.y() + transition.label.offset[1]};
+        // surface.rectangle(box_top_left, box_size, GREY, Pixels{1});
 
         if (transition.label.tether.show) {
             const PointCoordinates box_bottom_right{box_top_left.x() + box_size.width, box_top_left.y() + box_size.height};
             const auto box_center = middle(box_top_left, box_bottom_right);
-            PointCoordinates at_box{box_center.x(), box_top_left.y()};
-            if (box_bottom_right.y() < at_edge_line.y())
-                at_box.y( box_bottom_right.y());
+            const auto vspace = name_sizes.front().height * text_line_interleave;
+            PointCoordinates at_box{box_center.x(), box_top_left.y() - vspace};
+            if (box_top_left.y() <= at_edge_line.y() && box_bottom_right.y() >= at_edge_line.y()) {
+                if (box_top_left.x() > at_edge_line.x())
+                    at_box.x(box_top_left.x());
+                else
+                    at_box.x(box_bottom_right.x());
+                at_box.y(box_center.y());
+            }
+            else if (box_bottom_right.y() < at_edge_line.y())
+                at_box.y(box_bottom_right.y() + vspace);
             surface.line(at_edge_line, at_box, transition.label.tether.line.color, transition.label.tether.line.line_width);
         }
 
         auto pos_x = box_top_left.x();
         auto pos_y = box_top_left.y();
         for (auto [index, name] : acmacs::enumerate(names)) {
-            pos_y += name_sizes[index].height * (1.0 + parameters().text_line_interleave);
+            if (index)
+                pos_y += name_sizes[index].height * (1.0 + text_line_interleave);
+            else
+                pos_y += name_sizes[index].height;
             surface.text({pos_x + (box_size.width - name_sizes[index].width) / 2.0, pos_y}, name, transition.label.color, text_size, transition.label.text_style);
         }
     }
