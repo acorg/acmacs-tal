@@ -527,7 +527,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
         rjson::call_if_not_null<double>(source.get("rotation_degrees"sv), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
 
         rjson::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
-        rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.color);
+        rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
+        rjson::copy_if_not_null(source.get("tether"sv, "line_width"sv), param.tether.line.line_width);
     }
 
 } // acmacs::tal::v3::Settings::read_label_parameters

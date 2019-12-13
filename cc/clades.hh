@@ -31,7 +31,7 @@ namespace acmacs::tal::inline v3
             const Node* last{nullptr};
             std::string display_name;
             slot_no_t slot_no{0};
-            LabelParameters label{BLACK, 0.7, vertical_position::middle, horizontal_position::left, {0.004, 0.0}, {}, NoRotation, LabelTetherParameters{}};
+            LabelParameters label{BLACK, 0.7, vertical_position::middle, horizontal_position::left, {0.004, 0.0}, {}, NoRotation, LabelTetherParameters{}, TextStyle{}};
             arrow_t arrow;
             LineParameters horizontal_line;
 

@@ -39,7 +39,7 @@ namespace acmacs::tal::inline v3
         {
             std::string name;
             Color color{PINK};
-            LabelParameters label{BLACK, 0.01, vertical_position::middle, horizontal_position::left, {-0.002, 0.0}, {}, NoRotation, LabelTetherParameters{}};
+            LabelParameters label{BLACK, 0.01, vertical_position::middle, horizontal_position::left, {-0.002, 0.0}, {}, NoRotation, LabelTetherParameters{}, TextStyle{}};
         };
 
         struct Parameters : public DashBar::Parameters

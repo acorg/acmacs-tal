@@ -224,8 +224,6 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
     const auto vertical_step = draw_tree->vertical_step();
     const auto& viewport = surface.viewport();
 
-    const TextStyle text_style{};
-
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
             const auto pos_x = time_series_to_the_left_ ?
@@ -245,7 +243,7 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 
             // label
             const Scaled label_size{parameters_.slot.width * section.label.scale};
-            const auto text_size = surface.text_size(section.display_name, label_size, text_style);
+            const auto text_size = surface.text_size(section.display_name, label_size, section.label.text_style);
             double vertical_pos;
             switch (section.label.vpos) {
                 case vertical_position::top:
@@ -259,7 +257,7 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                     break;
             }
             const auto text_pos_x = time_series_to_the_left_ ? (pos_x + section.label.offset[0]) : (pos_x - text_size.width - section.label.offset[0]);
-            surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, text_style, section.label.rotation);
+            surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
 
         }
     }

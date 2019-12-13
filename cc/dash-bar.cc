@@ -18,7 +18,6 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
     const auto& viewport = surface.viewport();
     const auto dash_width = parameters().dash.width;
     const auto dash_pos_x = viewport.left() + viewport.size.width * (1.0 - dash_width) * 0.5;
-    const TextStyle text_style{};
 
     for (const auto& clade : parameters().clades) {
         double first_line_pos_y{1e20}, last_line_pos_y{-1.0}, sum_line_pos_y{0.0};
@@ -38,7 +37,7 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
         });
         if (!clade.label.text.empty()) {
             const Scaled label_size{viewport.size.height * clade.label.scale};
-            const auto text_size = surface.text_size(clade.label.text, label_size, text_style);
+            const auto text_size = surface.text_size(clade.label.text, label_size, clade.label.text_style);
             double pos_y;
             switch (clade.label.vpos) {
                 case vertical_position::top:
@@ -63,7 +62,7 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
                     pos_x = viewport.right() + clade.label.offset[0];
                     break;
             }
-            surface.text({pos_x, pos_y}, clade.label.text, clade.label.color, label_size, text_style, clade.label.rotation);
+            surface.text({pos_x, pos_y}, clade.label.text, clade.label.color, label_size, clade.label.text_style, clade.label.rotation);
         }
     }
 

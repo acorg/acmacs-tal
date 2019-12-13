@@ -98,7 +98,7 @@ namespace acmacs::tal::inline v3
         struct LabelTetherParameters
         {
             bool show{false};
-            Color color{BLACK};
+            LineParameters line;
         };
 
         struct LabelParameters
@@ -111,6 +111,7 @@ namespace acmacs::tal::inline v3
             std::string text;
             Rotation rotation{NoRotation};
             LabelTetherParameters tether;
+            TextStyle text_style;
         };
 
         struct DashParameters
