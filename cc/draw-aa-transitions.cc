@@ -81,7 +81,7 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
             const auto vspace = name_sizes.front().height * text_line_interleave;
             PointCoordinates at_box{box_center.x(), box_top_left.y() - vspace};
             if (box_top_left.y() <= at_edge_line.y() && box_bottom_right.y() >= at_edge_line.y()) {
-                if (box_top_left.x() > at_edge_line.x())
+                if (box_top_left.x() >= at_edge_line.x())
                     at_box.x(box_top_left.x());
                 else
                     at_box.x(box_bottom_right.x());
@@ -89,7 +89,8 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
             }
             else if (box_bottom_right.y() < at_edge_line.y())
                 at_box.y(box_bottom_right.y() + vspace);
-            surface.line(at_edge_line, at_box, transition.label.tether.line.color, transition.label.tether.line.line_width);
+            if (distance(at_edge_line, at_box) > distance(box_top_left, box_bottom_right) * 0.2)
+                surface.line(at_edge_line, at_box, transition.label.tether.line.color, transition.label.tether.line.line_width);
         }
 
         auto pos_x = box_top_left.x();

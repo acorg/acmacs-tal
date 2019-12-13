@@ -14,8 +14,6 @@
   {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
    "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}},
    "per_node": [
-    {"?node_id":  "498.16", "name": "S74R I295V",  "label": {"offset": [0.0, -0.01], "color": "red"}},
-    {"node_id":  "498.16", "name": "S74R I295V",  "label": {"offset": [-0.05, -0.011], "color": "red"}}
    ]
   },
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
