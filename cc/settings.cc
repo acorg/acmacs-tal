@@ -11,6 +11,7 @@
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
+#include "acmacs-tal/draw-aa-transitions.hh"
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +68,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             add_clades();
         else if (name == "dash-bar-clades"sv)
             add_dash_bar_clades();
+        else if (name == "draw-aa-transitions"sv)
+            add_draw_aa_transitions();
         else if (name == "gap"sv)
             add_element<Gap>();
         else if (name == "ladderize"sv)
@@ -522,6 +525,9 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
         rjson::copy_if_not_null(source.get("offset"sv), param.offset);
         rjson::copy_if_not_null(source.get("text"sv), param.text);
         rjson::call_if_not_null<double>(source.get("rotation_degrees"sv), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
+
+        rjson::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
+        rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.color);
     }
 
 } // acmacs::tal::v3::Settings::read_label_parameters
@@ -582,6 +588,18 @@ void acmacs::tal::v3::Settings::add_legend()
         fmt::print(stderr, "WARNING: unrecognized legend type: \"{}\"\n", legend_type);
 
 } // acmacs::tal::v3::Settings::add_legend
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_draw_aa_transitions()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<DrawAATransitions>();
+    auto& param = element.parameters();
+
+
+} // acmacs::tal::v3::Settings::add_draw_aa_transitions
 
 // ----------------------------------------------------------------------
 

@@ -10,6 +10,7 @@
  "layout": [
   {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
   {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
+  {"N": "draw-aa-transitions"},
   {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
 
   {"?N": "---------- H1 ----------"},
@@ -106,7 +107,7 @@
   {"N": "report-time-series", "output": "{report-time-series-output}"},
   {"N": "ladderize", "method": "{ladderize-method}"},
   {"?N": "update-common-aa", "report": false},
-  {"N": "aa-transitions", "report": false},
+  {"N": "aa-transitions", "report": true},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
   {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 

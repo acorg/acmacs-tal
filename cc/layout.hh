@@ -16,6 +16,7 @@ namespace acmacs::tal::inline v3
     class DrawTree;
     class TimeSeries;
     class Clades;
+    class DrawAATransitions;
 
     class Layout
     {
@@ -40,10 +41,12 @@ namespace acmacs::tal::inline v3
     extern template const DrawTree* Layout::find<DrawTree>() const;
     extern template const TimeSeries* Layout::find<TimeSeries>() const;
     extern template const Clades* Layout::find<Clades>() const;
+    extern template const DrawAATransitions* Layout::find<DrawAATransitions>() const;
 
     extern template DrawTree* Layout::find<DrawTree>();
     extern template TimeSeries* Layout::find<TimeSeries>();
     extern template Clades* Layout::find<Clades>();
+    extern template DrawAATransitions* Layout::find<DrawAATransitions>();
 
     extern template void Layout::prepare_element<DrawTree>();
     extern template void Layout::prepare_element<TimeSeries>();
@@ -92,6 +95,12 @@ namespace acmacs::tal::inline v3
         enum class vertical_position { top, middle, bottom };
         enum class horizontal_position { left, middle, right };
 
+        struct LabelTetherParameters
+        {
+            bool show{false};
+            Color color{BLACK};
+        };
+
         struct LabelParameters
         {
             Color color{BLACK};
@@ -101,6 +110,7 @@ namespace acmacs::tal::inline v3
             std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
             std::string text;
             Rotation rotation{NoRotation};
+            LabelTetherParameters tether;
         };
 
         struct DashParameters

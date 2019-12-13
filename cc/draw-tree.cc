@@ -1,6 +1,7 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/tree-iterate.hh"
+#include "acmacs-tal/draw-aa-transitions.hh"
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,9 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                     fmt::print(stderr, "WARNING: node is not hidden but all ist children are hidden {} total children: {}\n", node.node_id_, node.subtree.size());
             }
         });
+
+    if (const auto* draw_aa_transitions = tal().draw().layout().find<DrawAATransitions>(); draw_aa_transitions)
+        draw_aa_transitions->draw_transitions(surface, *this);
 
 } // acmacs::tal::v3::DrawTree::draw
 

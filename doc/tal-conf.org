@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-13 11:31:17 eu>
+# Time-stamp: <2019-12-13 13:07:04 eu>
 
 * Command line defines
 
@@ -125,6 +125,7 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Tree
 
 {"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "draw-aa-transitions"},
 
 *** Time series
 
@@ -169,12 +170,14 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
 
 *** Label parameters
-"label": {"text": "",
-          "rotation_degrees": 0, "color": "black",
-          "scale": 0.5, "?scale?": "scale is a fraction of the slot width in clades"
-          "vertical_position": "middle|top|bottom",
-          "horizontal_position": "left|middle|right",
-          "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height"
+"label": {
+  "text": "",
+  "rotation_degrees": 0, "color": "black",
+  "scale": 0.5, "?scale?": "scale is a fraction of the slot width in clades"
+  "vertical_position": "middle|top|bottom",
+  "horizontal_position": "left|middle|right",
+  "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",
+  "tether": {"show": false, "color": "black"}
 }
 
 * Debug outline

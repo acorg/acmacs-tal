@@ -282,7 +282,7 @@ namespace acmacs::tal::inline v3
 
 template <> struct fmt::formatter<acmacs::tal::node_id_t> {
     template <typename ParseContext> constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
-    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) { return format_to(ctx.out(), "{}.{}", node_id.vertical, node_id.horizontal); }
+    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) { return format_to(ctx.out(), "{:4d}.{}", node_id.vertical, node_id.horizontal); }
 };
 
 // ----------------------------------------------------------------------
