@@ -91,6 +91,7 @@ namespace acmacs::tal::inline v3
         operator bool() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en; }); }
 
         std::string display(bool show_empty_left = false) const;
+        std::vector<std::string> names() const;
 
         bool contains(std::string_view label) const
         {

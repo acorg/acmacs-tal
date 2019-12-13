@@ -23,6 +23,16 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
+        struct Transition
+        {
+            const Node* node;
+            LabelParameters label;
+
+            Transition(const Node* a_node, const LabelParameters& a_label) : node(a_node), label(a_label) {}
+        };
+
+        // ----------------------------------------------------------------------
+
         struct TransitionParameters
         {
             node_id_t node_id;
@@ -31,6 +41,8 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
+            size_t minimum_number_leaves_in_subtree{20};
+            double text_line_interleave{0.3}; // fraction of the text height
             std::vector<TransitionParameters> transitions;
         };
 
@@ -39,6 +51,7 @@ namespace acmacs::tal::inline v3
 
       private:
         Parameters parameters_;
+        std::vector<Transition> transitions_;
     };
 
 } // namespace acmacs::tal::inlinev3

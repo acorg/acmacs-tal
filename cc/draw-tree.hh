@@ -17,6 +17,7 @@ namespace acmacs::tal::inline v3
         void draw(acmacs::surface::Surface& surface) const override;
 
         constexpr double vertical_step() const { return vertical_step_; }
+        constexpr double horizontal_step() const { return horizontal_step_; }
 
       private:
         const double height_{1.0};

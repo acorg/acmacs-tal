@@ -95,6 +95,19 @@ std::string acmacs::tal::v3::AA_Transitions::display(bool show_empty_left) const
 
 // ----------------------------------------------------------------------
 
+std::vector<std::string> acmacs::tal::v3::AA_Transitions::names() const
+{
+    std::vector<std::string> result;
+    for (const auto& en : data_) {
+        if (!en.empty_left())
+            result.push_back(en.display());
+    }
+    return result;
+
+} // acmacs::tal::v3::AA_Transitions::names
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:
