@@ -45,6 +45,7 @@ namespace acmacs::tal::inline v3
         void add_legend();
 
         void read_dash_parameters(LayoutElement::DashParameters& param);
+        void read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param);
     };
 
 } // namespace acmacs::tal::inlinev3

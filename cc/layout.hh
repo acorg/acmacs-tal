@@ -83,10 +83,24 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        struct line_t
+        struct LineParameters
         {
             Color color{BLACK};
             Pixels line_width{1.0};
+        };
+
+        enum class vertical_position { top, middle, bottom };
+        enum class horizontal_position { left, middle, right };
+
+        struct LabelParameters
+        {
+            Color color{BLACK};
+            double scale{0.7};                         // relative to parameters_.slot.width
+            vertical_position vpos{vertical_position::middle};
+            horizontal_position hpos{horizontal_position::left};
+            std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
+            std::string text;
+            Rotation rotation{NoRotation};
         };
 
         struct DashParameters

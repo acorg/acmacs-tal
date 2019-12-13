@@ -17,7 +17,7 @@ namespace acmacs::tal::inline v3
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
 
-        void add_horizontal_line_above(const Node* node, const line_t& line);
+        void add_horizontal_line_above(const Node* node, const LineParameters& line);
 
         // ----------------------------------------------------------------------
 
@@ -53,11 +53,11 @@ namespace acmacs::tal::inline v3
         constexpr const Parameters& parameters() const { return parameters_; }
 
       private:
-        struct horizontal_line_t : public line_t
+        struct horizontal_line_t : public LineParameters
         {
             const Node* node;
 
-            constexpr horizontal_line_t(const Node* a_node, const line_t& a_line) : line_t(a_line), node(a_node) {}
+            constexpr horizontal_line_t(const Node* a_node, const LineParameters& a_line) : LineParameters(a_line), node(a_node) {}
         };
 
         Parameters parameters_;

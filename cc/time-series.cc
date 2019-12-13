@@ -31,7 +31,7 @@ void acmacs::tal::v3::TimeSeries::prepare()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const line_t& line)
+void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const LineParameters& line)
 {
     if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
         if (found->color != line.color || found->line_width != line.line_width)

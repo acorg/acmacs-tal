@@ -20,18 +20,7 @@ namespace acmacs::tal::inline v3
         using slot_no_t = acmacs::named_size_t<struct acmacs_tal_Clades_slot_no_tag>;
         constexpr static const slot_no_t NoSlot{static_cast<size_t>(-1)};
 
-        enum class vertical_position { top, middle, bottom };
-
-        struct label_t
-        {
-            Rotation rotation{NoRotation};
-            Color color{BLACK};
-            double scale{0.7};                         // relative to parameters_.slot.width
-            vertical_position position{vertical_position::middle};
-            std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
-        };
-
-        struct arrow_t : public line_t
+        struct arrow_t : public LineParameters
         {
             Pixels arrow_width{3.0};
         };
@@ -42,9 +31,9 @@ namespace acmacs::tal::inline v3
             const Node* last{nullptr};
             std::string display_name;
             slot_no_t slot_no{0};
-            label_t label;
+            LabelParameters label{BLACK, 0.7, vertical_position::middle, horizontal_position::left, {0.004, 0.0}, {}, NoRotation};
             arrow_t arrow;
-            line_t horizontal_line;
+            LineParameters horizontal_line;
 
             clade_section_t(const Node* frst, const Node* lst, std::string_view disp) : first{frst}, last{lst}, display_name{disp} {}
             constexpr node_id_t::value_type size() const
@@ -82,9 +71,9 @@ namespace acmacs::tal::inline v3
             unsigned short section_inclusion_tolerance{10};
             unsigned short section_exclusion_tolerance{5};
             slot_no_t slot_no{NoSlot};
-            label_t label;
+            LabelParameters label;
             arrow_t arrow;
-            line_t horizontal_line{GREY, Pixels{0.5}};
+            LineParameters horizontal_line{GREY, Pixels{0.5}};
             double tree_top_gap{50.0}, tree_bottom_gap{50.0};
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };

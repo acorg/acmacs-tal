@@ -452,7 +452,7 @@ void acmacs::tal::v3::Settings::add_clades()
     }
 
     enum class ignore_name { no, yes };
-    const auto read_clade_parameters = [](const rjson::value& source, Clades::CladeParameters& clade_paramters, ignore_name ign) {
+    const auto read_clade_parameters = [this](const rjson::value& source, Clades::CladeParameters& clade_paramters, ignore_name ign) {
         if (ign == ignore_name::no)
             rjson::copy_if_not_null(source.get("name"sv), clade_paramters.name);
         rjson::copy_if_not_null(source.get("display_name"sv), clade_paramters.display_name);
@@ -466,20 +466,7 @@ void acmacs::tal::v3::Settings::add_clades()
         rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_paramters.section_exclusion_tolerance);
         rjson::copy_if_not_null(source.get("slot"sv), clade_paramters.slot_no);
 
-        rjson::call_if_not_null<double>(source.get("label"sv, "rotation_degrees"sv), [&clade_paramters](auto rotation_degrees) { clade_paramters.label.rotation = RotationDegrees(rotation_degrees); });
-        rjson::copy_if_not_null(source.get("label"sv, "color"sv), clade_paramters.label.color);
-        rjson::copy_if_not_null(source.get("label"sv, "scale"sv), clade_paramters.label.scale);
-        rjson::call_if_not_null<std::string_view>(source.get("label"sv, "position"sv), [&clade_paramters](auto position) {
-            if (position == "middle")
-                clade_paramters.label.position = Clades::vertical_position::middle;
-            else if (position == "top")
-                clade_paramters.label.position = Clades::vertical_position::top;
-            else if (position == "bottom")
-                clade_paramters.label.position = Clades::vertical_position::bottom;
-            else
-                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
-        });
-        rjson::copy_if_not_null(source.get("label"sv, "offset"sv), clade_paramters.label.offset);
+        read_label_parameters(source.get("label"sv), clade_paramters.label);
 
         rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_paramters.arrow.color);
         rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_paramters.arrow.line_width);
@@ -505,6 +492,42 @@ void acmacs::tal::v3::Settings::add_clades()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param)
+{
+    using namespace std::string_view_literals;
+
+    if (!source.is_null()) {
+        rjson::copy_if_not_null(source.get("color"sv), param.color);
+        rjson::copy_if_not_null(source.get("scale"sv), param.scale);
+        rjson::call_if_not_null<std::string_view>(source.get("vertical_position"sv), [&param](auto position) {
+            if (position == "middle"sv)
+                param.vpos = Clades::vertical_position::middle;
+            else if (position == "top"sv)
+                param.vpos = Clades::vertical_position::top;
+            else if (position == "bottom"sv)
+                param.vpos = Clades::vertical_position::bottom;
+            else
+                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
+        });
+        rjson::call_if_not_null<std::string_view>(source.get("horizontal_position"sv), [&param](auto position) {
+            if (position == "middle"sv)
+                param.hpos = Clades::horizontal_position::middle;
+            else if (position == "left"sv)
+                param.hpos = Clades::horizontal_position::left;
+            else if (position == "right"sv)
+                param.hpos = Clades::horizontal_position::right;
+            else
+                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
+        });
+        rjson::copy_if_not_null(source.get("offset"sv), param.offset);
+        rjson::copy_if_not_null(source.get("text"sv), param.text);
+        rjson::call_if_not_null<double>(source.get("rotation_degrees"sv), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
+    }
+
+} // acmacs::tal::v3::Settings::read_label_parameters
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::add_dash_bar_clades()
 {
     using namespace std::string_view_literals;
@@ -514,10 +537,11 @@ void acmacs::tal::v3::Settings::add_dash_bar_clades()
 
     read_dash_parameters(param.dash);
 
-    rjson::for_each(getenv("clades"sv), [&param](const rjson::value& for_clade) {
+    rjson::for_each(getenv("clades"sv), [this, &param](const rjson::value& for_clade) {
         auto& clade = param.clades.emplace_back();
         rjson::copy_if_not_null(for_clade.get("name"sv), clade.name);
         rjson::copy_if_not_null(for_clade.get("color"sv), clade.color);
+        read_label_parameters(for_clade.get("label"sv), clade.label);
     });
 
 } // acmacs::tal::v3::Settings::add_dash_bar_clades

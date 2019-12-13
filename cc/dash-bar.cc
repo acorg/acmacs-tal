@@ -18,17 +18,54 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
     const auto& viewport = surface.viewport();
     const auto dash_width = parameters().dash.width;
     const auto dash_pos_x = viewport.left() + viewport.size.width * (1.0 - dash_width) * 0.5;
+    const TextStyle text_style{};
 
-    tree::iterate_leaf(tal().tree(), [this, &surface, dash_pos_x, dash_width, viewport_width = viewport.size.width, vertical_step = draw_tree->vertical_step(),
-                                      dash_line_width = parameters().dash.line_width](const Node& leaf) {
-        if (!leaf.hidden) {
-            for (const auto& clade : parameters().clades) {
-                if (leaf.clades.exists(clade.name))
-                    surface.line({dash_pos_x, vertical_step * leaf.cumulative_vertical_offset_}, {dash_pos_x + viewport_width * dash_width, vertical_step * leaf.cumulative_vertical_offset_},
-                                 clade.color, dash_line_width, surface::LineCap::Round);
+    for (const auto& clade : parameters().clades) {
+        double first_line_pos_y{1e20}, last_line_pos_y{-1.0}, sum_line_pos_y{0.0};
+        size_t num_lines{0};
+        tree::iterate_leaf(tal().tree(), [&surface, &clade, &first_line_pos_y, &last_line_pos_y, &sum_line_pos_y, &num_lines, dash_pos_x, dash_width, viewport_width = viewport.size.width,
+                                          vertical_step = draw_tree->vertical_step(), dash_line_width = parameters().dash.line_width](const Node& leaf) {
+            if (!leaf.hidden) {
+                if (leaf.clades.exists(clade.name)) {
+                    const double vpos = vertical_step * leaf.cumulative_vertical_offset_;
+                    first_line_pos_y = std::min(first_line_pos_y, vpos);
+                    last_line_pos_y = std::max(last_line_pos_y, vpos);
+                    sum_line_pos_y += vpos;
+                    ++num_lines;
+                    surface.line({dash_pos_x, vpos}, {dash_pos_x + viewport_width * dash_width, vpos}, clade.color, dash_line_width, surface::LineCap::Round);
+                }
             }
+        });
+        if (!clade.label.text.empty()) {
+            const Scaled label_size{viewport.size.height * clade.label.scale};
+            const auto text_size = surface.text_size(clade.label.text, label_size, text_style);
+            double pos_y;
+            switch (clade.label.vpos) {
+                case vertical_position::top:
+                    pos_y = first_line_pos_y + clade.label.offset[1] + text_size.height;
+                    break;
+                case vertical_position::middle:
+                    pos_y = sum_line_pos_y / num_lines + clade.label.offset[1] + text_size.height / 2.0;
+                    break;
+                case vertical_position::bottom:
+                    pos_y = last_line_pos_y + clade.label.offset[1];
+                    break;
+            }
+            double pos_x;
+            switch (clade.label.hpos) {
+                case horizontal_position::left:
+                    pos_x = viewport.left() + clade.label.offset[0] - text_size.width;
+                    break;
+                case horizontal_position::middle:
+                    pos_x = viewport.center().x() + clade.label.offset[0] - text_size.width / 2.0;
+                    break;
+                case horizontal_position::right:
+                    pos_x = viewport.right() + clade.label.offset[0];
+                    break;
+            }
+            surface.text({pos_x, pos_y}, clade.label.text, clade.label.color, label_size, text_style, clade.label.rotation);
         }
-    });
+    }
 
 } // acmacs::tal::v3::DashBarClades::draw
 

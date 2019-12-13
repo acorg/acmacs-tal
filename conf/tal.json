@@ -17,13 +17,14 @@
    {"N": "dash-bar-clades",
     "width_to_height_ratio": 0.009,
     "clades": [
-     {"name": "183P-1",   "color": "#a2b324"},
-     {"name": "183P-2",   "color": "#e72f27"},
-     {"name": "183P-3/6", "color": "#03569b"},
-     {"name": "183P-4",   "color": "#742f32"},
-     {"name": "183P-5",   "color": "#e9a390"},
-     {"name": "183P-5A",  "color": "#e9a390"},
-     {"name": "183P-7",   "color": "#a020f0"}
+     {"name": "183P-1",   "color": "#a2b324", "label": {"text": "183P-1"}},
+     {"name": "183P-2",   "color": "#e72f27", "label": {"text": "183P-2"}},
+     {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-3", "vertical_position": "top", "offset": [-0.002, 0.15]}},
+     {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-6", "vertical_position": "bottom", "offset": [-0.002, -0.02]}},
+     {"name": "183P-4",   "color": "#742f32", "label": {"text": "183P-4", "vertical_position": "top"}},
+     {"name": "183P-5",   "color": "#e9a390", "label": {"text": "183P-5", "vertical_position": "top", "offset": [-0.002, 0.1]}},
+     {"name": "183P-5A",  "color": "#e9a390", "label": {"text": "183P-5A"}},
+     {"name": "183P-7",   "color": "#a020f0", "label": {"text": "183P-7", "vertical_position": "top"}}
     ],
     "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
     "?debug_outline": "lightblue"},
@@ -56,7 +57,7 @@
    "all_clades": {"?top_gap": 100.0, "?bottom_gap": 100.0,
                   "time_series_top_separator": true, "time_series_bottom_separator": true,
                   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-                  "?label": {"?rotation_degrees": 45, "?color": "magenta", "scale": 0.7, "?position": "middle|top|bottom", "offset": [0.004, 0.0]}, "?label?": "scale relative to the slot width, offset relative to the area height",
+                  "?label": {"?rotation_degrees": 45, "?color": "magenta", "scale": 0.7, "?vertical_position": "middle|top|bottom", "offset": [0.004, 0.0]},
                   "?arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
                   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "width in pixels"
                  },
@@ -90,7 +91,6 @@
   {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
   {"?N": "hz lines"},
-  {"?N": "H1 183P"},
   {"?N": "AA at pos"},
   {"?N": "AA substitutions"},
   {"?N": "vaccine, most recent cell"},

@@ -246,7 +246,7 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
             const Scaled label_size{parameters_.slot.width * section.label.scale};
             const auto text_size = surface.text_size(section.display_name, label_size, text_style);
             double vertical_pos;
-            switch (section.label.position) {
+            switch (section.label.vpos) {
                 case vertical_position::top:
                     vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1] + text_size.height;
                     break;
