@@ -645,6 +645,9 @@ std::pair<date::year_month_day, date::year_month_day> acmacs::tal::v3::Tree::sug
         catch (date::date_parse_error&) {
         }
     }
+    if (it == std::end(stat.counter()))
+        return {date::invalid_date(), date::invalid_date()};
+
     auto cur = prev, start = prev;
     for (++it; it != std::end(stat.counter()); ++it) {
         try {
@@ -669,17 +672,20 @@ std::pair<date::year_month_day, date::year_month_day> acmacs::tal::v3::Tree::sug
 
 std::string acmacs::tal::v3::Tree::report_time_series(report_size rs) const
 {
-    const auto by_month = stat_by_month();
-    const auto [first, last] = suggest_time_series_start_end(by_month);
-    const auto brief = fmt::format("Months total:{} Suggested:{} {} .. {}", by_month.size(), date::months_between_dates(first, last) + 1,
-                                   date::display(first, date::allow_incomplete::yes), date::display(last, date::allow_incomplete::yes));
-    if (rs == report_size::brief)
-        return brief;
+    if (const auto by_month = stat_by_month(); !by_month.empty()) {
+        const auto [first, last] = suggest_time_series_start_end(by_month);
+        const auto brief = fmt::format("Months total:{} Suggested:{} {} .. {}", by_month.size(), date::months_between_dates(first, last) + 1, date::display(first, date::allow_incomplete::yes),
+                                       date::display(last, date::allow_incomplete::yes));
+        if (rs == report_size::brief)
+            return brief;
 
-    fmt::memory_buffer out;
-    for (auto [month, count] : by_month.counter())
-        fmt::format_to(out, "  {} {}\n", month, count);
-    return fmt::format("{}\n{}", brief, fmt::to_string(out));
+        fmt::memory_buffer out;
+        for (auto [month, count] : by_month.counter())
+            fmt::format_to(out, "  {} {}\n", month, count);
+        return fmt::format("{}\n{}", brief, fmt::to_string(out));
+    }
+    else
+        return "No dates for sequences available";
 
 } // acmacs::tal::v3::Tree::report_time_series
 
