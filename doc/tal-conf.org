@@ -1,4 +1,4 @@
-# Time-stamp: <2019-12-13 17:02:40 eu>
+# Time-stamp: <2020-01-07 18:08:10 eu>
 
 * Command line defines
 
@@ -164,6 +164,17 @@ If multiple criteria specified within single "select" object, they all used (con
  "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
  "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
 }
+
+*** dash-bar-clades
+
+{"N": "dash-bar-clades",
+ "width_to_height_ratio": 0.009,
+ "clades": [
+   {"name": "2DEL2017", "color": "#A0A0A0"},
+   {"name": "3DEL2017", "color": "#606060"}
+ ],
+ "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+ "?debug_outline": "lightblue"}
 
 *** Title
 
