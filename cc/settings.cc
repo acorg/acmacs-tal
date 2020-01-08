@@ -452,8 +452,8 @@ void acmacs::tal::v3::Settings::add_clades()
 
     getenv_copy_if_present("report"sv, param.report);
 
-    if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
-        rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
+    if (const auto& slot_val = substitute(getenv("slot"sv)); !slot_val.is_null()) {
+        rjson::copy_if_not_null(substitute(slot_val.get("width"sv)), param.slot.width);
     }
 
     // ----------------------------------------------------------------------
