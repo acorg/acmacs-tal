@@ -1,15 +1,16 @@
 #pragma once
 
 #include "acmacs-tal/layout.hh"
+#include "acmacs-tal/tree.hh"
 
 // ----------------------------------------------------------------------
 
 namespace acmacs::tal::inline v3
 {
-    class DashBar : public LayoutElement
+    class DashBarBase : public LayoutElement
     {
       public:
-        DashBar(Tal& tal) : LayoutElement(tal, 0.009) {}
+        DashBarBase(Tal& tal) : LayoutElement(tal, 0.009) {}
 
         // void prepare() override;
 
@@ -25,10 +26,40 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
-    class DashBarClades : public DashBar
+    class DashBar : public DashBarBase
     {
       public:
-        DashBarClades(Tal& tal) : DashBar(tal) {}
+        DashBar(Tal& tal) : DashBarBase(tal) {}
+
+        void prepare() override;
+        void draw(acmacs::surface::Surface& surface) const override;
+
+        // ----------------------------------------------------------------------
+
+        struct NodeParameters
+        {
+            NodeSet nodes;
+            Color color{PINK};
+        };
+
+        struct Parameters : public DashBarBase::Parameters
+        {
+            std::vector<NodeParameters> for_nodes;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
+    };
+
+    // ----------------------------------------------------------------------
+
+    class DashBarClades : public DashBarBase
+    {
+      public:
+        DashBarClades(Tal& tal) : DashBarBase(tal) {}
 
         void prepare() override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -42,7 +73,7 @@ namespace acmacs::tal::inline v3
             LabelParameters label{BLACK, 0.01, vertical_position::middle, horizontal_position::left, {-0.002, 0.0}, {}, NoRotation, LabelTetherParameters{}, TextStyle{}};
         };
 
-        struct Parameters : public DashBar::Parameters
+        struct Parameters : public DashBarBase::Parameters
         {
             std::vector<CladeParameters> clades;
         };

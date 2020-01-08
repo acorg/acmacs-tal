@@ -40,6 +40,7 @@ namespace acmacs::tal::inline v3
         void add_tree();
         void add_time_series();
         void add_clades();
+        void add_dash_bar();
         void add_dash_bar_clades();
         void add_title();
         void add_legend();

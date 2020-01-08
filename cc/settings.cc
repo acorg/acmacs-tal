@@ -66,6 +66,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             clade();
         else if (name == "clades"sv)
             add_clades();
+        else if (name == "dash-bar"sv)
+            add_dash_bar();
         else if (name == "dash-bar-clades"sv)
             add_dash_bar_clades();
         else if (name == "draw-aa-transitions"sv)
@@ -538,6 +540,25 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
     }
 
 } // acmacs::tal::v3::Settings::read_label_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_dash_bar()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<DashBar>();
+    auto& param = element.parameters();
+
+    read_dash_parameters(param.dash);
+
+    rjson::for_each(getenv("nodes"sv), [this, &param](const rjson::value& entry) {
+        auto& for_nodes = param.for_nodes.emplace_back();
+        for_nodes.nodes = select_nodes(entry.get("select"sv));
+        rjson::copy_if_not_null(entry.get("color"sv), for_nodes.color);
+    });
+
+} // acmacs::tal::v3::Settings::add_dash_bar
 
 // ----------------------------------------------------------------------
 

@@ -5,6 +5,35 @@
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::DashBar::prepare()
+{
+
+} // acmacs::tal::v3::DashBar::prepare
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
+{
+    const auto* draw_tree = tal().draw().layout().find_draw_tree();
+    const auto& viewport = surface.viewport();
+    const auto vertical_step = draw_tree->vertical_step();
+    const auto dash_width = parameters().dash.width;
+    const auto dash_line_width = parameters().dash.line_width;
+    const auto dash_pos_x = viewport.left() + viewport.size.width * (1.0 - dash_width) * 0.5;
+
+    for (const auto& for_nodes : parameters().for_nodes) {
+        for (const auto* node : for_nodes.nodes) {
+            if (!node->hidden) {
+                const auto vpos = vertical_step * node->cumulative_vertical_offset_;
+                surface.line({dash_pos_x, vpos}, {dash_pos_x + viewport.size.width * dash_width, vpos}, for_nodes.color, dash_line_width, surface::LineCap::Round);
+            }
+        }
+    }
+
+} // acmacs::tal::v3::DashBar::draw
+
+// ======================================================================
+
 void acmacs::tal::v3::DashBarClades::prepare()
 {
 
