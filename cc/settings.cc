@@ -558,6 +558,10 @@ void acmacs::tal::v3::Settings::add_dash_bar()
         rjson::copy_if_not_null(entry.get("color"sv), for_nodes.color);
     });
 
+    rjson::for_each(getenv("labels"sv), [this, &param](const rjson::value& label_data) {
+        read_label_parameters(label_data, param.labels.emplace_back());
+    });
+
 } // acmacs::tal::v3::Settings::add_dash_bar
 
 // ----------------------------------------------------------------------

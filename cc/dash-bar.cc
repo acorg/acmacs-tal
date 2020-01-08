@@ -30,6 +30,36 @@ void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
         }
     }
 
+    for (const auto& label : parameters().labels) {
+        const Scaled label_size{viewport.size.height * label.scale};
+        const auto text_size = surface.text_size(label.text, label_size, label.text_style);
+        double pos_y;
+        switch (label.vpos) {
+            case vertical_position::top:
+                pos_y = viewport.top() + label.offset[1] + text_size.height;
+                break;
+            case vertical_position::middle:
+                pos_y = viewport.center().y() + label.offset[1] + text_size.height / 2.0;
+                break;
+            case vertical_position::bottom:
+                pos_y = viewport.bottom() + label.offset[1];
+                break;
+        }
+        double pos_x;
+        switch (label.hpos) {
+            case horizontal_position::left:
+                pos_x = viewport.left() + label.offset[0] - text_size.width;
+                break;
+            case horizontal_position::middle:
+                pos_x = viewport.center().x() + label.offset[0] - text_size.width / 2.0;
+                break;
+            case horizontal_position::right:
+                pos_x = viewport.right() + label.offset[0];
+                break;
+        }
+        surface.text({pos_x, pos_y}, label.text, label.color, label_size, label.text_style, label.rotation);
+    }
+
 } // acmacs::tal::v3::DashBar::draw
 
 // ======================================================================

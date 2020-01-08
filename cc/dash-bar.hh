@@ -45,6 +45,7 @@ namespace acmacs::tal::inline v3
         struct Parameters : public DashBarBase::Parameters
         {
             std::vector<NodeParameters> for_nodes;
+            std::vector<LabelParameters> labels;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
