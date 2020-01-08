@@ -263,19 +263,19 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             tree().select_all(selected, update);
         }
         else if (key == "aa") {
-            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(val));
+            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute(val)));
         }
         else if (key == "cumulative >=") {
-            tree().select_if_cumulative_more_than(selected, update, val.to<double>());
+            tree().select_if_cumulative_more_than(selected, update, substitute(val).to<double>());
         }
         else if (key == "date") {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
         else if (key == "edge >=") {
-            tree().select_if_edge_more_than(selected, update, val.to<double>());
+            tree().select_if_edge_more_than(selected, update, substitute(val).to<double>());
         }
         else if (key == "edge >= mean_edge of") {
-            tree().select_if_edge_more_than_mean_edge_of(selected, update, val.to<double>());
+            tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute(val).to<double>());
         }
         else if (key == "matches-chart-antigen") {
             if (!tal_.chart_present())
@@ -288,7 +288,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
-            if (const auto match_type = val.to<std::string_view>(); match_type == "reassortant")
+            if (const auto match_type = substitute(val).to<std::string_view>(); match_type == "reassortant")
                 mt = Tree::serum_match_t::reassortant;
             else if (match_type == "passage")
                 mt = Tree::serum_match_t::passage_type;
@@ -297,13 +297,13 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id") {
-            tree().select_by_seq_id(selected, update, val.to<std::string_view>());
+            tree().select_by_seq_id(selected, update, substitute(val).to<std::string_view>());
         }
         else if (key == "report") {
-            report = val.to<bool>();
+            report = substitute(val).to<bool>();
         }
         else if (key == "vaccine") {
-            select_vaccine(selected, update, val);
+            select_vaccine(selected, update, substitute(val));
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
@@ -504,9 +504,9 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::copy_if_not_null(source.get("color"sv), param.color);
-        rjson::copy_if_not_null(source.get("scale"sv), param.scale);
-        rjson::call_if_not_null<std::string_view>(source.get("vertical_position"sv), [&param](auto position) {
+        rjson::copy_if_not_null(substitute(source.get("color"sv)), param.color);
+        rjson::copy_if_not_null(substitute(source.get("scale"sv)), param.scale);
+        rjson::call_if_not_null<std::string_view>(substitute(source.get("vertical_position"sv)), [&param](auto position) {
             if (position == "middle"sv)
                 param.vpos = Clades::vertical_position::middle;
             else if (position == "top"sv)
@@ -516,7 +516,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
             else
                 fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
         });
-        rjson::call_if_not_null<std::string_view>(source.get("horizontal_position"sv), [&param](auto position) {
+        rjson::call_if_not_null<std::string_view>(substitute(source.get("horizontal_position"sv)), [&param](auto position) {
             if (position == "middle"sv)
                 param.hpos = Clades::horizontal_position::middle;
             else if (position == "left"sv)
@@ -527,8 +527,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
                 fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
         });
         rjson::copy_if_not_null(source.get("offset"sv), param.offset);
-        rjson::copy_if_not_null(source.get("text"sv), param.text);
-        rjson::call_if_not_null<double>(source.get("rotation_degrees"sv), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
+        rjson::copy_if_not_null(substitute(source.get("text"sv)), param.text);
+        rjson::call_if_not_null<double>(substitute(source.get("rotation_degrees"sv)), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
 
         rjson::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
         rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
@@ -555,7 +555,7 @@ void acmacs::tal::v3::Settings::add_dash_bar()
     rjson::for_each(getenv("nodes"sv), [this, &param](const rjson::value& entry) {
         auto& for_nodes = param.for_nodes.emplace_back();
         for_nodes.nodes = select_nodes(entry.get("select"sv));
-        rjson::copy_if_not_null(entry.get("color"sv), for_nodes.color);
+        rjson::copy_if_not_null(substitute(entry.get("color"sv)), for_nodes.color);
     });
 
     rjson::for_each(getenv("labels"sv), [this, &param](const rjson::value& label_data) {
