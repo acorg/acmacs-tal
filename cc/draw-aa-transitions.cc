@@ -47,17 +47,20 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     const auto text_line_interleave = parameters().text_line_interleave;
     const auto vertical_step = draw_tree.vertical_step();
     const auto horizontal_step = draw_tree.horizontal_step();
+    auto interleave{0.0};
 
     for (auto& transition : transitions_) {
         const auto names = transition.node->aa_transitions_.names();
 
         const Scaled text_size{transition.label.scale};
         transition.name_sizes.resize(names.size());
-        std::transform(std::begin(names), std::end(names), std::begin(transition.name_sizes), [&surface, &transition, text_size](const auto& name) { return surface.text_size(name, text_size, transition.label.text_style); });
+        std::transform(std::begin(names), std::end(names), std::begin(transition.name_sizes),
+                       [&surface, &transition, text_size](const auto& name) { return surface.text_size(name, text_size, transition.label.text_style); });
         transition.box.size = std::accumulate(std::begin(transition.name_sizes), std::end(transition.name_sizes), Size{}, [](const Size& result, const Size& name_size) {
             return Size{std::max(result.width, name_size.width), result.height + name_size.height};
         });
-        transition.box.size.height += (names.size() - 1) * text_line_interleave * transition.name_sizes.front().height;
+        interleave = text_line_interleave * transition.name_sizes.front().height;
+        transition.box.size.height += (names.size() - 1) * interleave;
 
         transition.at_edge_line.x(horizontal_step * (transition.node->cumulative_edge_length.as_number() - transition.node->edge_length.as_number() / 2.0));
         transition.at_edge_line.y(vertical_step * transition.node->cumulative_vertical_offset_);
@@ -85,25 +88,39 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
         }
     };
 
-    fmt::print(stderr, "WARNING: overlapping 1\n");
-    for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
-        const auto overlapping = find_overlapping(trn, std::end(transitions_));
-        report_overlapping(trn, overlapping);
+    for (size_t overlapping_no = 1; overlapping_no > 0;) {
+        fmt::print(stderr, "WARNING: overlapping {}\n", overlapping_no);
+        bool overlapping_present = false;
+        for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
+            const auto overlapping = find_overlapping(trn, std::end(transitions_));
+            report_overlapping(trn, overlapping);
 
-        if (!overlapping.empty()) {
-            const auto& over = overlapping.front();
-            if ((over->box.left() - trn->box.left()) < (over->box.top() - trn->box.top()))
-                over->box.origin.y(trn->box.bottom());
-            else
-                over->box.origin.x(trn->box.right());
+            if (!overlapping.empty()) {
+                overlapping_present = true;
+                const auto& over = overlapping.front();
+                const auto dist = (trn->box.bottom() - over->box.top() + interleave * 4) / 2.0;
+                trn->box.origin.y(trn->box.top() - dist);
+                over->box.origin.y(over->box.top() + dist);
+
+                // over->box.origin.y(trn->box.bottom() + interleave);
+
+                // if ((over->box.left() - trn->box.left()) < (over->box.top() - trn->box.top()))
+                //     over->box.origin.y(trn->box.bottom());
+                // else
+                //     over->box.origin.x(trn->box.right());
+            }
         }
+        if (overlapping_present)
+            ++overlapping_no;
+        else
+            overlapping_no = 0;
     }
 
-    fmt::print(stderr, "WARNING: overlapping 2\n");
-    for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
-        const auto overlapping = find_overlapping(trn, std::end(transitions_));
-        report_overlapping(trn, overlapping);
-    }
+    // fmt::print(stderr, "WARNING: overlapping 2\n");
+    // for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
+    //     const auto overlapping = find_overlapping(trn, std::end(transitions_));
+    //     report_overlapping(trn, overlapping);
+    // }
 
 } // acmacs::tal::v3::DrawAATransitions::calculate_transion_boxes
 
