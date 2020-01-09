@@ -65,6 +65,21 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
         transition.box.origin.y(transition.at_edge_line.y() + transition.label.offset[1]);
     }
 
+    // overlapping detection
+    fmt::print(stderr, "WARNING: overlapping\n");
+    for (auto trn1 = std::begin(transitions_); trn1 != std::end(transitions_); ++trn1) {
+        std::vector<decltype(trn1)> overlapping;
+        for (auto trn2 = std::next(trn1); trn2 != std::end(transitions_); ++trn2) {
+            if (trn1->box.is_overlap(trn2->box))
+                overlapping.push_back(trn2);
+        }
+        if (!overlapping.empty()) {
+            fmt::print(stderr, "    ({}) {} \"{}\" {}\n", overlapping.size(), trn1->node->node_id_, trn1->node->aa_transitions_.display(), trn1->box);
+            for (const auto& over : overlapping)
+                fmt::print(stderr, "        {} \"{}\" {}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
+        }
+    }
+
 } // acmacs::tal::v3::DrawAATransitions::calculate_transion_boxes
 
 // ----------------------------------------------------------------------
