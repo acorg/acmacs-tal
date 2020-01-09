@@ -66,18 +66,43 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     }
 
     // overlapping detection
-    fmt::print(stderr, "WARNING: overlapping\n");
-    for (auto trn1 = std::begin(transitions_); trn1 != std::end(transitions_); ++trn1) {
-        std::vector<decltype(trn1)> overlapping;
-        for (auto trn2 = std::next(trn1); trn2 != std::end(transitions_); ++trn2) {
-            if (trn1->box.is_overlap(trn2->box))
-                overlapping.push_back(trn2);
+
+    using transition_iterator = decltype(std::begin(transitions_));
+    const auto find_overlapping = [](transition_iterator primary, transition_iterator end) {
+        std::vector<transition_iterator> overlapping;
+        for (transition_iterator secondary = std::next(primary); secondary != end; ++secondary) {
+            if (primary->box.is_overlap(secondary->box))
+                overlapping.push_back(secondary);
         }
+        return overlapping;
+    };
+
+    const auto report_overlapping = [](transition_iterator primary, const auto& overlapping) {
         if (!overlapping.empty()) {
-            fmt::print(stderr, "    ({}) {} \"{}\" {}\n", overlapping.size(), trn1->node->node_id_, trn1->node->aa_transitions_.display(), trn1->box);
+            fmt::print(stderr, "    ({}) {} \"{}\" {:.6f}\n", overlapping.size(), primary->node->node_id_, primary->node->aa_transitions_.display(), primary->box);
             for (const auto& over : overlapping)
-                fmt::print(stderr, "        {} \"{}\" {}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
+                fmt::print(stderr, "        {} \"{}\" {:.6f}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
         }
+    };
+
+    fmt::print(stderr, "WARNING: overlapping 1\n");
+    for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
+        const auto overlapping = find_overlapping(trn, std::end(transitions_));
+        report_overlapping(trn, overlapping);
+
+        if (!overlapping.empty()) {
+            const auto& over = overlapping.front();
+            if ((over->box.left() - trn->box.left()) < (over->box.top() - trn->box.top()))
+                over->box.origin.y(trn->box.bottom());
+            else
+                over->box.origin.x(trn->box.right());
+        }
+    }
+
+    fmt::print(stderr, "WARNING: overlapping 2\n");
+    for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
+        const auto overlapping = find_overlapping(trn, std::end(transitions_));
+        report_overlapping(trn, overlapping);
     }
 
 } // acmacs::tal::v3::DrawAATransitions::calculate_transion_boxes
