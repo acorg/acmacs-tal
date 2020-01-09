@@ -693,11 +693,13 @@ std::string acmacs::tal::v3::Tree::report_time_series(report_size rs) const
 
 void acmacs::tal::v3::Tree::update_common_aa() const
 {
-    tree::iterate_post(*this, [](const Node& node) {
+    tree::iterate_post(*this, [this](const Node& node) {
         for (const auto& child : node.subtree) {
             if (!child.hidden) {
-                if (child.is_leaf())
+                if (child.is_leaf()) {
                     node.common_aa_.update(child.aa_sequence);
+                    longest_sequence_ = std::max(longest_sequence_, seqdb::pos0_t{child.aa_sequence.size()});
+                }
                 else
                     node.common_aa_.update(child.common_aa_);
             }
@@ -714,7 +716,7 @@ void acmacs::tal::v3::Tree::report_common_aa() const
     tree::iterate_pre_parent(*this, [](const Node& node, const Node& parent) {
         if (node.number_leaves_in_subtree_ >= 100) {
             if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
-                fmt::print("(children:{} leaves:{}) {}\n", node.subtree.size(), node.number_leaves_in_subtree_, rep);
+                fmt::print("node:{:4.3} (children:{} leaves:{}) {}\n", node.node_id_, node.subtree.size(), node.number_leaves_in_subtree_, rep);
         }
     });
 
@@ -736,8 +738,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
     };
 
     Timeit time2("DEBUG: update_aa_transitions counting: ", report_time::no);
-    tree::iterate_post(*this, [aa_at](const Node& node) {
-        for (seqdb::pos0_t pos{0}; *pos < node.common_aa_.size(); ++pos) {
+    tree::iterate_post(*this, [aa_at, this](const Node& node) {
+        for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
             if (node.common_aa_.is_no_common(pos)) {
                 CounterChar counter;
                 for (const auto& child : node.subtree) {
@@ -749,10 +751,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                         counter.count(found->right);
                     }
                 }
-                if ((node.number_leaves_in_subtree_ == 36 || node.number_leaves_in_subtree_ == (2124 - 36) || node.number_leaves_in_subtree_ == (2124 - 37) || node.number_leaves_in_subtree_ == 2124 ||
-                     node.number_leaves_in_subtree_ == 2125) &&
-                    pos == seqdb::pos1_t{91})
-                    fmt::print(stderr, "DEBUG: leaves:{} pos:{} counter: {}\n", node.number_leaves_in_subtree_, pos, counter);
+                // if (pos == seqdb::pos1_t{484})
+                //     fmt::print(stderr, "DEBUG: node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}\n", node.node_id_, node.number_leaves_in_subtree_, pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);

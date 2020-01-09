@@ -272,6 +272,7 @@ namespace acmacs::tal::inline v3
         std::string lineage_;
         clades_t clades_;
         mutable bool chart_matched_{false};
+        mutable seqdb::pos0_t longest_sequence_{0};
 
     }; // class Tree
 
@@ -281,9 +282,45 @@ namespace acmacs::tal::inline v3
 
 // ======================================================================
 
-template <> struct fmt::formatter<acmacs::tal::node_id_t> {
-    template <typename ParseContext> constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
-    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) { return format_to(ctx.out(), "{}.{}", node_id.vertical, node_id.horizontal); }
+// {:4.3} -> {:>4d}.{:<3d}
+template <> struct fmt::formatter<acmacs::tal::node_id_t>
+{
+    template <typename ParseContext> constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin())
+    {
+        auto it = ctx.begin();
+        if (it != ctx.end() && *it == ':')
+            ++it;
+        if (it != ctx.end() && *it != '}' && *it != '.') {
+            char* end{nullptr};
+            v_size_ = std::strtoul(&*it, &end, 10);
+            it = std::next(it, end - &*it);
+        }
+        if (it != ctx.end() && *it == '.')
+            ++it;
+        if (it != ctx.end() && *it != '}') {
+            char* end{nullptr};
+            h_size_ = std::strtoul(&*it, &end, 10);
+            it = std::next(it, end - &*it);
+        }
+        while (it != ctx.end() && *it != '}')
+            ++it;
+        return it;
+    }
+
+    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx)
+    {
+        if (v_size_.has_value())
+            format_to(ctx.out(), "{:>{}d}.", node_id.vertical, *v_size_);
+        else
+            format_to(ctx.out(), "{}.", node_id.vertical);
+        if (h_size_.has_value())
+            format_to(ctx.out(), "{:<{}d}", node_id.horizontal, *h_size_);
+        else
+            format_to(ctx.out(), "{}", node_id.horizontal);
+        return ctx.out();
+    }
+
+    std::optional<size_t> v_size_, h_size_;
 };
 
 // ----------------------------------------------------------------------

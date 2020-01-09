@@ -92,7 +92,7 @@ int main(int argc, const char *argv[])
         if (opt.open || opt.ql) {
             for (const auto& output : *opt.outputs) {
                 if (output.substr(output.size() - 4) == ".pdf")
-                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
+                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 1);
             }
         }
 
