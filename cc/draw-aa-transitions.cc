@@ -61,6 +61,9 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
     const auto text_line_interleave = parameters().text_line_interleave;
 
     for (const auto& transition : transitions_) {
+        // if (!transition.node->aa_transitions_.find(seqdb::pos1_t{484}))
+        //     continue;
+
         const auto names = transition.node->aa_transitions_.names();
 
         const Scaled text_size{transition.label.scale};

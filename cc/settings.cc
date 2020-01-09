@@ -51,12 +51,17 @@ void acmacs::tal::v3::Settings::update_env()
 
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose verb)
 {
+    Timeit time_apply(fmt::format("DEBUG: applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
     using namespace std::string_view_literals;
     try {
         // printenv();
         if (name == "aa-transitions"sv) {
+            Timeit time_update_common_aa("DEBUG: update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
+            time_update_common_aa.report();
+            Timeit time_update_aa_transitions("DEBUG: update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
+            time_update_aa_transitions.report();
             if (getenv("report"sv, false))
                 tree().report_aa_transitions();
         }

@@ -2,6 +2,7 @@
 #include "acmacs-base/acmacsd.hh"
 #include "acmacs-base/filesystem.hh"
 #include "acmacs-base/quicklook.hh"
+#include "acmacs-base/timeit.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -47,11 +48,17 @@ int main(int argc, const char *argv[])
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
         const acmacs::verbose verbose{opt.verbose ? acmacs::verbose::yes : acmacs::verbose::no};
+        const report_time report{opt.verbose ? report_time::yes : report_time::no};
 
         acmacs::tal::Tal tal;
+        Timeit time_loading_tree("DEBUG: Loading tree: ", report);
         tal.import_tree(opt.tree_file);
+        time_loading_tree.report();
+        Timeit time_loading_chart("DEBUG: Loading chart: ", report);
         tal.import_chart(opt.chart_file);
+        time_loading_chart.report();
 
+        Timeit time_loading_settings("DEBUG: Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
         using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
@@ -67,11 +74,20 @@ int main(int argc, const char *argv[])
             else
                 settings.setenv(def, true);
         }
+        time_loading_settings.report();
 
+        Timeit time_applying_settings("DEBUG: Applying settings: ", report);
         settings.apply("main"sv, verbose);
+        time_applying_settings.report();
+
+        Timeit time_preparing("DEBUG: preparing: ", report);
         tal.prepare();
+        time_preparing.report();
+
+        Timeit time_exporting("DEBUG: exporting: ", report);
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
+        time_exporting.report();
 
         if (opt.open || opt.ql) {
             for (const auto& output : *opt.outputs) {
