@@ -27,6 +27,9 @@ namespace acmacs::tal::inline v3
         {
             const Node* node;
             LabelParameters label;
+            std::vector<Size> name_sizes;
+            PointCoordinates at_edge_line{PointCoordinates::zero2D};
+            Viewport box;
 
             Transition(const Node* a_node, const LabelParameters& a_label) : node(a_node), label(a_label) {}
         };
@@ -53,7 +56,10 @@ namespace acmacs::tal::inline v3
 
       private:
         Parameters parameters_;
-        std::vector<Transition> transitions_;
+        mutable std::vector<Transition> transitions_;
+
+        void calculate_boxes(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const;
+        void report() const;
     };
 
 } // namespace acmacs::tal::inlinev3
