@@ -838,13 +838,13 @@ acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::st
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& substitutions, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
 {
     size_t num = 0;
     const std::string name_s{name};
     auto& clade_sections = find_or_add_clade(name, display_name).sections;
-    tree::iterate_leaf(*this, [&substitutions, name_s, &num, &clade_sections](Node& node) {
-        if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, substitutions)) {
+    tree::iterate_leaf(*this, [&aa_at_pos, name_s, &num, &clade_sections](Node& node) {
+        if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos)) {
             node.clades.add(name_s);
             ++num;
             if (clade_sections.empty() || (node.node_id_.vertical - clade_sections.back().last->node_id_.vertical) > 1)

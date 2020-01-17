@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-08 11:00:43 eu>
+# Time-stamp: <2020-01-17 11:10:33 eu>
 
 * Command line defines
 
@@ -104,7 +104,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 
 {"N": "clades-reset"}
-{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "substitutions": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false}
+{"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "aa": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false}
 -- "inclusion_tolerance": "{clade_section_inclusion_tolerance}", "exclusion_tolerance": "{clade_section_exclusion_tolerance}"}
 
 ** Report

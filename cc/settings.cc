@@ -334,10 +334,10 @@ void acmacs::tal::v3::Settings::clade() const
     // const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
     // const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
 
-    if (const auto& substitutions = getenv("substitutions"sv); !substitutions.is_null())
-        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitutions), display_name);
+    if (const auto& aa_at_pos = getenv("aa"sv); !aa_at_pos.is_null())
+        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(aa_at_pos), display_name);
     else
-        throw error{"no \"substitutions\" provided"};
+        throw error{"no \"aa\" provided"};
 
     if (report)
         tree().clade_report(clade_name);

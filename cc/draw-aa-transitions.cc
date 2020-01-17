@@ -88,6 +88,8 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
         }
     };
 
+    // move upper box up and lower box down
+    // boxes are not moved horizontally
     const auto make_separate = [interleave](auto& upper, auto& lower) {
         const auto dist_y = (upper.box.bottom() - lower.box.top() + interleave * 4) / 2.0;
         upper.box.origin.y(upper.box.top() - dist_y);
