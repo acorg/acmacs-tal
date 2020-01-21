@@ -136,7 +136,8 @@ void acmacs::tal::v3::DrawAATransitions::report() const
     for (const auto& transition : transitions_) {
         const auto node_id = fmt::format("\"{}\"", transition.node->node_id_);
         const auto name = fmt::format("\"{}\",", transition.node->aa_transitions_.display());
-        fmt::print("          {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:.6f}, {:.6f}], \"?box_size\": [{:.6f}]}}}},\n", node_id, max_id + 2, name, max_name + 3, transition.label.offset[0], transition.label.offset[1], transition.box.size);
+        fmt::print("          {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:.6f}, {:.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": {}}},\n", node_id, max_id + 2, name, max_name + 3,
+                   transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_leaf().seq_id);
     }
 
 } // acmacs::tal::v3::DrawAATransitions::report
