@@ -88,6 +88,7 @@ namespace acmacs::tal::inline v3
         // leaf node only
         SeqId seq_id;
         acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
+        acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
         std::string_view date;
         std::string_view continent;
         std::string_view country;
@@ -194,6 +195,7 @@ namespace acmacs::tal::inline v3
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
+        void select_by_nuc(NodeSet& nodes, Select update, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos1);
         void select_matches_chart_antigens(NodeSet& nodes, Select update);
 
         enum class serum_match_t { name, reassortant, passage_type };
@@ -252,6 +254,7 @@ namespace acmacs::tal::inline v3
 
         void clades_reset();
         void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name);
+        void clade_set(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name);
         void clade_report(std::string_view name={}) const;
 
         // ----------------------------------------------------------------------

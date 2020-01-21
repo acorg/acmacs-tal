@@ -96,6 +96,9 @@ namespace
                             case 'a':
                                 node_.aa_sequence = acmacs::seqdb::sequence_aligned_ref_t{data};
                                 break;
+                            case 'N':
+                                node_.nuc_sequence = acmacs::seqdb::sequence_aligned_ref_t{data};
+                                break;
                             case 'd':
                                 node_.date = data;
                                 break;

@@ -336,8 +336,10 @@ void acmacs::tal::v3::Settings::clade() const
 
     if (const auto& aa_at_pos = getenv("aa"sv); !aa_at_pos.is_null())
         tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(aa_at_pos), display_name);
+    else if (const auto& nuc_at_pos = getenv("nuc"sv); !nuc_at_pos.is_null())
+        tree().clade_set(clade_name, acmacs::seqdb::extract_nuc_at_pos1_eq_list(nuc_at_pos), display_name);
     else
-        throw error{"no \"aa\" provided"};
+        throw error{"neither \"aa\" nor \"nuc\" provided"};
 
     if (report)
         tree().clade_report(clade_name);

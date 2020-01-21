@@ -351,6 +351,11 @@ void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const ac
     select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](const Node& node) { return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
 }
 
+void acmacs::tal::v3::Tree::select_by_nuc(NodeSet& nodes, Select update, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos1)
+{
+    select_update(nodes, update, Descent::yes, *this, [&nuc_at_pos1](const Node& node) { return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.nuc_sequence, nuc_at_pos1); });
+}
+
 void acmacs::tal::v3::Tree::select_matches_chart_antigens(NodeSet& nodes, Select update)
 {
     select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && node.antigen_index_in_chart_.has_value(); });
@@ -418,6 +423,7 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
         if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
             const auto& ref = subset.front();
             node.aa_sequence = ref.seq().aa_aligned();
+            node.nuc_sequence = ref.seq().nuc_aligned();
             node.date = ref.entry->date();
             node.continent = ref.entry->continent;
             node.country = ref.entry->country;
@@ -860,6 +866,26 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
     //     std::end(clade_sections));
 
     // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
+
+} // acmacs::tal::v3::Tree::clade_set
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
+{
+    size_t num = 0;
+    const std::string name_s{name};
+    auto& clade_sections = find_or_add_clade(name, display_name).sections;
+    tree::iterate_leaf(*this, [&nuc_at_pos, name_s, &num, &clade_sections](Node& node) {
+        if (!node.hidden && acmacs::seqdb::matches(node.nuc_sequence, nuc_at_pos)) {
+            node.clades.add(name_s);
+            ++num;
+            if (clade_sections.empty() || (node.node_id_.vertical - clade_sections.back().last->node_id_.vertical) > 1)
+                clade_sections.emplace_back(&node);
+            else
+                clade_sections.back().last = &node;
+        }
+    });
 
 } // acmacs::tal::v3::Tree::clade_set
 
