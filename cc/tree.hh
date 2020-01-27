@@ -103,6 +103,7 @@ namespace acmacs::tal::inline v3
         // -> export
         double edge_line_width_scale{1.0};
         Color color_edge_line{BLACK};
+        double label_scale{1.0};
         // Color color_tree_label{BLACK};
 
         // -------------------- not exported --------------------

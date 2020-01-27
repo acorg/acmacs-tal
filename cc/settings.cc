@@ -156,6 +156,11 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 throw error{"time_series element is not added yet, use \"nodes\" mod after \"layout\""};
             }
         }
+        else if (key == "tree-label-scale") {
+            const auto scale{value.to<double>()};
+            for (Node* node : selected)
+                node->label_scale = scale;
+        }
         else if (key == "tree-edge-line-color") {
             const Color color{value.to<std::string_view>()};
             for (Node* node : selected)

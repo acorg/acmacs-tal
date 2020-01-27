@@ -35,8 +35,9 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                 surface.line({horizontal_step_ * (leaf.cumulative_edge_length - leaf.edge_length).as_number(), vertical_step() * leaf.cumulative_vertical_offset_},
                              {horizontal_step_ * leaf.cumulative_edge_length.as_number(), vertical_step() * leaf.cumulative_vertical_offset_}, leaf.color_edge_line,
                              line_width * leaf.edge_line_width_scale);
-                surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + text_size.value() * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + text_size.value() * 0.3},
-                             std::string{leaf.seq_id}, color(leaf), text_size);
+                const auto label_size = text_size.value() * leaf.label_scale;
+                surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + label_size * 0.3},
+                             std::string{leaf.seq_id}, color(leaf), Scaled{label_size});
             }
         },
         // pre
