@@ -362,7 +362,7 @@ void acmacs::tal::v3::Tree::select_by_continent(NodeSet& nodes, Select update, s
 void acmacs::tal::v3::Tree::select_by_location(NodeSet& nodes, Select update, std::string_view location)
 {
     select_update(nodes, update, Descent::yes, *this, [location](const Node& node) {
-        return node.is_leaf() && !node.hidden && ::virus_name::location(acmacs::virus::v2::name_t{node.strain_name}) == location;
+        return node.is_leaf() && !node.hidden && !node.strain_name.empty() && ::virus_name::location(acmacs::virus::v2::name_t{node.strain_name}) == location;
     });
 
 } // acmacs::tal::v3::Tree::select_by_location
