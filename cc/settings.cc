@@ -270,6 +270,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         else if (key == "aa") {
             tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute(val)));
         }
+        else if (key == "country") {
+            tree().select_by_country(selected, update, substitute(val).to<std::string_view>());
+        }
         else if (key == "cumulative >=") {
             tree().select_if_cumulative_more_than(selected, update, substitute(val).to<double>());
         }
@@ -281,6 +284,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "edge >= mean_edge of") {
             tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute(val).to<double>());
+        }
+        else if (key == "location") {
+            tree().select_by_location(selected, update, substitute(val).to<std::string_view>());
         }
         else if (key == "matches-chart-antigen") {
             if (!tal_.chart_present())

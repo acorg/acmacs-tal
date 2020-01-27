@@ -3,6 +3,7 @@
 #include <set>
 
 #include "acmacs-base/statistics.hh"
+#include "acmacs-virus/virus-name.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/tree.hh"
@@ -346,6 +347,26 @@ void acmacs::tal::v3::Tree::select_by_seq_id(NodeSet& nodes, Select update, std:
     select_update(nodes, update, Descent::yes, *this, [&re](const Node& node) { return node.is_leaf() && !node.hidden && std::regex_search(node.seq_id->begin(), node.seq_id->end(), re); });
 }
 
+void acmacs::tal::v3::Tree::select_by_country(NodeSet& nodes, Select update, std::string_view country_to_select)
+{
+    select_update(nodes, update, Descent::yes, *this, [country_to_select](const Node& node) { return node.is_leaf() && !node.hidden && node.country == country_to_select; });
+
+} // acmacs::tal::v3::Tree::select_by_country
+
+void acmacs::tal::v3::Tree::select_by_continent(NodeSet& nodes, Select update, std::string_view continent_to_select)
+{
+    select_update(nodes, update, Descent::yes, *this, [continent_to_select](const Node& node) { return node.is_leaf() && !node.hidden && node.continent == continent_to_select; });
+
+} // acmacs::tal::v3::Tree::select_by_continent
+
+void acmacs::tal::v3::Tree::select_by_location(NodeSet& nodes, Select update, std::string_view location)
+{
+    select_update(nodes, update, Descent::yes, *this, [location](const Node& node) {
+        return node.is_leaf() && !node.hidden && ::virus_name::location(acmacs::virus::v2::name_t{node.strain_name}) == location;
+    });
+
+} // acmacs::tal::v3::Tree::select_by_location
+
 void acmacs::tal::v3::Tree::select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1)
 {
     select_update(nodes, update, Descent::yes, *this, [&aa_at_pos1](const Node& node) { return node.is_leaf() && !node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos1); });
@@ -425,6 +446,7 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
             node.aa_sequence = ref.seq().aa_aligned();
             node.nuc_sequence = ref.seq().nuc_aligned();
             node.date = ref.entry->date();
+            node.strain_name = ref.entry->name;
             node.continent = ref.entry->continent;
             node.country = ref.entry->country;
             node.hi_names = ref.seq().hi_names;
@@ -822,9 +844,9 @@ void acmacs::tal::v3::Tree::clades_reset()
 
 // ----------------------------------------------------------------------
 
-const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::string_view name) const
+const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::string_view clade_name) const
 {
-    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [clade_name](const auto& cl) { return cl.name == clade_name; }); found != std::end(clades_))
         return &*found;
     else
         return nullptr;
@@ -833,25 +855,25 @@ const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::str
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::string_view name, std::string_view display_name)
+acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::string_view clade_name, std::string_view display_name)
 {
-    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [name](const auto& cl) { return cl.name == name; }); found != std::end(clades_))
+    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [clade_name](const auto& cl) { return cl.name == clade_name; }); found != std::end(clades_))
         return *found;
     else
-        return clades_.emplace_back(name, display_name);
+        return clades_.emplace_back(clade_name, display_name);
 
 } // acmacs::tal::v3::Tree::find_or_add_clade
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
 {
     size_t num = 0;
-    const std::string name_s{name};
-    auto& clade_sections = find_or_add_clade(name, display_name).sections;
-    tree::iterate_leaf(*this, [&aa_at_pos, name_s, &num, &clade_sections](Node& node) {
+    const std::string clade_name_s{clade_name};
+    auto& clade_sections = find_or_add_clade(clade_name, display_name).sections;
+    tree::iterate_leaf(*this, [&aa_at_pos, clade_name_s, &num, &clade_sections](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos)) {
-            node.clades.add(name_s);
+            node.clades.add(clade_name_s);
             ++num;
             if (clade_sections.empty() || (node.node_id_.vertical - clade_sections.back().last->node_id_.vertical) > 1)
                 clade_sections.emplace_back(&node);
@@ -865,20 +887,20 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
     //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->node_id_.vertical - section.first->node_id_.vertical) < exclusion_tolerance; }),
     //     std::end(clade_sections));
 
-    // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", name, num, clade_sections.size());
+    // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", clade_name, num, clade_sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
 {
     size_t num = 0;
-    const std::string name_s{name};
-    auto& clade_sections = find_or_add_clade(name, display_name).sections;
-    tree::iterate_leaf(*this, [&nuc_at_pos, name_s, &num, &clade_sections](Node& node) {
+    const std::string clade_name_s{clade_name};
+    auto& clade_sections = find_or_add_clade(clade_name, display_name).sections;
+    tree::iterate_leaf(*this, [&nuc_at_pos, clade_name_s, &num, &clade_sections](Node& node) {
         if (!node.hidden && acmacs::seqdb::matches(node.nuc_sequence, nuc_at_pos)) {
-            node.clades.add(name_s);
+            node.clades.add(clade_name_s);
             ++num;
             if (clade_sections.empty() || (node.node_id_.vertical - clade_sections.back().last->node_id_.vertical) > 1)
                 clade_sections.emplace_back(&node);
@@ -891,7 +913,7 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view name, const acmacs::seqdb
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
+void acmacs::tal::v3::Tree::clade_report(std::string_view clade_name_to_report) const
 {
     const auto report = [](std::string_view clade_name, const auto& sections) {
         fmt::print("Clade \"{}\" ({})\n", clade_name, sections.size());
@@ -903,14 +925,14 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view name) const
         fmt::print("\n");
     };
 
-    if (name.empty()) {
+    if (clade_name_to_report.empty()) {
         for (const auto& clade : clades_)
             report(clade.name, clade.sections);
     }
-    else if (const auto* found = find_clade(name); found)
-        report(name, found->sections);
+    else if (const auto* found = find_clade(clade_name_to_report); found)
+        report(clade_name_to_report, found->sections);
     else
-        fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", name);
+        fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", clade_name_to_report);
 
 } // acmacs::tal::v3::Tree::clade_report
 

@@ -64,6 +64,7 @@ void acmacs::tal::v3::Clades::make_sections()
     const auto& tree_clades = tal().tree().clades();
     for (const auto& tree_clade : tree_clades) {
         const auto& clade_param = parameters_for_clade(tree_clade.name);
+        // fmt::print(stderr, "DEBUG: parameters_for_clade \"{}\": slot:{} display_name:{} hidden:{}\n", tree_clade.name, clade_param.slot_no, clade_param.display_name, clade_param.hidden);
         if (!clade_param.hidden) {
             auto& clade = clades_.emplace_back(tree_clade.name);
             for (const auto& tree_section : tree_clade.sections) {

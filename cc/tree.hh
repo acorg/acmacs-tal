@@ -89,6 +89,7 @@ namespace acmacs::tal::inline v3
         SeqId seq_id;
         acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
         acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
+        std::string_view strain_name;  // from seqdb
         std::string_view date;
         std::string_view continent;
         std::string_view country;
@@ -194,6 +195,9 @@ namespace acmacs::tal::inline v3
         void select_all(NodeSet& nodes, Select update);
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
+        void select_by_country(NodeSet& nodes, Select update, std::string_view country);
+        void select_by_continent(NodeSet& nodes, Select update, std::string_view continent);
+        void select_by_location(NodeSet& nodes, Select update, std::string_view location);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
         void select_by_nuc(NodeSet& nodes, Select update, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos1);
         void select_matches_chart_antigens(NodeSet& nodes, Select update);

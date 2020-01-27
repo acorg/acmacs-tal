@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-17 11:10:33 eu>
+# Time-stamp: <2020-01-27 10:04:35 eu>
 
 * Command line defines
 
@@ -42,6 +42,9 @@ If multiple criteria specified within single "select" object, they all used (con
 {"edge >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 {"seq_id": "regexp", "report": true}
+{"country": "BRUNEI", "report": true}
+{"continent": "NORTH-AMERICA", "report": true}
+{"location": "HONG-KONG", "report": true}
 {"vaccine": {"type": "current", "passage": "cell"}, "report": true}
 {"matches-chart-antigen": true, "report": true}
 {"matches-chart-serum": "name|reassortant|passage", "report": true} -- name only, name+reassortant, name+reassortant+passage_type
