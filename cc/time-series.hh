@@ -1,7 +1,9 @@
 #pragma once
 
 #include "acmacs-base/time-series.hh"
+#include "acmacs-base/flat-map.hh"
 #include "acmacs-tal/layout.hh"
+#include "acmacs-tal/tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -42,11 +44,19 @@ namespace acmacs::tal::inline v3
             SlotLabelParameters label;
         };
 
+        struct PerNodeParameters
+        {
+            std::optional<Color> color;
+            std::optional<double> width; // fraction of slot width
+            std::optional<Pixels> line_width;
+        };
+
         struct Parameters
         {
             acmacs::time_series::parameters time_series;
             SlotParameters slot;
             DashParameters dash;
+            flat_map_t<SeqId, PerNodeParameters> per_nodes;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

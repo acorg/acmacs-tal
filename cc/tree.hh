@@ -101,10 +101,9 @@ namespace acmacs::tal::inline v3
         std::vector<std::string_view> aa_substs;
 
         // -> export
-        Color color_tree_label{BLACK};
-        Color color_time_series_dash{BLACK};
-        Color color_edge_line{BLACK};
         double edge_line_width_scale{1.0};
+        Color color_edge_line{BLACK};
+        // Color color_tree_label{BLACK};
 
         // -------------------- not exported --------------------
         // all nodes

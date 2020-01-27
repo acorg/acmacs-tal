@@ -25,7 +25,7 @@ namespace acmacs::tal::inline v3
         Tal& tal_;
 
         Tree& tree() const { return tal_.tree(); }
-        Draw& draw() { return tal_.draw(); }
+        Draw& draw() const { return tal_.draw(); }
 
         template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args);
 

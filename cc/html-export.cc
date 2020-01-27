@@ -42,7 +42,7 @@ void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, cons
                        "{color_tree_label}'>{seq_id}</td></tr></table></li>\n",
                        fmt::arg("prefix", ::string::join("", prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""),
                        fmt::arg("edge", static_cast<int>(node.edge_length.as_number() * edge_scale)), fmt::arg("seq_id", node.seq_id),
-                       fmt::arg("color_tree_label", node.color_tree_label.to_hex_string()));
+                       fmt::arg("color_tree_label", "black" /*node.color_tree_label.to_hex_string()*/));
     }
     else {
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);

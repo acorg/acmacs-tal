@@ -124,6 +124,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
 
 void acmacs::tal::v3::Settings::apply_nodes() const
 {
+    using namespace std::string_view_literals;
+
     const auto selected = select_nodes(getenv("select"));
     // fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
 
@@ -136,17 +138,25 @@ void acmacs::tal::v3::Settings::apply_nodes() const
             else
                 throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
         }
-        else if (key == "tree-label") {
-            const Color color{value.to<std::string_view>()};
-            for (Node* node : selected)
-                node->color_tree_label = color;
-        }
+        // else if (key == "tree-label-color") {
+        //     const Color color{value.to<std::string_view>()};
+        //     for (Node* node : selected)
+        //         node->color_tree_label = color;
+        // }
         else if (key == "time-series-dash") {
-            const Color color{value.to<std::string_view>()};
-            for (Node* node : selected)
-                node->color_time_series_dash = color;
+            if (auto* time_series = draw().layout().find<TimeSeries>(); time_series) {
+                for (Node* node : selected) {
+                    auto& entry = time_series->parameters().per_nodes.emplace(node->seq_id, TimeSeries::PerNodeParameters{}).second;
+                    rjson::copy_if_not_null(value.get("color"sv), entry.color);
+                    rjson::copy_if_not_null(value.get("width"sv), entry.width);
+                    rjson::copy_if_not_null(value.get("line_width_pixels"sv), entry.line_width);
+                }
+            }
+            else {
+                throw error{"time_series element is not added yet, use \"nodes\" mod after \"layout\""};
+            }
         }
-        else if (key == "tree-edge-line") {
+        else if (key == "tree-edge-line-color") {
             const Color color{value.to<std::string_view>()};
             for (Node* node : selected)
                 node->color_edge_line = color;

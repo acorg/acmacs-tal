@@ -39,9 +39,12 @@
           {"name": "2DEL2017", "show": false, "section_inclusion_tolerance": 15},
           {"name": "3DEL2017", "show": false},
           {"name": "6DEL2019", "show": false},
-          {"?N": "---------- BYam ----------"},
+          {"?N": "---------- BYam ----------"}
       ],
       "?debug_outline": "lightblue"}
+ ],
+ "?": "----------------------------------------------------------------------",
+ "node-modifications": [
  ],
  "?": "----------------------------------------------------------------------",
  "layout": [
@@ -131,6 +134,7 @@
          {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
      ]},
 
-     "layout"
+     "layout",
+     "node-modifications"
  ]
 }
