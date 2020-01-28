@@ -181,6 +181,14 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 throw error{"time_series element is not added yet, use \"nodes\" mod after \"layout\""};
             }
         }
+        else if (key == "text") {
+            if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
+                LayoutElement::TextParameters text;
+                read_text_parameters(value, text);
+                for (Node* node : selected)
+                    draw_on_tree->parameters().per_node.push_back({node->seq_id, text, {}});
+            }
+        }
         else if (key == "tree-label-scale") {
             const auto scale{value.to<double>()};
             for (Node* node : selected)
@@ -679,7 +687,7 @@ void acmacs::tal::v3::Settings::add_title()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters)
+void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters) const
 {
     using namespace std::string_view_literals;
 

@@ -78,8 +78,13 @@ void acmacs::tal::v3::DrawOnTree::draw(acmacs::surface::Surface& /*surface*/, ve
 
 void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose /*verb*/) const
 {
-    // const auto& param = parameters();
     const TextStyle text_style{};
+
+    for (const auto& per_node : parameters().per_node) {
+        if (!per_node.text.text.empty()) {
+        }
+    }
+
     for (const auto& text : parameters().texts) {
         surface.text(text.offset, text.text, text.color, text.size, text_style, NoRotation);
     }

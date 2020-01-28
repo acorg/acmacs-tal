@@ -1,6 +1,7 @@
 #pragma once
 
 #include "acmacs-tal/layout.hh"
+#include "acmacs-tal/tree.hh"
 
 // ----------------------------------------------------------------------
 

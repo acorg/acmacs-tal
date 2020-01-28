@@ -56,7 +56,7 @@ namespace acmacs::tal::inline v3
         void read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param);
         void read_clade_parameters(const rjson::value& source, Clades::CladeParameters& clade_parameters);
         void read_per_clade(Clades::Parameters& parameters);
-        void read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters);
+        void read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters) const;
     };
 
 } // namespace acmacs::tal::inlinev3
