@@ -1,13 +1,20 @@
 {"_": "-*- js-indent-level: 4 -*-",
+
+ "? overwrite in local settings": "----------------------------------------------------------------------",
+ "node-modifications": [
+ ],
+
  "init": [
      {"N": "set",
       "?report-cumulative-output": "",
       "?report-time-series-output": "",
       "whocc": false,
-      "ladderize-method": "number-of-leaves"
+      "ladderize-method": "number-of-leaves",
+      "tree-color-by": "continent"
      }
  ],
- "?": "----------------------------------------------------------------------",
+ "? end overwrite in local settings": "----------------------------------------------------------------------",
+ 
  "clades-element": [
      {"N": "clades", "report": true,
       "slot": {"width": 0.02},
@@ -43,13 +50,14 @@
       ],
       "?debug_outline": "lightblue"}
  ],
- "?": "----------------------------------------------------------------------",
- "node-modifications": [
+
+ "node-modifications-tal": [
+     "node-modifications"
  ],
- "?": "----------------------------------------------------------------------",
+
  "layout": [
      {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
-     {"N": "tree", "color_by": "continent", "width_to_height_ratio": 0.48, "debug_outline": false},
+     {"N": "tree", "color_by": "{tree-color-by}", "width_to_height_ratio": 0.48, "debug_outline": false},
 
      {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
       "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}},
@@ -99,7 +107,7 @@
       "?debug_outline": "lightblue"},
 
      {"N": "clades-element"},
-     
+
      {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
 
      {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
@@ -135,6 +143,6 @@
      ]},
 
      "layout",
-     "node-modifications"
+     "node-modifications-tal"
  ]
 }
