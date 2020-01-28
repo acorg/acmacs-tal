@@ -497,7 +497,7 @@ void acmacs::tal::v3::Settings::add_clades()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_element<Clades>();
+    auto& element = add_unique_element<Clades>();
     auto& param = element.parameters();
 
     getenv_copy_if_present("report"sv, param.report);
