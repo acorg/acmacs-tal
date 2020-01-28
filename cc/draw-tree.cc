@@ -22,7 +22,7 @@ void acmacs::tal::v3::DrawTree::prepare(verbose verb)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface, verbose verb) const
 {
     const Scaled line_width{vertical_step() * 0.5};
     const Scaled text_size{vertical_step() * 0.8};
@@ -58,7 +58,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
         });
 
     if (const auto* draw_aa_transitions = tal().draw().layout().find<DrawAATransitions>(); draw_aa_transitions)
-        draw_aa_transitions->draw_transitions(surface, *this);
+        draw_aa_transitions->draw_transitions(surface, *this, verb);
 
 } // acmacs::tal::v3::DrawTree::draw
 

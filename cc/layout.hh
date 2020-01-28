@@ -61,7 +61,7 @@ namespace acmacs::tal::inline v3
         Color outline_color{PINK};
         Pixels outline_width{2};
 
-        void draw(acmacs::surface::Surface& surface) const;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const;
     };
 
     // ----------------------------------------------------------------------
@@ -80,7 +80,7 @@ namespace acmacs::tal::inline v3
 
         virtual Position position() const { return Position::normal; }
         virtual void prepare(verbose /*verb*/) { prepared_ = true; }
-        virtual void draw(acmacs::surface::Surface& surface) const = 0;
+        virtual void draw(acmacs::surface::Surface& surface, verbose verb) const = 0;
 
         double pos_y_above(const Node& node, double vertical_step) const;
         double pos_y_below(const Node& node, double vertical_step) const;
@@ -139,7 +139,7 @@ namespace acmacs::tal::inline v3
       public:
         Gap(Tal& tal) : LayoutElement(tal, 0.05) {}
 
-        void draw(acmacs::surface::Surface& /*surface*/) const override {}
+        void draw(acmacs::surface::Surface& /*surface*/, verbose /*verb*/) const override {}
     };
 
     // ----------------------------------------------------------------------

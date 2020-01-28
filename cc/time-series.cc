@@ -44,7 +44,7 @@ void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, co
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     draw_labels(surface);
 

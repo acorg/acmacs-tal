@@ -17,9 +17,9 @@ namespace acmacs::tal::inline v3
         Position position() const override { return Position::absolute; }
 
         void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
-        void draw_transitions(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const;
+        void draw_transitions(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose verb) const;
 
         // ----------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
         mutable std::vector<Transition> transitions_;
 
-        void calculate_boxes(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const;
+        void calculate_boxes(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose verb) const;
         void report() const;
     };
 

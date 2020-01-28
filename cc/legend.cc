@@ -3,7 +3,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     continent_map_draw(surface.subsurface(parameters().offset, parameters().size, continent_map_size(), false));
 

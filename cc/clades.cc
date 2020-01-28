@@ -219,7 +219,7 @@ size_t acmacs::tal::v3::Clades::number_of_slots() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto vertical_step = draw_tree->vertical_step();

@@ -13,7 +13,7 @@ namespace acmacs::tal::inline v3
         Clades(Tal& tal) : LayoutElement(tal, 0.0) {}
 
         void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
         // ----------------------------------------------------------------------
 

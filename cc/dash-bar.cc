@@ -5,7 +5,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto& viewport = surface.viewport();
@@ -57,7 +57,7 @@ void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
 
 // ======================================================================
 
-void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto& viewport = surface.viewport();

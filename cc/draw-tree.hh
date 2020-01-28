@@ -14,7 +14,7 @@ namespace acmacs::tal::inline v3
         DrawTree(Tal& tal) : LayoutElementWithColoring(tal, 0.7) {}
 
         void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
         constexpr double vertical_step() const { return vertical_step_; }
         constexpr double horizontal_step() const { return horizontal_step_; }

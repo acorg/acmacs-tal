@@ -40,7 +40,7 @@ namespace acmacs::tal::inline v3
       public:
         using Legend::Legend;
 
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
     };
 

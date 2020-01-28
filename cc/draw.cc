@@ -28,7 +28,7 @@ void acmacs::tal::v3::Draw::export_pdf(std::string_view filename, verbose verb) 
     pdf.rectangle_filled(viewport.origin, viewport.size, WHITE, Pixels{0}, WHITE);
     auto& drawing_area = pdf.subsurface({margins_.left, margins_.top}, Scaled{width_to_height_ratio_ - margins_.left - margins_.right},
                                         Size{(width_to_height_ratio_ - margins_.left - margins_.right) / (1.0 - margins_.top - margins_.bottom), 1.0}, false);
-    outline().draw(drawing_area);
+    outline().draw(drawing_area, verb);
     layout_.draw(drawing_area, verb);
 
 } // acmacs::tal::v3::Draw::export_pdf

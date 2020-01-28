@@ -17,7 +17,7 @@ namespace acmacs::tal::inline v3
         TimeSeries(Tal& tal) : LayoutElementWithColoring(tal, 0.0) {}
 
         void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
         void add_horizontal_line_above(const Node* node, const LineParameters& line);
 

@@ -7,7 +7,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     if (outline) {
         const auto& viewport = surface.viewport();
@@ -121,19 +121,19 @@ const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool th
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
+void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface, verbose verb) const
 {
     double normal_left = 0.0;
     for (const auto& element : elements_) {
         switch (element->position()) {
             case Position::normal: {
                 auto& drawing_area = surface.subsurface({normal_left, 0.0}, Scaled{element->width_to_height_ratio()}, Size{element->width_to_height_ratio(), 1.0}, false);
-                element->outline().draw(drawing_area);
-                element->draw(drawing_area);
+                element->outline().draw(drawing_area, verb);
+                element->draw(drawing_area, verb);
                 normal_left += element->width_to_height_ratio();
             } break;
             case Position::absolute:
-                element->draw(surface);
+                element->draw(surface, verb);
                 break;
         }
     }
