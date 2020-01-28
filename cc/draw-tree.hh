@@ -37,10 +37,19 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
+        // relative to node
+        struct PerNodeParameters
+        {
+            SeqId seq_id;
+            TextParameters text;
+            LineWithOffsetParameters line;
+        };
+
         struct Parameters
         {
             // bool report{false};
             std::vector<TextParameters> texts;
+            std::vector<PerNodeParameters> per_node;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

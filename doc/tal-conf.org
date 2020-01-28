@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-28 14:50:18 eu>
+# Time-stamp: <2020-01-28 15:22:27 eu>
 
 * Command line defines
 
@@ -83,16 +83,16 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-scale": 2.0}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-color": "black"}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-color": "red"}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-width": 2.0}} -- relative to the inferred line width for all edge lines
 
 *** Time series dash
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"time-series-dash": {"width": 0.5, "line_width_pixels": 0.5, "color": "red"}}}
 
-*** Color and other parameters
+*** Line and text attached to node
 
-# not implemented {"tree-label-color": "red"}
-{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-color": "red"}}
-{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-width": 2.0}} -- relative to the inferred line width for all edge lines
+-- {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"line": {}, "text": <[[Text parameters]]>}}
 
 *** Just report selected
 
@@ -213,7 +213,9 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Draw on tree
 
-{"N": "draw-on-tree", "texts": [{<[[Text parameters]]>}, ...]}
+{"N": "draw-on-tree", 
+ "texts": [{<[[Text parameters]]>}, ...]
+}
 
 *** Label parameters
 

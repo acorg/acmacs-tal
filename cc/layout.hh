@@ -99,6 +99,13 @@ namespace acmacs::tal::inline v3
             Pixels line_width{1.0};
         };
 
+        struct LineWithOffsetParameters
+        {
+            Color color{BLACK};
+            Pixels line_width{1.0};
+            PointCoordinates p1{0.0, 0.0}, p2{0.1, 0.1};
+        };
+
         enum class vertical_position { top, middle, bottom };
         enum class horizontal_position { left, middle, right };
 
