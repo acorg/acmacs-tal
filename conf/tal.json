@@ -27,11 +27,6 @@
         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 
-        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-            {"?N": "clades-{virus-type}{lineage}", "report": false},
-            {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
-        ]},
-
         "layout",
         "modifications-tal"
     ],
@@ -47,7 +42,7 @@
         {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
         {"?N": "hz lines"},
-        {"?N": "vaccine, most recent cell"},
+        {"?N": "vaccine, most recent cell --> modifications-tal mark vaccine"},
         {"?N": "legend", "type": "colored by AA at pos"},
         {"?N": "color bar for antigens colored by date"},
         {"?N": ""}
@@ -60,6 +55,11 @@
              "text_line_interleave": 0.3,
              "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
             }
+        ]},
+
+        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+            {"?N": "mark vaccine"},
+            {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
         ]},
 
         "modifications",
