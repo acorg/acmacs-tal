@@ -60,8 +60,31 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface, verbose 
 
     if (const auto* draw_aa_transitions = tal().draw().layout().find<DrawAATransitions>(); draw_aa_transitions)
         draw_aa_transitions->draw_transitions(surface, *this, verb);
+    if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
+        draw_on_tree->draw_on_tree(surface, *this, verb);
 
 } // acmacs::tal::v3::DrawTree::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::DrawOnTree::draw(acmacs::surface::Surface& /*surface*/, verbose /*verb*/) const
+{
+    // do nothing
+    // draw_on_tree() called by DrawTree::draw is used for drawing
+
+} // acmacs::tal::v3::DrawOnTree::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose /*verb*/) const
+{
+    // const auto& param = parameters();
+    const TextStyle text_style{};
+    for (const auto& text : parameters().texts) {
+        surface.text(text.offset, text.text, text.color, text.size, text_style, NoRotation);
+    }
+
+} // acmacs::tal::v3::DrawOnTree::draw_on_tree
 
 // ----------------------------------------------------------------------
 /// Local Variables:

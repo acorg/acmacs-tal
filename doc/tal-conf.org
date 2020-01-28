@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-28 14:08:38 eu>
+# Time-stamp: <2020-01-28 14:50:18 eu>
 
 * Command line defines
 
@@ -205,13 +205,18 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Title
 
-{"N": "title", "display_name": "{virus-type/lineage}", "offset": [0.1, 0.1], "color": "black", "size": 0.05}
+{"N": "title", "texts": [{<[[Text parameters]]>}, ...]}
 
 *** Legend
 
 {"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
 
+*** Draw on tree
+
+{"N": "draw-on-tree", "texts": [{<[[Text parameters]]>}, ...]}
+
 *** Label parameters
+
 "label": {
   "text": "",
   "rotation_degrees": 0, "color": "black",
@@ -222,6 +227,10 @@ If multiple criteria specified within single "select" object, they all used (con
   "tether": {"show": false, "color": "black", "line_width": 1.0},
   "text_style": {"font": "monospace", "weight": "normal", "slant": "normal"}
 }
+
+*** Text parameters
+
+{"text": "", "offset": [0.1, 0.1], "color": "black", "size": 0.05}
 
 * Debug outline
 

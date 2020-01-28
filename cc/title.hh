@@ -20,12 +20,9 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        struct Parameters
+        struct Parameters : TextParameters
         {
-            std::string display_name;
-            PointCoordinates offset{0.0, -0.005};
-            Color color{BLACK};
-            Scaled size{0.015};
+            Parameters() : TextParameters{{}, PointCoordinates{0.0, -0.005}, BLACK, Scaled{0.015}} {}
         };
 
         constexpr Parameters& parameters() { return parameters_; }

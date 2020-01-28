@@ -15,6 +15,7 @@ namespace acmacs::tal::inline v3
     class Tal;
     class LayoutElement;
     class DrawTree;
+    class DrawOnTree;
     class TimeSeries;
     class Clades;
     class DrawAATransitions;
@@ -41,12 +42,14 @@ namespace acmacs::tal::inline v3
     };
 
     extern template const DrawTree* Layout::find<DrawTree>() const;
+    extern template const DrawOnTree* Layout::find<DrawOnTree>() const;
     extern template const TimeSeries* Layout::find<TimeSeries>() const;
     extern template const Clades* Layout::find<Clades>() const;
     extern template const DrawAATransitions* Layout::find<DrawAATransitions>() const;
     extern template const Title* Layout::find<Title>() const;
 
     extern template DrawTree* Layout::find<DrawTree>();
+    extern template DrawOnTree* Layout::find<DrawOnTree>();
     extern template TimeSeries* Layout::find<TimeSeries>();
     extern template Clades* Layout::find<Clades>();
     extern template DrawAATransitions* Layout::find<DrawAATransitions>();
@@ -122,6 +125,14 @@ namespace acmacs::tal::inline v3
         {
             double width{0.5}; // fraction of slot width
             Pixels line_width{0.5};
+        };
+
+        struct TextParameters
+        {
+            std::string text;
+            PointCoordinates offset{0.0, 0.0};
+            Color color{BLACK};
+            Scaled size{0.007};
         };
 
       protected:

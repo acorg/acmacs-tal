@@ -100,6 +100,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             add_dash_bar_clades();
         else if (name == "draw-aa-transitions"sv)
             add_draw_aa_transitions();
+        else if (name == "draw-on-tree"sv)
+            add_draw_on_tree();
         else if (name == "gap"sv)
             add_element<Gap>();
         else if (name == "ladderize"sv)
@@ -665,12 +667,28 @@ void acmacs::tal::v3::Settings::add_title()
     auto& element = add_unique_element<Title>();
     auto& param = element.parameters();
 
-    getenv_copy_if_present("display_name"sv, param.display_name);
-    rjson::copy(getenv("offset"sv), param.offset);
-    getenv_extract_copy_if_present<std::string_view>("color"sv, param.color);
-    getenv_extract_copy_if_present<double>("size"sv, param.size);
+    const rjson::object source{
+        {"text", getenv("text"sv)},
+        {"offset", getenv("offset"sv)},
+        {"color", getenv("color"sv)},
+        {"size", getenv("size"sv)}
+    };
+    read_text_parameters(source, param);
 
 } // acmacs::tal::v3::Settings::add_title
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters)
+{
+    using namespace std::string_view_literals;
+
+    rjson::copy_if_not_null(source.get("text"sv), text_parameters.text);
+    rjson::copy(source.get("offset"sv), text_parameters.offset);
+    rjson::copy_if_not_null(source.get("color"sv), text_parameters.color);
+    rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
+
+} // acmacs::tal::v3::Settings::read_text_parameters
 
 // ----------------------------------------------------------------------
 
@@ -721,6 +739,22 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     });
 
 } // acmacs::tal::v3::Settings::add_draw_aa_transitions
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_draw_on_tree()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_unique_element<DrawOnTree>();
+    auto& param = element.parameters();
+
+    rjson::for_each(getenv("texts"sv), [&param,this](const rjson::value& text_entry) {
+        auto& text_param = param.texts.emplace_back();
+        read_text_parameters(text_entry, text_param);
+    });
+
+} // acmacs::tal::v3::Settings::add_draw_on_tree
 
 // ----------------------------------------------------------------------
 

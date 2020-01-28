@@ -5,7 +5,7 @@
 void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     const TextStyle text_style{};
-    surface.text(parameters().offset, parameters().display_name, parameters().color, parameters().size, text_style, NoRotation);
+    surface.text(parameters().offset, parameters().text, parameters().color, parameters().size, text_style, NoRotation);
 
 } // acmacs::tal::v3::Title::draw
 

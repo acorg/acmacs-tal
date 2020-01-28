@@ -27,6 +27,30 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
+    class DrawOnTree : public LayoutElement
+    {
+      public:
+        DrawOnTree(Tal& tal) : LayoutElement(tal, 0.0) {}
+
+        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
+        void draw_on_tree(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose verb) const;
+
+        // ----------------------------------------------------------------------
+
+        struct Parameters
+        {
+            // bool report{false};
+            std::vector<TextParameters> texts;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
+    };
+
+
 }
 
 // ----------------------------------------------------------------------
