@@ -161,11 +161,11 @@ void acmacs::tal::v3::Settings::apply_nodes() const
             else
                 throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
         }
-        // else if (key == "tree-label-color") {
-        //     const Color color{value.to<std::string_view>()};
-        //     for (Node* node : selected)
-        //         node->color_tree_label = color;
-        // }
+        else if (key == "tree-label-color") {
+            const Color color{value.to<std::string_view>()};
+            for (Node* node : selected)
+                node->label_color = color;
+        }
         else if (key == "time-series-dash") {
             if (auto* time_series = draw().layout().find<TimeSeries>(); time_series) {
                 for (Node* node : selected) {

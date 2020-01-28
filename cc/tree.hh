@@ -104,7 +104,7 @@ namespace acmacs::tal::inline v3
         double edge_line_width_scale{1.0};
         Color color_edge_line{BLACK};
         double label_scale{1.0};
-        // Color color_tree_label{BLACK};
+        std::optional<Color> label_color;
 
         // -------------------- not exported --------------------
         // all nodes

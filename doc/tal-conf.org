@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-28 11:35:37 eu>
+# Time-stamp: <2020-01-28 14:08:38 eu>
 
 * Command line defines
 
@@ -79,9 +79,10 @@ If multiple criteria specified within single "select" object, they all used (con
 ***** hide by aa
 {"N": "nodes", "select": {"aa": "159F", "report": true}, "apply": "hide"}
 
-*** Tree label scale
+*** Tree label color and scale
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-scale": 2.0}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-color": "black"}}
 
 *** Time series dash
 
