@@ -1,7 +1,7 @@
 {"_": "-*- js-indent-level: 4 -*-",
 
  "? overwrite in local settings": "----------------------------------------------------------------------",
- "node-modifications": [
+ "modifications": [
  ],
 
  "init": [
@@ -10,11 +10,12 @@
       "?report-time-series-output": "",
       "whocc": false,
       "ladderize-method": "number-of-leaves",
+      "tree-draw-aa-transitions": true,
       "tree-color-by": "continent"
      }
  ],
  "? end overwrite in local settings": "----------------------------------------------------------------------",
- 
+
  "clades-element": [
      {"N": "clades", "report": true,
       "slot": {"width": 0.02},
@@ -51,98 +52,108 @@
       "?debug_outline": "lightblue"}
  ],
 
- "node-modifications-tal": [
-     "node-modifications"
- ],
+ "modifications-tal": [
+     {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
+         {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
+          "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}},
+          "per_node": [
+          ]
+         }
+     ]},
 
- "layout": [
-     {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
-     {"N": "tree", "color_by": "{tree-color-by}", "width_to_height_ratio": 0.48, "debug_outline": false},
-
-     {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
-      "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}},
+     {"N": "draw-aa-transitions",
       "per_node": [
+          {"node_id": "363.6", "name": "K82R", "label": {"offset": [0.1, 0.020000]}}
       ]
      },
-     {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
+     
+      "modifications"
 
-     {"?N": "---------- H1 ----------"},
-     {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
-         {"N": "dash-bar-clades",
-          "width_to_height_ratio": 0.009,
-          "clades": [
-              {"name": "183P-1",   "color": "#a2b324", "label": {"text": "183P-1"}},
-              {"name": "183P-2",   "color": "#e72f27", "label": {"text": "183P-2"}},
-              {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-3", "vertical_position": "top", "offset": [-0.002, 0.15]}},
-              {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-6", "vertical_position": "bottom", "offset": [-0.002, -0.02]}},
-              {"name": "183P-4",   "color": "#742f32", "label": {"text": "183P-4", "vertical_position": "top"}},
-              {"name": "183P-5",   "color": "#e9a390", "label": {"text": "183P-5", "vertical_position": "top", "offset": [-0.002, 0.1]}},
-              {"name": "183P-5A",  "color": "#e9a390", "label": {"text": "183P-5A"}},
-              {"name": "183P-7",   "color": "#a020f0", "label": {"text": "183P-7", "vertical_position": "top"}}
-          ],
-          "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+     ],
+
+     "layout": [
+         {"N": "margins", "?left": 0.1, "?debug_outline": "cyan"},
+         {"N": "tree", "color_by": "{tree-color-by}", "width_to_height_ratio": 0.48, "debug_outline": false},
+
+         {"?N": "gap", "width_to_height_ratio": 0.2, "debug_outline": {"color": "green", "width": 5}},
+
+         {"?N": "---------- H1 ----------"},
+         {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
+             {"N": "dash-bar-clades",
+              "width_to_height_ratio": 0.009,
+              "clades": [
+                  {"name": "183P-1",   "color": "#a2b324", "label": {"text": "183P-1"}},
+                  {"name": "183P-2",   "color": "#e72f27", "label": {"text": "183P-2"}},
+                  {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-3", "vertical_position": "top", "offset": [-0.002, 0.15]}},
+                  {"name": "183P-3/6", "color": "#03569b", "label": {"text": "183P-6", "vertical_position": "bottom", "offset": [-0.002, -0.02]}},
+                  {"name": "183P-4",   "color": "#742f32", "label": {"text": "183P-4", "vertical_position": "top"}},
+                  {"name": "183P-5",   "color": "#e9a390", "label": {"text": "183P-5", "vertical_position": "top", "offset": [-0.002, 0.1]}},
+                  {"name": "183P-5A",  "color": "#e9a390", "label": {"text": "183P-5A"}},
+                  {"name": "183P-7",   "color": "#a020f0", "label": {"text": "183P-7", "vertical_position": "top"}}
+              ],
+              "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+              "?debug_outline": "lightblue"},
+             {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
+         ]},
+
+         {"?N": "---------- BVic ----------"},
+         {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": [
+             {"N": "dash-bar-clades",
+              "width_to_height_ratio": 0.009,
+              "clades": [
+                  {"name": "2DEL2017", "color": "#A0A0A0"},
+                  {"name": "3DEL2017", "color": "#606060"}
+              ],
+              "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+              "?debug_outline": "lightblue"},
+             {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
+         ]},
+
+         {"N": "time_series", "color_by": "continent",
+          "?start": "2019-01-01", "?end": "2019-12-31", "interval": {"month": 1},
+          "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is a fraction of slot_width",
+          "?slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
+                    "?label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
+                   },
           "?debug_outline": "lightblue"},
-         {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
-     ]},
 
-     {"?N": "---------- BVic ----------"},
-     {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": [
-         {"N": "dash-bar-clades",
-          "width_to_height_ratio": 0.009,
-          "clades": [
-              {"name": "2DEL2017", "color": "#A0A0A0"},
-              {"name": "3DEL2017", "color": "#606060"}
-          ],
-          "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
-          "?debug_outline": "lightblue"},
-         {"N": "gap", "width_to_height_ratio": 0.005, "?debug_outline": "red"}
-     ]},
+         {"N": "clades-element"},
 
-     {"N": "time_series", "color_by": "continent",
-      "?start": "2019-01-01", "?end": "2019-12-31", "interval": {"month": 1},
-      "?dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is a fraction of slot_width",
-      "?slot": {"?separator": {"width_pixels": 2.5, "color": "red"},
-                "?label": {"rotation": "anticlockwise", "color": "green3", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
-               },
-      "?debug_outline": "lightblue"},
+         {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
 
-     {"N": "clades-element"},
+         {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
-     {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
+         {"?N": "hz lines"},
+         {"?N": "AA at pos"},
+         {"?N": "AA substitutions"},
+         {"?N": "vaccine, most recent cell"},
+         {"?N": "legend", "type": "colored by AA at pos"},
+         {"?N": "color bar for antigens colored by date"},
+         {"?N": ""}
+     ],
+     "?": "----------------------------------------------------------------------",
+     "main": [
+         {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
+             {"N": "seqdb", "filename": "{seqdb-filename}"}
+         ]},
+         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
+         {"N": "report-time-series", "output": "{report-time-series-output}"},
+         {"N": "ladderize", "method": "{ladderize-method}"},
+         {"?N": "update-common-aa", "report": false},
+         {"N": "aa-transitions", "report": false},
+         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
+         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 
-     {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+         {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
+         {"?N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0, "report": true}},
+         {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
 
-     {"?N": "hz lines"},
-     {"?N": "AA at pos"},
-     {"?N": "AA substitutions"},
-     {"?N": "vaccine, most recent cell"},
-     {"?N": "legend", "type": "colored by AA at pos"},
-     {"?N": "color bar for antigens colored by date"},
-     {"?N": ""}
- ],
- "?": "----------------------------------------------------------------------",
- "main": [
-     {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
-         {"N": "seqdb", "filename": "{seqdb-filename}"}
-     ]},
-     {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
-     {"N": "report-time-series", "output": "{report-time-series-output}"},
-     {"N": "ladderize", "method": "{ladderize-method}"},
-     {"?N": "update-common-aa", "report": false},
-     {"N": "aa-transitions", "report": false},
-     {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
-     {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
+         {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+             {"N": "clades-{virus-type}{lineage}", "report": false},
+             {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
+         ]},
 
-     {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
-     {"?N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0, "report": true}},
-     {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
-
-     {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-         {"N": "clades-{virus-type}{lineage}", "report": false},
-         {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
-     ]},
-
-     "layout",
-     "node-modifications-tal"
- ]
-}
+         "layout",
+         "modifications-tal"
+     ]
+ }

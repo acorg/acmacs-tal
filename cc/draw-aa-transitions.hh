@@ -16,7 +16,7 @@ namespace acmacs::tal::inline v3
 
         Position position() const override { return Position::absolute; }
 
-        void prepare() override;
+        void prepare(verbose verb) override;
         void draw(acmacs::surface::Surface& surface) const override;
 
         void draw_transitions(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const;

@@ -6,7 +6,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawAATransitions::prepare()
+void acmacs::tal::v3::DrawAATransitions::prepare(verbose verb)
 {
     tree::iterate_pre(tal().tree(), [this](const Node& node) {
         if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
@@ -16,7 +16,7 @@ void acmacs::tal::v3::DrawAATransitions::prepare()
     });
     std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id_ < e2.node->node_id_; });
 
-    LayoutElement::prepare();
+    LayoutElement::prepare(verb);
 
 } // acmacs::tal::v3::Legend::prepare
 
@@ -99,11 +99,11 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     };
 
     for (size_t overlapping_no = 1; overlapping_no > 0;) {
-        fmt::print(stderr, "WARNING: overlapping {}\n", overlapping_no);
+        // fmt::print(stderr, "WARNING: overlapping {}\n", overlapping_no);
         bool overlapping_present = false;
         for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
             const auto overlapping = find_overlapping(trn, std::end(transitions_));
-            report_overlapping(trn, overlapping);
+            // report_overlapping(trn, overlapping);
 
             if (!overlapping.empty()) {
                 overlapping_present = true;

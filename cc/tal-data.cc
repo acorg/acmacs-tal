@@ -26,20 +26,20 @@ void acmacs::tal::v3::Tal::import_chart(std::string_view filename)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tal::prepare()
+void acmacs::tal::v3::Tal::prepare(verbose verb)
 {
-    draw().prepare();
+    draw().prepare(verb);
 
 } // acmacs::tal::v3::Tal::prepare
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tal::export_tree(std::string_view filename)
+void acmacs::tal::v3::Tal::export_tree(std::string_view filename, verbose verb)
 {
     const fs::path filepath{filename};
     const auto ext = filepath.extension();
     if (ext == ".pdf") {
-        draw().export_pdf(filename);
+        draw().export_pdf(filename, verb);
     }
     else {
         acmacs::tal::export_tree(filename, tree_);

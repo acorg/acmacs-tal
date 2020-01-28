@@ -17,15 +17,37 @@
 
 template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&& ... args)
 {
-    using namespace std::string_view_literals;
     auto element_p = std::make_unique<ElementType>(tal_, std::forward<Args>(args) ...);
     auto& element = *element_p;
     draw().layout().add(std::move(element_p));
-    getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
-    outline(element.outline());
+    init_element(element);
     return element;
 
 } // acmacs::tal::v3::Settings::add_element
+
+// ----------------------------------------------------------------------
+
+template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_unique_element(Args&& ... args)
+{
+    if (auto* found = draw().layout().find<ElementType>(); found) {
+        init_element(*found);
+        return *found;
+    }
+    else {
+        return add_element<ElementType>(std::forward<Args>(args) ...);
+    }
+
+} // acmacs::tal::v3::Settings::add_unique_element
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::init_element(LayoutElement& element)
+{
+    using namespace std::string_view_literals;
+    getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
+    outline(element.outline());
+
+} // acmacs::tal::v3::Settings::init_element
 
 // ----------------------------------------------------------------------
 
@@ -654,7 +676,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_element<DrawAATransitions>();
+    auto& element = add_unique_element<DrawAATransitions>();
     auto& param = element.parameters();
 
     getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);

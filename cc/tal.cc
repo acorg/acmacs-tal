@@ -81,12 +81,12 @@ int main(int argc, const char *argv[])
         time_applying_settings.report();
 
         Timeit time_preparing("DEBUG: preparing: ", report);
-        tal.prepare();
+        tal.prepare(verbose);
         time_preparing.report();
 
         Timeit time_exporting("DEBUG: exporting: ", report);
         for (const auto& output : *opt.outputs)
-            tal.export_tree(output);
+            tal.export_tree(output, verbose);
         time_exporting.report();
 
         if (opt.open || opt.ql) {

@@ -3,9 +3,9 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Draw::prepare()
+void acmacs::tal::v3::Draw::prepare(verbose verb)
 {
-    layout_.prepare();
+    layout_.prepare(verb);
     set_width_to_height_ratio();
 
 } // acmacs::tal::v3::Draw::prepare
@@ -21,7 +21,7 @@ void acmacs::tal::v3::Draw::set_width_to_height_ratio()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Draw::export_pdf(std::string_view filename) const
+void acmacs::tal::v3::Draw::export_pdf(std::string_view filename, verbose verb) const
 {
     acmacs::surface::PdfCairo pdf{filename, height_ * width_to_height_ratio_, height_, width_to_height_ratio_};
     const auto& viewport = pdf.viewport();
@@ -29,7 +29,7 @@ void acmacs::tal::v3::Draw::export_pdf(std::string_view filename) const
     auto& drawing_area = pdf.subsurface({margins_.left, margins_.top}, Scaled{width_to_height_ratio_ - margins_.left - margins_.right},
                                         Size{(width_to_height_ratio_ - margins_.left - margins_.right) / (1.0 - margins_.top - margins_.bottom), 1.0}, false);
     outline().draw(drawing_area);
-    layout_.draw(drawing_area);
+    layout_.draw(drawing_area, verb);
 
 } // acmacs::tal::v3::Draw::export_pdf
 

@@ -2,13 +2,6 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Title::prepare()
-{
-
-} // acmacs::tal::v3::Title::prepare
-
-// ----------------------------------------------------------------------
-
 void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface) const
 {
     const TextStyle text_style{};

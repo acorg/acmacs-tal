@@ -5,13 +5,6 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DashBar::prepare()
-{
-
-} // acmacs::tal::v3::DashBar::prepare
-
-// ----------------------------------------------------------------------
-
 void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
 {
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
@@ -63,13 +56,6 @@ void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
 } // acmacs::tal::v3::DashBar::draw
 
 // ======================================================================
-
-void acmacs::tal::v3::DashBarClades::prepare()
-{
-
-} // acmacs::tal::v3::DashBarClades::prepare
-
-// ----------------------------------------------------------------------
 
 void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) const
 {
@@ -126,9 +112,6 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
     }
 
 } // acmacs::tal::v3::DashBarClades::draw
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

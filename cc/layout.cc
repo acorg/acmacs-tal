@@ -40,10 +40,10 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::prepare()
+void acmacs::tal::v3::Layout::prepare(verbose verb)
 {
     for (auto& element : elements_)
-        element->prepare();
+        element->prepare(verb);
 
 } // acmacs::tal::v3::Layout::prepare
 
@@ -79,18 +79,18 @@ template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmac
 
 // ----------------------------------------------------------------------
 
-template <typename Element> void acmacs::tal::v3::Layout::prepare_element()
+template <typename Element> void acmacs::tal::v3::Layout::prepare_element(verbose verb)
 {
     for (auto& element : elements_) {
         if (auto* found = dynamic_cast<Element*>(element.get()); found)
-            found->prepare();
+            found->prepare(verb);
     }
 
 } // acmacs::tal::v3::Layout::prepare_tree
 
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>();
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>();
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>(verbose verb);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>(verbose verb);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>(verbose verb);
 
 // ----------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool th
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
     double normal_left = 0.0;
     for (const auto& element : elements_) {

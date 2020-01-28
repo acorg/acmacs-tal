@@ -13,7 +13,7 @@ namespace acmacs::tal::inline v3
       public:
         DrawTree(Tal& tal) : LayoutElementWithColoring(tal, 0.7) {}
 
-        void prepare() override;
+        void prepare(verbose verb) override;
         void draw(acmacs::surface::Surface& surface) const override;
 
         constexpr double vertical_step() const { return vertical_step_; }

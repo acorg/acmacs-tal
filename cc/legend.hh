@@ -15,7 +15,7 @@ namespace acmacs::tal::inline v3
 
         Position position() const override { return Position::absolute; }
 
-        void prepare() override;
+        // void prepare(verbose verb) override;
 
         // ----------------------------------------------------------------------
 

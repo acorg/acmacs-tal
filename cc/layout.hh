@@ -1,5 +1,6 @@
 #pragma once
 
+#include "acmacs-base/debug.hh"
 #include "acmacs-draw/surface.hh"
 #include "acmacs-tal/coloring.hh"
 
@@ -24,12 +25,12 @@ namespace acmacs::tal::inline v3
         LayoutElement& add(std::unique_ptr<LayoutElement> element);
 
         double width_relative_to_height() const;
-        void prepare();
-        void draw(acmacs::surface::Surface& surface) const;
+        void prepare(verbose verb);
+        void draw(acmacs::surface::Surface& surface, verbose verb) const;
 
         template <typename Element> const Element* find() const;
         template <typename Element> Element* find();
-        template <typename Element> void prepare_element();
+        template <typename Element> void prepare_element(verbose verb);
         size_t index_of(const LayoutElement* look_for) const;
 
         const DrawTree* find_draw_tree(bool throw_error = true) const; // throws error or prints warning if not found
@@ -48,9 +49,9 @@ namespace acmacs::tal::inline v3
     extern template Clades* Layout::find<Clades>();
     extern template DrawAATransitions* Layout::find<DrawAATransitions>();
 
-    extern template void Layout::prepare_element<DrawTree>();
-    extern template void Layout::prepare_element<TimeSeries>();
-    extern template void Layout::prepare_element<Clades>();
+    extern template void Layout::prepare_element<DrawTree>(verbose verb);
+    extern template void Layout::prepare_element<TimeSeries>(verbose verb);
+    extern template void Layout::prepare_element<Clades>(verbose verb);
 
     // ======================================================================
 
@@ -78,7 +79,7 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         virtual Position position() const { return Position::normal; }
-        virtual void prepare() { prepared_ = true; }
+        virtual void prepare(verbose /*verb*/) { prepared_ = true; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
         double pos_y_above(const Node& node, double vertical_step) const;

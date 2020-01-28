@@ -10,6 +10,7 @@
 namespace acmacs::tal::inline v3
 {
     class TimeSeries;
+    class LayoutElement;
 
     class Settings : public acmacs::settings::Settings
     {
@@ -28,6 +29,8 @@ namespace acmacs::tal::inline v3
         Draw& draw() const { return tal_.draw(); }
 
         template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args);
+        template <typename ElementType, typename ... Args> ElementType& add_unique_element(Args&& ... args);
+        void init_element(LayoutElement& element);
 
         void apply_nodes() const;
         void update_env();
