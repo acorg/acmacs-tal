@@ -44,7 +44,7 @@ template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3:
 void acmacs::tal::v3::Settings::init_element(LayoutElement& element)
 {
     using namespace std::string_view_literals;
-    getenv_copy_if_present("width_to_height_ratio"sv, element.width_to_height_ratio());
+    getenv_copy_if_present("width-to-height-ratio"sv, element.width_to_height_ratio());
     outline(element.outline());
 
 } // acmacs::tal::v3::Settings::init_element
@@ -126,7 +126,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
             tree().match_seqdb(getenv("filename"sv, ""));
             update_env();
         }
-        else if (name == "time_series"sv)
+        else if (name == "time-series"sv)
             add_time_series();
         else if (name == "title"sv)
             add_title();
@@ -256,7 +256,7 @@ void acmacs::tal::v3::Settings::margins()
 void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
 {
     using namespace std::string_view_literals;
-    if (const auto debug_outline = getenv("debug_outline"sv); !debug_outline.is_null()) {
+    if (const auto debug_outline = getenv("debug-outline"sv); !debug_outline.is_null()) {
         std::visit(
             [&draw_outline]<typename T>(T && val) {
                 if constexpr (std::is_same_v<std::decay_t<T>, bool>) {
@@ -272,7 +272,7 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
                     rjson::copy_if_not_null(val.get("width"sv), draw_outline.outline_width);
                 }
                 else {
-                    fmt::print(stderr, "WARNING: unrecognized debug_outline value: {}\n", val);
+                    fmt::print(stderr, "WARNING: unrecognized debug-outline value: {}\n", val);
                 }
             },
             debug_outline.val_());
@@ -440,7 +440,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 
 void acmacs::tal::v3::Settings::add_tree()
 {
-    auto& element = add_element<DrawTree>();
+    auto& element = add_unique_element<DrawTree>();
     process_color_by(element);
 
 } // acmacs::tal::v3::Settings::add_tree
@@ -451,7 +451,7 @@ void acmacs::tal::v3::Settings::add_time_series()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_element<TimeSeries>();
+    auto& element = add_unique_element<TimeSeries>();
     auto& param = element.parameters();
 
     process_color_by(element);

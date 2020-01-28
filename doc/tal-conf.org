@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-27 12:29:16 eu>
+# Time-stamp: <2020-01-28 10:26:37 eu>
 
 * Command line defines
 
@@ -124,17 +124,17 @@ If multiple criteria specified within single "select" object, they all used (con
 
 ** Draw
 
-{"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "margins", "left": 0.025, "right": 0.025, "top": 0.025, "bottom": 0.025, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 ** Layout
 
 *** Gap
 
-{"N": "gap", "width_to_height_ratio": 0.1, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "gap", "width-to-height-ratio": 0.1, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 *** Tree
 
-{"N": "tree", "color_by": <[[Color by][color-by]]>, "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+{"N": "tree", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
 {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
  "all": {"node_id": "", "label": {<[[Label parameters]]>}},
  "per_node": [
@@ -143,7 +143,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Time series
 
-{"N": "time_series", "color_by": <[[Color by][color-by]]>,
+{"N": "time-series", "color_by": <[[Color by][color-by]]>,
  "start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
  "interval": {"month": 1}, "?": "month, week, year, day",
  "?interval": "month"
@@ -152,7 +152,7 @@ If multiple criteria specified within single "select" object, they all used (con
           "separator": {"width_pixels": 0.5, "color": "black"},
           "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
          },
- "width_to_height_ratio": 0.7, "debug_outline": <[[Debug outline][debug-outline]]>},
+ "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 *** Clade
 
@@ -160,7 +160,7 @@ If multiple criteria specified within single "select" object, they all used (con
  "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
  "all_clades": {<[[Clade parameters]]>},
  "per_clade": [{<[[Clade parameters]]>}, ...],
- "?width_to_height_ratio": 0.3, "debug_outline": <[[Debug outline][debug-outline]]>},
+ "?width-to-height-ratio": 0.3, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 **** Clade parameters
 
@@ -178,18 +178,18 @@ If multiple criteria specified within single "select" object, they all used (con
 *** dash-bar-clades
 
 {"N": "dash-bar-clades",
- "?width_to_height_ratio": 0.009,
+ "?width-to-height-ratio": 0.009,
  "clades": [
    {"name": "2DEL2017", "color": "#A0A0A0"},
    {"name": "3DEL2017", "color": "#606060"}
  ],
  "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
- "?debug_outline": "lightblue"}
+ "?debug-outline": "lightblue"}
 
 *** dash-bar - Show colored dashes for selected nodes
 
 {"N": "dash-bar",
- "?width_to_height_ratio": 0.009,
+ "?width-to-height-ratio": 0.009,
  "nodes": [
    {"select": {<[[Select Nodes]]>}, "color": "#A0A0A0"},
  ],
@@ -197,7 +197,7 @@ If multiple criteria specified within single "select" object, they all used (con
    {<[[Label parameters]]>}
  ],
  "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
- "?debug_outline": "lightblue"}
+ "?debug-outline": "lightblue"}
 
 *** Title
 
@@ -221,10 +221,10 @@ If multiple criteria specified within single "select" object, they all used (con
 
 * Debug outline
 
-"debug_outline": true
-"debug_outline": false
-"debug_outline": "pink"
-"debug_outline": {"show": true, "color": "pink", "width": 2}
+"debug-outline": true
+"debug-outline": false
+"debug-outline": "pink"
+"debug-outline": {"show": true, "color": "pink", "width": 2}
 
 * Color by
 
