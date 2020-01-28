@@ -4,6 +4,7 @@
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-aa-transitions.hh"
+#include "acmacs-tal/title.hh"
 
 // ----------------------------------------------------------------------
 
@@ -62,6 +63,7 @@ template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::
 template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>() const;
 template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>() const;
 template const acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>() const;
+template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>() const;
 
 template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
 {
@@ -76,6 +78,7 @@ template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v
 template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>();
 template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>();
 template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>();
+template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>();
 
 // ----------------------------------------------------------------------
 

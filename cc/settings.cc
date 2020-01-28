@@ -640,7 +640,7 @@ void acmacs::tal::v3::Settings::add_title()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_element<Title>();
+    auto& element = add_unique_element<Title>();
     auto& param = element.parameters();
 
     getenv_copy_if_present("display_name"sv, param.display_name);

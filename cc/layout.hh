@@ -18,6 +18,7 @@ namespace acmacs::tal::inline v3
     class TimeSeries;
     class Clades;
     class DrawAATransitions;
+    class Title;
 
     class Layout
     {
@@ -43,11 +44,13 @@ namespace acmacs::tal::inline v3
     extern template const TimeSeries* Layout::find<TimeSeries>() const;
     extern template const Clades* Layout::find<Clades>() const;
     extern template const DrawAATransitions* Layout::find<DrawAATransitions>() const;
+    extern template const Title* Layout::find<Title>() const;
 
     extern template DrawTree* Layout::find<DrawTree>();
     extern template TimeSeries* Layout::find<TimeSeries>();
     extern template Clades* Layout::find<Clades>();
     extern template DrawAATransitions* Layout::find<DrawAATransitions>();
+    extern template Title* Layout::find<Title>();
 
     extern template void Layout::prepare_element<DrawTree>(verbose verb);
     extern template void Layout::prepare_element<TimeSeries>(verbose verb);

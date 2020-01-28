@@ -4,7 +4,8 @@
     "modifications": [
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
-        {"N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"}
+        {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},
+        {"?N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "?color": "red"}
     ],
 
     "init": [
@@ -110,7 +111,7 @@
 
         {"N": "clades-element"},
 
-        {"N": "title", "display_name": "{virus-type/lineage}", "?offset": [0.3, -0.005], "color": "black", "size": 0.015},
+        {"N": "title", "display_name": "{virus-type/lineage}", "color": "black", "size": 0.015},
 
         {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
