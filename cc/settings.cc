@@ -169,7 +169,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         else if (key == "time-series-dash") {
             if (auto* time_series = draw().layout().find<TimeSeries>(); time_series) {
                 for (Node* node : selected) {
-                    auto& entry = time_series->parameters().per_nodes.emplace(node->seq_id, TimeSeries::PerNodeParameters{}).second;
+                    auto& entry = time_series->parameters().per_nodes.emplace_not_replace(node->seq_id).second;
                     rjson::copy_if_not_null(value.get("color"sv), entry.color);
                     rjson::copy_if_not_null(value.get("width"sv), entry.width);
                     rjson::copy_if_not_null(value.get("line_width_pixels"sv), entry.line_width);
