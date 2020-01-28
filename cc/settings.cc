@@ -7,7 +7,6 @@
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
-#include "acmacs-tal/clades.hh"
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
@@ -89,10 +88,12 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         }
         else if (name == "clades-reset"sv)
             tree().clades_reset();
-        else if (name == "clade"sv)
+        else if (name == "clade"sv) // acmacs-whocc-data/conf/clades.json
             clade();
         else if (name == "clades"sv)
             add_clades();
+        else if (name == "clades-per-clade"sv)
+            clades_per_clade();
         else if (name == "dash-bar"sv)
             add_dash_bar();
         else if (name == "dash-bar-clades"sv)
@@ -493,6 +494,50 @@ void acmacs::tal::v3::Settings::read_dash_parameters(LayoutElement::DashParamete
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::value& source, Clades::CladeParameters& clade_parameters)
+{
+    using namespace std::string_view_literals;
+    rjson::copy_if_not_null(source.get("display_name"sv), clade_parameters.display_name);
+    if (const auto& shown = source.get("shown"sv); !shown.is_null())
+        clade_parameters.hidden = !shown.template to<bool>();
+    else if (const auto& show = source.get("show"sv); !show.is_null())
+        clade_parameters.hidden = !show.template to<bool>();
+    else
+        rjson::copy_if_not_null(source.get("hidden"sv), clade_parameters.hidden);
+    rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_parameters.section_inclusion_tolerance);
+    rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_parameters.section_exclusion_tolerance);
+    rjson::copy_if_not_null(source.get("slot"sv), clade_parameters.slot_no);
+
+    read_label_parameters(source.get("label"sv), clade_parameters.label);
+
+    rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
+    rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
+    rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
+
+    rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_parameters.horizontal_line.color);
+    rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_parameters.horizontal_line.line_width);
+
+    rjson::copy_if_not_null(source.get("top_gap"sv), clade_parameters.tree_top_gap);
+    rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_parameters.tree_bottom_gap);
+    rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_parameters.time_series_top_separator);
+    rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_parameters.time_series_bottom_separator);
+
+} // acmacs::tal::v3::Settings::read_clade_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_per_clade(Clades::Parameters& parameters)
+{
+    using namespace std::string_view_literals;
+    rjson::for_each(getenv("per_clade"sv), [this,&parameters](const rjson::value& for_clade) {
+        if (const auto& name = for_clade.get("name"sv); !name.is_null())
+            read_clade_parameters(for_clade, parameters.find_or_add_pre_clade(name.to<std::string_view>()));
+    });
+
+} // acmacs::tal::v3::Settings::read_per_clade
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::add_clades()
 {
     using namespace std::string_view_literals;
@@ -508,44 +553,21 @@ void acmacs::tal::v3::Settings::add_clades()
 
     // ----------------------------------------------------------------------
 
-    enum class ignore_name { no, yes };
-    const auto read_clade_parameters = [this](const rjson::value& source, Clades::CladeParameters& clade_parameters, ignore_name ign) {
-        if (ign == ignore_name::no)
-            rjson::copy_if_not_null(source.get("name"sv), clade_parameters.name);
-        rjson::copy_if_not_null(source.get("display_name"sv), clade_parameters.display_name);
-        if (const auto& shown = source.get("shown"sv); !shown.is_null())
-            clade_parameters.hidden = !shown.template to<bool>();
-        else if (const auto& show = source.get("show"sv); !show.is_null())
-            clade_parameters.hidden = !show.template to<bool>();
-        else
-            rjson::copy_if_not_null(source.get("hidden"sv), clade_parameters.hidden);
-        rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_parameters.section_inclusion_tolerance);
-        rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_parameters.section_exclusion_tolerance);
-        rjson::copy_if_not_null(source.get("slot"sv), clade_parameters.slot_no);
-
-        read_label_parameters(source.get("label"sv), clade_parameters.label);
-
-        rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
-        rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
-        rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
-
-        rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_parameters.horizontal_line.color);
-        rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_parameters.horizontal_line.line_width);
-
-        rjson::copy_if_not_null(source.get("top_gap"sv), clade_parameters.tree_top_gap);
-        rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_parameters.tree_bottom_gap);
-        rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_parameters.time_series_top_separator);
-        rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_parameters.time_series_bottom_separator);
-    };
-
     if (const auto& all_clades_val = getenv("all_clades"sv); !all_clades_val.is_null())
-        read_clade_parameters(all_clades_val, param.all_clades, ignore_name::yes);
-    rjson::for_each(getenv("per_clade"sv), [&param,read_clade_parameters](const rjson::value& for_clade) {
-        param.per_clade.push_back(param.all_clades);
-        read_clade_parameters(for_clade, param.per_clade.back(), ignore_name::no);
-    });
+        read_clade_parameters(all_clades_val, param.all_clades);
+    read_per_clade(param);
 
 } // acmacs::tal::v3::Settings::add_clades
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::clades_per_clade()
+{
+    if (auto* clades_element = draw().layout().find<Clades>(); clades_element) {
+        read_per_clade(clades_element->parameters());
+    }
+
+} // acmacs::tal::v3::Settings::clades_per_clade
 
 // ----------------------------------------------------------------------
 

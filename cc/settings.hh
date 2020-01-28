@@ -4,6 +4,7 @@
 
 #include "acmacs-base/settings.hh"
 #include "acmacs-tal/tal-data.hh"
+#include "acmacs-tal/clades.hh"
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,7 @@ namespace acmacs::tal::inline v3
         void apply_nodes() const;
         void update_env();
         void clade() const;
+        void clades_per_clade();
         void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
         void ladderize();
         void margins();
@@ -51,6 +53,8 @@ namespace acmacs::tal::inline v3
 
         void read_dash_parameters(LayoutElement::DashParameters& param);
         void read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param);
+        void read_clade_parameters(const rjson::value& source, Clades::CladeParameters& clade_parameters);
+        void read_per_clade(Clades::Parameters& parameters);
     };
 
 } // namespace acmacs::tal::inlinev3

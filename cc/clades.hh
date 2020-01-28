@@ -84,6 +84,7 @@ namespace acmacs::tal::inline v3
             SlotParameters slot;
             CladeParameters all_clades;
             std::vector<CladeParameters> per_clade;
+            CladeParameters& find_or_add_pre_clade(std::string_view name);
         };
 
         constexpr Parameters& parameters() { return parameters_; }

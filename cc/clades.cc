@@ -49,6 +49,7 @@ const acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::paramet
 
 void acmacs::tal::v3::Clades::make_clades()
 {
+    fmt::print(stderr, "DEBUG: Clades::make_clades\n");
     make_sections();
     set_slots();
     add_gaps_to_tree();
@@ -264,6 +265,21 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface, verbose /*
     }
 
 } // acmacs::tal::v3::Clades::draw
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::Parameters::find_or_add_pre_clade(std::string_view name)
+{
+    if (auto found = std::find_if(std::begin(per_clade), std::end(per_clade), [name](const auto& param) { return param.name == name; }); found != std::end(per_clade)) {
+        return *found;
+    }
+    else {
+        per_clade.push_back(all_clades);
+        per_clade.back().name = name;
+        return per_clade.back();
+    }
+
+} // acmacs::tal::v3::Clades::Parameters::find_or_add_pre_clade
 
 // ----------------------------------------------------------------------
 /// Local Variables:

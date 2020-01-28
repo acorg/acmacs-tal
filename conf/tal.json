@@ -2,6 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "modifications": [
+        {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
         "clades-whocc",
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
@@ -19,6 +20,69 @@
         }
     ],
     "? end overwrite in local settings": "----------------------------------------------------------------------",
+
+    "main": [
+        "pre-tal",
+        {"?N": "update-common-aa", "report": false},
+        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
+        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
+
+        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+            {"?N": "clades-{virus-type}{lineage}", "report": false},
+            {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
+        ]},
+
+        "layout",
+        "modifications-tal"
+    ],
+
+    "layout": [
+        {"N": "margins", "?left": 0.1, "?debug-outline": "cyan"},
+        {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "debug-outline": false},
+        {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
+        "dash-bar-clades-tal",
+        {"N": "time-series", "color_by": "continent"},
+        {"N": "clades"},
+        {"N": "title", "display_name": "{virus-type/lineage}", "color": "black", "size": 0.015},
+        {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+
+        {"?N": "hz lines"},
+        {"?N": "vaccine, most recent cell"},
+        {"?N": "legend", "type": "colored by AA at pos"},
+        {"?N": "color bar for antigens colored by date"},
+        {"?N": ""}
+    ],
+
+    "modifications-tal": [
+        {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
+            {"N": "draw-aa-transitions",
+             "minimum_number_leaves_in_subtree": 20,
+             "text_line_interleave": 0.3,
+             "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
+            }
+        ]},
+
+        "modifications",
+
+        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+            {"N": "clades-{virus-type}{lineage}", "report": false}
+        ]}
+
+    ],
+
+    "pre-tal": [
+        {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
+            {"N": "seqdb", "filename": "{seqdb-filename}"}
+        ]},
+        {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
+        {"N": "report-time-series", "output": "{report-time-series-output}"},
+        {"N": "ladderize", "method": "{ladderize-method}"},
+        {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
+            {"N": "aa-transitions", "report": false}
+        ]},
+
+        {"?N": ""}
+    ],
 
     "dash-bar-clades-tal": [
         {"?N": "---------- H1 ----------"},
@@ -55,7 +119,7 @@
     ],
 
     "clades-whocc": [
-        {"N": "clades",
+        {"N": "clades-per-clade",
          "per_clade": [
              {"?N": "---------- H1 ----------"},
              {"name": "6B", "show": false},
@@ -84,60 +148,5 @@
              {"?N": "---------- BYam ----------"}
          ],
          "?debug-outline": "lightblue"}
-    ],
-
-    "modifications-tal": [
-        {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
-            {"N": "draw-aa-transitions",
-             "minimum_number_leaves_in_subtree": 20,
-             "text_line_interleave": 0.3,
-             "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
-            }
-        ]},
-
-        "modifications"
-
-    ],
-
-    "layout": [
-        {"N": "margins", "?left": 0.1, "?debug-outline": "cyan"},
-        {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "debug-outline": false},
-        {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
-        "dash-bar-clades-tal",
-        {"N": "time-series", "color_by": "continent"},
-        {"N": "clades"},
-        {"N": "title", "display_name": "{virus-type/lineage}", "color": "black", "size": 0.015},
-        {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
-
-        {"?N": "hz lines"},
-        {"?N": "vaccine, most recent cell"},
-        {"?N": "legend", "type": "colored by AA at pos"},
-        {"?N": "color bar for antigens colored by date"},
-        {"?N": ""}
-    ],
-    "?": "----------------------------------------------------------------------",
-    "main": [
-        {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
-            {"N": "seqdb", "filename": "{seqdb-filename}"}
-        ]},
-        {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
-        {"N": "report-time-series", "output": "{report-time-series-output}"},
-        {"N": "ladderize", "method": "{ladderize-method}"},
-        {"?N": "update-common-aa", "report": false},
-        {"N": "aa-transitions", "report": false},
-        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
-        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
-
-        {"?N": "nodes", "select": {"cumulative >=": 0.01, "report": false}, "apply": "hide"},
-        {"?N": "nodes", "select": {"edge >=": 0.0173, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0, "report": true}},
-        {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": {"hide": true, "tree-edge-line": "green", "?tree-edge-line-width": 5.0}},
-
-        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-            {"N": "clades-{virus-type}{lineage}", "report": false},
-            {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
-        ]},
-
-        "layout",
-        "modifications-tal"
     ]
 }

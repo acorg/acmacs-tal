@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-28 10:26:37 eu>
+# Time-stamp: <2020-01-28 11:35:37 eu>
 
 * Command line defines
 
@@ -104,7 +104,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}]}, "then": [{"N": "seqdb", "filename": "{seqdb-filename}"}]}
 {"N": "seqdb", "filename": "{seqdb-filename}"}
 
-- {"N": "clade", "subtype": "A(H3N2)"} detect clade (only if aa_sequence present) based on given criteria
+{"N": "clade", "subtype": "A(H3N2)"} -- detect clade (only if aa_sequence present) based on given criteria, see acmacs-whocc-data/conf/clades.json
 
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
@@ -161,6 +161,9 @@ If multiple criteria specified within single "select" object, they all used (con
  "all_clades": {<[[Clade parameters]]>},
  "per_clade": [{<[[Clade parameters]]>}, ...],
  "?width-to-height-ratio": 0.3, "debug-outline": <[[Debug outline][debug-outline]]>},
+
+-- does not add clades to layout, ignored if clades absent in the layout
+{"N": "clades-per-clade", "per_clade": [{<[[Clade parameters]]>}, ...]},
 
 **** Clade parameters
 
