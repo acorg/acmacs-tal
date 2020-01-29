@@ -472,8 +472,41 @@ void acmacs::tal::v3::Settings::add_time_series()
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
         rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
-        rjson::copy_if_not_null(slot_val.get("separator"sv, "width_pixels"sv), param.slot.separator.width);
-        rjson::copy_if_not_null(slot_val.get("separator"sv, "color"sv), param.slot.separator.color);
+
+        if (const auto& separator = slot_val.get("separator"sv); !separator.is_null()) {
+            if (const auto& width_pixels = separator.get("width_pixels"sv); !width_pixels.is_null()) {
+                rjson::copy_if_not_null(width_pixels, param.slot.separator[0].width);
+                for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
+                    mp->width = param.slot.separator[0].width;
+            }
+            if (const auto& color = separator.get("color"sv); !color.is_null()) {
+                rjson::copy_if_not_null(color, param.slot.separator[0].color);
+                for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
+                    mp->color = param.slot.separator[0].color;
+            }
+            rjson::for_each(separator.get("per_month"sv), [&param](const rjson::value& for_month) {
+                if (const auto& month = for_month.get("month"sv); !month.is_null()) {
+                    const auto month_no = month.to<size_t>() - 1;
+                    rjson::copy_if_not_null(for_month.get("width_pixels"sv), param.slot.separator[month_no].width);
+                    rjson::copy_if_not_null(for_month.get("color"sv), param.slot.separator[month_no].color);
+                }
+            });
+        }
+
+        if (const auto& background = slot_val.get("background"sv); !background.is_null()) {
+            if (const auto& color = background.get("color"sv); !color.is_null()) {
+                rjson::copy_if_not_null(color, param.slot.background[0]);
+                for (auto mp = std::next(std::begin(param.slot.background)); mp != std::end(param.slot.background); ++mp)
+                    *mp = param.slot.background[0];
+            }
+            rjson::for_each(background.get("per_month"sv), [&param](const rjson::value& for_month) {
+                if (const auto& month = for_month.get("month"sv); !month.is_null()) {
+                    const auto month_no = month.to<size_t>() - 1;
+                    rjson::copy_if_not_null(for_month.get("color"sv), param.slot.background[month_no]);
+                }
+            });
+        }
+
         rjson::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
         rjson::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
         rjson::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);

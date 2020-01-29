@@ -40,7 +40,8 @@ namespace acmacs::tal::inline v3
         struct SlotParameters
         {
             double width{0.01}; // relative to the time series area height
-            SlotSeparatorParameters separator;
+            std::array<SlotSeparatorParameters, 12> separator; // left separator in each month, only the first element used for non-monthly ts
+            std::array<Color, 12> background{TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT};
             SlotLabelParameters label;
         };
 
@@ -74,8 +75,10 @@ namespace acmacs::tal::inline v3
         acmacs::time_series::series series_;
         std::vector<horizontal_line_t> horizontal_lines_;
 
+        void draw_background_separators(acmacs::surface::Surface& surface) const;
         void draw_labels(acmacs::surface::Surface& surface) const;
         std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
+        size_t slot_month(const acmacs::time_series::slot& slot) const;
         void draw_horizontal_lines(acmacs::surface::Surface& surface, const DrawTree* draw_tree) const;
 
     };

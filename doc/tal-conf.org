@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-28 15:22:27 eu>
+# Time-stamp: <2020-01-29 09:25:29 eu>
 
 * Command line defines
 
@@ -150,7 +150,18 @@ If multiple criteria specified within single "select" object, they all used (con
  "?interval": "month"
  "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
  "slot": {"width": 0.01, "?": "fraction of the time series area height",
-          "separator": {"width_pixels": 0.5, "color": "black"},
+          "separator": {
+               "width_pixels": 0.5, "color": "black",
+               "per_month": [
+                  {"month": 1, "width_pixels": 1, "color": "red"} -- month: 1..12
+               ]
+          },
+          "background": {
+              "color": "transparent",
+               "per_month": [
+                  {"month": 1, "color": "#F0000000"} -- month: 1..12
+               ]
+          },
           "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
          },
  "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},

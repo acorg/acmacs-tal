@@ -46,6 +46,7 @@ void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, co
 
 void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
 {
+    draw_background_separators(surface);
     draw_labels(surface);
 
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
@@ -70,6 +71,26 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface, verbos
     draw_horizontal_lines(surface, draw_tree);
 
 } // acmacs::tal::v3::TimeSeries::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::draw_background_separators(acmacs::surface::Surface& surface) const
+{
+    const auto& viewport = surface.viewport();
+    double line_offset_x = viewport.left();
+    for (const auto& slot : series_) {
+        const auto month_no = slot_month(slot);
+        if (parameters().slot.background[month_no] != TRANSPARENT)
+            surface.rectangle_filled({line_offset_x, viewport.top()}, {parameters().slot.width, viewport.size.height}, parameters().slot.background[month_no], Pixels{0}, parameters().slot.background[month_no]);
+        surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, parameters().slot.separator[month_no].color, parameters().slot.separator[month_no].width);
+        line_offset_x += parameters().slot.width;
+    }
+    auto next_month_no = slot_month(series_.back()) + 1;
+    if (next_month_no > 11)
+        next_month_no = 0;
+    surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, parameters().slot.separator[next_month_no].color, parameters().slot.separator[next_month_no].width);
+
+} // acmacs::tal::v3::TimeSeries::draw_background_separators
 
 // ----------------------------------------------------------------------
 
@@ -101,9 +122,9 @@ void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface)
         year_bottom = origin_y + viewport.size.height + year_label_offset_y;
     }
 
-    double line_offset_x = viewport.origin.x();
+    double line_offset_x = viewport.left();
     for (const auto& slot : series_) {
-        surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters().slot.separator.color, parameters().slot.separator.width);
+        // surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters().slot.separator.color, parameters().slot.separator.width);
 
         const auto [year_label, month_label] = labels(slot);
         const auto label_offset_x = line_offset_x + month_label_offset_x;
@@ -113,7 +134,7 @@ void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface)
         surface.text({label_offset_x, year_bottom}, year_label, parameters().slot.label.color, month_label_size, text_style, parameters().slot.label.rotation);
         line_offset_x += parameters().slot.width;
     }
-    surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters().slot.separator.color, parameters().slot.separator.width);
+    // surface.line({line_offset_x, viewport.origin.y()}, {line_offset_x, viewport.origin.y() + viewport.size.height}, parameters().slot.separator.color, parameters().slot.separator.width);
 
 } // acmacs::tal::v3::TimeSeries::draw_labels
 
@@ -134,6 +155,22 @@ std::pair<std::string, std::string> acmacs::tal::v3::TimeSeries::labels(const ac
     return {date::year_2(slot.first), date::month_3(slot.first)}; // g++9 wants this
 
 } // acmacs::tal::v3::TimeSeries::labels
+
+// ----------------------------------------------------------------------
+
+size_t acmacs::tal::v3::TimeSeries::slot_month(const acmacs::time_series::slot& slot) const
+{
+    switch (parameters().time_series.intervl) {
+        case acmacs::time_series::v2::interval::month:
+            return static_cast<unsigned>(slot.first.month()) - 1;
+        case acmacs::time_series::v2::interval::day:
+        case acmacs::time_series::v2::interval::week:
+        case acmacs::time_series::v2::interval::year:
+            return 0;
+    }
+    return 0;                   // g++-9
+
+} // acmacs::tal::v3::TimeSeries::slot_month
 
 // ----------------------------------------------------------------------
 
