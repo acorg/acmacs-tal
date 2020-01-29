@@ -726,6 +726,7 @@ void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source,
 
     rjson::copy_if_not_null(source.get("text"sv), text_parameters.text);
     rjson::copy(source.get("offset"sv), text_parameters.offset);
+    rjson::copy_if_not_null(source.get("absolute_x"sv), text_parameters.absolute_x);
     rjson::copy_if_not_null(source.get("color"sv), text_parameters.color);
     rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
 

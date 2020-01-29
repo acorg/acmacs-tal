@@ -81,7 +81,12 @@ void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface
     const TextStyle text_style{};
 
     for (const auto& per_node : parameters().per_node) {
-        if (!per_node.text.text.empty()) {
+        if (const auto* leaf = tal().tree().find_node_by_seq_id(per_node.seq_id); leaf) {
+            const double x0 = per_node.text.absolute_x.has_value() ? *per_node.text.absolute_x : draw_tree.horizontal_step() * leaf->cumulative_edge_length.as_number();
+            if (!per_node.text.text.empty()) {
+                surface.text({x0 + per_node.text.offset.x(), draw_tree.vertical_step() * leaf->cumulative_vertical_offset_ + per_node.text.offset.y() + per_node.text.size.value() * 0.3},
+                             per_node.text.text, per_node.text.color, per_node.text.size);
+            }
         }
     }
 

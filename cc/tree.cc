@@ -575,7 +575,27 @@ const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::next_leaf(const Node* initia
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_name(SeqId look_for) const
+const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::find_node_by_seq_id(SeqId look_for) const
+{
+    const Node* found{nullptr};
+
+    const auto leaf = [&found, look_for](const Node& node) -> bool {
+        if (node.seq_id == look_for) {
+            found = &node;
+            return true;
+        }
+        else
+            return false;
+    };
+
+    tree::iterate_leaf_stop(*this, leaf);
+    return found;
+
+} // acmacs::tal::v3::Tree::find_node_by_seq_id
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_path_by_seq_id(SeqId look_for) const
 {
     NodePath path;
     bool found{false};
@@ -601,13 +621,13 @@ acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_name(SeqId look_for) const
         throw error(fmt::format("seq-id \"{}\" not found in the tree", look_for));
     return path;
 
-} // acmacs::tal::v3::Tree::find_name
+} // acmacs::tal::v3::Tree::find_path_by_seq_id
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::re_root(SeqId new_root)
 {
-    auto path = find_name(new_root);
+    auto path = find_path_by_seq_id(new_root);
     path.get().pop_back();
     re_root(path);
 

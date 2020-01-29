@@ -103,7 +103,8 @@ namespace acmacs::tal::inline v3
         {
             Color color{BLACK};
             Pixels line_width{1.0};
-            PointCoordinates p1{0.0, 0.0}, p2{0.0, 0.0};
+            std::array<PointCoordinates, 2> offset{PointCoordinates{0.0, 0.0}, PointCoordinates{0.0, 0.0}}; // relative to node or {absolute_x, node-y}
+            std::optional<double> absolute_x;
         };
 
         enum class vertical_position { top, middle, bottom };
@@ -137,7 +138,8 @@ namespace acmacs::tal::inline v3
         struct TextParameters
         {
             std::string text;
-            PointCoordinates offset{0.0, 0.0};
+            PointCoordinates offset{0.0, 0.0}; // relative to node or {absolute_x, node-y}
+            std::optional<double> absolute_x;
             Color color{BLACK};
             Scaled size{0.007};
         };

@@ -176,7 +176,8 @@ namespace acmacs::tal::inline v3
 
         bool has_sequences() const { return !first_leaf().aa_sequence.empty(); }
 
-        NodePath find_name(SeqId look_for) const;
+        NodePath find_path_by_seq_id(SeqId look_for) const;
+        const Node* find_node_by_seq_id(SeqId look_for) const;
 
         void match_seqdb(std::string_view seqdb_filename);
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-29 09:25:29 eu>
+# Time-stamp: <2020-01-29 10:23:19 eu>
 
 * Command line defines
 
@@ -92,7 +92,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Line and text attached to node
 
--- {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"line": {}, "text": <[[Text parameters]]>}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"line": <[[Line with offset parameters]]>, "text": <[[Text parameters]]>}}
 
 *** Just report selected
 
@@ -243,7 +243,11 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Text parameters
 
-{"text": "", "offset": [0.1, 0.1], "color": "black", "size": 0.05}
+{"text": "", "offset": [0.1, 0.1], "?absolute_x": 100, "color": "black", "size": 0.05} -- absolute_x is for text attached to node
+
+*** Line with offset parameters
+
+{"c1": [0.0, 0.0], "c2": [0.0, 0.0], "?absolute_x": 100, "color": "black", "line_width": 0.5} -- absolute_x is for line attached to node
 
 * Debug outline
 
