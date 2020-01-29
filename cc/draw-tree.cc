@@ -82,10 +82,16 @@ void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface
 
     for (const auto& per_node : parameters().per_node) {
         if (const auto* leaf = tal().tree().find_node_by_seq_id(per_node.seq_id); leaf) {
-            const double x0 = per_node.text.absolute_x.has_value() ? *per_node.text.absolute_x : draw_tree.horizontal_step() * leaf->cumulative_edge_length.as_number();
-            if (!per_node.text.text.empty()) {
-                surface.text({x0 + per_node.text.offset.x(), draw_tree.vertical_step() * leaf->cumulative_vertical_offset_ + per_node.text.offset.y() + per_node.text.size.value() * 0.3},
-                             per_node.text.text, per_node.text.color, per_node.text.size);
+            if (!per_node.text.text.empty() && per_node.text.color != TRANSPARENT) {
+                const PointCoordinates origin{(per_node.text.absolute_x.has_value() ? *per_node.text.absolute_x : draw_tree.horizontal_step() * leaf->cumulative_edge_length.as_number()) +
+                                                  per_node.text.offset.x(),
+                                              draw_tree.vertical_step() * leaf->cumulative_vertical_offset_ + per_node.text.offset.y() + per_node.text.size.value() * 0.3};
+                surface.text(origin, per_node.text.text, per_node.text.color, per_node.text.size);
+            }
+            if (per_node.line.color != TRANSPARENT && per_node.line.line_width.value() > 0.0 && per_node.line.offset[0] != per_node.line.offset[1]) {
+                const PointCoordinates origin{(per_node.line.absolute_x.has_value() ? *per_node.line.absolute_x : draw_tree.horizontal_step() * leaf->cumulative_edge_length.as_number()),
+                                              draw_tree.vertical_step() * leaf->cumulative_vertical_offset_};
+                surface.line(origin + PointCoordinates{per_node.line.offset[0]}, origin + PointCoordinates{per_node.line.offset[1]}, per_node.line.color, per_node.line.line_width);
             }
         }
     }

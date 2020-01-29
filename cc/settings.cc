@@ -163,6 +163,14 @@ void acmacs::tal::v3::Settings::apply_nodes() const
             else
                 throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
         }
+        else if (key == "line") {
+            if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
+                LayoutElement::LineWithOffsetParameters line;
+                read_line_parameters(value, line);
+                for (Node* node : selected)
+                    draw_on_tree->parameters().per_node.push_back({node->seq_id, {}, line});
+            }
+        }
         else if (key == "tree-label-color") {
             const Color color{value.to<std::string_view>()};
             for (Node* node : selected)
@@ -731,6 +739,20 @@ void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source,
     rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
 
 } // acmacs::tal::v3::Settings::read_text_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const
+{
+    using namespace std::string_view_literals;
+
+    rjson::copy_if_not_null(source.get("color"sv), line_parameters.color);
+    rjson::copy_if_not_null(source.get("line_width"sv), line_parameters.line_width);
+    rjson::copy(source.get("c1"sv), line_parameters.offset[0]);
+    rjson::copy(source.get("c2"sv), line_parameters.offset[1]);
+    rjson::copy_if_not_null(source.get("absolute_x"sv), line_parameters.absolute_x);
+
+} // acmacs::tal::v3::Settings::read_line_parameters
 
 // ----------------------------------------------------------------------
 
