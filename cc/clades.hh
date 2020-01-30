@@ -73,7 +73,7 @@ namespace acmacs::tal::inline v3
             slot_no_t slot_no{NoSlot};
             LabelParameters label;
             arrow_t arrow;
-            LineParameters horizontal_line{GREY, Pixels{0.5}};
+            LineParameters horizontal_line{GREY, Pixels{0.5}, surface::Dash::NoDash};
             double tree_top_gap{50.0}, tree_bottom_gap{50.0};
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };

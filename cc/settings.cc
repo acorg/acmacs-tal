@@ -484,9 +484,9 @@ void acmacs::tal::v3::Settings::add_time_series()
 
         if (const auto& separator = slot_val.get("separator"sv); !separator.is_null()) {
             if (const auto& width_pixels = separator.get("width_pixels"sv); !width_pixels.is_null()) {
-                rjson::copy_if_not_null(width_pixels, param.slot.separator[0].width);
+                rjson::copy_if_not_null(width_pixels, param.slot.separator[0].line_width);
                 for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
-                    mp->width = param.slot.separator[0].width;
+                    mp->line_width = param.slot.separator[0].line_width;
             }
             if (const auto& color = separator.get("color"sv); !color.is_null()) {
                 rjson::copy_if_not_null(color, param.slot.separator[0].color);
@@ -496,7 +496,7 @@ void acmacs::tal::v3::Settings::add_time_series()
             rjson::for_each(separator.get("per_month"sv), [&param](const rjson::value& for_month) {
                 if (const auto& month = for_month.get("month"sv); !month.is_null()) {
                     const auto month_no = month.to<size_t>() - 1;
-                    rjson::copy_if_not_null(for_month.get("width_pixels"sv), param.slot.separator[month_no].width);
+                    rjson::copy_if_not_null(for_month.get("width_pixels"sv), param.slot.separator[month_no].line_width);
                     rjson::copy_if_not_null(for_month.get("color"sv), param.slot.separator[month_no].color);
                 }
             });
@@ -566,8 +566,7 @@ void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::value& source
     rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
     rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
 
-    rjson::copy_if_not_null(source.get("horizontal_line"sv, "color"sv), clade_parameters.horizontal_line.color);
-    rjson::copy_if_not_null(source.get("horizontal_line"sv, "line_width"sv), clade_parameters.horizontal_line.line_width);
+    read_line_parameters(source.get("horizontal_line"sv), clade_parameters.horizontal_line);
 
     rjson::copy_if_not_null(source.get("top_gap"sv), clade_parameters.tree_top_gap);
     rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_parameters.tree_bottom_gap);

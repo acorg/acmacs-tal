@@ -23,10 +23,9 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        struct SlotSeparatorParameters
+        struct SlotSeparatorParameters : LineParameters
         {
-            Pixels width{0.5};
-            Color color{BLACK};
+            SlotSeparatorParameters() : LineParameters{BLACK, Pixels{0.5}, surface::Dash::NoDash} {}
         };
 
         struct SlotLabelParameters

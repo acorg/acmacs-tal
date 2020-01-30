@@ -240,8 +240,8 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface, verbose /*
             // horizontal lines
             const auto left = time_series_to_the_left_ ? viewport.left() : pos_x;
             const auto right = time_series_to_the_left_ ? pos_x : viewport.right();
-            surface.line({left, pos_y_top}, {right, pos_y_top}, section.horizontal_line.color, section.horizontal_line.line_width);
-            surface.line({left, pos_y_bottom}, {right, pos_y_bottom}, section.horizontal_line.color, section.horizontal_line.line_width);
+            surface.line({left, pos_y_top}, {right, pos_y_top}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
+            surface.line({left, pos_y_bottom}, {right, pos_y_bottom}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
 
             // label
             const Scaled label_size{parameters_.slot.width * section.label.scale};

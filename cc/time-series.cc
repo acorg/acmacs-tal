@@ -82,13 +82,15 @@ void acmacs::tal::v3::TimeSeries::draw_background_separators(acmacs::surface::Su
         const auto month_no = slot_month(slot);
         if (parameters().slot.background[month_no] != TRANSPARENT)
             surface.rectangle_filled({line_offset_x, viewport.top()}, {parameters().slot.width, viewport.size.height}, parameters().slot.background[month_no], Pixels{0}, parameters().slot.background[month_no]);
-        surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, parameters().slot.separator[month_no].color, parameters().slot.separator[month_no].width);
+        const auto& sep_param = parameters().slot.separator[month_no];
+        surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, sep_param.color, sep_param.line_width, sep_param.dash);
         line_offset_x += parameters().slot.width;
     }
     auto next_month_no = slot_month(series_.back()) + 1;
     if (next_month_no > 11)
         next_month_no = 0;
-    surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, parameters().slot.separator[next_month_no].color, parameters().slot.separator[next_month_no].width);
+    const auto& last_sep_param = parameters().slot.separator[next_month_no];
+    surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, last_sep_param.color, last_sep_param.line_width, last_sep_param.dash);
 
 } // acmacs::tal::v3::TimeSeries::draw_background_separators
 
