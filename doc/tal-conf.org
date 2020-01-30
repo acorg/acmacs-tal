@@ -1,4 +1,4 @@
-# Time-stamp: <2020-01-29 10:23:19 eu>
+# Time-stamp: <2020-01-30 11:55:45 eu>
 
 * Command line defines
 
@@ -220,7 +220,14 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Legend
 
-{"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1}
+{"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1,
+ "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
+ "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
+ "dots": [ -- palcement is *very* approximate due to world map layout is not correct
+     {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
+     {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
+ ]
+}
 
 *** Draw on tree
 
