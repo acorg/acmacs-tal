@@ -42,6 +42,19 @@ namespace acmacs::tal::inline v3
 
         void draw(acmacs::surface::Surface& surface, verbose verb) const override;
 
+        struct Parameters : public Legend::Parameters
+        {
+            LineParameters equator{TRANSPARENT, Pixels{0.1}, surface::Dash::NoDash};
+            LineParameters tropics{TRANSPARENT, Pixels{0.1}, surface::Dash::Dash2};
+            std::vector<DotParameters> dots;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
+
     };
 
 } // namespace acmacs::tal::inlinev3

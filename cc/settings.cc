@@ -732,13 +732,40 @@ void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source,
 {
     using namespace std::string_view_literals;
 
-    rjson::copy_if_not_null(source.get("text"sv), text_parameters.text);
-    rjson::copy(source.get("offset"sv), text_parameters.offset);
-    rjson::copy_if_not_null(source.get("absolute_x"sv), text_parameters.absolute_x);
-    rjson::copy_if_not_null(source.get("color"sv), text_parameters.color);
-    rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
+    if (!source.is_null()) {
+        rjson::copy_if_not_null(source.get("text"sv), text_parameters.text);
+        rjson::copy(source.get("offset"sv), text_parameters.offset);
+        rjson::copy_if_not_null(source.get("absolute_x"sv), text_parameters.absolute_x);
+        rjson::copy_if_not_null(source.get("color"sv), text_parameters.color);
+        rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
+    }
 
 } // acmacs::tal::v3::Settings::read_text_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source, LayoutElement::LineParameters& line_parameters) const
+{
+    using namespace std::string_view_literals;
+
+    if (!source.is_null()) {
+        rjson::copy_if_not_null(source.get("color"sv), line_parameters.color);
+        rjson::copy_if_not_null(source.get("line_width"sv), line_parameters.line_width);
+
+        if (const auto& dash_val = source.get("dash"sv); !dash_val.is_null()) {
+            const auto dash = dash_val.to<std::string_view>();
+            if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash")
+                line_parameters.dash = surface::Dash::NoDash;
+            else if (dash == "dash1")
+                line_parameters.dash = surface::Dash::Dash1;
+            else if (dash == "dash2")
+                line_parameters.dash = surface::Dash::Dash2;
+            else if (dash == "dash3")
+                line_parameters.dash = surface::Dash::Dash3;
+        }
+    }
+
+} // acmacs::tal::v3::Settings::read_line_parameters
 
 // ----------------------------------------------------------------------
 
@@ -746,13 +773,30 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source,
 {
     using namespace std::string_view_literals;
 
-    rjson::copy_if_not_null(source.get("color"sv), line_parameters.color);
-    rjson::copy_if_not_null(source.get("line_width"sv), line_parameters.line_width);
-    rjson::copy(source.get("c1"sv), line_parameters.offset[0]);
-    rjson::copy(source.get("c2"sv), line_parameters.offset[1]);
-    rjson::copy_if_not_null(source.get("absolute_x"sv), line_parameters.absolute_x);
+    if (!source.is_null()) {
+        read_line_parameters(source, static_cast<LayoutElement::LineParameters&>(line_parameters));
+        rjson::copy(source.get("c1"sv), line_parameters.offset[0]);
+        rjson::copy(source.get("c2"sv), line_parameters.offset[1]);
+        rjson::copy_if_not_null(source.get("absolute_x"sv), line_parameters.absolute_x);
+    }
 
 } // acmacs::tal::v3::Settings::read_line_parameters
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, LayoutElement::DotParameters& dot_parameters) const
+{
+    using namespace std::string_view_literals;
+
+    if (!source.is_null()) {
+        rjson::copy(source.get("coordinates"sv), dot_parameters.coordinates);
+        rjson::copy_if_not_null(source.get("outline"sv), dot_parameters.outline);
+        rjson::copy_if_not_null(source.get("fill"sv), dot_parameters.fill);
+        rjson::copy_if_not_null(source.get("outline_width"sv), dot_parameters.outline_width);
+        rjson::copy_if_not_null(source.get("size"sv), dot_parameters.size);
+    }
+
+} // acmacs::tal::v3::Settings::read_dot_parameters
 
 // ----------------------------------------------------------------------
 
@@ -768,6 +812,9 @@ void acmacs::tal::v3::Settings::add_legend()
         auto& param = element.parameters();
         rjson::copy(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);
+        read_line_parameters(getenv("equator"sv), param.equator);
+        read_line_parameters(getenv("tropics"sv), param.tropics);
+        rjson::for_each(getenv("dots"sv), [&param, this](const rjson::value& for_dot) { read_dot_parameters(for_dot, param.dots.emplace_back()); });
     }
     else
         fmt::print(stderr, "WARNING: unrecognized legend type: \"{}\"\n", legend_type);

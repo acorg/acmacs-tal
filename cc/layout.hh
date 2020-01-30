@@ -97,14 +97,22 @@ namespace acmacs::tal::inline v3
         {
             Color color{BLACK};
             Pixels line_width{1.0};
+            surface::Dash dash{surface::Dash::NoDash};
         };
 
-        struct LineWithOffsetParameters
+        struct LineWithOffsetParameters : public LineParameters
         {
-            Color color{BLACK};
-            Pixels line_width{1.0};
             std::array<PointCoordinates, 2> offset{PointCoordinates{0.0, 0.0}, PointCoordinates{0.0, 0.0}}; // relative to node or {absolute_x, node-y}
             std::optional<double> absolute_x;
+        };
+
+        struct DotParameters
+        {
+            PointCoordinates coordinates{0.0, 0.0}; // {lat, long}: {0,0} - middle Africa, {-33.87,151.21} - Sydney, {49.25, -123.1} - Vancouver
+            Color outline{WHITE};
+            Color fill{BLACK};
+            Pixels outline_width{1.0};
+            Pixels size{3.0};
         };
 
         enum class vertical_position { top, middle, bottom };
