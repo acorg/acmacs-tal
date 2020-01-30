@@ -46,7 +46,7 @@ namespace acmacs::tal::inline v3
         {
             LineParameters equator{TRANSPARENT, Pixels{0.1}, surface::Dash::NoDash};
             LineParameters tropics{TRANSPARENT, Pixels{0.1}, surface::Dash::Dash2};
-            std::vector<DotParameters> dots;
+            std::vector<WorldMapDotParameters> dots;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

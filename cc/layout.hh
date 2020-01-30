@@ -20,6 +20,7 @@ namespace acmacs::tal::inline v3
     class Clades;
     class DrawAATransitions;
     class Title;
+    class LegendContinentMap;
 
     class Layout
     {
@@ -47,6 +48,7 @@ namespace acmacs::tal::inline v3
     extern template const Clades* Layout::find<Clades>() const;
     extern template const DrawAATransitions* Layout::find<DrawAATransitions>() const;
     extern template const Title* Layout::find<Title>() const;
+    extern template const LegendContinentMap* Layout::find<LegendContinentMap>() const;
 
     extern template DrawTree* Layout::find<DrawTree>();
     extern template DrawOnTree* Layout::find<DrawOnTree>();
@@ -54,6 +56,7 @@ namespace acmacs::tal::inline v3
     extern template Clades* Layout::find<Clades>();
     extern template DrawAATransitions* Layout::find<DrawAATransitions>();
     extern template Title* Layout::find<Title>();
+    extern template LegendContinentMap* Layout::find<LegendContinentMap>();
 
     extern template void Layout::prepare_element<DrawTree>(verbose verb);
     extern template void Layout::prepare_element<TimeSeries>(verbose verb);
@@ -106,7 +109,7 @@ namespace acmacs::tal::inline v3
             std::optional<double> absolute_x;
         };
 
-        struct DotParameters
+        struct WorldMapDotParameters
         {
             PointCoordinates coordinates{0.0, 0.0}; // {lat, long}: {0,0} - middle Africa, {-33.87,151.21} - Sydney, {49.25, -123.1} - Vancouver
             Color outline{WHITE};

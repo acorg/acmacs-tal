@@ -7,7 +7,7 @@ void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface
 {
     auto& map_surface = surface.subsurface(parameters().offset, parameters().size, continent_map_size(), false);
     continent_map_draw(map_surface);
-    map_surface.rectangle(map_surface.viewport().origin, map_surface.viewport().size, PINK, Pixels{2});
+    // map_surface.rectangle(map_surface.viewport().origin, map_surface.viewport().size, PINK, Pixels{2});
 
     const auto latitude = [height = map_surface.viewport().size.height](double lat) { return (90.0 - lat) / 180.0 * height; };
     const auto longitude = [width = map_surface.viewport().size.width](double longi) { return (180.0 + longi) / 360.0 * width; };

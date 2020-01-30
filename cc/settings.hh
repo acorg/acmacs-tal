@@ -59,7 +59,7 @@ namespace acmacs::tal::inline v3
         void read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters) const;
         void read_line_parameters(const rjson::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const;
         void read_line_parameters(const rjson::value& source, LayoutElement::LineParameters& line_parameters) const;
-        void read_dot_parameters(const rjson::value& source, LayoutElement::DotParameters& dot_parameters) const;
+        void read_dot_parameters(const rjson::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const;
     };
 
 } // namespace acmacs::tal::inlinev3

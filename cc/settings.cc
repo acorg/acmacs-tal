@@ -1,6 +1,7 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/range-v3.hh"
 #include "acmacs-base/string.hh"
+#include "locationdb/locdb.hh"
 #include "acmacs-virus/virus-name.hh"
 #include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-chart-2/chart.hh"
@@ -784,11 +785,20 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source,
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, LayoutElement::DotParameters& dot_parameters) const
+void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
+        if (const auto& loc = source.get("location"sv); !loc.is_null()) {
+            try {
+                const auto found = get_locdb().find(loc.to<std::string_view>());
+                dot_parameters.coordinates = PointCoordinates{found.latitude(), found.longitude()};
+            }
+            catch (std::exception&) {
+                fmt::print(stderr, "WARNING: \"location\" for world map dot not found: {}\n", source);
+            }
+        }
         rjson::copy(source.get("coordinates"sv), dot_parameters.coordinates);
         rjson::copy_if_not_null(source.get("outline"sv), dot_parameters.outline);
         rjson::copy_if_not_null(source.get("fill"sv), dot_parameters.fill);
@@ -808,7 +818,7 @@ void acmacs::tal::v3::Settings::add_legend()
     getenv_copy_if_present("type"sv, legend_type);
 
     if (legend_type == "world-map") {
-        auto& element = add_element<LegendContinentMap>();
+        auto& element = add_unique_element<LegendContinentMap>();
         auto& param = element.parameters();
         rjson::copy(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);
