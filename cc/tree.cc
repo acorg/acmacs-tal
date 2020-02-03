@@ -443,8 +443,8 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
     tree::iterate_leaf(*this, [this,&seqdb](Node& node) {
         if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
             const auto& ref = subset.front();
-            node.aa_sequence = ref.seq().aa_aligned();
-            node.nuc_sequence = ref.seq().nuc_aligned();
+            node.aa_sequence = ref.aa_aligned(seqdb);
+            node.nuc_sequence = ref.nuc_aligned(seqdb);
             node.date = ref.entry->date();
             node.strain_name = ref.entry->name;
             node.continent = ref.entry->continent;
