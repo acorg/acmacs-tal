@@ -73,7 +73,8 @@
 
     "pre-tal": [
         {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
-            {"N": "seqdb", "filename": "{seqdb-filename}"}
+            {"N": "seqdb", "filename": "{seqdb-filename}"},
+            {"N": "populate-with-nuc-duplicates"}
         ]},
         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
         {"N": "report-time-series", "output": "{report-time-series-output}"},

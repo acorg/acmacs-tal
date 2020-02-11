@@ -56,7 +56,7 @@ namespace acmacs::tal::inline v3
             acmacs::time_series::parameters time_series;
             SlotParameters slot;
             DashParameters dash;
-            flat_map_t<SeqId, PerNodeParameters> per_nodes;
+            flat_map_t<seq_id_t, PerNodeParameters> per_nodes;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

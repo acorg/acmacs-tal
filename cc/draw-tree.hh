@@ -41,7 +41,7 @@ namespace acmacs::tal::inline v3
         // relative to node
         struct PerNodeParameters
         {
-            SeqId seq_id;
+            seq_id_t seq_id;
             TextParameters text;
             LineWithOffsetParameters line;
         };

@@ -21,6 +21,27 @@ namespace acmacs::tal::inline v3::tree
         }
     }
 
+    template <typename N, typename F1> inline void iterate_leaf_path(N&& node, F1 f_name, std::vector<size_t>& path)
+    {
+        if (node.is_leaf()) {
+            f_name(std::forward<N>(node), path);
+        }
+        else {
+            path.push_back(0);
+            for (auto [no, subnode] : acmacs::enumerate(node.subtree)) {
+                path.back() = no;
+                iterate_leaf_path(subnode, f_name, path);
+            }
+            path.pop_back();
+        }
+    }
+
+    template <typename N, typename F1> inline void iterate_leaf_path(N&& node, F1 f_name)
+    {
+        std::vector<size_t> path;
+        iterate_leaf_path_impl(std::forward<N>(node), f_name, path);
+    }
+
     // ----------------------------------------------------------------------
 
     // stops iterating if f_name returns true

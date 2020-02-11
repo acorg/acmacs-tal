@@ -91,7 +91,7 @@ namespace
                     if (key_.size() == 1) {
                         switch (key_.front()) {
                             case 'n':
-                                node_.seq_id = acmacs::tal::v3::SeqId{data};
+                                node_.seq_id = acmacs::tal::v3::seq_id_t{data};
                                 break;
                             case 'a':
                                 node_.aa_sequence = acmacs::seqdb::sequence_aligned_ref_t{data};

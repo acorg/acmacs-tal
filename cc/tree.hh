@@ -12,8 +12,7 @@
 #include "acmacs-base/date.hh"
 #include "acmacs-base/color.hh"
 #include "acmacs-base/flat-set.hh"
-#include "seqdb-3/aa-at-pos.hh"
-#include "seqdb-3/seq-id.hh"
+#include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
@@ -32,7 +31,7 @@ namespace acmacs::tal::inline v3
         using std::runtime_error::runtime_error;
     };
 
-    using SeqId = acmacs::named_string_view_t<struct acmacs_tal_SeqId_tag>;
+    using seq_id_t = acmacs::seqdb::seq_id_t; // string, not string_view to support populate_with_nuc_duplicates
 
     using EdgeLength = named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>;
     // class EdgeLength : public named_double_from_string_t<struct acmacs_tal_EdgeLength_tag>
@@ -48,7 +47,7 @@ namespace acmacs::tal::inline v3
     {
         EdgeLength edge{EdgeLengthNotSet};
         std::string_view date;
-        SeqId seq_id;
+        seq_id_t seq_id;
         constexpr bool operator<(const ladderize_helper_t& rhs) const { return edge == rhs.edge ? (date == rhs.date ? seq_id < rhs.seq_id : date < rhs.date) : edge < rhs.edge; }
     };
 
@@ -71,11 +70,11 @@ namespace acmacs::tal::inline v3
         using Subtree = std::vector<Node>;
 
         Node() = default;
-        Node(SeqId a_seq_id, EdgeLength a_edge) : edge_length{a_edge}, seq_id{a_seq_id} {}
+        Node(const seq_id_t& a_seq_id, EdgeLength a_edge) : edge_length{a_edge}, seq_id{a_seq_id} {}
 
         bool is_leaf() const { return subtree.empty(); } // seq_id may contain generated node name used for debugging
 
-        Node& add_leaf(SeqId a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
+        Node& add_leaf(const seq_id_t& a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
         Node& add_subtree() { return subtree.emplace_back(); }
 
         const Node& first_leaf() const;
@@ -86,7 +85,8 @@ namespace acmacs::tal::inline v3
         bool hidden{false};
 
         // leaf node only
-        SeqId seq_id;
+        seq_id_t seq_id;
+        acmacs::seqdb::ref ref;
         acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
         acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
         std::string_view strain_name;  // from seqdb
@@ -119,6 +119,7 @@ namespace acmacs::tal::inline v3
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
         mutable const Node* node_for_left_aa_transitions_{nullptr};
+        Subtree to_populate;    // populate_with_nuc_duplicates()
 
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
@@ -130,6 +131,7 @@ namespace acmacs::tal::inline v3
         std::vector<const Node*> shown_children() const;
 
         void hide();
+        void populate(const acmacs::seqdb::ref& a_ref, const acmacs::seqdb::Seqdb& seqdb);
 
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
@@ -176,10 +178,11 @@ namespace acmacs::tal::inline v3
 
         bool has_sequences() const { return !first_leaf().aa_sequence.empty(); }
 
-        NodePath find_path_by_seq_id(SeqId look_for) const;
-        const Node* find_node_by_seq_id(SeqId look_for) const;
+        NodePath find_path_by_seq_id(const seq_id_t& look_for) const;
+        const Node* find_node_by_seq_id(const seq_id_t& look_for) const;
 
         void match_seqdb(std::string_view seqdb_filename);
+        void populate_with_nuc_duplicates();
 
         std::string report_cumulative() const;
         void cumulative_calculate(bool recalculate = false) const;
@@ -214,7 +217,7 @@ namespace acmacs::tal::inline v3
         void ladderize(Ladderize method);
 
         // re-roots tree making the parent of the leaf node with the passed name root
-        void re_root(SeqId new_root);
+        void re_root(const seq_id_t& new_root);
         void re_root(const NodePath& new_root);
 
         void number_leaves_in_subtree() const;

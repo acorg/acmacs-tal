@@ -138,10 +138,10 @@ void acmacs::tal::v3::newick_import(std::string_view filename, Tree& tree)
                     break;
                 case Tokenizer::Leaf:
                     // fmt::print(stderr, "DEBUG: Leaf {} :{} -- {}\n", token.name, token.edge_length, tokenizer.rest().substr(0, 20));
-                    node_stack.top()->add_leaf(SeqId{token.name}, EdgeLength{token.edge_length});
+                    node_stack.top()->add_leaf(seq_id_t{token.name}, EdgeLength{token.edge_length});
                     break;
                 case Tokenizer::EndSubtree:
-                    node_stack.top()->seq_id = SeqId{token.name};
+                    node_stack.top()->seq_id = seq_id_t{token.name};
                     node_stack.top()->edge_length = EdgeLength{token.edge_length};
                     node_stack.pop();
                     break;

@@ -4,7 +4,6 @@
 
 #include "acmacs-base/statistics.hh"
 #include "acmacs-virus/virus-name.hh"
-#include "seqdb-3/seqdb.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
@@ -119,12 +118,12 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
 // {
 //     struct CumulativeEntry
 //     {
-//         acmacs::tal::SeqId seq_id;
+//         acmacs::tal::seq_id_t seq_id;
 //         acmacs::tal::EdgeLength edge_length;
 //         acmacs::tal::EdgeLength cumulative_edge_length;
 //         acmacs::tal::EdgeLength gap_to_next{acmacs::tal::EdgeLengthNotSet};
 
-//         CumulativeEntry(const acmacs::tal::SeqId& a_seq_id, acmacs::tal::EdgeLength a_edge, acmacs::tal::EdgeLength a_cumulative)
+//         CumulativeEntry(const acmacs::tal::seq_id_t& a_seq_id, acmacs::tal::EdgeLength a_edge, acmacs::tal::EdgeLength a_cumulative)
 //             : seq_id{a_seq_id}, edge_length{a_edge}, cumulative_edge_length{a_cumulative}
 //         {
 //         }
@@ -442,22 +441,15 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
 
     tree::iterate_leaf(*this, [this,&seqdb](Node& node) {
         if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
-            const auto& ref = subset.front();
-            node.aa_sequence = ref.aa_aligned(seqdb);
-            node.nuc_sequence = ref.nuc_aligned(seqdb);
-            node.date = ref.entry->date();
-            node.strain_name = ref.entry->name;
-            node.continent = ref.entry->continent;
-            node.country = ref.entry->country;
-            node.hi_names = ref.seq().hi_names;
+            node.populate(subset.front(), seqdb);
             if (virus_type_.empty())
-                virus_type_ = ref.entry->virus_type;
-            else if (virus_type_ != ref.entry->virus_type)
-                fmt::print(stderr, "WARNING: multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, ref.entry->virus_type);
+                virus_type_ = node.ref.entry->virus_type;
+            else if (virus_type_ != node.ref.entry->virus_type)
+                fmt::print(stderr, "WARNING: multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, node.ref.entry->virus_type);
             if (lineage_.empty())
-                lineage_ = ref.entry->lineage;
-            else if (lineage_ != ref.entry->lineage && !ref.entry->lineage.empty())
-                fmt::print(stderr, "WARNING: multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, ref.entry->lineage);
+                lineage_ = node.ref.entry->lineage;
+            else if (lineage_ != node.ref.entry->lineage && !node.ref.entry->lineage.empty())
+                fmt::print(stderr, "WARNING: multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, node.ref.entry->lineage);
         }
         else {
             fmt::print(stderr, "WARNING: seq_id \"{}\" not found in seqdb\n", node.seq_id);
@@ -465,6 +457,60 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
     });
 
 } // acmacs::tal::v3::Tree::match_seqdb
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Node::populate(const acmacs::seqdb::ref& a_ref, const acmacs::seqdb::Seqdb& seqdb)
+{
+    ref = a_ref;
+    aa_sequence = ref.aa_aligned(seqdb);
+    nuc_sequence = ref.nuc_aligned(seqdb);
+    date = ref.entry->date();
+    strain_name = ref.entry->name;
+    continent = ref.entry->continent;
+    country = ref.entry->country;
+    hi_names = ref.seq().hi_names;
+
+} // acmacs::tal::v3::Node::populate
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
+{
+    std::vector<seq_id_t> all_seq_ids;
+    tree::iterate_leaf(*this, [&all_seq_ids](const Node& node) { all_seq_ids.push_back(node.seq_id); });
+    std::sort(std::begin(all_seq_ids), std::end(all_seq_ids));
+    const auto already_in_tree = [&all_seq_ids](const seq_id_t& look_for) {
+        const auto found = std::lower_bound(std::begin(all_seq_ids), std::end(all_seq_ids), look_for);
+        return found != std::end(all_seq_ids) && *found == look_for;
+    };
+
+    const auto& seqdb = acmacs::seqdb::get();
+    Node* parent{nullptr};
+    const auto pre = [&parent](Node& node) { parent = &node; };
+    const auto leaf = [&parent, &seqdb, already_in_tree](const Node& node) {
+        if (!node.ref.empty()) {
+            for (const auto& slave : node.ref.find_slaves(seqdb))
+                if (const auto seq_id = slave.seq_id(); !already_in_tree(seq_id)) {
+                    parent->to_populate.emplace_back(seq_id, node.edge_length).populate(slave, seqdb);
+                }
+        }
+    };
+    tree::iterate_leaf_pre(*this, leaf, pre);
+
+    size_t added_leaves{0};
+    const auto post = [&added_leaves](Node& node) {
+        if (!node.to_populate.empty()) {
+            added_leaves += node.to_populate.size();
+            std::move(std::begin(node.to_populate), std::end(node.to_populate), std::back_inserter(node.subtree));
+            node.to_populate.clear();
+        }
+    };
+    tree::iterate_post(*this, post);
+
+    fmt::print("INFO: populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}\n", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
+
+} // acmacs::tal::v3::Tree::populate_with_nuc_duplicates
 
 // ----------------------------------------------------------------------
 
@@ -575,7 +621,7 @@ const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::next_leaf(const Node* initia
 
 // ----------------------------------------------------------------------
 
-const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::find_node_by_seq_id(SeqId look_for) const
+const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::find_node_by_seq_id(const seq_id_t& look_for) const
 {
     const Node* found{nullptr};
 
@@ -595,7 +641,7 @@ const acmacs::tal::v3::Node* acmacs::tal::v3::Tree::find_node_by_seq_id(SeqId lo
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_path_by_seq_id(SeqId look_for) const
+acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_path_by_seq_id(const seq_id_t& look_for) const
 {
     NodePath path;
     bool found{false};
@@ -625,7 +671,7 @@ acmacs::tal::v3::NodePath acmacs::tal::v3::Tree::find_path_by_seq_id(SeqId look_
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::re_root(SeqId new_root)
+void acmacs::tal::v3::Tree::re_root(const seq_id_t& new_root)
 {
     auto path = find_path_by_seq_id(new_root);
     path.get().pop_back();
