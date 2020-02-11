@@ -49,7 +49,7 @@ const acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::paramet
 
 void acmacs::tal::v3::Clades::make_clades()
 {
-    fmt::print(stderr, "DEBUG: Clades::make_clades\n");
+    // fmt::print(stderr, "DEBUG: Clades::make_clades\n");
     make_sections();
     set_slots();
     add_gaps_to_tree();
@@ -188,6 +188,7 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
 void acmacs::tal::v3::Clades::report_clades()
 {
     if (parameters_.report) {
+        fmt::print("INFO: ==================== Clades ({}) ==================================================\n", clades_.size());
         for (const auto& clade : clades_) {
             fmt::print("Clade {} ({})\n", clade.name, clade.sections.size());
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
@@ -198,6 +199,7 @@ void acmacs::tal::v3::Clades::report_clades()
                     fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
             }
         }
+        fmt::print("INFO: ===================================================================================\n", clades_.size());
     }
 
 } // acmacs::tal::v3::Clades::report_clades

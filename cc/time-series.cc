@@ -14,7 +14,7 @@ void acmacs::tal::v3::TimeSeries::prepare(verbose verb)
         if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal().tree().stat_by_month();
             const auto [first, last] = tal().tree().suggest_time_series_start_end(month_stat);
-            fmt::print(stderr, "DEBUG: suggested: {} {}\n", first, last);
+            fmt::print("INFO: Time Series range suggested: {} {}\n", first, last);
             if (parameters().time_series.first == date::invalid_date())
                 parameters().time_series.first = first;
             if (parameters().time_series.after_last == date::invalid_date())

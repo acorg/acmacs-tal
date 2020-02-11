@@ -2,7 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "modifications": [
-        {"N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
+        {"?N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
         "clades-whocc",
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
@@ -139,6 +139,7 @@
              {"name": "3C.3", "show": false},
              {"name": "3C.2A", "show": false},
              {"name": "3C.2A1", "show": false},
+             {"name": "3C.2A1A", "section_exclusion_tolerance": 20},
              {"name": "3C.2A1B", "section_inclusion_tolerance": 20},
              {"?N": "---------- BVic ----------"},
              {"name": "V1B", "show": false},

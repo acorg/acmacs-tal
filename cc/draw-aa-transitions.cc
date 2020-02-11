@@ -128,19 +128,26 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
 
 void acmacs::tal::v3::DrawAATransitions::report() const
 {
-    fmt::print("INFO: AA transitions ({})\n", transitions_.size());
+    fmt::print("INFO: ==================== AA transitions ({}) ==================================================\n", transitions_.size());
     size_t max_id{0}, max_name{0};
     for (const auto& transition : transitions_) {
         max_id = std::max(max_id, fmt::format("{}", transition.node->node_id_).size());
         max_name = std::max(max_name, transition.node->aa_transitions_.display().size());
     }
 
+    fmt::print("[\n");
+    bool comma = false;
     for (const auto& transition : transitions_) {
         const auto node_id = fmt::format("\"{}\"", transition.node->node_id_);
         const auto name = fmt::format("\"{}\",", transition.node->aa_transitions_.display());
-        fmt::print("          {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:9.6f}, {:9.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": \"{}\"}},\n", node_id, max_id + 2, name, max_name + 3,
+        if (comma)
+            fmt::print(",\n");
+        fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:9.6f}, {:9.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": \"{}\"}}", node_id, max_id + 2, name, max_name + 3,
                    transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_leaf().seq_id);
+        comma = true;
     }
+    fmt::print("\n]\n");
+    fmt::print("INFO: ============================================================================================\n", transitions_.size());
 
 } // acmacs::tal::v3::DrawAATransitions::report
 

@@ -857,7 +857,7 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 void acmacs::tal::v3::Tree::clades_reset()
 {
-    fmt::print(stderr, "DEBUG: Tree::clades_reset\n");
+    // fmt::print(stderr, "DEBUG: Tree::clades_reset\n");
     tree::iterate_leaf(*this, [](Node& node) { node.clades.clear(); });
     clades_.clear();
 
