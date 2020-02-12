@@ -486,11 +486,12 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
     };
 
     const auto& seqdb = acmacs::seqdb::get();
+    seqdb.find_slaves();
     Node* parent{nullptr};
     const auto pre = [&parent](Node& node) { parent = &node; };
     const auto leaf = [&parent, &seqdb, already_in_tree](const Node& node) {
         if (!node.ref.empty()) {
-            for (const auto& slave : node.ref.find_slaves(seqdb))
+            for (const auto& slave : node.ref.seq().slaves())
                 if (const auto seq_id = slave.seq_id(); !already_in_tree(seq_id)) {
                     parent->to_populate.emplace_back(seq_id, node.edge_length).populate(slave, seqdb);
                 }
