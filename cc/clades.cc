@@ -190,7 +190,9 @@ void acmacs::tal::v3::Clades::report_clades()
     if (parameters_.report) {
         fmt::print("INFO: ==================== Clades ({}) ==================================================\n", clades_.size());
         for (const auto& clade : clades_) {
-            fmt::print("Clade {} ({})\n", clade.name, clade.sections.size());
+            const auto& clade_param = parameters_for_clade(clade.name);
+            fmt::print("Clade {} ({})    {{\"name\": \"{}\", \"display_name\": \"{}\", \"section_inclusion_tolerance\": {}, \"section_exclusion_tolerance\": {}, \"show\": {}}}\n", clade.name,
+                       clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, !clade_param.hidden);
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
                 fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id_, section.first->seq_id, section.last->node_id_,
