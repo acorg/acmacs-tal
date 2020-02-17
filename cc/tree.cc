@@ -1057,6 +1057,63 @@ double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::find_first_last_leaves()
+{
+    if (!first_leaf_.leaf) {
+        size_t leaf_no{0};
+        std::vector<Node*> parents;
+
+        const auto leaf = [&leaf_no, &parents](const Node& node) {
+            if (!node.hidden) {
+                for (Node* parent : parents) {
+                    if (!parent->first_leaf_.leaf) {
+                        parent->first_leaf_.leaf = &node;
+                        parent->first_leaf_.no = leaf_no;
+                    }
+                    parent->last_leaf_.leaf = &node;
+                    parent->last_leaf_.no = leaf_no;
+                }
+                ++leaf_no;
+            }
+        };
+
+        const auto pre = [&parents](Node& node) { parents.push_back(&node); };
+
+        const auto post = [&parents](Node& node) {
+            if (parents.back() != &node)
+                throw std::runtime_error("Tree::find_first_last_leaves::post: internal");
+            parents.pop_back();
+        };
+
+        tree::iterate_leaf_pre_post(*this, leaf, pre, post);
+    }
+
+} // acmacs::tal::v3::Tree::find_first_last_leaves
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves) const
+{
+    size_t level{0};
+
+    const auto pre = [min_number_of_leaves, &level](const Node& node) {
+        if (!node.first_leaf_.leaf || !node.last_leaf_.leaf)
+            throw std::runtime_error("Tree::report_first_last_leaves::pre: internal");
+        if ((node.last_leaf_.no - node.first_leaf_.no + 1) >= min_number_of_leaves) {
+            const auto aa_transitions = node.aa_transitions_.display();
+            fmt::print("{:{}s}[{}]  {}  --  {}{}\n", "", level * 4, node.last_leaf_.no - node.first_leaf_.no + 1, node.first_leaf_.leaf->seq_id, node.last_leaf_.leaf->seq_id, aa_transitions.empty() ? std::string{} : "  --  " + aa_transitions);
+        }
+        ++level;
+    };
+
+    const auto post = [&level](const Node&) { --level; };
+
+    tree::iterate_pre_post(*this, pre, post);
+
+} // acmacs::tal::v3::Tree::report_first_last_leaves
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

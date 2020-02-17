@@ -216,6 +216,16 @@ namespace acmacs::tal::inline v3::tree
 
     // ----------------------------------------------------------------------
 
+    template <typename N, typename F1, typename F2> inline void iterate_pre_post(N&& node, F1 f_subtree_pre, F2 f_subtree_post)
+    {
+        if (!node.is_leaf()) {
+            f_subtree_pre(std::forward<N>(node));
+            for (auto& subnode : node.subtree)
+                iterate_pre_post(subnode, f_subtree_pre, f_subtree_post);
+            f_subtree_post(std::forward<N>(node));
+        }
+    }
+
 } // namespace acmacs::tal::inlinev3::tree
 
 // ----------------------------------------------------------------------

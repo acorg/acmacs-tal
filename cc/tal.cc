@@ -21,6 +21,7 @@ struct Options : public argv
     option<str_array> settings_files{*this, 's'};
     option<str_array> defines{*this, 'D', "--define", desc{"see $ACMACSD_ROOT/share/doc/tal-conf.org"}};
     option<str>       chart_file{*this, "chart", desc{"path to a chart for the signature page"}};
+    option<size_t>    first_last_leaves{*this, "first-last-leaves", desc{"min num of leaves per node to print"}};
     option<bool>      open{*this, "open"};
     option<bool>      ql{*this, "ql"};
     option<bool>      verbose{*this, 'v', "verbose"};
@@ -83,6 +84,11 @@ int main(int argc, const char *argv[])
         Timeit time_preparing("DEBUG: preparing: ", report);
         tal.prepare(verbose);
         time_preparing.report();
+
+        if (opt.first_last_leaves.has_value()) {
+            tal.tree().find_first_last_leaves();
+            tal.tree().report_first_last_leaves(opt.first_last_leaves);
+        }
 
         Timeit time_exporting("DEBUG: exporting: ", report);
         for (const auto& output : *opt.outputs)

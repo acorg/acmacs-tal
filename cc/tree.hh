@@ -121,6 +121,13 @@ namespace acmacs::tal::inline v3
         mutable const Node* node_for_left_aa_transitions_{nullptr};
         Subtree to_populate;    // populate_with_nuc_duplicates()
 
+        struct leaf_ref_t
+        {
+            const Node* leaf{nullptr};
+            size_t no{0};
+        };
+        leaf_ref_t first_leaf_, last_leaf_;
+
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
         constexpr static const double default_vertical_offset{1.0};
@@ -222,6 +229,9 @@ namespace acmacs::tal::inline v3
 
         void number_leaves_in_subtree() const;
         const Node* next_leaf(const Node* node) const;
+
+        void find_first_last_leaves();
+        void report_first_last_leaves(size_t min_number_of_leaves) const;
 
         // ----------------------------------------------------------------------
 
