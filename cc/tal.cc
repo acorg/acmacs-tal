@@ -48,7 +48,7 @@ int main(int argc, const char *argv[])
     try {
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
-        const acmacs::verbose verbose{opt.verbose ? acmacs::verbose::yes : acmacs::verbose::no};
+        const acmacs::verbose verbose{acmacs::verbose_from(opt.verbose)};
         const report_time report{opt.verbose ? report_time::yes : report_time::no};
 
         acmacs::tal::Tal tal;
