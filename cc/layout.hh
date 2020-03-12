@@ -21,6 +21,11 @@ namespace acmacs::tal::inline v3
     class DrawAATransitions;
     class Title;
     class LegendContinentMap;
+    class Gap;
+    class DashBar;
+    class DashBarClades;
+
+    using LayoutElementId = named_string_t<struct LayoutElementId_tag>;
 
     class Layout
     {
@@ -31,8 +36,8 @@ namespace acmacs::tal::inline v3
         void prepare(verbose verb);
         void draw(acmacs::surface::Surface& surface, verbose verb) const;
 
-        template <typename Element> const Element* find() const;
-        template <typename Element> Element* find();
+        template <typename Element> const Element* find(const LayoutElementId& id = {}) const;
+        template <typename Element> Element* find(const LayoutElementId& id = {});
 
         // counts elements of the same type
         size_t count(LayoutElement& element) const;
@@ -47,21 +52,27 @@ namespace acmacs::tal::inline v3
         std::vector<std::unique_ptr<LayoutElement>> elements_;
     };
 
-    extern template const DrawTree* Layout::find<DrawTree>() const;
-    extern template const DrawOnTree* Layout::find<DrawOnTree>() const;
-    extern template const TimeSeries* Layout::find<TimeSeries>() const;
-    extern template const Clades* Layout::find<Clades>() const;
-    extern template const DrawAATransitions* Layout::find<DrawAATransitions>() const;
-    extern template const Title* Layout::find<Title>() const;
-    extern template const LegendContinentMap* Layout::find<LegendContinentMap>() const;
+    extern template const DrawTree* Layout::find<DrawTree>(const LayoutElementId& id) const;
+    extern template const DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id) const;
+    extern template const TimeSeries* Layout::find<TimeSeries>(const LayoutElementId& id) const;
+    extern template const Clades* Layout::find<Clades>(const LayoutElementId& id) const;
+    extern template const DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id) const;
+    extern template const Title* Layout::find<Title>(const LayoutElementId& id) const;
+    extern template const LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id) const;
+    extern template const Gap* Layout::find<Gap>(const LayoutElementId& id) const;
+    extern template const DashBar* Layout::find<DashBar>(const LayoutElementId& id) const;
+    extern template const DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id) const;
 
-    extern template DrawTree* Layout::find<DrawTree>();
-    extern template DrawOnTree* Layout::find<DrawOnTree>();
-    extern template TimeSeries* Layout::find<TimeSeries>();
-    extern template Clades* Layout::find<Clades>();
-    extern template DrawAATransitions* Layout::find<DrawAATransitions>();
-    extern template Title* Layout::find<Title>();
-    extern template LegendContinentMap* Layout::find<LegendContinentMap>();
+    extern template DrawTree* Layout::find<DrawTree>(const LayoutElementId& id);
+    extern template DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id);
+    extern template TimeSeries* Layout::find<TimeSeries>(const LayoutElementId& id);
+    extern template Clades* Layout::find<Clades>(const LayoutElementId& id);
+    extern template DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id);
+    extern template Title* Layout::find<Title>(const LayoutElementId& id);
+    extern template LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id);
+    extern template Gap* Layout::find<Gap>(const LayoutElementId& id);
+    extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
+    extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
 
     extern template void Layout::prepare_element<DrawTree>(verbose verb);
     extern template void Layout::prepare_element<TimeSeries>(verbose verb);
@@ -79,8 +90,6 @@ namespace acmacs::tal::inline v3
     };
 
     // ----------------------------------------------------------------------
-
-    using LayoutElementId = named_string_t<struct LayoutElementId_tag>;
 
     class LayoutElement
     {

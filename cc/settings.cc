@@ -15,29 +15,25 @@
 
 // ----------------------------------------------------------------------
 
-template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&& ... args)
+template <typename ElementType, typename... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&&... args)
 {
-    auto element_p = std::make_unique<ElementType>(tal_, std::forward<Args>(args) ...);
-    auto& element = *element_p;
-    draw().layout().add(std::move(element_p));
-    init_element(element);
-    return element;
+    using namespace std::string_view_literals;
+    const LayoutElementId element_id{getenv("id"sv, "")};
+    if (auto* found = draw().layout().find<ElementType>(element_id); found) {
+        init_element(*found);
+        return *found;
+    }
+    else {
+
+        auto element_p = std::make_unique<ElementType>(tal_, std::forward<Args>(args)...);
+        auto& element = *element_p;
+        element.id(element_id);
+        draw().layout().add(std::move(element_p));
+        init_element(element);
+        return element;
+    }
 
 } // acmacs::tal::v3::Settings::add_element
-
-// ----------------------------------------------------------------------
-
-// template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_unique_element(Args&& ... args)
-// {
-//     if (auto* found = draw().layout().find<ElementType>(); found) {
-//         init_element(*found);
-//         return *found;
-//     }
-//     else {
-//         return add_element<ElementType>(std::forward<Args>(args) ...);
-//     }
-
-// } // acmacs::tal::v3::Settings::add_unique_element
 
 // ----------------------------------------------------------------------
 

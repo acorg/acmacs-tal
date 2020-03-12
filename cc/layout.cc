@@ -7,6 +7,7 @@
 #include "acmacs-tal/draw-aa-transitions.hh"
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
+#include "acmacs-tal/dash-bar.hh"
 
 // ----------------------------------------------------------------------
 
@@ -23,8 +24,6 @@ void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface, verbo
 
 acmacs::tal::v3::LayoutElement& acmacs::tal::v3::Layout::add(std::unique_ptr<LayoutElement> element)
 {
-    if (element->id().empty())
-        element->id(LayoutElementId{fmt::format("-{}", count(*element))});
     elements_.push_back(std::move(element));
     return *elements_.back();
 
@@ -64,39 +63,45 @@ void acmacs::tal::v3::Layout::prepare(verbose verb)
 
 // ----------------------------------------------------------------------
 
-template <typename Element> inline const Element* acmacs::tal::v3::Layout::find() const
+template <typename Element> inline const Element* acmacs::tal::v3::Layout::find(const LayoutElementId& id) const
 {
     for (const auto& element : elements_) {
-        if (const auto* found = dynamic_cast<const Element*>(element.get()); found)
+        if (const auto* found = dynamic_cast<const Element*>(element.get()); found && (id.empty() || found->id() == id))
             return found;
     }
     return nullptr;
 }
 
-template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>() const;
-template const acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>() const;
-template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>() const;
-template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>() const;
-template const acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>() const;
-template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>() const;
-template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>() const;
+template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
 
-template <typename Element> inline Element* acmacs::tal::v3::Layout::find()
+template <typename Element> inline Element* acmacs::tal::v3::Layout::find(const LayoutElementId& id)
 {
     for (auto& element : elements_) {
-        if (auto* found = dynamic_cast<Element*>(element.get()); found)
+        if (auto* found = dynamic_cast<Element*>(element.get()); found && (id.empty() || found->id() == id))
             return found;
     }
     return nullptr;
 }
 
-template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>();
-template acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>();
-template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>();
-template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>();
-template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>();
-template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>();
-template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>();
+template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>(const LayoutElementId& id);
+template acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>(const LayoutElementId& id);
+template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>(const LayoutElementId& id);
+template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id);
+template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id);
+template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id);
+template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id);
+template acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id);
+template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id);
+template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);
 
 // ----------------------------------------------------------------------
 

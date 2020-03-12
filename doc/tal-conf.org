@@ -1,4 +1,4 @@
-# Time-stamp: <2020-02-11 09:13:40 eu>
+# Time-stamp: <2020-03-12 16:41:19 eu>
 
 * Command line defines
 
@@ -136,7 +136,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Tree
 
-{"N": "tree", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
+{"N": "tree", "id": "<id>", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
 {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
  "all": {"node_id": "", "label": {<[[Label parameters]]>}},
  "per_node": [
