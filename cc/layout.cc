@@ -1,3 +1,4 @@
+#include "acmacs-base/range-v3.hh"
 #include "acmacs-tal/layout.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
@@ -22,10 +23,22 @@ void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface, verbo
 
 acmacs::tal::v3::LayoutElement& acmacs::tal::v3::Layout::add(std::unique_ptr<LayoutElement> element)
 {
+    if (element->id().empty())
+        element->id(LayoutElementId{fmt::format("-{}", count(*element))});
     elements_.push_back(std::move(element));
     return *elements_.back();
 
 } // acmacs::tal::v3::Layout::add
+
+// ----------------------------------------------------------------------
+
+size_t acmacs::tal::v3::Layout::count(LayoutElement& element) const
+{
+    const auto& type = typeid(element);
+    const auto if_same_type = [&type](const auto& elt) { return typeid(*elt) == type; };
+    return static_cast<size_t>(ranges::count_if(elements_, if_same_type));
+
+} // acmacs::tal::v3::Layout::count
 
 // ----------------------------------------------------------------------
 

@@ -33,7 +33,12 @@ namespace acmacs::tal::inline v3
 
         template <typename Element> const Element* find() const;
         template <typename Element> Element* find();
+
+        // counts elements of the same type
+        size_t count(LayoutElement& element) const;
+
         template <typename Element> void prepare_element(verbose verb);
+
         size_t index_of(const LayoutElement* look_for) const;
 
         const DrawTree* find_draw_tree(bool throw_error = true) const; // throws error or prints warning if not found
@@ -75,6 +80,8 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
+    using LayoutElementId = named_string_t<struct LayoutElementId_tag>;
+
     class LayoutElement
     {
       public:
@@ -93,6 +100,9 @@ namespace acmacs::tal::inline v3
 
         double pos_y_above(const Node& node, double vertical_step) const;
         double pos_y_below(const Node& node, double vertical_step) const;
+
+        constexpr const LayoutElementId& id() const { return id_; }
+        void id(const LayoutElementId& a_id) { id_ = a_id; }
 
         // ----------------------------------------------------------------------
 
@@ -130,7 +140,7 @@ namespace acmacs::tal::inline v3
         struct LabelParameters
         {
             Color color{BLACK};
-            double scale{0.7};                         // relative to parameters_.slot.width
+            double scale{0.7}; // relative to parameters_.slot.width
             vertical_position vpos{vertical_position::middle};
             horizontal_position hpos{horizontal_position::left};
             std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
@@ -164,6 +174,7 @@ namespace acmacs::tal::inline v3
         Tal& tal_;
         double width_to_height_ratio_;
         DrawOutline outline_;
+        LayoutElementId id_;
     };
 
     // ----------------------------------------------------------------------

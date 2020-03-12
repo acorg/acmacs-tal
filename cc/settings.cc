@@ -27,17 +27,17 @@ template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3:
 
 // ----------------------------------------------------------------------
 
-template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_unique_element(Args&& ... args)
-{
-    if (auto* found = draw().layout().find<ElementType>(); found) {
-        init_element(*found);
-        return *found;
-    }
-    else {
-        return add_element<ElementType>(std::forward<Args>(args) ...);
-    }
+// template <typename ElementType, typename ... Args> ElementType& acmacs::tal::v3::Settings::add_unique_element(Args&& ... args)
+// {
+//     if (auto* found = draw().layout().find<ElementType>(); found) {
+//         init_element(*found);
+//         return *found;
+//     }
+//     else {
+//         return add_element<ElementType>(std::forward<Args>(args) ...);
+//     }
 
-} // acmacs::tal::v3::Settings::add_unique_element
+// } // acmacs::tal::v3::Settings::add_unique_element
 
 // ----------------------------------------------------------------------
 
@@ -462,7 +462,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 
 void acmacs::tal::v3::Settings::add_tree()
 {
-    auto& element = add_unique_element<DrawTree>();
+    auto& element = add_element<DrawTree>();
     process_color_by(element);
 
 } // acmacs::tal::v3::Settings::add_tree
@@ -473,7 +473,7 @@ void acmacs::tal::v3::Settings::add_time_series()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_unique_element<TimeSeries>();
+    auto& element = add_element<TimeSeries>();
     auto& param = element.parameters();
 
     process_color_by(element);
@@ -595,7 +595,7 @@ void acmacs::tal::v3::Settings::add_clades()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_unique_element<Clades>();
+    auto& element = add_element<Clades>();
     auto& param = element.parameters();
 
     getenv_copy_if_present("report"sv, param.report);
@@ -715,7 +715,7 @@ void acmacs::tal::v3::Settings::add_title()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_unique_element<Title>();
+    auto& element = add_element<Title>();
     auto& param = element.parameters();
 
     const rjson::object source{
@@ -819,7 +819,7 @@ void acmacs::tal::v3::Settings::add_legend()
     getenv_copy_if_present("type"sv, legend_type);
 
     if (legend_type == "world-map") {
-        auto& element = add_unique_element<LegendContinentMap>();
+        auto& element = add_element<LegendContinentMap>();
         auto& param = element.parameters();
         rjson::copy(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);
@@ -838,7 +838,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_unique_element<DrawAATransitions>();
+    auto& element = add_element<DrawAATransitions>();
     auto& param = element.parameters();
 
     getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
@@ -868,7 +868,7 @@ void acmacs::tal::v3::Settings::add_draw_on_tree()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_unique_element<DrawOnTree>();
+    auto& element = add_element<DrawOnTree>();
     auto& param = element.parameters();
 
     rjson::for_each(getenv("texts"sv), [&param,this](const rjson::value& text_entry) {

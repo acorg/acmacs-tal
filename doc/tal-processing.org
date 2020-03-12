@@ -1,4 +1,4 @@
-# Time-stamp: <2019-11-04 15:01:41 eu>
+# Time-stamp: <2020-03-12 15:31:23 eu>
 
 * Settings
 - layout
@@ -51,22 +51,22 @@ the evolution might have gone, and do not care about egg adaptions.
 **** DONE hide isolated before
 **** DONE hide by seq_id and regexp
 **** DONE hide by aa
-**** hide between
-**** hide not found in chart
+**** NO hide between
+**** NO hide not found in chart
 *** DONE Match antigens and sera from chart
 **** DONE tracked antigens
 **** DONE tracked sera
 - egg/cell/reasortant matched, all matched by antigen name without passage
 *** SOMETHING Infer AA subst for subrees ("to" part of AA)
 *** SOMETHING Infer "from" part of AA subst --> aa-transition.hh
-*** Infer hz sections
+*** NO hz sections
 **** infer all as substitute for section
 **** AA subst for a section (to be shown in the map title)
 **** hide/show sections
 **** tracked antigens for each section
 **** tracked sera for each section
 **** infer all aa substitutions for a panel, find all sequenced ags in chart that have those aa substitutions and find all Sera in chart with names of those antigens and draw circles
-*** AAAtPosDraw
+*** NO AAAtPosDraw
 - find_most_diverse_positions
 - infer sections: make_aa_pos_sections
 
@@ -176,10 +176,11 @@ the evolution might have gone, and do not care about egg adaptions.
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
-#+TODO: STARTED SOMETHING MORE ALMOST | DONE
+#+TODO: NO STARTED SOMETHING MORE ALMOST | DONE
 #+STARTUP: showall indent
 Local Variables:
 eval: (auto-fill-mode 0)
 eval: (add-hook 'before-save-hook 'time-stamp)
-eval: (set (make-local-variable org-confirm-elisp-link-function) nil)
+eval: (set (make-local-variable 'org-confirm-elisp-link-function) nil)
+eval: (set (make-local-variable 'org-todo-keyword-faces) '(("NO" . "red") ("STARTED" . "blue") ("SOMETHING" . "orange") ("MORE" . "#A0FF00") ("ALMOST" . "#40FF00")))
 End:
