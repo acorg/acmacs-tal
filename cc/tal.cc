@@ -3,6 +3,7 @@
 #include "acmacs-base/filesystem.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
+#include "acmacs-base/debug.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -24,7 +25,7 @@ struct Options : public argv
     option<size_t>    first_last_leaves{*this, "first-last-leaves", desc{"min num of leaves per node to print"}};
     option<bool>      open{*this, "open"};
     option<bool>      ql{*this, "ql"};
-    option<bool>      verbose{*this, 'v', "verbose"};
+    option<str_array> verbose{*this, 'v', "verbose", desc{"comma separated list (or multiple switches) of enablers"}};
 
     argument<str> tree_file{*this, arg_name{"tree.newick|tree.json[.xz]"}, mandatory};
     argument<str_array> outputs{*this, arg_name{".pdf, .json[.xz], .html, .txt"}}; // , mandatory};
@@ -43,13 +44,24 @@ struct Options : public argv
     // option<bool>      no_draw{*this, "no-draw", desc{"do not generate pdf"}};
 };
 
+namespace acmacs::log
+{
+    constexpr const section_t timer = 1 << 0;
+}
+
 int main(int argc, const char *argv[])
 {
+    using namespace std::string_view_literals;
     try {
+        acmacs::log::register_enabler_all("all"sv);
+        acmacs::log::register_enabler("timer"sv, acmacs::log::timer);
+
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
-        const acmacs::verbose verbose{acmacs::verbose_from(opt.verbose)};
-        const report_time report{opt.verbose ? report_time::yes : report_time::no};
+        const acmacs::verbose verbose{acmacs::verbose_from(true)};
+        acmacs::log::enable(opt.verbose);
+
+        const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
 
         acmacs::tal::Tal tal;
         Timeit time_loading_tree("DEBUG: Loading tree: ", report);
