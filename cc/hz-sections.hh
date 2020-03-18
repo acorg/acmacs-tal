@@ -2,6 +2,7 @@
 
 #include "acmacs-tal/layout.hh"
 #include "acmacs-tal/tree.hh"
+#include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
 
@@ -26,6 +27,7 @@ namespace acmacs::tal::inline v3
             const Node* last{nullptr};
             bool shown{true};
             std::string label;
+            AA_Transitions aa_transitions{};
         };
 
         // ----------------------------------------------------------------------
@@ -52,6 +54,8 @@ namespace acmacs::tal::inline v3
       private:
         Parameters parameters_;
         std::vector<Section> sections_;
+
+        void set_aa_transitions();
     };
 
 } // namespace acmacs::tal::inline v3

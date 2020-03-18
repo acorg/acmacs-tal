@@ -104,6 +104,9 @@ namespace acmacs::tal::inline v3
                 tr.left = seq.at(tr.pos);
         }
 
+        void add_or_replace(const AA_Transition& transition);
+        void add_or_replace(const AA_Transitions& transitions);
+
       private:
         std::vector<AA_Transition> data_;
 

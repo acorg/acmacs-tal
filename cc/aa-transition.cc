@@ -79,6 +79,26 @@ std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent) const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::AA_Transitions::add_or_replace(const AA_Transition& to_add)
+{
+    if (const auto found = std::find_if(std::begin(data_), std::end(data_), [&to_add](const auto& en) { return en.pos == to_add.pos; }); found != std::end(data_))
+        *found = to_add;
+    else
+        data_.push_back(to_add);
+
+} // acmacs::tal::v3::AA_Transitions::add_or_replace
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::AA_Transitions::add_or_replace(const AA_Transitions& transitions)
+{
+    for (const auto& transition : transitions.data_)
+        add_or_replace(transition);
+
+} // acmacs::tal::v3::AA_Transitions::add_or_replace
+
+// ----------------------------------------------------------------------
+
 std::string acmacs::tal::v3::AA_Transitions::display(bool show_empty_left) const
 {
     fmt::memory_buffer output;
