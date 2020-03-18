@@ -48,7 +48,6 @@ namespace acmacs::tal::inline v3
         EdgeLength edge{EdgeLengthNotSet};
         std::string_view date;
         seq_id_t seq_id;
-        constexpr bool operator<(const ladderize_helper_t& rhs) const { return edge == rhs.edge ? (date == rhs.date ? seq_id < rhs.seq_id : date < rhs.date) : edge < rhs.edge; }
     };
 
     struct node_id_t
@@ -77,7 +76,7 @@ namespace acmacs::tal::inline v3
         Node& add_leaf(const seq_id_t& a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
         Node& add_subtree() { return subtree.emplace_back(); }
 
-        const Node& first_leaf() const;
+        const Node& find_first_leaf() const;
 
         // all nodes
         EdgeLength edge_length{0.0};
@@ -107,10 +106,12 @@ namespace acmacs::tal::inline v3
         std::optional<Color> label_color;
 
         // -------------------- not exported --------------------
+        Node* first_leaf{nullptr}; // nullptr for leaves
+        Node* last_next_leaf{nullptr}; // last leaf for intermediate nodes, next leaf for leaves, nullptr for the last leaf
+        node_id_t node_id;            // includes vertical leaf number for leaves
+
         // all nodes
-        mutable size_t number_leaves_in_subtree_{1};
         ladderize_helper_t ladderize_helper_;
-        node_id_t node_id_;
         // leaf node only
         mutable std::optional<size_t> antigen_index_in_chart_;
         mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
@@ -120,13 +121,6 @@ namespace acmacs::tal::inline v3
         mutable AA_Transitions aa_transitions_;
         mutable const Node* node_for_left_aa_transitions_{nullptr};
         Subtree to_populate;    // populate_with_nuc_duplicates()
-
-        struct leaf_ref_t
-        {
-            const Node* leaf{nullptr};
-            size_t no{0};
-        };
-        leaf_ref_t first_leaf_, last_leaf_;
 
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
@@ -139,6 +133,14 @@ namespace acmacs::tal::inline v3
 
         void hide();
         void populate(const acmacs::seqdb::ref& a_ref, const acmacs::seqdb::Seqdb& seqdb);
+
+        size_t number_leaves_in_subtree() const
+        {
+            if (first_leaf)
+                return last_next_leaf->node_id.vertical - first_leaf->node_id.vertical + 1;
+            else
+                return 0;
+        }
 
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
@@ -183,7 +185,7 @@ namespace acmacs::tal::inline v3
         void virus_type(std::string_view virus_type) { virus_type_.assign(virus_type); }
         void lineage(std::string_view lineage) { lineage_.assign(lineage); }
 
-        bool has_sequences() const { return !first_leaf().aa_sequence.empty(); }
+        bool has_sequences() const;
 
         NodePath find_path_by_seq_id(const seq_id_t& look_for) const;
         const Node* find_node_by_seq_id(const seq_id_t& look_for) const;
@@ -218,7 +220,7 @@ namespace acmacs::tal::inline v3
 
         void hide(const NodeSet& nodes);
 
-        void set_node_id();
+        void just_imported();
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
@@ -227,10 +229,6 @@ namespace acmacs::tal::inline v3
         void re_root(const seq_id_t& new_root);
         void re_root(const NodePath& new_root);
 
-        void number_leaves_in_subtree() const;
-        const Node* next_leaf(const Node* node) const;
-
-        void find_first_last_leaves();
         void report_first_last_leaves(size_t min_number_of_leaves) const;
 
         // ----------------------------------------------------------------------
@@ -287,6 +285,7 @@ namespace acmacs::tal::inline v3
         clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
         std::vector<const Node*> sorted_by_edge() const;
         double mean_edge_of(double fraction_or_number) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
+        void set_first_last_next_node_id();
 
         std::string data_buffer_;
         std::string virus_type_;
@@ -294,6 +293,7 @@ namespace acmacs::tal::inline v3
         clades_t clades_;
         mutable bool chart_matched_{false};
         mutable seqdb::pos0_t longest_sequence_{0};
+        bool nodes_hidden_{false};
 
     }; // class Tree
 

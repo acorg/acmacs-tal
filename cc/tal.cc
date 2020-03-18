@@ -100,10 +100,8 @@ int main(int argc, const char *argv[])
         tal.prepare();
         time_preparing.report();
 
-        if (opt.first_last_leaves.has_value()) {
-            tal.tree().find_first_last_leaves();
+        if (opt.first_last_leaves.has_value())
             tal.tree().report_first_last_leaves(opt.first_last_leaves);
-        }
 
         Timeit time_exporting("DEBUG: exporting: ", report);
         for (const auto& output : *opt.outputs)

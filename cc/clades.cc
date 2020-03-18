@@ -11,8 +11,8 @@ bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
 {
     for (const auto& sec_lhs : sections) {
         for (const auto& sec_rhs : rhs.sections) {
-            const auto& [upper, lower] = sec_lhs.first->node_id_.vertical < sec_rhs.first->node_id_.vertical ? std::pair{sec_lhs, sec_rhs} : std::pair{sec_rhs, sec_lhs};
-            if (upper.last->node_id_.vertical > lower.first->node_id_.vertical)
+            const auto& [upper, lower] = sec_lhs.first->node_id.vertical < sec_rhs.first->node_id.vertical ? std::pair{sec_lhs, sec_rhs} : std::pair{sec_rhs, sec_lhs};
+            if (upper.last->node_id.vertical > lower.first->node_id.vertical)
                 return true;
         }
     }
@@ -92,7 +92,7 @@ void acmacs::tal::v3::Clades::make_sections()
             // merge sections
             for (auto section = std::begin(clade.sections), merge_to = section; section != std::end(clade.sections) && std::next(section) != std::end(clade.sections); ++section) {
                 const auto next_section = std::next(section);
-                if ((next_section->first->node_id_.vertical - section->last->node_id_.vertical) <= clade_param.section_inclusion_tolerance) {
+                if ((next_section->first->node_id.vertical - section->last->node_id.vertical) <= clade_param.section_inclusion_tolerance) {
                     merge_to->last = next_section->last;
                     next_section->first = nullptr;
                 }
@@ -165,8 +165,8 @@ void acmacs::tal::v3::Clades::add_gaps_to_tree()
             if (clade_param.tree_top_gap > 0.0 && section.first->vertical_offset_ < clade_param.tree_top_gap)
                 section.first->vertical_offset_ = clade_param.tree_top_gap;
             if (clade_param.tree_bottom_gap > 0.0) {
-                if (const auto next_leaf = tal().tree().next_leaf(section.last); next_leaf && next_leaf->vertical_offset_ < clade_param.tree_bottom_gap) {
-                    next_leaf->vertical_offset_ = clade_param.tree_bottom_gap;
+                if (section.last->last_next_leaf && section.last->last_next_leaf->vertical_offset_ < clade_param.tree_bottom_gap) {
+                    section.last->last_next_leaf->vertical_offset_ = clade_param.tree_bottom_gap;
                 }
             }
         }
@@ -185,8 +185,8 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
                 if (clade_param.time_series_top_separator)
                     time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line);
                 if (clade_param.time_series_bottom_separator) {
-                    if (const auto next_leaf = tal().tree().next_leaf(section.last); next_leaf)
-                        time_series->add_horizontal_line_above(next_leaf, clade_param.horizontal_line);
+                    if (section.last->last_next_leaf)
+                        time_series->add_horizontal_line_above(section.last->last_next_leaf, clade_param.horizontal_line);
                 }
             }
         }
@@ -206,10 +206,10 @@ void acmacs::tal::v3::Clades::report_clades()
                        clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, !clade_param.hidden);
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id_, section.first->seq_id, section.last->node_id_,
+                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
                            section.last->seq_id);
                 if (section_no < (clade.sections.size() - 1))
-                    fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id_.vertical - section.last->node_id_.vertical - 1);
+                    fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id.vertical - section.last->node_id.vertical - 1);
             }
         }
         fmt::print("INFO: ===================================================================================\n", clades_.size());

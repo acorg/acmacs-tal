@@ -306,9 +306,9 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
     fmt::print("{}", prefix);
     for (const auto* node : nodes) {
         if (node->is_leaf())
-            fmt::print("{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id_, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
+            fmt::print("{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
         else
-            fmt::print("{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id_, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
+            fmt::print("{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
     }
 
 } // acmacs::tal::v3::Settings::report_nodes

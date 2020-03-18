@@ -39,7 +39,7 @@ namespace acmacs::tal::inline v3
             constexpr node_id_t::value_type size() const
             {
                 if (first && last)
-                    return last->node_id_.vertical - first->node_id_.vertical + 1;
+                    return last->node_id.vertical - first->node_id.vertical + 1;
                 else
                     return 0;
             }

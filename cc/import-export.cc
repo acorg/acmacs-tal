@@ -33,7 +33,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
     }
     else
         throw ImportError{fmt::format("cannot infer import method from filename: {}", filename)};
-    tree.set_node_id();
+    tree.just_imported();
 
 } // acmacs::tal::v3::import_tree
 

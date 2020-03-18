@@ -10,12 +10,12 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 {
     if (!prepared_) {
         tree::iterate_pre(tal().tree(), [this](const Node& node) {
-            if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
-                const auto node_id = fmt::format("{}", node.node_id_);
+            if (!node.hidden && node.number_leaves_in_subtree() >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
+                const auto node_id = fmt::format("{}", node.node_id);
                 transitions_.emplace_back(&node, parameters_for_node(node_id).label);
             }
         });
-        std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id_ < e2.node->node_id_; });
+        std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id < e2.node->node_id; });
     }
     LayoutElement::prepare(stage);
 
@@ -83,9 +83,9 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
 
     // const auto report_overlapping = [](transition_iterator primary, const auto& overlapping) {
     //     if (!overlapping.empty()) {
-    //         fmt::print(stderr, "    ({}) {} \"{}\" {:.6f}\n", overlapping.size(), primary->node->node_id_, primary->node->aa_transitions_.display(), primary->box);
+    //         fmt::print(stderr, "    ({}) {} \"{}\" {:.6f}\n", overlapping.size(), primary->node->node_id, primary->node->aa_transitions_.display(), primary->box);
     //         for (const auto& over : overlapping)
-    //             fmt::print(stderr, "        {} \"{}\" {:.6f}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
+    //             fmt::print(stderr, "        {} \"{}\" {:.6f}\n", over->node->node_id, over->node->aa_transitions_.display(), over->box);
     //     }
     // };
 
@@ -129,19 +129,19 @@ void acmacs::tal::v3::DrawAATransitions::report() const
     fmt::print("INFO: ==================== AA transitions ({}) ==================================================\n", transitions_.size());
     size_t max_id{0}, max_name{0};
     for (const auto& transition : transitions_) {
-        max_id = std::max(max_id, fmt::format("{}", transition.node->node_id_).size());
+        max_id = std::max(max_id, fmt::format("{}", transition.node->node_id).size());
         max_name = std::max(max_name, transition.node->aa_transitions_.display().size());
     }
 
     fmt::print("[\n");
     bool comma = false;
     for (const auto& transition : transitions_) {
-        const auto node_id = fmt::format("\"{}\"", transition.node->node_id_);
+        const auto node_id = fmt::format("\"{}\"", transition.node->node_id);
         const auto name = fmt::format("\"{}\",", transition.node->aa_transitions_.display());
         if (comma)
             fmt::print(",\n");
         fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:9.6f}, {:9.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": \"{}\"}}", node_id, max_id + 2, name, max_name + 3,
-                   transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_leaf().seq_id);
+                   transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_leaf->seq_id);
         comma = true;
     }
     fmt::print("\n]\n");

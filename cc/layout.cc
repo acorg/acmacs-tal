@@ -183,8 +183,8 @@ double acmacs::tal::v3::LayoutElement::pos_y_above(const Node& node, double vert
 
 double acmacs::tal::v3::LayoutElement::pos_y_below(const Node& node, double vertical_step) const
 {
-    if (const auto next_leaf = tal().tree().next_leaf(&node); next_leaf) // if node is not the last leaf
-        return vertical_step * (next_leaf->cumulative_vertical_offset_ - next_leaf->vertical_offset_ / 2.0);
+    if (node.last_next_leaf) // if node is not the last leaf
+        return vertical_step * (node.last_next_leaf->cumulative_vertical_offset_ - node.last_next_leaf->vertical_offset_ / 2.0);
     else // last leaf
         return vertical_step * node.cumulative_vertical_offset_;
 

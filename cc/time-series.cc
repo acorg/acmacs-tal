@@ -35,7 +35,7 @@ void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, co
 {
     if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
         if (found->color != line.color || found->line_width != line.line_width)
-            fmt::print(stderr, "WARNING: time series horizontal line above {} {} already added with different parameters\n", node->node_id_, node->seq_id);
+            fmt::print(stderr, "WARNING: time series horizontal line above {} {} already added with different parameters\n", node->node_id, node->seq_id);
     }
     else
         horizontal_lines_.emplace_back(node, line);
@@ -76,21 +76,24 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 
 void acmacs::tal::v3::TimeSeries::draw_background_separators(acmacs::surface::Surface& surface) const
 {
-    const auto& viewport = surface.viewport();
-    double line_offset_x = viewport.left();
-    for (const auto& slot : series_) {
-        const auto month_no = slot_month(slot);
-        if (parameters().slot.background[month_no] != TRANSPARENT)
-            surface.rectangle_filled({line_offset_x, viewport.top()}, {parameters().slot.width, viewport.size.height}, parameters().slot.background[month_no], Pixels{0}, parameters().slot.background[month_no]);
-        const auto& sep_param = parameters().slot.separator[month_no];
-        surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, sep_param.color, sep_param.line_width, sep_param.dash);
-        line_offset_x += parameters().slot.width;
+    if (!series_.empty()) {
+        const auto& viewport = surface.viewport();
+        double line_offset_x = viewport.left();
+        for (const auto& slot : series_) {
+            const auto month_no = slot_month(slot);
+            if (parameters().slot.background[month_no] != TRANSPARENT)
+                surface.rectangle_filled({line_offset_x, viewport.top()}, {parameters().slot.width, viewport.size.height}, parameters().slot.background[month_no], Pixels{0},
+                                         parameters().slot.background[month_no]);
+            const auto& sep_param = parameters().slot.separator[month_no];
+            surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, sep_param.color, sep_param.line_width, sep_param.dash);
+            line_offset_x += parameters().slot.width;
+        }
+        auto next_month_no = slot_month(series_.back()) + 1;
+        if (next_month_no > 11)
+            next_month_no = 0;
+        const auto& last_sep_param = parameters().slot.separator[next_month_no];
+        surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, last_sep_param.color, last_sep_param.line_width, last_sep_param.dash);
     }
-    auto next_month_no = slot_month(series_.back()) + 1;
-    if (next_month_no > 11)
-        next_month_no = 0;
-    const auto& last_sep_param = parameters().slot.separator[next_month_no];
-    surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, last_sep_param.color, last_sep_param.line_width, last_sep_param.dash);
 
 } // acmacs::tal::v3::TimeSeries::draw_background_separators
 
