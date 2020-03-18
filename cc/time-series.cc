@@ -6,10 +6,10 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeries::prepare(verbose verb)
+void acmacs::tal::v3::TimeSeries::prepare()
 {
     if (!prepared_) {
-        tal().draw().layout().prepare_element<DrawTree>(verb);
+        tal().draw().layout().prepare_element<DrawTree>();
 
         if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal().tree().stat_by_month();
@@ -25,7 +25,7 @@ void acmacs::tal::v3::TimeSeries::prepare(verbose verb)
             width_to_height_ratio() = series_.size() * parameters().slot.width;
         // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
     }
-    LayoutElementWithColoring::prepare(verb);
+    LayoutElementWithColoring::prepare();
 
 } // acmacs::tal::v3::TimeSeries::prepare
 
@@ -44,7 +44,7 @@ void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, co
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
+void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 {
     draw_background_separators(surface);
     draw_labels(surface);

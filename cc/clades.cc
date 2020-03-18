@@ -20,7 +20,7 @@ bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Clades::prepare(verbose verb)
+void acmacs::tal::v3::Clades::prepare()
 {
     if (!prepared_) {
         auto& layout = tal().draw().layout();
@@ -30,7 +30,7 @@ void acmacs::tal::v3::Clades::prepare(verbose verb)
         if (width_to_height_ratio() <= 0.0 && number_of_slots())
             width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
     }
-    LayoutElement::prepare(verb);
+    LayoutElement::prepare();
 
 } // acmacs::tal::v3::Clades::prepare
 
@@ -224,7 +224,7 @@ size_t acmacs::tal::v3::Clades::number_of_slots() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
+void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 {
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto vertical_step = draw_tree->vertical_step();

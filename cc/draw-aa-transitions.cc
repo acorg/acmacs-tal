@@ -6,7 +6,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawAATransitions::prepare(verbose verb)
+void acmacs::tal::v3::DrawAATransitions::prepare()
 {
     tree::iterate_pre(tal().tree(), [this](const Node& node) {
         if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
@@ -16,7 +16,7 @@ void acmacs::tal::v3::DrawAATransitions::prepare(verbose verb)
     });
     std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id_ < e2.node->node_id_; });
 
-    LayoutElement::prepare(verb);
+    LayoutElement::prepare();
 
 } // acmacs::tal::v3::Legend::prepare
 
@@ -33,7 +33,7 @@ const acmacs::tal::v3::DrawAATransitions::TransitionParameters& acmacs::tal::v3:
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawAATransitions::draw(acmacs::surface::Surface& /*surface*/, verbose /*verb*/) const
+void acmacs::tal::v3::DrawAATransitions::draw(acmacs::surface::Surface& /*surface*/) const
 {
     // do nothing
     // draw_transitions() called by DrawTree::draw is used for drawing transitions
@@ -42,7 +42,7 @@ void acmacs::tal::v3::DrawAATransitions::draw(acmacs::surface::Surface& /*surfac
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose verb) const
+void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const
 {
     const auto text_line_interleave = parameters().text_line_interleave;
     const auto vertical_step = draw_tree.vertical_step();
@@ -80,13 +80,13 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
         return overlapping;
     };
 
-    const auto report_overlapping = [](transition_iterator primary, const auto& overlapping) {
-        if (!overlapping.empty()) {
-            fmt::print(stderr, "    ({}) {} \"{}\" {:.6f}\n", overlapping.size(), primary->node->node_id_, primary->node->aa_transitions_.display(), primary->box);
-            for (const auto& over : overlapping)
-                fmt::print(stderr, "        {} \"{}\" {:.6f}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
-        }
-    };
+    // const auto report_overlapping = [](transition_iterator primary, const auto& overlapping) {
+    //     if (!overlapping.empty()) {
+    //         fmt::print(stderr, "    ({}) {} \"{}\" {:.6f}\n", overlapping.size(), primary->node->node_id_, primary->node->aa_transitions_.display(), primary->box);
+    //         for (const auto& over : overlapping)
+    //             fmt::print(stderr, "        {} \"{}\" {:.6f}\n", over->node->node_id_, over->node->aa_transitions_.display(), over->box);
+    //     }
+    // };
 
     // move upper box up and lower box down
     // boxes are not moved horizontally
@@ -99,13 +99,10 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     };
 
     for (size_t overlapping_no = 1; overlapping_no > 0;) {
-        if (verb == verbose::yes)
-            fmt::print(stderr, "DEBUG: overlapping {}\n", overlapping_no);
         bool overlapping_present = false;
         for (auto trn = std::begin(transitions_); trn != std::end(transitions_); ++trn) {
             const auto overlapping = find_overlapping(trn, std::end(transitions_));
-            if (verb == verbose::yes)
-                report_overlapping(trn, overlapping);
+            // report_overlapping(trn, overlapping);
 
             if (!overlapping.empty()) {
                 overlapping_present = true;
@@ -153,9 +150,9 @@ void acmacs::tal::v3::DrawAATransitions::report() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose verb) const
+void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const
 {
-    calculate_boxes(surface, draw_tree, verb);
+    calculate_boxes(surface, draw_tree);
     report();
 
     const auto text_line_interleave = parameters().text_line_interleave;

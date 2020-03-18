@@ -15,8 +15,8 @@ namespace acmacs::tal::inline v3
     class Draw
     {
       public:
-        void prepare(verbose verb);
-        void export_pdf(std::string_view filename, verbose verb) const;
+        void prepare();
+        void export_pdf(std::string_view filename) const;
 
         constexpr Margins& margins() { return margins_; }
         constexpr Layout& layout() { return layout_; }

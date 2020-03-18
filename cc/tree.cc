@@ -114,7 +114,7 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
 // ----------------------------------------------------------------------
 
 // enum class CumulativeReport { clusters, all };
-// std::string x_report_cumulative(acmacs::verbose verb, CumulativeReport report)
+// std::string x_report_cumulative(CumulativeReport report)
 // {
 //     struct CumulativeEntry
 //     {

@@ -5,10 +5,10 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawTree::prepare(verbose verb)
+void acmacs::tal::v3::DrawTree::prepare()
 {
     if (!prepared_) {
-        tal().draw().layout().prepare_element<Clades>(verb);
+        tal().draw().layout().prepare_element<Clades>();
 
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
         tal().tree().number_leaves_in_subtree();
@@ -16,13 +16,13 @@ void acmacs::tal::v3::DrawTree::prepare(verbose verb)
         vertical_step_ = height_ / tree_height;
         horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
     }
-    LayoutElementWithColoring::prepare(verb);
+    LayoutElementWithColoring::prepare();
 
 } // acmacs::tal::v3::DrawTree::prepare
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface, verbose verb) const
+void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
 {
     const Scaled line_width{vertical_step() * 0.5};
     const Scaled text_size{vertical_step() * 0.8};
@@ -59,15 +59,15 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface, verbose 
         });
 
     if (const auto* draw_aa_transitions = tal().draw().layout().find<DrawAATransitions>(); draw_aa_transitions)
-        draw_aa_transitions->draw_transitions(surface, *this, verb);
+        draw_aa_transitions->draw_transitions(surface, *this);
     if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
-        draw_on_tree->draw_on_tree(surface, *this, verb);
+        draw_on_tree->draw_on_tree(surface, *this);
 
 } // acmacs::tal::v3::DrawTree::draw
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawOnTree::draw(acmacs::surface::Surface& /*surface*/, verbose /*verb*/) const
+void acmacs::tal::v3::DrawOnTree::draw(acmacs::surface::Surface& /*surface*/) const
 {
     // do nothing
     // draw_on_tree() called by DrawTree::draw is used for drawing
@@ -76,7 +76,7 @@ void acmacs::tal::v3::DrawOnTree::draw(acmacs::surface::Surface& /*surface*/, ve
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface, const DrawTree& draw_tree, verbose /*verb*/) const
+void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface, const DrawTree& draw_tree) const
 {
     const TextStyle text_style{};
 

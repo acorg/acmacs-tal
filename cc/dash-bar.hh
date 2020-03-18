@@ -12,7 +12,7 @@ namespace acmacs::tal::inline v3
       public:
         DashBarBase(Tal& tal) : LayoutElement(tal, 0.009) {}
 
-        // void prepare(verbose verb) override;
+        // void prepare() override;
 
         // ----------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ namespace acmacs::tal::inline v3
       public:
         DashBar(Tal& tal) : DashBarBase(tal) {}
 
-        // void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
+        // void prepare() override;
+        void draw(acmacs::surface::Surface& surface) const override;
 
         // ----------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ namespace acmacs::tal::inline v3
       public:
         DashBarClades(Tal& tal) : DashBarBase(tal) {}
 
-        // void prepare(verbose verb) override;
-        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
+        // void prepare() override;
+        void draw(acmacs::surface::Surface& surface) const override;
 
         // ----------------------------------------------------------------------
 

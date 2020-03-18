@@ -33,8 +33,8 @@ namespace acmacs::tal::inline v3
         LayoutElement& add(std::unique_ptr<LayoutElement> element);
 
         double width_relative_to_height() const;
-        void prepare(verbose verb);
-        void draw(acmacs::surface::Surface& surface, verbose verb) const;
+        void prepare();
+        void draw(acmacs::surface::Surface& surface) const;
 
         template <typename Element> const Element* find(const LayoutElementId& id = {}) const;
         template <typename Element> Element* find(const LayoutElementId& id = {});
@@ -42,7 +42,7 @@ namespace acmacs::tal::inline v3
         // counts elements of the same type
         size_t count(LayoutElement& element) const;
 
-        template <typename Element> void prepare_element(verbose verb);
+        template <typename Element> void prepare_element();
 
         size_t index_of(const LayoutElement* look_for) const;
 
@@ -74,9 +74,9 @@ namespace acmacs::tal::inline v3
     extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
     extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
 
-    extern template void Layout::prepare_element<DrawTree>(verbose verb);
-    extern template void Layout::prepare_element<TimeSeries>(verbose verb);
-    extern template void Layout::prepare_element<Clades>(verbose verb);
+    extern template void Layout::prepare_element<DrawTree>();
+    extern template void Layout::prepare_element<TimeSeries>();
+    extern template void Layout::prepare_element<Clades>();
 
     // ======================================================================
 
@@ -86,7 +86,7 @@ namespace acmacs::tal::inline v3
         Color outline_color{PINK};
         Pixels outline_width{2};
 
-        void draw(acmacs::surface::Surface& surface, verbose verb) const;
+        void draw(acmacs::surface::Surface& surface) const;
     };
 
     // ----------------------------------------------------------------------
@@ -104,8 +104,8 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         virtual Position position() const { return Position::normal; }
-        virtual void prepare(verbose /*verb*/) { prepared_ = true; }
-        virtual void draw(acmacs::surface::Surface& surface, verbose verb) const = 0;
+        virtual void prepare() { prepared_ = true; }
+        virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
         double pos_y_above(const Node& node, double vertical_step) const;
         double pos_y_below(const Node& node, double vertical_step) const;
@@ -193,7 +193,7 @@ namespace acmacs::tal::inline v3
       public:
         Gap(Tal& tal) : LayoutElement(tal, 0.05) {}
 
-        void draw(acmacs::surface::Surface& /*surface*/, verbose /*verb*/) const override {}
+        void draw(acmacs::surface::Surface& /*surface*/) const override {}
     };
 
     // ----------------------------------------------------------------------

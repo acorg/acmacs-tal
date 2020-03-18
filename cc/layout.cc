@@ -11,7 +11,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
+void acmacs::tal::v3::DrawOutline::draw(acmacs::surface::Surface& surface) const
 {
     if (outline) {
         const auto& viewport = surface.viewport();
@@ -54,10 +54,10 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::prepare(verbose verb)
+void acmacs::tal::v3::Layout::prepare()
 {
     for (auto& element : elements_)
-        element->prepare(verb);
+        element->prepare();
 
 } // acmacs::tal::v3::Layout::prepare
 
@@ -105,18 +105,18 @@ template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::t
 
 // ----------------------------------------------------------------------
 
-template <typename Element> void acmacs::tal::v3::Layout::prepare_element(verbose verb)
+template <typename Element> void acmacs::tal::v3::Layout::prepare_element()
 {
     for (auto& element : elements_) {
         if (auto* found = dynamic_cast<Element*>(element.get()); found)
-            found->prepare(verb);
+            found->prepare();
     }
 
 } // acmacs::tal::v3::Layout::prepare_tree
 
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>(verbose verb);
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>(verbose verb);
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>(verbose verb);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>();
 
 // ----------------------------------------------------------------------
 
@@ -147,19 +147,19 @@ const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool th
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface, verbose verb) const
+void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
 {
     double normal_left = 0.0;
     for (const auto& element : elements_) {
         switch (element->position()) {
             case Position::normal: {
                 auto& drawing_area = surface.subsurface({normal_left, 0.0}, Scaled{element->width_to_height_ratio()}, Size{element->width_to_height_ratio(), 1.0}, false);
-                element->outline().draw(drawing_area, verb);
-                element->draw(drawing_area, verb);
+                element->outline().draw(drawing_area);
+                element->draw(drawing_area);
                 normal_left += element->width_to_height_ratio();
             } break;
             case Position::absolute:
-                element->draw(surface, verb);
+                element->draw(surface);
                 break;
         }
     }

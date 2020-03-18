@@ -67,19 +67,19 @@ void acmacs::tal::v3::Settings::update_env()
 
 // ----------------------------------------------------------------------
 
-bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose verb)
+bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
 {
-    Timeit time_apply(fmt::format("DEBUG: applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
+    // Timeit time_apply(fmt::format("DEBUG: applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
     using namespace std::string_view_literals;
     try {
         // printenv();
         if (name == "aa-transitions"sv) {
-            Timeit time_update_common_aa("DEBUG: update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // Timeit time_update_common_aa("DEBUG: update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
-            time_update_common_aa.report();
-            Timeit time_update_aa_transitions("DEBUG: update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // time_update_common_aa.report();
+            // Timeit time_update_aa_transitions("DEBUG: update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
-            time_update_aa_transitions.report();
+            // time_update_aa_transitions.report();
             if (getenv("report"sv, false))
                 tree().report_aa_transitions();
         }
@@ -135,7 +135,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name, verbose ve
         else if (name == "tree"sv)
             add_tree();
         else
-            return acmacs::settings::Settings::apply_built_in(name, verb);
+            return acmacs::settings::Settings::apply_built_in(name);
         return true;
     }
     catch (std::exception& err) {

@@ -22,8 +22,8 @@ namespace acmacs::tal::inline v3
 
         void import_tree(std::string_view filename);
         void import_chart(std::string_view filename);
-        void prepare(verbose verb);
-        void export_tree(std::string_view filename, verbose verb);
+        void prepare();
+        void export_tree(std::string_view filename);
 
         constexpr Tree& tree() { return tree_; }
         constexpr const Tree& tree() const { return tree_; }

@@ -2,7 +2,7 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface, verbose /*verb*/) const
+void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface) const
 {
     const TextStyle text_style{};
     surface.text(parameters().offset, parameters().text, parameters().color, parameters().size, text_style, NoRotation);

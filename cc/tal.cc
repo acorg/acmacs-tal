@@ -46,19 +46,21 @@ struct Options : public argv
 
 namespace acmacs::log
 {
-    constexpr const section_t timer = 1 << 0;
+    // enum {
+    //     timer = 16
+    // };
+
 }
 
 int main(int argc, const char *argv[])
 {
     using namespace std::string_view_literals;
     try {
-        acmacs::log::register_enabler_all("all"sv);
-        acmacs::log::register_enabler("timer"sv, acmacs::log::timer);
+        acmacs::log::register_enabler_acmacs_base();
+        // acmacs::log::register_enabler("timer"sv, acmacs::log::timer);
 
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
-        const acmacs::verbose verbose{acmacs::verbose_from(true)};
         acmacs::log::enable(opt.verbose);
 
         const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
@@ -76,11 +78,11 @@ int main(int argc, const char *argv[])
         using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
-                settings.load(filename, verbose);
+                settings.load(filename);
             else
                 fmt::print(stderr, "WARNING: cannot load \"{}\": file not found\n", filename);
         }
-        settings.load(opt.settings_files, verbose);
+        settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
             if (const auto pos = def.find('='); pos != std::string_view::npos)
                 settings.setenv_from_string(def.substr(0, pos), def.substr(pos + 1));
@@ -90,11 +92,11 @@ int main(int argc, const char *argv[])
         time_loading_settings.report();
 
         Timeit time_applying_settings("DEBUG: Applying settings: ", report);
-        settings.apply("main"sv, verbose);
+        settings.apply("main"sv);
         time_applying_settings.report();
 
         Timeit time_preparing("DEBUG: preparing: ", report);
-        tal.prepare(verbose);
+        tal.prepare();
         time_preparing.report();
 
         if (opt.first_last_leaves.has_value()) {
@@ -104,7 +106,7 @@ int main(int argc, const char *argv[])
 
         Timeit time_exporting("DEBUG: exporting: ", report);
         for (const auto& output : *opt.outputs)
-            tal.export_tree(output, verbose);
+            tal.export_tree(output);
         time_exporting.report();
 
         if (opt.open || opt.ql) {

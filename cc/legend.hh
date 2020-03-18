@@ -15,7 +15,7 @@ namespace acmacs::tal::inline v3
 
         Position position() const override { return Position::absolute; }
 
-        // void prepare(verbose verb) override;
+        // void prepare() override;
 
         // ----------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ namespace acmacs::tal::inline v3
       public:
         using Legend::Legend;
 
-        void draw(acmacs::surface::Surface& surface, verbose verb) const override;
+        void draw(acmacs::surface::Surface& surface) const override;
 
         struct Parameters : public Legend::Parameters
         {
