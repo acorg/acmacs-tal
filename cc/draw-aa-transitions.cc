@@ -8,14 +8,15 @@
 
 void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 {
-    tree::iterate_pre(tal().tree(), [this](const Node& node) {
-        if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
-            const auto node_id = fmt::format("{}", node.node_id_);
-            transitions_.emplace_back(&node, parameters_for_node(node_id).label);
-        }
-    });
-    std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id_ < e2.node->node_id_; });
-
+    if (!prepared_) {
+        tree::iterate_pre(tal().tree(), [this](const Node& node) {
+            if (!node.hidden && node.number_leaves_in_subtree_ >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
+                const auto node_id = fmt::format("{}", node.node_id_);
+                transitions_.emplace_back(&node, parameters_for_node(node_id).label);
+            }
+        });
+        std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id_ < e2.node->node_id_; });
+    }
     LayoutElement::prepare(stage);
 
 } // acmacs::tal::v3::Legend::prepare

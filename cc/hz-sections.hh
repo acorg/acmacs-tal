@@ -7,6 +7,8 @@
 
 namespace acmacs::tal::inline v3
 {
+    class Node;
+
     class HzSections : public LayoutElement
     {
       public:
@@ -20,8 +22,8 @@ namespace acmacs::tal::inline v3
         struct Section
         {
             std::string id;
-            // seq_id_t first;
-            // seq_id_t last;
+            const Node* first{nullptr};
+            const Node* last{nullptr};
             bool shown{true};
             std::string label;
         };
@@ -44,6 +46,8 @@ namespace acmacs::tal::inline v3
 
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
+
+        void add_section(Section&& section) { sections_.push_back(std::move(section)); }
 
       private:
         Parameters parameters_;

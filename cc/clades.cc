@@ -3,6 +3,7 @@
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
+#include "acmacs-tal/hz-sections.hh"
 
 // ----------------------------------------------------------------------
 
@@ -61,6 +62,7 @@ void acmacs::tal::v3::Clades::make_clades()
     if (auto hz_sections = tal().draw().layout().find<HzSections>(); hz_sections) {
         for (const auto& clade : clades_) {
             for (auto [section_no, clade_section] : acmacs::enumerate(clade.sections)) {
+                hz_sections->add_section(HzSections::Section{fmt::format("{}-{}", clade.name, section_no), clade_section.first, clade_section.last, true, clade_section.display_name});
             }
         }
     }
