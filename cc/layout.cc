@@ -8,6 +8,7 @@
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
+#include "acmacs-tal/hz-sections.hh"
 
 // ----------------------------------------------------------------------
 
@@ -56,8 +57,10 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 void acmacs::tal::v3::Layout::prepare()
 {
-    for (auto& element : elements_)
-        element->prepare();
+    for (preparation_stage_t stage = 1; stage <= 2; ++stage) {
+        for (auto& element : elements_)
+            element->prepare(stage);
+    }
 
 } // acmacs::tal::v3::Layout::prepare
 
@@ -82,6 +85,7 @@ template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::fin
 template const acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id) const;
 
 template <typename Element> inline Element* acmacs::tal::v3::Layout::find(const LayoutElementId& id)
 {
@@ -102,21 +106,22 @@ template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acma
 template acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);
+template acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id);
 
 // ----------------------------------------------------------------------
 
-template <typename Element> void acmacs::tal::v3::Layout::prepare_element()
+template <typename Element> void acmacs::tal::v3::Layout::prepare_element(preparation_stage_t stage)
 {
     for (auto& element : elements_) {
         if (auto* found = dynamic_cast<Element*>(element.get()); found)
-            found->prepare();
+            found->prepare(stage);
     }
 
 } // acmacs::tal::v3::Layout::prepare_tree
 
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>();
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>();
-template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>();
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>(preparation_stage_t stage);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>(preparation_stage_t stage);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>(preparation_stage_t stage);
 
 // ----------------------------------------------------------------------
 

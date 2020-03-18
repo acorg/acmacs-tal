@@ -12,6 +12,7 @@
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
 #include "acmacs-tal/draw-aa-transitions.hh"
+#include "acmacs-tal/hz-sections.hh"
 
 // ----------------------------------------------------------------------
 
@@ -458,8 +459,9 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 
 void acmacs::tal::v3::Settings::add_tree()
 {
-    auto& element = add_element<DrawTree>();
-    process_color_by(element);
+    auto& tree_element = add_element<DrawTree>();
+    process_color_by(tree_element);
+    add_element<HzSections>();
 
 } // acmacs::tal::v3::Settings::add_tree
 

@@ -24,8 +24,11 @@ namespace acmacs::tal::inline v3
     class Gap;
     class DashBar;
     class DashBarClades;
+    class HzSections;
 
     using LayoutElementId = named_string_t<struct LayoutElementId_tag>;
+
+    using preparation_stage_t = size_t;
 
     class Layout
     {
@@ -42,7 +45,7 @@ namespace acmacs::tal::inline v3
         // counts elements of the same type
         size_t count(LayoutElement& element) const;
 
-        template <typename Element> void prepare_element();
+        template <typename Element> void prepare_element(preparation_stage_t stage);
 
         size_t index_of(const LayoutElement* look_for) const;
 
@@ -62,6 +65,7 @@ namespace acmacs::tal::inline v3
     extern template const Gap* Layout::find<Gap>(const LayoutElementId& id) const;
     extern template const DashBar* Layout::find<DashBar>(const LayoutElementId& id) const;
     extern template const DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id) const;
+    extern template const HzSections* Layout::find<HzSections>(const LayoutElementId& id) const;
 
     extern template DrawTree* Layout::find<DrawTree>(const LayoutElementId& id);
     extern template DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id);
@@ -73,10 +77,11 @@ namespace acmacs::tal::inline v3
     extern template Gap* Layout::find<Gap>(const LayoutElementId& id);
     extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
     extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
+    extern template HzSections* Layout::find<HzSections>(const LayoutElementId& id);
 
-    extern template void Layout::prepare_element<DrawTree>();
-    extern template void Layout::prepare_element<TimeSeries>();
-    extern template void Layout::prepare_element<Clades>();
+    extern template void Layout::prepare_element<DrawTree>(preparation_stage_t stage);
+    extern template void Layout::prepare_element<TimeSeries>(preparation_stage_t stage);
+    extern template void Layout::prepare_element<Clades>(preparation_stage_t stage);
 
     // ======================================================================
 
@@ -104,7 +109,7 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         virtual Position position() const { return Position::normal; }
-        virtual void prepare() { prepared_ = true; }
+        virtual void prepare(preparation_stage_t stage) { prepared_ = stage; }
         virtual void draw(acmacs::surface::Surface& surface) const = 0;
 
         double pos_y_above(const Node& node, double vertical_step) const;
@@ -175,7 +180,7 @@ namespace acmacs::tal::inline v3
         };
 
       protected:
-        bool prepared_{false};
+        preparation_stage_t prepared_{0};
         constexpr const Tal& tal() const { return tal_; }
         constexpr Tal& tal() { return tal_; }
 

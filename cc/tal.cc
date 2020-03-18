@@ -46,9 +46,9 @@ struct Options : public argv
 
 namespace acmacs::log
 {
-    // enum {
-    //     timer = 16
-    // };
+    enum {
+        hz_sections = 16
+    };
 
 }
 
@@ -57,11 +57,12 @@ int main(int argc, const char *argv[])
     using namespace std::string_view_literals;
     try {
         acmacs::log::register_enabler_acmacs_base();
-        // acmacs::log::register_enabler("timer"sv, acmacs::log::timer);
+        acmacs::log::register_enabler("hz-sections"sv, acmacs::log::hz_sections);
 
         Options opt(argc, argv);
         acmacs::seqdb::setup(opt.seqdb);
         acmacs::log::enable(opt.verbose);
+        acmacs::log::enable("hz-sections"sv);
 
         const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
 

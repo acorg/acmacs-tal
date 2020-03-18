@@ -1,3 +1,4 @@
+#include "acmacs-base/enumerate.hh"
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
@@ -20,7 +21,7 @@ bool acmacs::tal::v3::Clades::clade_t::intersects(const clade_t& rhs) const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Clades::prepare()
+void acmacs::tal::v3::Clades::prepare(preparation_stage_t stage)
 {
     if (!prepared_) {
         auto& layout = tal().draw().layout();
@@ -29,8 +30,9 @@ void acmacs::tal::v3::Clades::prepare()
         make_clades();
         if (width_to_height_ratio() <= 0.0 && number_of_slots())
             width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
+
     }
-    LayoutElement::prepare();
+    LayoutElement::prepare(stage);
 
 } // acmacs::tal::v3::Clades::prepare
 
@@ -55,6 +57,13 @@ void acmacs::tal::v3::Clades::make_clades()
     add_gaps_to_tree();
     add_separators_to_time_series();
     report_clades();
+
+    if (auto hz_sections = tal().draw().layout().find<HzSections>(); hz_sections) {
+        for (const auto& clade : clades_) {
+            for (auto [section_no, clade_section] : acmacs::enumerate(clade.sections)) {
+            }
+        }
+    }
 
 } // acmacs::tal::v3::Clades::make_clades
 

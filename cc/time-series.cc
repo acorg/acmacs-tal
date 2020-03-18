@@ -6,10 +6,10 @@
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeries::prepare()
+void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 {
     if (!prepared_) {
-        tal().draw().layout().prepare_element<DrawTree>();
+        tal().draw().layout().prepare_element<DrawTree>(stage);
 
         if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal().tree().stat_by_month();
@@ -25,7 +25,7 @@ void acmacs::tal::v3::TimeSeries::prepare()
             width_to_height_ratio() = series_.size() * parameters().slot.width;
         // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
     }
-    LayoutElementWithColoring::prepare();
+    LayoutElementWithColoring::prepare(stage);
 
 } // acmacs::tal::v3::TimeSeries::prepare
 
