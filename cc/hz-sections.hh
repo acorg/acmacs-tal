@@ -58,6 +58,7 @@ namespace acmacs::tal::inline v3
         std::vector<Section> sections_;
 
         void set_aa_transitions();
+        void sort();
     };
 
 } // namespace acmacs::tal::inline v3

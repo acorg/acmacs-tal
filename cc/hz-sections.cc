@@ -8,6 +8,7 @@ void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
 {
     if (stage == 2 && prepared_ < stage) {
         width_to_height_ratio() = 0.0;
+        sort();
         set_aa_transitions();
         // fmt::print(stderr, "DEBUG: hz-sections prepare width_to_height_ratio: {}\n", width_to_height_ratio());
         // auto& layout = tal().draw().layout();
@@ -34,12 +35,32 @@ void acmacs::tal::v3::HzSections::set_aa_transitions()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::HzSections::sort()
+{
+    std::sort(std::begin(sections_), std::end(sections_), [](const auto& s1, const auto& s2) { return s1.first->node_id.vertical < s2.first->node_id.vertical; });
+
+} // acmacs::tal::v3::HzSections::sort
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) const
 {
     // fmt::print(stderr, "DEBUG: HzSections width_to_height_ratio: {}\n", width_to_height_ratio());
 
+    fmt::print(stderr, "DEBUG: hz_sections\n");
+    bool hidden_present{false};
     for (const auto& section : sections_) {
-        fmt::print(stderr, "DEBUG: hz-section \"{}\" {} {} {} \"{}\"\n", section.id, section.first ? section.first->seq_id : seq_id_t{}, section.last ? section.last->seq_id : seq_id_t{}, section.aa_transitions, section.label);
+        if (section.shown)
+            fmt::print(stderr, "    \"{}\" {} {} {} \"{}\"\n", section.id, section.first ? section.first->seq_id : seq_id_t{}, section.last ? section.last->seq_id : seq_id_t{}, section.aa_transitions, section.label);
+        else
+            hidden_present = true;
+    }
+    if (hidden_present) {
+        fmt::print(stderr, "DEBUG: hidden hz_sections\n");
+        for (const auto& section : sections_) {
+            if (!section.shown)
+                fmt::print(stderr, "  - \"{}\" {} {} {} \"{}\"\n", section.id, section.first ? section.first->seq_id : seq_id_t{}, section.last ? section.last->seq_id : seq_id_t{}, section.aa_transitions, section.label);
+        }
     }
 
 } // acmacs::tal::v3::HzSections::draw
