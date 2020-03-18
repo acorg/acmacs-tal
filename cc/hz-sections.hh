@@ -20,9 +20,11 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
+        using section_id_t = acmacs::named_string_t<struct acmacs_tal_section_id_t_tag>;
+
         struct Section
         {
-            std::string id;
+            section_id_t id;
             const Node* first{nullptr};
             const Node* last{nullptr};
             bool shown{true};
