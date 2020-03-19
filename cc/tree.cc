@@ -542,6 +542,9 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
                 prev_leaf->last_next_leaf = &node;
                 node.first_prev_leaf = prev_leaf;
             }
+            else
+                node.first_prev_leaf = nullptr;
+            node.last_next_leaf = nullptr;
             prev_leaf = &node;
             for (Node* parent : parents) {
                 if (!parent->first_prev_leaf)

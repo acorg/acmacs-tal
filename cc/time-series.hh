@@ -19,7 +19,7 @@ namespace acmacs::tal::inline v3
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
 
-        void add_horizontal_line_above(const Node* node, const LineParameters& line);
+        void add_horizontal_line_above(const Node* node, const LineParameters& line, bool warn_if_present);
 
         // ----------------------------------------------------------------------
 

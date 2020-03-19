@@ -179,10 +179,10 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
             const auto& clade_param = parameters_for_clade(clade.name);
             for (const auto& section : clade.sections) {
                 if (clade_param.time_series_top_separator)
-                    time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line);
+                    time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line, true);
                 if (clade_param.time_series_bottom_separator) {
                     if (section.last->last_next_leaf)
-                        time_series->add_horizontal_line_above(section.last->last_next_leaf, clade_param.horizontal_line);
+                        time_series->add_horizontal_line_above(section.last->last_next_leaf, clade_param.horizontal_line, true);
                 }
             }
         }

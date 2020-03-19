@@ -635,7 +635,7 @@ void acmacs::tal::v3::Settings::hz_sections()
             rjson::copy_if_not_null(for_section.get("last"sv), section.last);
             rjson::copy_if_not_null(for_section.get("label"sv), section.label);
         }
-        else
+        else if (for_section.get("?id"sv).is_null() && for_section.get("? id"sv).is_null())
             fmt::print(stderr, "WARNING: settings hz-section without \"id\" ignored: {}\n", for_section);
     });
 
