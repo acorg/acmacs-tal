@@ -633,6 +633,7 @@ void acmacs::tal::v3::Settings::hz_sections()
             section.shown = rjson::get_or(for_section, "show"sv, true);
             rjson::copy_if_not_null(for_section.get("first"sv), section.first);
             rjson::copy_if_not_null(for_section.get("last"sv), section.last);
+            rjson::copy_if_not_null(for_section.get("label"sv), section.label);
         }
         else
             fmt::print(stderr, "WARNING: settings hz-section without \"id\" ignored: {}\n", for_section);

@@ -24,6 +24,8 @@ namespace acmacs::tal::inline v3
 
         struct Section
         {
+            Section(std::string_view a_id) : id{section_id_t{a_id}} {}
+            Section(std::string_view a_id, const Node* a_first, const Node* a_last, std::string_view a_label) : id{section_id_t{a_id}}, first{a_first}, last{a_last}, label{a_label} {}
             section_id_t id;
             const Node* first{nullptr};
             const Node* last{nullptr};
@@ -36,7 +38,7 @@ namespace acmacs::tal::inline v3
 
         struct SectionParameters
         {
-            SectionParameters(std::string_view a_id) : id{a_id}, label{a_id} {}
+            SectionParameters(std::string_view a_id) : id{a_id} {}
             std::string id;
             seq_id_t first;
             seq_id_t last;
@@ -53,10 +55,7 @@ namespace acmacs::tal::inline v3
 
             SectionParameters& find_add_section(std::string_view id)
             {
-                if (auto found = std::find_if(std::begin(sections), std::end(sections), [id](const auto& section) { return section.id == id; }); found != std::end(sections))
-                    return *found;
-                else
-                    return sections.emplace_back(id);
+                return HzSections::find_add_section(sections, id);
             }
         };
 
@@ -69,9 +68,18 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
         std::vector<Section> sections_;
 
+        void update_from_parameters();
         void set_aa_transitions();
         void sort();
         void report() const;
+
+        template <typename Sec> inline static Sec& find_add_section(std::vector<Sec>& sections, std::string_view id)
+            {
+                if (auto found = std::find_if(std::begin(sections), std::end(sections), [id](const auto& section) { return section.id == id; }); found != std::end(sections))
+                    return *found;
+                else
+                    return sections.emplace_back(id);
+            }
     };
 
 } // namespace acmacs::tal::inline v3

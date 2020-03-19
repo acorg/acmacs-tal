@@ -1,4 +1,4 @@
-# Time-stamp: <2020-03-19 11:32:26 eu>
+# Time-stamp: <2020-03-19 15:18:55 eu>
 
 * Command line defines
 
@@ -194,7 +194,7 @@ If multiple criteria specified within single "select" object, they all used (con
  "line": {"color": "black", "line_width": 1},
  "top_gap": 0.05, "bottom_gap": 0.05,
  "sections": [
-  {"id": "<uniq-id>", "first": "<seq_id>", "last": "<seq_id>", "show": true}
+  {"id": "<uniq-id>", "first": "<seq_id>", "last": "<seq_id>", "label": "", "show": true}
  ]
 },
 
