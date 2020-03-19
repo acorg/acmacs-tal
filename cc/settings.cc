@@ -90,8 +90,6 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             clade();
         else if (name == "clades"sv)
             add_clades();
-        else if (name == "clades-per-clade"sv)
-            clades_per_clade();
         else if (name == "dash-bar"sv)
             add_dash_bar();
         else if (name == "dash-bar-clades"sv)
@@ -612,13 +610,13 @@ void acmacs::tal::v3::Settings::add_clades()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::clades_per_clade()
-{
-    if (auto* clades_element = draw().layout().find<Clades>(); clades_element) {
-        read_per_clade(clades_element->parameters());
-    }
+// void acmacs::tal::v3::Settings::clades_per_clade()
+// {
+//     if (auto* clades_element = draw().layout().find<Clades>(); clades_element) {
+//         read_per_clade(clades_element->parameters());
+//     }
 
-} // acmacs::tal::v3::Settings::clades_per_clade
+// } // acmacs::tal::v3::Settings::clades_per_clade
 
 // ----------------------------------------------------------------------
 

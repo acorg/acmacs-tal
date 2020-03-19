@@ -36,7 +36,6 @@ namespace acmacs::tal::inline v3
         void apply_nodes() const;
         void update_env();
         void clade() const;
-        void clades_per_clade();
         void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
         void ladderize();
         void margins();

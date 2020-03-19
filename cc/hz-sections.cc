@@ -24,7 +24,7 @@ void acmacs::tal::v3::HzSections::set_aa_transitions()
     auto pre = [this](const Node& node) {
         if (!node.aa_transitions_.empty()) {
             for (auto& section : sections_) {
-                if (section.first->node_id.vertical >= node.first_leaf->node_id.vertical && section.last->node_id.vertical <= node.last_next_leaf->node_id.vertical)
+                if (section.first->node_id.vertical >= node.first_prev_leaf->node_id.vertical && section.last->node_id.vertical <= node.last_next_leaf->node_id.vertical)
                     section.aa_transitions.add_or_replace(node.aa_transitions_);
             }
         }

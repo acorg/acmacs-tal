@@ -121,7 +121,7 @@
     ],
 
     "clades-whocc": [
-        {"N": "clades-per-clade",
+        {"N": "clades",
          "per_clade": [
              {"?N": "---------- H1 ----------"},
              {"name": "6B", "show": false},
@@ -139,7 +139,7 @@
              {"?N": "---------- H3 ----------"},
              {"name": "3C.3", "show": false},
              {"name": "3C.2A", "show": false},
-             {"name": "3C.2A1", "show": false},
+             {"name": "3C.2A1", "show": true},
              {"name": "3C.2A1A", "section_exclusion_tolerance": 20},
              {"name": "3C.2A1B", "section_inclusion_tolerance": 20},
              {"?N": "---------- BVic ----------"},

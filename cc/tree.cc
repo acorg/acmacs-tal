@@ -3,6 +3,7 @@
 #include <set>
 
 #include "acmacs-base/statistics.hh"
+#include "acmacs-base/timeit.hh"
 #include "acmacs-virus/virus-name.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/tree.hh"
@@ -527,6 +528,8 @@ void acmacs::tal::v3::Tree::just_imported()
 
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
+    Timeit time_set_first_last_next_node_id("DEBUG: [time] set_first_last_next_node_id: ");
+
     node_id_t::value_type vertical{0};
     Node* prev_leaf{nullptr};
     std::vector<Node*> parents;
@@ -535,12 +538,14 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
         if (!node.hidden) {
             node.node_id.vertical = vertical;
             node.node_id.horizontal = 0;
-            if (prev_leaf)
+            if (prev_leaf) {
                 prev_leaf->last_next_leaf = &node;
+                node.first_prev_leaf = prev_leaf;
+            }
             prev_leaf = &node;
             for (Node* parent : parents) {
-                if (!parent->first_leaf)
-                    parent->first_leaf = &node;
+                if (!parent->first_prev_leaf)
+                    parent->first_prev_leaf = &node;
                 parent->last_next_leaf = &node;
             }
             ++vertical;
@@ -548,8 +553,16 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
     };
 
     const auto pre = [&parents](Node& node) {
-        node.first_leaf = nullptr; // reset
+        node.first_prev_leaf = nullptr; // reset
         parents.push_back(&node);
+        if (node.subtree.size() > 1) {
+            node.subtree.front().leaf_pos = leaf_position::first;
+            node.subtree.back().leaf_pos = leaf_position::last;
+            for (auto child = std::next(std::begin(node.subtree)); child != std::prev(std::end(node.subtree)); ++child)
+                child->leaf_pos = leaf_position::middle;
+        }
+        else
+            node.subtree.front().leaf_pos = leaf_position::single;
     };
 
     const auto post = [&parents](Node& node) {
@@ -560,6 +573,7 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
         parents.pop_back();
     };
 
+    fmt::print(stderr, "DEBUG: set_first_last_next_node_id\n");
     tree::iterate_leaf_pre_post(*this, leaf, pre, post);
 
 } // acmacs::tal::v3::Tree::set_first_last_next_node_id
@@ -571,11 +585,11 @@ void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves
     size_t level{0};
 
     const auto pre = [min_number_of_leaves, &level](const Node& node) {
-        if (!node.first_leaf || !node.last_next_leaf)
+        if (!node.first_prev_leaf || !node.last_next_leaf)
             throw std::runtime_error("Tree::report_first_last_leaves::pre: internal");
-        if (const auto num_leaves = node.last_next_leaf->node_id.vertical - node.first_leaf->node_id.vertical + 1; static_cast<size_t>(num_leaves) >= min_number_of_leaves) {
+        if (const auto num_leaves = node.number_leaves_in_subtree(); num_leaves >= min_number_of_leaves) {
             const auto aa_transitions = node.aa_transitions_.display();
-            fmt::print("{:{}s}[{}]  {}  --  {}{}\n", "", level * 4, num_leaves, node.first_leaf->seq_id, node.last_next_leaf->seq_id, aa_transitions.empty() ? std::string{} : "  --  " + aa_transitions);
+            fmt::print("{:{}s}[{}]  {}  --  {}{}\n", "", level * 4, num_leaves, node.first_prev_leaf->seq_id, node.last_next_leaf->seq_id, aa_transitions.empty() ? std::string{} : "  --  " + aa_transitions);
         }
         ++level;
     };
@@ -590,6 +604,8 @@ void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves
 
 void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 {
+    Timeit time_ladderize("DEBUG: [time] ladderize: ");
+
     const auto set_leaf = [](Node& node) { node.ladderize_helper_ = ladderize_helper_t{node.edge_length, node.date, node.seq_id}; };
 
     const auto set_parent = [](Node& node) {
@@ -961,10 +977,10 @@ acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::st
 
 bool acmacs::tal::v3::Tree::has_sequences() const
 {
-    if (!first_leaf)
+    if (!first_prev_leaf)
         return !find_first_leaf().aa_sequence.empty();
     else
-        return !first_leaf->aa_sequence.empty();
+        return !first_prev_leaf->aa_sequence.empty();
 
 } // acmacs::tal::v3::Tree::has_sequences
 

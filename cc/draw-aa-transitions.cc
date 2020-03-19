@@ -141,7 +141,7 @@ void acmacs::tal::v3::DrawAATransitions::report() const
         if (comma)
             fmt::print(",\n");
         fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:9.6f}, {:9.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": \"{}\"}}", node_id, max_id + 2, name, max_name + 3,
-                   transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_leaf->seq_id);
+                   transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_prev_leaf->seq_id);
         comma = true;
     }
     fmt::print("\n]\n");

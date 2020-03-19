@@ -71,7 +71,7 @@ namespace acmacs::tal::inline v3
         Node() = default;
         Node(const seq_id_t& a_seq_id, EdgeLength a_edge) : edge_length{a_edge}, seq_id{a_seq_id} {}
 
-        bool is_leaf() const { return subtree.empty(); } // seq_id may contain generated node name used for debugging
+        bool is_leaf() const noexcept { return subtree.empty(); } // seq_id may contain generated node name used for debugging
 
         Node& add_leaf(const seq_id_t& a_seq_id, EdgeLength a_edge) { return subtree.emplace_back(a_seq_id, a_edge); }
         Node& add_subtree() { return subtree.emplace_back(); }
@@ -106,8 +106,10 @@ namespace acmacs::tal::inline v3
         std::optional<Color> label_color;
 
         // -------------------- not exported --------------------
-        Node* first_leaf{nullptr}; // nullptr for leaves
-        Node* last_next_leaf{nullptr}; // last leaf for intermediate nodes, next leaf for leaves, nullptr for the last leaf
+        Node* first_prev_leaf{nullptr}; // first leaf for non-leaf nodes, prev leaf for leaves, nullptr for the top of the tree
+        Node* last_next_leaf{nullptr}; // last leaf for non-leaf nodes, next leaf for leaves, nullptr for the last leaf
+        enum class leaf_position { first, middle, last, single };
+        leaf_position leaf_pos{leaf_position::middle};
         node_id_t node_id;            // includes vertical leaf number for leaves
 
         // all nodes
@@ -136,8 +138,8 @@ namespace acmacs::tal::inline v3
 
         size_t number_leaves_in_subtree() const
         {
-            if (first_leaf)
-                return last_next_leaf->node_id.vertical - first_leaf->node_id.vertical + 1;
+            if (!is_leaf())
+                return last_next_leaf->node_id.vertical - first_prev_leaf->node_id.vertical + 1;
             else
                 return 0;
         }
