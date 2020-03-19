@@ -47,7 +47,16 @@ void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) co
 {
     // fmt::print(stderr, "DEBUG: HzSections width_to_height_ratio: {}\n", width_to_height_ratio());
 
-    fmt::print(stderr, "DEBUG: hz_sections\n");
+    if (parameters().report)
+        report();
+
+} // acmacs::tal::v3::HzSections::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::HzSections::report() const
+{
+    fmt::print(stderr, "HZ sections ({})\n", sections_.size());
     bool hidden_present{false};
     for (const auto& section : sections_) {
         if (section.shown)
@@ -63,7 +72,8 @@ void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) co
         }
     }
 
-} // acmacs::tal::v3::HzSections::draw
+
+} // acmacs::tal::v3::HzSections::report
 
 // ----------------------------------------------------------------------
 

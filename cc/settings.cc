@@ -100,6 +100,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             add_draw_on_tree();
         else if (name == "gap"sv)
             add_element<Gap>();
+        else if (name == "hz-sections"sv || name == "hz_sections"sv)
+            hz_sections();
         else if (name == "ladderize"sv)
             ladderize();
         else if (name == "legend"sv)
@@ -610,13 +612,33 @@ void acmacs::tal::v3::Settings::add_clades()
 
 // ----------------------------------------------------------------------
 
-// void acmacs::tal::v3::Settings::clades_per_clade()
-// {
-//     if (auto* clades_element = draw().layout().find<Clades>(); clades_element) {
-//         read_per_clade(clades_element->parameters());
-//     }
+void acmacs::tal::v3::Settings::hz_sections()
+{
+    using namespace std::string_view_literals;
 
-// } // acmacs::tal::v3::Settings::clades_per_clade
+    auto& element = add_element<HzSections>();
+    auto& param = element.parameters();
+
+    getenv_copy_if_present("report"sv, param.report);
+    if (const auto& line_val = substitute(getenv("line"sv)); !line_val.is_null()) {
+        rjson::copy_if_not_null(substitute(line_val.get("color"sv)), param.line.color);
+        rjson::copy_if_not_null(substitute(line_val.get("line_width"sv)), param.line.line_width);
+    }
+    rjson::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
+    rjson::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
+
+    rjson::for_each(getenv("sections"sv), [&param](const rjson::value& for_section) {
+        if (const auto& id = for_section.get("id"sv); !id.is_null()) {
+            auto& section = param.find_add_section(id.to<std::string_view>());
+            section.shown = rjson::get_or(for_section, "show"sv, true);
+            rjson::copy_if_not_null(for_section.get("first"sv), section.first);
+            rjson::copy_if_not_null(for_section.get("last"sv), section.last);
+        }
+        else
+            fmt::print(stderr, "WARNING: settings hz-section without \"id\" ignored: {}\n", for_section);
+    });
+
+} // acmacs::tal::v3::Settings::hz_sections
 
 // ----------------------------------------------------------------------
 

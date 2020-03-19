@@ -36,6 +36,7 @@ namespace acmacs::tal::inline v3
 
         struct SectionParameters
         {
+            SectionParameters(std::string_view a_id) : id{a_id}, label{a_id} {}
             std::string id;
             seq_id_t first;
             seq_id_t last;
@@ -45,7 +46,18 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
+            bool report{true};
             std::vector<SectionParameters> sections;
+            LineParameters line;
+            double tree_top_gap{50.0}, tree_bottom_gap{50.0};
+
+            SectionParameters& find_add_section(std::string_view id)
+            {
+                if (auto found = std::find_if(std::begin(sections), std::end(sections), [id](const auto& section) { return section.id == id; }); found != std::end(sections))
+                    return *found;
+                else
+                    return sections.emplace_back(id);
+            }
         };
 
         constexpr Parameters& parameters() { return parameters_; }
@@ -59,6 +71,7 @@ namespace acmacs::tal::inline v3
 
         void set_aa_transitions();
         void sort();
+        void report() const;
     };
 
 } // namespace acmacs::tal::inline v3
