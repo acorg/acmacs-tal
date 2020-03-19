@@ -99,8 +99,10 @@ void acmacs::tal::v3::HzSections::add_separators_to_time_series()
         for (const auto& section : sections_) {
             if (section.shown) {
                 time_series->add_horizontal_line_above(section.first, parameters().line);
-                if (section.last->last_next_leaf)
+                if (section.last->last_next_leaf) {
+                    fmt::print(stderr, "DEBUG: add_horizontal_line_above: {} --> {}\n", section.last->seq_id, section.last->last_next_leaf->seq_id);
                     time_series->add_horizontal_line_above(section.last->last_next_leaf, parameters().line);
+                }
             }
         }
     }

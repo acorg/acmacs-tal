@@ -50,7 +50,7 @@ namespace acmacs::tal::inline v3
         {
             bool report{true};
             std::vector<SectionParameters> sections;
-            LineParameters line;
+            LineParameters line{GREY, Pixels{1.0}, surface::Dash::NoDash};
             double tree_top_gap{50.0}, tree_bottom_gap{50.0};
 
             SectionParameters& find_add_section(std::string_view id)

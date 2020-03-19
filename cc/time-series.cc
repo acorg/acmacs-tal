@@ -33,6 +33,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
 void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const LineParameters& line)
 {
+    // fmt::print(stderr, "DEBUG: TimeSeries::add_horizontal_line_above: {}\n", node->seq_id);
     if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
         if (found->color != line.color || found->line_width != line.line_width)
             fmt::print(stderr, "WARNING: time series horizontal line above {} {} already added with different parameters\n", node->node_id, node->seq_id);
