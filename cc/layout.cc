@@ -57,7 +57,7 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 void acmacs::tal::v3::Layout::prepare()
 {
-    for (preparation_stage_t stage = 1; stage <= 2; ++stage) {
+    for (preparation_stage_t stage = 1; stage <= 3; ++stage) {
         for (auto& element : elements_)
             element->prepare(stage);
     }

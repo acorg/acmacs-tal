@@ -282,6 +282,17 @@ namespace acmacs::tal::inline v3
         // drawing support
         double compute_cumulative_vertical_offsets(); // returns tree height
 
+        static void set_top_gap(const Node& node, double gap)
+        {
+            if (node.vertical_offset_ < gap)
+                node.vertical_offset_ = gap;
+        }
+        static void set_bottom_gap(const Node& node, double gap)
+        {
+            if (node.last_next_leaf)
+                set_top_gap(*node.last_next_leaf, gap);
+        }
+
       private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});

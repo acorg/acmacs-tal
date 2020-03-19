@@ -71,6 +71,8 @@ namespace acmacs::tal::inline v3
         void update_from_parameters();
         void set_aa_transitions();
         void sort();
+        void add_gaps_to_tree();
+        void add_separators_to_time_series();
         void report() const;
 
         template <typename Sec> inline static Sec& find_add_section(std::vector<Sec>& sections, std::string_view id)

@@ -7,15 +7,12 @@
 
 void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
-    if (prepared_ < stage) {
-        if (stage == 1) {
-            tal().draw().layout().prepare_element<Clades>(stage);
-            const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
-            tal().tree().number_leaves_in_subtree();
-            fmt::print("INFO: tree [{}] Shown leaves: {}\n", id(), tal().tree().number_leaves_in_subtree());
-            vertical_step_ = height_ / tree_height;
-            horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
-        }
+    if (stage == 3 && prepared_ < stage) {
+        const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
+        tal().tree().number_leaves_in_subtree();
+        fmt::print("INFO: tree [{}] Shown leaves: {}\n", id(), tal().tree().number_leaves_in_subtree());
+        vertical_step_ = height_ / tree_height;
+        horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
     }
     LayoutElementWithColoring::prepare(stage);
 

@@ -11,8 +11,12 @@ void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
         update_from_parameters();
         sort();
         set_aa_transitions();
+        add_gaps_to_tree();
+        add_separators_to_time_series();
         // fmt::print(stderr, "DEBUG: hz-sections prepare width_to_height_ratio: {}\n", width_to_height_ratio());
         // auto& layout = tal().draw().layout();
+        if (parameters().report)
+            report();
     }
     LayoutElement::prepare(stage);
 
@@ -75,12 +79,30 @@ void acmacs::tal::v3::HzSections::sort()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::HzSections::add_gaps_to_tree()
+{
+    for (const auto& section : sections_) {
+        if (section.shown) {
+            Tree::set_top_gap(*section.first, parameters().tree_top_gap);
+            Tree::set_bottom_gap(*section.last, parameters().tree_bottom_gap);
+        }
+    }
+
+} // acmacs::tal::v3::HzSections::add_gaps_to_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::HzSections::add_separators_to_time_series()
+{
+
+} // acmacs::tal::v3::HzSections::add_separators_to_time_series
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) const
 {
     // fmt::print(stderr, "DEBUG: HzSections width_to_height_ratio: {}\n", width_to_height_ratio());
 
-    if (parameters().report)
-        report();
 
 } // acmacs::tal::v3::HzSections::draw
 

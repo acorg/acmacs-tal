@@ -1114,10 +1114,6 @@ double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
 } // acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets
 
 // ----------------------------------------------------------------------
-
-
-
-// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:
