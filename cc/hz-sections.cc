@@ -1,5 +1,6 @@
 #include "acmacs-tal/hz-sections.hh"
 #include "acmacs-tal/tal-data.hh"
+#include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
 // ----------------------------------------------------------------------
@@ -94,6 +95,15 @@ void acmacs::tal::v3::HzSections::add_gaps_to_tree()
 
 void acmacs::tal::v3::HzSections::add_separators_to_time_series()
 {
+    if (auto* time_series = tal().draw().layout().find<TimeSeries>(); time_series) {
+        for (const auto& section : sections_) {
+            if (section.shown) {
+                time_series->add_horizontal_line_above(section.first, parameters().line);
+                if (section.last->last_next_leaf)
+                    time_series->add_horizontal_line_above(section.last->last_next_leaf, parameters().line);
+            }
+        }
+    }
 
 } // acmacs::tal::v3::HzSections::add_separators_to_time_series
 
