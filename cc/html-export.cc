@@ -21,7 +21,7 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
 {
     tree.cumulative_calculate();
     const double edge_scale = 1000.0 / tree.max_cumulative_shown().as_number();
-    fmt::print(stderr, "DEBUG: max {} edge_scale {}\n", tree.max_cumulative_shown(), edge_scale);
+    fmt::print(stderr, "DEBUG max {} edge_scale {}\n", tree.max_cumulative_shown(), edge_scale);
 
     fmt::memory_buffer html;
     fmt::format_to(html, sHeader, fmt::arg("title", fmt::format("{} {}", tree.virus_type(), tree.lineage())));

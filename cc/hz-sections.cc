@@ -14,7 +14,7 @@ void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
         set_aa_transitions();
         add_gaps_to_tree();
         add_separators_to_time_series();
-        // fmt::print(stderr, "DEBUG: hz-sections prepare width_to_height_ratio: {}\n", width_to_height_ratio());
+        // fmt::print(stderr, "DEBUG hz-sections prepare width_to_height_ratio: {}\n", width_to_height_ratio());
         // auto& layout = tal().draw().layout();
         if (parameters().report)
             report();
@@ -101,7 +101,7 @@ void acmacs::tal::v3::HzSections::add_separators_to_time_series()
                 const auto warn_if_present = section.id.size() < 3 || section.id[section.id.size() - 2] != '-';
                 time_series->add_horizontal_line_above(section.first, parameters().line, warn_if_present);
                 if (section.last->last_next_leaf) {
-                    fmt::print(stderr, "DEBUG: add_horizontal_line_above: {} --> {}\n", section.last->seq_id, section.last->last_next_leaf->seq_id);
+                    // fmt::print(stderr, "DEBUG add_horizontal_line_above: {} --> {}\n", section.last->seq_id, section.last->last_next_leaf->seq_id);
                     time_series->add_horizontal_line_above(section.last->last_next_leaf, parameters().line, warn_if_present);
                 }
             }
@@ -114,7 +114,7 @@ void acmacs::tal::v3::HzSections::add_separators_to_time_series()
 
 void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) const
 {
-    // fmt::print(stderr, "DEBUG: HzSections width_to_height_ratio: {}\n", width_to_height_ratio());
+    // fmt::print(stderr, "DEBUG HzSections width_to_height_ratio: {}\n", width_to_height_ratio());
 
 
 } // acmacs::tal::v3::HzSections::draw
@@ -142,7 +142,7 @@ void acmacs::tal::v3::HzSections::report() const
             hidden_present = true;
     }
     if (hidden_present) {
-        fmt::print(stderr, "DEBUG: hidden hz_sections\n");
+        fmt::print(stderr, "DEBUG hidden hz_sections\n");
         for (const auto& section : sections_) {
             if (!section.shown)
                 fmt::print(stderr, "    {:{}s} {:{}s} {:{}s} {} \"{}\"\n", fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);

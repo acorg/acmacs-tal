@@ -67,21 +67,21 @@ int main(int argc, const char *argv[])
         const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
 
         acmacs::tal::Tal tal;
-        Timeit time_loading_tree("DEBUG: Loading tree: ", report);
+        Timeit time_loading_tree("DEBUG Loading tree: ", report);
         tal.import_tree(opt.tree_file);
         time_loading_tree.report();
-        Timeit time_loading_chart("DEBUG: Loading chart: ", report);
+        Timeit time_loading_chart("DEBUG Loading chart: ", report);
         tal.import_chart(opt.chart_file);
         time_loading_chart.report();
 
-        Timeit time_loading_settings("DEBUG: Loading settings: ", report);
+        Timeit time_loading_settings("DEBUG Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
         using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
             if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename))
                 settings.load(filename);
             else
-                fmt::print(stderr, "WARNING: cannot load \"{}\": file not found\n", filename);
+                fmt::print(stderr, "WARNING cannot load \"{}\": file not found\n", filename);
         }
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
@@ -92,18 +92,18 @@ int main(int argc, const char *argv[])
         }
         time_loading_settings.report();
 
-        Timeit time_applying_settings("DEBUG: Applying settings: ", report);
+        Timeit time_applying_settings("DEBUG Applying settings: ", report);
         settings.apply("main"sv);
         time_applying_settings.report();
 
-        Timeit time_preparing("DEBUG: preparing: ", report);
+        Timeit time_preparing("DEBUG preparing: ", report);
         tal.prepare();
         time_preparing.report();
 
         if (opt.first_last_leaves.has_value())
             tal.tree().report_first_last_leaves(opt.first_last_leaves);
 
-        Timeit time_exporting("DEBUG: exporting: ", report);
+        Timeit time_exporting("DEBUG exporting: ", report);
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
         time_exporting.report();
@@ -119,7 +119,7 @@ int main(int argc, const char *argv[])
         return 0;
     }
     catch (std::exception& err) {
-        fmt::print(stderr, "ERROR: {}\n", err);
+        fmt::print(stderr, "ERROR {}\n", err);
         return 1;
     }
 }

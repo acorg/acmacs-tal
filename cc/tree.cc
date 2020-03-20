@@ -277,7 +277,7 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     NodeSet selected;
     select_if_edge_more_than(selected, Select::init, mean_edge_of(0.01));
     for (Node* node : selected) {
-        fmt::print(stderr, "DEBUG: long edge {} {} {}\n", node->edge_length, node->node_id, node->seq_id);
+        fmt::print(stderr, "DEBUG long edge {} {} {}\n", node->edge_length, node->node_id, node->seq_id);
         node->color_edge_line = RED;
     }
 
@@ -446,14 +446,14 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
             if (virus_type_.empty())
                 virus_type_ = node.ref.entry->virus_type;
             else if (virus_type_ != node.ref.entry->virus_type)
-                fmt::print(stderr, "WARNING: multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, node.ref.entry->virus_type);
+                fmt::print(stderr, "WARNING multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, node.ref.entry->virus_type);
             if (lineage_.empty())
                 lineage_ = node.ref.entry->lineage;
             else if (lineage_ != node.ref.entry->lineage && !node.ref.entry->lineage.empty())
-                fmt::print(stderr, "WARNING: multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, node.ref.entry->lineage);
+                fmt::print(stderr, "WARNING multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, node.ref.entry->lineage);
         }
         else {
-            fmt::print(stderr, "WARNING: seq_id \"{}\" not found in seqdb\n", node.seq_id);
+            fmt::print(stderr, "WARNING seq_id \"{}\" not found in seqdb\n", node.seq_id);
         }
     });
 
@@ -512,7 +512,7 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
 
     set_first_last_next_node_id();
 
-    fmt::print("INFO: populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}\n", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
+    fmt::print("INFO populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}\n", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
 
 } // acmacs::tal::v3::Tree::populate_with_nuc_duplicates
 
@@ -528,7 +528,7 @@ void acmacs::tal::v3::Tree::just_imported()
 
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
-    Timeit time_set_first_last_next_node_id("DEBUG: [time] set_first_last_next_node_id: ");
+    Timeit time_set_first_last_next_node_id("DEBUG [time] set_first_last_next_node_id: ");
 
     node_id_t::value_type vertical{0};
     Node* prev_leaf{nullptr};
@@ -576,7 +576,7 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
         parents.pop_back();
     };
 
-    fmt::print(stderr, "DEBUG: set_first_last_next_node_id\n");
+    fmt::print(stderr, "DEBUG set_first_last_next_node_id\n");
     tree::iterate_leaf_pre_post(*this, leaf, pre, post);
 
 } // acmacs::tal::v3::Tree::set_first_last_next_node_id
@@ -607,7 +607,7 @@ void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves
 
 void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 {
-    Timeit time_ladderize("DEBUG: [time] ladderize: ");
+    Timeit time_ladderize("DEBUG [time] ladderize: ");
 
     const auto set_leaf = [](Node& node) { node.ladderize_helper_ = ladderize_helper_t{node.edge_length, node.date, node.seq_id}; };
 
@@ -646,16 +646,16 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 
     switch (method) {
         case Ladderize::MaxEdgeLength:
-            fmt::print(stderr, "INFO: ladderizing by MaxEdgeLength\n");
+            fmt::print(stderr, "INFO ladderizing by MaxEdgeLength\n");
             tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
             break;
         case Ladderize::NumberOfLeaves:
-            fmt::print(stderr, "INFO: ladderizing by NumberOfLeaves\n");
+            fmt::print(stderr, "INFO ladderizing by NumberOfLeaves\n");
             number_leaves_in_subtree();
             tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
             break;
         case Ladderize::None:
-            fmt::print(stderr, "WARNING: no ladderizing\n");
+            fmt::print(stderr, "WARNING no ladderizing\n");
             break;
     }
 
@@ -865,7 +865,7 @@ void acmacs::tal::v3::Tree::report_common_aa() const
 
 void acmacs::tal::v3::Tree::update_aa_transitions() const
 {
-    Timeit time1("DEBUG: update_aa_transitions cumulative_calculate: ", report_time::no);
+    Timeit time1("DEBUG update_aa_transitions cumulative_calculate: ", report_time::no);
     cumulative_calculate();
     time1.report();
 
@@ -876,7 +876,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
             return node.common_aa_.at(pos);
     };
 
-    Timeit time2("DEBUG: update_aa_transitions counting: ", report_time::no);
+    Timeit time2("DEBUG update_aa_transitions counting: ", report_time::no);
     tree::iterate_post(*this, [aa_at, this](const Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
             if (node.common_aa_.is_no_common(pos)) {
@@ -891,7 +891,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                     }
                 }
                 // if (pos == seqdb::pos1_t{484})
-                //     fmt::print(stderr, "DEBUG: node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}\n", node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                //     fmt::print(stderr, "DEBUG node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}\n", node.node_id, node.number_leaves_in_subtree(), pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
@@ -901,14 +901,14 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
     });
     time2.report();
 
-    Timeit time3("DEBUG: update_aa_transitions sorted_leaf_nodes: ", report_time::no);
+    Timeit time3("DEBUG update_aa_transitions sorted_leaf_nodes: ", report_time::no);
     std::vector<const Node*> sorted_leaf_nodes;
     tree::iterate_leaf(*this, [&sorted_leaf_nodes](const Node& node) { sorted_leaf_nodes.push_back(&node); });
     const auto sorted_leaf_nodes_cmp = [](const auto* n1, const auto* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; };
     std::sort(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), sorted_leaf_nodes_cmp); // bigger cumul length first
     time3.report();
 
-    Timeit time4("DEBUG: update_aa_transitions left part: ", report_time::no);
+    Timeit time4("DEBUG update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
     auto add_left_part = [&sorted_leaf_nodes](const Node& node) {
         if (!node.aa_transitions_.empty()) {
@@ -948,7 +948,7 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 void acmacs::tal::v3::Tree::clades_reset()
 {
-    // fmt::print(stderr, "DEBUG: Tree::clades_reset\n");
+    // fmt::print(stderr, "DEBUG Tree::clades_reset\n");
     tree::iterate_leaf(*this, [](Node& node) { node.clades.clear(); });
     clades_.clear();
 
@@ -1016,7 +1016,7 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs:
     //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->node_id.vertical - section.first->node_id.vertical) < exclusion_tolerance; }),
     //     std::end(clade_sections));
 
-    // fmt::print(stderr, "DEBUG: clade \"{}\": {} leaves, {} sections\n", clade_name, num, clade_sections.size());
+    // fmt::print(stderr, "DEBUG clade \"{}\": {} leaves, {} sections\n", clade_name, num, clade_sections.size());
 
 } // acmacs::tal::v3::Tree::clade_set
 
@@ -1061,7 +1061,7 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view clade_name_to_report) 
     else if (const auto* found = find_clade(clade_name_to_report); found)
         report(clade_name_to_report, found->sections);
     else
-        fmt::print(stderr, "WARNING: no clade \"{}\" defined\n", clade_name_to_report);
+        fmt::print(stderr, "WARNING no clade \"{}\" defined\n", clade_name_to_report);
 
 } // acmacs::tal::v3::Tree::clade_report
 

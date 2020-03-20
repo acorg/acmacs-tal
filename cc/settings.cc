@@ -70,15 +70,15 @@ void acmacs::tal::v3::Settings::update_env()
 
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
 {
-    // Timeit time_apply(fmt::format("DEBUG: applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
+    // Timeit time_apply(fmt::format("DEBUG applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
     using namespace std::string_view_literals;
     try {
         // printenv();
         if (name == "aa-transitions"sv) {
-            // Timeit time_update_common_aa("DEBUG: update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // Timeit time_update_common_aa("DEBUG update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
             // time_update_common_aa.report();
-            // Timeit time_update_aa_transitions("DEBUG: update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // Timeit time_update_aa_transitions("DEBUG update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
             // time_update_aa_transitions.report();
             if (getenv("report"sv, false))
@@ -123,7 +123,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_time_series(Tree::report_size::detailed));
             else
-                fmt::print("INFO: {}\n", tree().report_time_series(Tree::report_size::brief));
+                fmt::print("INFO {}\n", tree().report_time_series(Tree::report_size::brief));
         }
         else if (name == "seqdb"sv) {
             tree().match_seqdb(getenv("filename"sv, ""));
@@ -152,7 +152,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
     using namespace std::string_view_literals;
 
     const auto selected = select_nodes(getenv("select"));
-    // fmt::print(stderr, "DEBUG: apply_nodes {}\n", selected.size());
+    // fmt::print(stderr, "DEBUG apply_nodes {}\n", selected.size());
 
     const auto apply_one = [this, &selected](std::string_view key, const rjson::value& value) {
         if (key == "hide") {
@@ -213,7 +213,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 node->edge_line_width_scale = line_width_scale;
         }
         else if (key == "report") {
-            report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
+            report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
         }
     };
 
@@ -291,7 +291,7 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
                     rjson::copy_if_not_null(val.get("width"sv), draw_outline.outline_width);
                 }
                 else {
-                    fmt::print(stderr, "WARNING: unrecognized debug-outline value: {}\n", val);
+                    fmt::print(stderr, "WARNING unrecognized debug-outline value: {}\n", val);
                 }
             },
             debug_outline.val_());
@@ -360,7 +360,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             else if (match_type == "passage")
                 mt = Tree::serum_match_t::passage_type;
             else if (match_type != "name")
-                fmt::print(stderr, "WARNING: unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed\n", match_type);
+                fmt::print(stderr, "WARNING unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed\n", match_type);
             tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id") {
@@ -378,7 +378,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             update = Tree::Select::update;
     });
     if (report)
-        report_nodes(fmt::format("INFO: {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
+        report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
     return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
@@ -430,7 +430,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             return std::make_unique<ColoringUniform>(Color{rjson::get_or(fields, "color", "black")});
         }
         else {
-            fmt::print(stderr, "WARNING: unrecognized \"color_by\": {}, uniform(PINK) assumed\n", key);
+            fmt::print(stderr, "WARNING unrecognized \"color_by\": {}, uniform(PINK) assumed\n", key);
             return std::make_unique<ColoringUniform>(PINK);
         }
     };
@@ -525,7 +525,7 @@ void acmacs::tal::v3::Settings::add_time_series()
             else if (rot == "anticlockwise" || rot == "counterclockwise")
                 param.slot.label.rotation = Rotation90DegreesAnticlockwise;
             else
-                fmt::print(stderr, "WARNING: unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
+                fmt::print(stderr, "WARNING unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
         });
     }
 
@@ -636,7 +636,7 @@ void acmacs::tal::v3::Settings::hz_sections()
             rjson::copy_if_not_null(for_section.get("label"sv), section.label);
         }
         else if (for_section.get("?id"sv).is_null() && for_section.get("? id"sv).is_null())
-            fmt::print(stderr, "WARNING: settings hz-section without \"id\" ignored: {}\n", for_section);
+            fmt::print(stderr, "WARNING settings hz-section without \"id\" ignored: {}\n", for_section);
     });
 
 } // acmacs::tal::v3::Settings::hz_sections
@@ -658,7 +658,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
             else if (position == "bottom"sv)
                 param.vpos = Clades::vertical_position::bottom;
             else
-                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
+                fmt::print(stderr, "WARNING unrecognized clade label position: \"{}\"\n", position);
         });
         rjson::call_if_not_null<std::string_view>(substitute(source.get("horizontal_position"sv)), [&param](auto position) {
             if (position == "middle"sv)
@@ -668,7 +668,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
             else if (position == "right"sv)
                 param.hpos = Clades::horizontal_position::right;
             else
-                fmt::print(stderr, "WARNING: unrecognized clade label position: \"{}\"\n", position);
+                fmt::print(stderr, "WARNING unrecognized clade label position: \"{}\"\n", position);
         });
         rjson::copy_if_not_null(source.get("offset"sv), param.offset);
         rjson::copy_if_not_null(substitute(source.get("text"sv)), param.text);
@@ -816,7 +816,7 @@ void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, 
                 dot_parameters.coordinates = PointCoordinates{found.latitude(), found.longitude()};
             }
             catch (std::exception&) {
-                fmt::print(stderr, "WARNING: \"location\" for world map dot not found: {}\n", source);
+                fmt::print(stderr, "WARNING \"location\" for world map dot not found: {}\n", source);
             }
         }
         rjson::copy(source.get("coordinates"sv), dot_parameters.coordinates);
@@ -847,7 +847,7 @@ void acmacs::tal::v3::Settings::add_legend()
         rjson::for_each(getenv("dots"sv), [&param, this](const rjson::value& for_dot) { read_dot_parameters(for_dot, param.dots.emplace_back()); });
     }
     else
-        fmt::print(stderr, "WARNING: unrecognized legend type: \"{}\"\n", legend_type);
+        fmt::print(stderr, "WARNING unrecognized legend type: \"{}\"\n", legend_type);
 
 } // acmacs::tal::v3::Settings::add_legend
 
@@ -906,7 +906,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
         | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::get_or(criteria, "type", "any"))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
         | ranges::views::transform([](const auto& en) { return en.name; }));
 
-    fmt::print(stderr, "DEBUG: select_vaccine {}\n", names);
+    fmt::print(stderr, "DEBUG select_vaccine {}\n", names);
     NodeSet selected_nodes;
     for (const auto& name : names) {
         NodeSet some_nodes;
@@ -937,7 +937,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
           nodes.filter(selected_nodes);
           break;
     }
-    // report_nodes(fmt::format("INFO: select_vaccine: {} selected nodes {}\n", nodes.size(), criteria), "  ", nodes);
+    // report_nodes(fmt::format("INFO select_vaccine: {} selected nodes {}\n", nodes.size(), criteria), "  ", nodes);
 
 } // acmacs::tal::v3::Settings::select_vaccine
 

@@ -14,7 +14,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal().tree().stat_by_month();
             const auto [first, last] = tal().tree().suggest_time_series_start_end(month_stat);
-            fmt::print("INFO: Time Series range suggested: {} {}\n", first, last);
+            fmt::print("INFO Time Series range suggested: {} {}\n", first, last);
             if (parameters().time_series.first == date::invalid_date())
                 parameters().time_series.first = first;
             if (parameters().time_series.after_last == date::invalid_date())
@@ -23,7 +23,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         series_ = acmacs::time_series::make(parameters().time_series);
         if (width_to_height_ratio() <= 0.0)
             width_to_height_ratio() = series_.size() * parameters().slot.width;
-        // fmt::print(stderr, "DEBUG: time series: {} {}\n", series_.size(), series_);
+        // fmt::print(stderr, "DEBUG time series: {} {}\n", series_.size(), series_);
     }
     LayoutElementWithColoring::prepare(stage);
 
@@ -33,10 +33,10 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
 void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const LineParameters& line, bool warn_if_present)
 {
-    // fmt::print(stderr, "DEBUG: TimeSeries::add_horizontal_line_above: {}\n", node->seq_id);
+    // fmt::print(stderr, "DEBUG TimeSeries::add_horizontal_line_above: {}\n", node->seq_id);
     if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
         if ((found->color != line.color || found->line_width != line.line_width) && warn_if_present)
-            fmt::print(stderr, "WARNING: time series horizontal line above {} {} already added with different parameters\n", node->node_id, node->seq_id);
+            fmt::print(stderr, "WARNING time series horizontal line above {} {} already added with different parameters\n", node->node_id, node->seq_id);
     }
     else
         horizontal_lines_.emplace_back(node, line);

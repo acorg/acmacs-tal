@@ -10,7 +10,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
     if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
         tal().tree().number_leaves_in_subtree();
-        fmt::print("INFO: tree [{}] Shown leaves: {}\n", id(), tal().tree().number_leaves_in_subtree());
+        fmt::print("INFO tree [{}] Shown leaves: {}\n", id(), tal().tree().number_leaves_in_subtree());
         vertical_step_ = height_ / tree_height;
         horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
     }
@@ -52,7 +52,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                                  line_width);
                 }
                 else
-                    fmt::print(stderr, "WARNING: node is not hidden but all ist children are hidden {} total children: {}\n", node.node_id, node.subtree.size());
+                    fmt::print(stderr, "WARNING node is not hidden but all ist children are hidden {} total children: {}\n", node.node_id, node.subtree.size());
             }
         });
 
