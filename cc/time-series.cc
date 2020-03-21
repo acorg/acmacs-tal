@@ -58,10 +58,21 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
         if (!leaf.hidden && !leaf.date.empty()) {
             const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
             if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
-                const auto specific = parameters().per_nodes.at_ptr(leaf.seq_id);
-                const auto dash_color = specific && specific->color.has_value() ? *specific->color : color(leaf);
-                const auto dash_line_width = specific && specific->line_width.has_value() ? *specific->line_width : parameters().dash.line_width;
-                const auto dash_width = specific && specific->width.has_value() ? *specific->width : parameters().dash.width;
+                auto dash_color = color(leaf);
+                auto dash_line_width = parameters().dash.line_width;
+                auto dash_width = parameters().dash.width;
+                parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
+                    if (per_node.color.has_value())
+                        dash_color = *per_node.color;
+                    if (per_node.line_width.has_value())
+                        dash_line_width = *per_node.line_width;
+                    if (per_node.width.has_value())
+                        dash_width = *per_node.width;
+                });
+                // const auto specific = parameters().per_nodes.at_ptr(leaf.seq_id);
+                // const auto dash_color = specific && specific->color.has_value() ? *specific->color : color(leaf);
+                // const auto dash_line_width = specific && specific->line_width.has_value() ? *specific->line_width : parameters().dash.line_width;
+                // const auto dash_width = specific && specific->width.has_value() ? *specific->width : parameters().dash.width;
                 const auto dash_offset_x = viewport.left() + slot_no * slot_width + parameters().slot.width * (1.0 - dash_width) * 0.5;
                 surface.line({dash_offset_x, vertical_step * leaf.cumulative_vertical_offset_}, {dash_offset_x + slot_width * dash_width, vertical_step * leaf.cumulative_vertical_offset_},
                              dash_color, dash_line_width, surface::LineCap::Round);

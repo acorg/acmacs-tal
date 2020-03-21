@@ -41,7 +41,7 @@ namespace acmacs::tal::inline v3
         ColoringByContinent() : colors_{continent_colors_dark()} {}
         Color color(const Node& node) const override;
 
-        void set(std::string_view continent, Color color) { colors_.emplace_or_replace(std::string{continent}, color); }
+        void set(std::string_view continent, Color color) { colors_.emplace_or_replace(continent, color); }
 
       private:
         continent_colors_t colors_;
@@ -57,7 +57,7 @@ namespace acmacs::tal::inline v3
 
       private:
         acmacs::seqdb::pos1_t pos_;
-        mutable acmacs::flat_map_t<char, Color> colors_;
+        mutable acmacs::small_map_with_unique_keys_t<char, Color> colors_;
     };
 
     // ----------------------------------------------------------------------
