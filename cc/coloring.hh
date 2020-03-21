@@ -44,7 +44,7 @@ namespace acmacs::tal::inline v3
         void set(std::string_view continent, Color color) { colors_.emplace_or_replace(std::string{continent}, color); }
 
       private:
-        acmacs::flat_map_t<std::string, Color> colors_;
+        continent_colors_t colors_;
     };
 
     // ----------------------------------------------------------------------
