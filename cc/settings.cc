@@ -678,7 +678,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
         rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
         rjson::copy_if_not_null(source.get("tether"sv, "line_width"sv), param.tether.line.line_width);
 
-        rjson::copy_if_not_null(source.get("text_style"sv, "font"sv), param.text_style.font_family);
+        rjson::copy_if_not_null(source.get("text_style"sv, "font"sv), param.text_style.font_family.set());
         rjson::copy_if_not_null(source.get("text_style"sv, "slant"sv), param.text_style.slant);
         rjson::copy_if_not_null(source.get("text_style"sv, "weight"sv), param.text_style.weight);
     }

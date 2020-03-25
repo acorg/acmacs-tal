@@ -1,6 +1,6 @@
 #pragma once
 
-#include "acmacs-base/color.hh"
+#include "acmacs-base/color-continent.hh"
 #include "acmacs-base/flat-map.hh"
 #include "seqdb-3/sequence.hh"
 

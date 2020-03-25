@@ -1,3 +1,4 @@
+#include "acmacs-base/color-distinct.hh"
 #include "acmacs-tal/coloring.hh"
 #include "acmacs-tal/tree.hh"
 
@@ -30,8 +31,8 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
     const auto aa = node.aa_sequence.at(pos_);
     if (aa == 'X')
         return BLACK;
-    const auto color = colors_.emplace_not_replace(aa, Color::distinct(colors_.size())).second;
-    fmt::print(stderr, "DEBUG ColoringByPos {} {}: {}\n", pos_, aa, color.to_string());
+    const auto color = colors_.emplace_not_replace(aa, acmacs::color::distinct(colors_.size())).second;
+    fmt::print(stderr, "DEBUG ColoringByPos {} {}: {}\n", pos_, aa, color);
     return color;
 
 } // acmacs::tal::v3::ColoringByPos::color
