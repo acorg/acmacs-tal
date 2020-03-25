@@ -178,7 +178,7 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
         for (const auto& clade : clades_) {
             const auto& clade_param = parameters_for_clade(clade.name);
             for (const auto& section : clade.sections) {
-                DEBUG("clade {} {}: {} .. {}", clade.name, section.display_name, section.first->seq_id, section.last ? section.last->seq_id : seq_id_t{});
+                AD_DEBUG("clade {} {}: {} .. {}", clade.name, section.display_name, section.first->seq_id, section.last ? section.last->seq_id : seq_id_t{});
                 if (clade_param.time_series_top_separator)
                     time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line, true);
                 if (clade_param.time_series_bottom_separator) {
