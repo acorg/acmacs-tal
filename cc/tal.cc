@@ -67,14 +67,14 @@ int main(int argc, const char *argv[])
         const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
 
         acmacs::tal::Tal tal;
-        Timeit time_loading_tree("DEBUG Loading tree: ", report);
+        Timeit time_loading_tree(">>>> Loading tree: ", report);
         tal.import_tree(opt.tree_file);
         time_loading_tree.report();
-        Timeit time_loading_chart("DEBUG Loading chart: ", report);
+        Timeit time_loading_chart(">>>> Loading chart: ", report);
         tal.import_chart(opt.chart_file);
         time_loading_chart.report();
 
-        Timeit time_loading_settings("DEBUG Loading settings: ", report);
+        Timeit time_loading_settings(">>>> Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
         using namespace std::string_view_literals;
         for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
@@ -83,7 +83,7 @@ int main(int argc, const char *argv[])
                 settings.load(filename);
             }
             else
-                fmt::print(stderr, "WARNING cannot load \"{}\": file not found\n", filename);
+                fmt::print(stderr, ">> WARNING cannot load \"{}\": file not found\n", filename);
         }
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {

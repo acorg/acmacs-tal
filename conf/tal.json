@@ -39,6 +39,7 @@
         "dash-bar-clades-tal",
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}},
         {"N": "clades"},
+        "dash-bar-found-in-chart",
         {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015},
         {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
 
@@ -117,6 +118,13 @@
              "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
              "?debug-outline": "lightblue"},
             {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"}
+        ]}
+    ],
+
+    "dash-bar-found-in-chart": [
+        {"N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [
+            {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
+            {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]}
         ]}
     ],
 
