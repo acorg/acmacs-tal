@@ -1,4 +1,4 @@
-# Time-stamp: <2020-03-19 15:18:55 eu>
+# Time-stamp: <2020-03-26 18:29:54 eu>
 
 * Command line defines
 
@@ -165,6 +165,7 @@ If multiple criteria specified within single "select" object, they all used (con
           },
           "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
          },
+ "color-scale": {"show": false, "colors": ["#440154", "#40ffff", "#fde725"], "offset": 0.008, "height": 0.01, "?type": "bezier-gradient"},
  "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 *** Clade

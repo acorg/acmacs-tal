@@ -51,16 +51,29 @@ namespace acmacs::tal::inline v3
             std::optional<Pixels> line_width;
         };
 
+        enum class color_scale_type { bezier_gradient };
+        struct ColorScaleParameters
+        {
+            bool show{true};
+            color_scale_type type{color_scale_type::bezier_gradient};
+            std::array<Color, 3> colors{Color{0x440154}, Color{0x40ffff}, Color{0xfde725}};
+            double offset{0.008};
+            double height{0.01};
+        };
+
         struct Parameters
         {
             acmacs::time_series::parameters time_series;
             SlotParameters slot;
             DashParameters dash;
             small_map_with_unique_keys_t<seq_id_t, PerNodeParameters> per_nodes;
+            ColorScaleParameters color_scale;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
+
+        Color color_for(date::year_month_day date) const;
 
       private:
         struct horizontal_line_t : public LineParameters
@@ -73,6 +86,10 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
         acmacs::time_series::series series_;
         std::vector<horizontal_line_t> horizontal_lines_;
+        std::vector<Color> color_scale_;
+
+        void make_color_scale();
+        void draw_color_scale(acmacs::surface::Surface& surface) const;
 
         void draw_background_separators(acmacs::surface::Surface& surface) const;
         void draw_labels(acmacs::surface::Surface& surface) const;

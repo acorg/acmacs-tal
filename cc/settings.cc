@@ -529,6 +529,28 @@ void acmacs::tal::v3::Settings::add_time_series()
         });
     }
 
+    if (const auto& color_scale_val = getenv("color-scale"sv); !color_scale_val.is_null()) {
+        rjson::copy_if_not_null(color_scale_val.get("show"sv), param.color_scale.show);
+        if (const auto& type_val = color_scale_val.get("type"sv); !type_val.is_null()) {
+            if (const auto type = type_val.to<std::string_view>(); type == "bezier_gradient" || type == "bezier-gradient")
+                param.color_scale.type = TimeSeries::color_scale_type::bezier_gradient;
+            else
+                AD_WARNING("unrecognized time-series color-scale type (\"bezier-gradient\" expected): {}", type);
+        }
+        switch (param.color_scale.type) {
+            case TimeSeries::color_scale_type::bezier_gradient:
+                if (const auto& colors_val = color_scale_val.get("colors"sv); !colors_val.is_null()) {
+                    if (colors_val.is_array() && colors_val.size() == 3)
+                        rjson::transform(colors_val, std::begin(param.color_scale.colors), [](const rjson::value& val) { return Color{val.to<std::string_view>()}; });
+                    else
+                        AD_WARNING("invalid number of colors in time-series color-scale colors (3 strings expected): {}", colors_val);
+                }
+                break;
+        }
+        rjson::copy_if_not_null(color_scale_val.get("offset"sv), param.color_scale.offset);
+        rjson::copy_if_not_null(color_scale_val.get("height"sv), param.color_scale.height);
+    }
+
 } // acmacs::tal::v3::Settings::add_time_series
 
 // ----------------------------------------------------------------------

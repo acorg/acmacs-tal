@@ -1,4 +1,4 @@
-#include "acmacs-base/string-split.hh"
+#include "acmacs-base/color-gradient.hh"
 #include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
@@ -21,6 +21,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
                 parameters().time_series.after_last = date::next_month(last);
         }
         series_ = acmacs::time_series::make(parameters().time_series);
+        make_color_scale();
         if (width_to_height_ratio() <= 0.0)
             width_to_height_ratio() = series_.size() * parameters().slot.width;
         // fmt::print(stderr, "DEBUG time series: {} {}\n", series_.size(), series_);
@@ -47,6 +48,7 @@ void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, co
 
 void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
 {
+    draw_color_scale(surface);
     draw_background_separators(surface);
     draw_labels(surface);
 
@@ -204,6 +206,49 @@ void acmacs::tal::v3::TimeSeries::draw_horizontal_lines(acmacs::surface::Surface
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::TimeSeries::make_color_scale()
+{
+    if (!series_.empty() && parameters().color_scale.show) {
+        switch (parameters().color_scale.type) {
+            case color_scale_type::bezier_gradient:
+                color_scale_ = acmacs::color::bezier_gradient(parameters().color_scale.colors[0], parameters().color_scale.colors[1], parameters().color_scale.colors[2], series_.size());
+                break;
+        }
+    }
+
+} // acmacs::tal::v3::TimeSeries::make_color_scale
+
+// ----------------------------------------------------------------------
+
+Color acmacs::tal::v3::TimeSeries::color_for(date::year_month_day date) const
+{
+    if (!series_.empty() && !color_scale_.empty()) {
+        if (const auto series_slot = std::find_if(std::begin(series_), std::end(series_), [&date](const auto& slot) { return slot.within(date); }); series_slot != std::end(series_))
+            return color_scale_[static_cast<size_t>(series_slot - std::begin(series_))];
+    }
+    return GREEN;
+
+} // acmacs::tal::v3::TimeSeries::color_for
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::draw_color_scale(acmacs::surface::Surface& surface) const
+{
+    if (!series_.empty() && parameters().color_scale.show) {
+        const auto& viewport = surface.viewport();
+        auto rect_x = viewport.left();
+        const auto rect_top = viewport.bottom() + parameters().color_scale.offset;
+        switch (parameters().color_scale.type) {
+            case color_scale_type::bezier_gradient:
+                for (const auto& color : color_scale_) {
+                    surface.rectangle_filled({rect_x, rect_top}, {parameters().slot.width, parameters().color_scale.height}, PINK, Pixels{0}, color);
+                    rect_x += parameters().slot.width;
+                }
+                break;
+        }
+    }
+
+} // acmacs::tal::v3::TimeSeries::draw_color_scale
 
 // ----------------------------------------------------------------------
 /// Local Variables:
