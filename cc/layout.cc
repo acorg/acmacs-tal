@@ -157,6 +157,8 @@ const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool th
 
 void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
 {
+    surface_ = &surface;
+
     double normal_left = 0.0;
     for (const auto& element : elements_) {
         switch (element->position()) {
@@ -172,7 +174,49 @@ void acmacs::tal::v3::Layout::draw(acmacs::surface::Surface& surface) const
         }
     }
 
+    surface_ = nullptr;
+
 } // acmacs::tal::v3::Layout::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Layout::draw_horizontal_line_between(const LayoutElement* elt1, const LayoutElement* elt2, double y_pos, Color line_color, Pixels line_width) const
+{
+    if (elt1 && elt2 /* && line_width > Pixels{0} */ && line_color != TRANSPARENT) {
+        double x1left{-1.0}, x1right{-1.0}, x2left{-1.0}, x2right{-1.0}, normal_left{0.0};
+        for (const auto& element : elements_) {
+            switch (element->position()) {
+                case Position::normal:
+                    if (elt1 == element.get())
+                        x1left = normal_left;
+                    else if (elt2 == element.get())
+                        x2left = normal_left;
+                    normal_left += element->width_to_height_ratio();
+                    if (elt1 == element.get())
+                        x1right = normal_left;
+                    else if (elt2 == element.get())
+                        x2right = normal_left;
+                    break;
+                case Position::absolute:
+                    if (elt1 == element.get()) {
+                        x1left = surface_->viewport().left();
+                        x1right = surface_->viewport().right();
+                    }
+                    else if (elt2 == element.get()) {
+                        x2left = surface_->viewport().left();
+                        x2right = surface_->viewport().right();
+                    }
+                    break;
+            }
+        }
+
+        if (x1right < x2left)
+            surface_->line({x1right, y_pos}, {x2left, y_pos}, line_color, line_width);
+        else
+            surface_->line({x2right, y_pos}, {x1left, y_pos}, line_color, line_width);
+    }
+
+} // acmacs::tal::v3::Layout::draw_horizontal_line_between
 
 // ----------------------------------------------------------------------
 
@@ -192,9 +236,6 @@ double acmacs::tal::v3::LayoutElement::pos_y_below(const Node& node, double vert
         return vertical_step * node.cumulative_vertical_offset_;
 
 } // acmacs::tal::v3::LayoutElement::pos_y_below
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

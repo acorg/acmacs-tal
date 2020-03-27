@@ -52,8 +52,11 @@ namespace acmacs::tal::inline v3
 
         const DrawTree* find_draw_tree(bool throw_error = true) const; // throws error or prints warning if not found
 
+        void draw_horizontal_line_between(const LayoutElement* elt1, const LayoutElement* elt2, double y_pos, Color line_color, Pixels line_width) const;
+
       private:
         std::vector<std::unique_ptr<LayoutElement>> elements_;
+        mutable surface::Surface* surface_{nullptr};
     };
 
     extern template const DrawTree* Layout::find<DrawTree>(const LayoutElementId& id) const;

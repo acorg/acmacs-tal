@@ -182,13 +182,16 @@ void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) c
     if (const auto* hz_sections = tal().draw().layout().find<HzSections>(); hz_sections && !hz_sections->sections().empty()) {
         if (const auto* draw_tree = tal().draw().layout().find_draw_tree(); draw_tree) {
             const auto& viewport = surface.viewport();
+            const auto* time_series = tal().draw().layout().find<TimeSeries>();
             for (const auto& section : hz_sections->sections()) {
                 const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
                 const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
                 const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
                 surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
-                // surface.line({viewport.left(), pos_y_bottom}, {viewport.right(), pos_y_bottom}, parameters().line.color, parameters().line.line_width);
-                // surface.line({viewport.left(), pos_y_bottom}, {viewport.right(), pos_y_bottom}, parameters().line.color, parameters().line.line_width);
+                if (time_series) {
+                    tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
+                    tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
+                }
             }
         }
     }
