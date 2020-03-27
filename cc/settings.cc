@@ -14,6 +14,7 @@
 #include "acmacs-tal/dash-bar.hh"
 #include "acmacs-tal/draw-aa-transitions.hh"
 #include "acmacs-tal/hz-sections.hh"
+#include "acmacs-tal/antigenic-maps.hh"
 
 // ----------------------------------------------------------------------
 
@@ -80,7 +81,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
     using namespace std::string_view_literals;
     try {
         // printenv();
-        if (name == "aa-transitions"sv) {
+        if (name == "antigenic-maps"sv)
+            antigenic_maps();
+         else if (name == "aa-transitions"sv) {
             // Timeit time_update_common_aa(">>>> update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
             // time_update_common_aa.report();
@@ -688,6 +691,20 @@ void acmacs::tal::v3::Settings::hz_section_marker()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::antigenic_maps()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<AntigenicMaps>();
+    auto& param = element.parameters();
+
+    getenv_copy_if_present("gap"sv, param.gap);
+    getenv_copy_if_present("columns"sv, param.columns);
+
+} // acmacs::tal::v3::Settings::antigenic_maps
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param)
 {
     using namespace std::string_view_literals;
@@ -892,7 +909,7 @@ void acmacs::tal::v3::Settings::add_legend()
         rjson::for_each(getenv("dots"sv), [&param, this](const rjson::value& for_dot) { read_dot_parameters(for_dot, param.dots.emplace_back()); });
     }
     else
-        fmt::print(stderr, "WARNING unrecognized legend type: \"{}\"\n", legend_type);
+        AD_WARNING("unrecognized legend type: \"{}\"", legend_type);
 
 } // acmacs::tal::v3::Settings::add_legend
 

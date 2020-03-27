@@ -1,4 +1,4 @@
-# Time-stamp: <2020-03-27 11:56:01 eu>
+# Time-stamp: <2020-03-27 18:36:26 eu>
 
 * Command line defines
 
@@ -226,6 +226,12 @@ If multiple criteria specified within single "select" object, they all used (con
  ],
  "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
  "?debug-outline": "lightblue"}
+
+*** Antigenic maps
+
+{"N": "antigenic-maps",
+ "gap": 10.0, "columns": 0
+}
 
 *** Title
 

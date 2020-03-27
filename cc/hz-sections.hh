@@ -86,7 +86,7 @@ namespace acmacs::tal::inline v3
                 else
                     return sections.emplace_back(id);
             }
-    };
+    }; // class HzSections
 
     // ----------------------------------------------------------------------
 
@@ -97,6 +97,8 @@ namespace acmacs::tal::inline v3
 
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
+
+        // ----------------------------------------------------------------------
 
         struct Parameters
         {
@@ -110,7 +112,7 @@ namespace acmacs::tal::inline v3
 
       private:
         Parameters parameters_;
-    };
+    }; // class HzSectionMarker
 
 } // namespace acmacs::tal::inline v3
 

@@ -9,6 +9,7 @@
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
 #include "acmacs-tal/hz-sections.hh"
+#include "acmacs-tal/antigenic-maps.hh"
 
 // ----------------------------------------------------------------------
 
@@ -87,6 +88,7 @@ template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::t
 template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::AntigenicMaps* acmacs::tal::v3::Layout::find<acmacs::tal::v3::AntigenicMaps>(const LayoutElementId& id) const;
 
 template <typename Element> inline Element* acmacs::tal::v3::Layout::find(const LayoutElementId& id)
 {
@@ -109,6 +111,7 @@ template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3
 template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);
 template acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id);
 template acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id);
+template acmacs::tal::v3::AntigenicMaps* acmacs::tal::v3::Layout::find<acmacs::tal::v3::AntigenicMaps>(const LayoutElementId& id);
 
 // ----------------------------------------------------------------------
 

@@ -37,7 +37,7 @@
          "else": [{"N": "layout-tree-only"}]
         },
         {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015},
-        {"N": "legend", "type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+        {"N": "legend", "type": "?world-map", "?offset": [0.0, 0.93], "?size": 0.15},
         {"?N": "legend", "type": "colored by AA at pos"},
         {"?N": "vaccine, most recent cell --> modifications-tal mark vaccine"}
     ],
@@ -62,7 +62,8 @@
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
         {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
-        {"?N": "antigenic-maps"}
+        {"N": "gap", "width-to-height-ratio": 0.05, "?debug-outline": "red"},
+        {"N": "antigenic-maps"}
     ],
 
     "modifications-tal": [
