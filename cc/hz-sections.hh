@@ -93,7 +93,7 @@ namespace acmacs::tal::inline v3
     class HzSectionMarker : public LayoutElement
     {
       public:
-        HzSectionMarker(Tal& tal) : LayoutElement(tal, 0.007) {}
+        HzSectionMarker(Tal& tal) : LayoutElement(tal, 0.005) {}
 
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
