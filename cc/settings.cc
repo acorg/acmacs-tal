@@ -5,6 +5,7 @@
 #include "acmacs-virus/virus-name.hh"
 #include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-chart-2/chart.hh"
+#include "acmacs-tal/log.hh"
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/time-series.hh"
@@ -51,13 +52,18 @@ void acmacs::tal::v3::Settings::init_element(LayoutElement& element)
 void acmacs::tal::v3::Settings::update_env()
 {
     const auto virus_type = tal_.tree().virus_type();
-    const auto lineage = tal_.tree().lineage();
-    setenv_toplevel("virus-type", virus_type);
-    setenv_toplevel("lineage", lineage);
-    if (lineage.empty())
-        setenv_toplevel("virus-type/lineage", virus_type);
+    if (!virus_type.empty()) {
+        const auto lineage = tal_.tree().lineage();
+        AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
+        setenv_toplevel("virus-type", virus_type);
+        setenv_toplevel("lineage", lineage);
+        if (lineage.empty())
+            setenv_toplevel("virus-type/lineage", virus_type);
+        else
+            setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
+    }
     else
-        setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
+        AD_WARNING("no virus type inferred from the tree");
     setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
     setenv_toplevel("chart-present", tal_.chart_present());
     if (tal_.chart_present()) {
@@ -70,15 +76,15 @@ void acmacs::tal::v3::Settings::update_env()
 
 bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
 {
-    // Timeit time_apply(fmt::format("DEBUG applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
+    // Timeit time_apply(fmt::format(">>>> applying {}: ", name), verb == verbose::yes ? report_time::yes : report_time::no);
     using namespace std::string_view_literals;
     try {
         // printenv();
         if (name == "aa-transitions"sv) {
-            // Timeit time_update_common_aa("DEBUG update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // Timeit time_update_common_aa(">>>> update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
             // time_update_common_aa.report();
-            // Timeit time_update_aa_transitions("DEBUG update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
+            // Timeit time_update_aa_transitions(">>>> update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
             // time_update_aa_transitions.report();
             if (getenv("report"sv, false))
@@ -102,6 +108,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             add_element<Gap>();
         else if (name == "hz-sections"sv || name == "hz_sections"sv)
             hz_sections();
+        else if (name == "hz-section-marker"sv)
+            hz_section_marker();
         else if (name == "ladderize"sv)
             ladderize();
         else if (name == "legend"sv)
@@ -152,7 +160,6 @@ void acmacs::tal::v3::Settings::apply_nodes() const
     using namespace std::string_view_literals;
 
     const auto selected = select_nodes(getenv("select"));
-    // fmt::print(stderr, "DEBUG apply_nodes {}\n", selected.size());
 
     const auto apply_one = [this, &selected](std::string_view key, const rjson::value& value) {
         if (key == "hide") {
@@ -396,10 +403,14 @@ void acmacs::tal::v3::Settings::clade() const
     // const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
     // const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
 
-    if (const auto& aa_at_pos = getenv("aa"sv); !aa_at_pos.is_null())
+    if (const auto& aa_at_pos = getenv("aa"sv); !aa_at_pos.is_null()) {
+        AD_LOG(acmacs::log::clades, "settings \"{}\" aa: {}", clade_name, aa_at_pos);
         tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(aa_at_pos), display_name);
-    else if (const auto& nuc_at_pos = getenv("nuc"sv); !nuc_at_pos.is_null())
+    }
+    else if (const auto& nuc_at_pos = getenv("nuc"sv); !nuc_at_pos.is_null()) {
+        AD_LOG(acmacs::log::clades, "settings \"{}\" nuc: {}", clade_name, nuc_at_pos);
         tree().clade_set(clade_name, acmacs::seqdb::extract_nuc_at_pos1_eq_list(nuc_at_pos), display_name);
+    }
     else
         throw error{"neither \"aa\" nor \"nuc\" provided"};
 
@@ -613,6 +624,8 @@ void acmacs::tal::v3::Settings::read_per_clade(Clades::Parameters& parameters)
 
 void acmacs::tal::v3::Settings::add_clades()
 {
+    AD_LOG(acmacs::log::settings, "clades");
+
     using namespace std::string_view_literals;
 
     auto& element = add_element<Clades>();
@@ -642,10 +655,7 @@ void acmacs::tal::v3::Settings::hz_sections()
     auto& param = element.parameters();
 
     getenv_copy_if_present("report"sv, param.report);
-    if (const auto& line_val = substitute(getenv("line"sv)); !line_val.is_null()) {
-        rjson::copy_if_not_null(substitute(line_val.get("color"sv)), param.line.color);
-        rjson::copy_if_not_null(substitute(line_val.get("line_width"sv)), param.line.line_width);
-    }
+    read_line_parameters(substitute(getenv("line"sv)), param.line);
     rjson::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
     rjson::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
 
@@ -662,6 +672,19 @@ void acmacs::tal::v3::Settings::hz_sections()
     });
 
 } // acmacs::tal::v3::Settings::hz_sections
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::hz_section_marker()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<HzSectionMarker>();
+    auto& param = element.parameters();
+
+    read_line_parameters(substitute(getenv("line"sv)), param.line);
+
+} // acmacs::tal::v3::Settings::hz_section_marker
 
 // ----------------------------------------------------------------------
 
@@ -928,7 +951,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
         | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::get_or(criteria, "type", "any"))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
         | ranges::views::transform([](const auto& en) { return en.name; }));
 
-    fmt::print(stderr, "DEBUG select_vaccine {}\n", names);
+    AD_LOG(acmacs::log::vaccines, "{}", names);
     NodeSet selected_nodes;
     for (const auto& name : names) {
         NodeSet some_nodes;

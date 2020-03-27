@@ -51,6 +51,7 @@ namespace acmacs::tal::inline v3
         void add_draw_aa_transitions();
         void add_draw_on_tree();
         void hz_sections();
+        void hz_section_marker();
 
         void read_dash_parameters(LayoutElement::DashParameters& param);
         void read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param);

@@ -6,6 +6,7 @@
 #include "acmacs-base/timeit.hh"
 #include "acmacs-virus/virus-name.hh"
 #include "acmacs-chart-2/chart.hh"
+#include "acmacs-tal/log.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
@@ -528,7 +529,7 @@ void acmacs::tal::v3::Tree::just_imported()
 
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
-    Timeit time_set_first_last_next_node_id("DEBUG [time] set_first_last_next_node_id: ");
+    // Timeit time_set_first_last_next_node_id(">>>> [time] set_first_last_next_node_id: ");
 
     node_id_t::value_type vertical{0};
     Node* prev_leaf{nullptr};
@@ -576,7 +577,6 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
         parents.pop_back();
     };
 
-    fmt::print(stderr, "DEBUG set_first_last_next_node_id\n");
     tree::iterate_leaf_pre_post(*this, leaf, pre, post);
 
 } // acmacs::tal::v3::Tree::set_first_last_next_node_id
@@ -607,7 +607,7 @@ void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves
 
 void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 {
-    Timeit time_ladderize("DEBUG [time] ladderize: ");
+    Timeit time_ladderize(">>>> [time] ladderize: ");
 
     const auto set_leaf = [](Node& node) { node.ladderize_helper_ = ladderize_helper_t{node.edge_length, node.date, node.seq_id}; };
 
@@ -865,7 +865,7 @@ void acmacs::tal::v3::Tree::report_common_aa() const
 
 void acmacs::tal::v3::Tree::update_aa_transitions() const
 {
-    Timeit time1("DEBUG update_aa_transitions cumulative_calculate: ", report_time::no);
+    Timeit time1(">>>> update_aa_transitions cumulative_calculate: ", report_time::no);
     cumulative_calculate();
     time1.report();
 
@@ -876,7 +876,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
             return node.common_aa_.at(pos);
     };
 
-    Timeit time2("DEBUG update_aa_transitions counting: ", report_time::no);
+    Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
     tree::iterate_post(*this, [aa_at, this](const Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
             if (node.common_aa_.is_no_common(pos)) {
@@ -901,14 +901,14 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
     });
     time2.report();
 
-    Timeit time3("DEBUG update_aa_transitions sorted_leaf_nodes: ", report_time::no);
+    Timeit time3(">>>> update_aa_transitions sorted_leaf_nodes: ", report_time::no);
     std::vector<const Node*> sorted_leaf_nodes;
     tree::iterate_leaf(*this, [&sorted_leaf_nodes](const Node& node) { sorted_leaf_nodes.push_back(&node); });
     const auto sorted_leaf_nodes_cmp = [](const auto* n1, const auto* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; };
     std::sort(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), sorted_leaf_nodes_cmp); // bigger cumul length first
     time3.report();
 
-    Timeit time4("DEBUG update_aa_transitions left part: ", report_time::no);
+    Timeit time4(">>>> update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
     auto add_left_part = [&sorted_leaf_nodes](const Node& node) {
         if (!node.aa_transitions_.empty()) {
@@ -948,7 +948,7 @@ void acmacs::tal::v3::Tree::report_aa_transitions() const
 
 void acmacs::tal::v3::Tree::clades_reset()
 {
-    // fmt::print(stderr, "DEBUG Tree::clades_reset\n");
+    AD_LOG(acmacs::log::clades, "reset");
     tree::iterate_leaf(*this, [](Node& node) { node.clades.clear(); });
     clades_.clear();
 
@@ -1016,8 +1016,8 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs:
     //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->node_id.vertical - section.first->node_id.vertical) < exclusion_tolerance; }),
     //     std::end(clade_sections));
 
+    AD_LOG(acmacs::log::clades, "\"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
     // fmt::print(stderr, "DEBUG clade \"{}\": {} leaves, {} sections\n", clade_name, num, clade_sections.size());
-
 } // acmacs::tal::v3::Tree::clade_set
 
 // ----------------------------------------------------------------------

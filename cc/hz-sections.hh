@@ -31,6 +31,7 @@ namespace acmacs::tal::inline v3
             const Node* last{nullptr};
             bool shown{true};
             std::string label;
+            std::string prefix; // A, B, C, etc.
             AA_Transitions aa_transitions{};
         };
 
@@ -64,6 +65,8 @@ namespace acmacs::tal::inline v3
 
         void add_section(Section&& section) { sections_.push_back(std::move(section)); }
 
+        constexpr const auto& sections() const { return sections_; }
+
       private:
         Parameters parameters_;
         std::vector<Section> sections_;
@@ -71,6 +74,7 @@ namespace acmacs::tal::inline v3
         void update_from_parameters();
         void set_aa_transitions();
         void sort();
+        void set_prefix();
         void add_gaps_to_tree();
         void add_separators_to_time_series();
         void report() const;
@@ -82,6 +86,28 @@ namespace acmacs::tal::inline v3
                 else
                     return sections.emplace_back(id);
             }
+    };
+
+    // ----------------------------------------------------------------------
+
+    class HzSectionMarker : public LayoutElement
+    {
+      public:
+        HzSectionMarker(Tal& tal) : LayoutElement(tal, 0.007) {}
+
+        void prepare(preparation_stage_t stage) override;
+        void draw(acmacs::surface::Surface& surface) const override;
+
+        struct Parameters
+        {
+            LineParameters line{BLACK, Pixels{1.0}, surface::Dash::NoDash};
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
     };
 
 } // namespace acmacs::tal::inline v3

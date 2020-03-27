@@ -64,12 +64,11 @@
             {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
         ]},
 
-        "modifications",
-
         {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
             {"N": "clades-{virus-type}{lineage}", "report": false}
-        ]}
+        ]},
 
+        "modifications"
     ],
 
     "pre-tal": [
@@ -124,7 +123,8 @@
     "dash-bar-found-in-chart": [
         {"N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [
             {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
-            {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]}
+            {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
+            {"N": "hz-section-marker", "width-to-height-ratio": 0.007}
         ]}
     ],
 

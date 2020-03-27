@@ -1,4 +1,4 @@
-# Time-stamp: <2020-03-26 18:29:54 eu>
+# Time-stamp: <2020-03-27 11:56:01 eu>
 
 * Command line defines
 
@@ -197,6 +197,10 @@ If multiple criteria specified within single "select" object, they all used (con
  "sections": [
   {"id": "<uniq-id>", "first": "<seq_id>", "last": "<seq_id>", "label": "", "show": true}
  ]
+},
+
+{"N": "hz-section-marker", "width-to-height-ratio": 0.1,
+ "line": {"color": "black", "line_width": 1},
 },
 
 *** dash-bar-clades

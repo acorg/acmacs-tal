@@ -1,6 +1,7 @@
 #include "acmacs-tal/hz-sections.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/time-series.hh"
+#include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
 // ----------------------------------------------------------------------
@@ -11,6 +12,7 @@ void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
         width_to_height_ratio() = 0.0;
         update_from_parameters();
         sort();
+        set_prefix();
         set_aa_transitions();
         add_gaps_to_tree();
         add_separators_to_time_series();
@@ -80,6 +82,15 @@ void acmacs::tal::v3::HzSections::sort()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::HzSections::set_prefix()
+{
+    for (auto [no, section] : acmacs::enumerate(sections_))
+        section.prefix.assign(1, 'A' + static_cast<char>(no));
+
+} // acmacs::tal::v3::HzSections::set_prefix
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::HzSections::add_gaps_to_tree()
 {
     for (const auto& section : sections_) {
@@ -137,7 +148,7 @@ void acmacs::tal::v3::HzSections::report() const
     bool hidden_present{false};
     for (const auto& section : sections_) {
         if (section.shown)
-            fmt::print(stderr, "    {:{}s} {:{}s} {:{}s} {} \"{}\"\n", fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
+            fmt::print(stderr, "    {:1s}. {:{}s} {:{}s} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
         else
             hidden_present = true;
     }
@@ -145,7 +156,7 @@ void acmacs::tal::v3::HzSections::report() const
         fmt::print(stderr, "DEBUG hidden hz_sections\n");
         for (const auto& section : sections_) {
             if (!section.shown)
-                fmt::print(stderr, "    {:{}s} {:{}s} {:{}s} {} \"{}\"\n", fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
+                fmt::print(stderr, "    {:1s}. {:{}s} {:{}s} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
         }
     }
 
@@ -153,6 +164,36 @@ void acmacs::tal::v3::HzSections::report() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::HzSectionMarker::prepare(preparation_stage_t stage)
+{
+    if (stage == 2 && prepared_ < stage) {
+        tal().draw().layout().prepare_element<HzSections>(stage);
+        if (const auto* hz_sections = tal().draw().layout().find<HzSections>(); !hz_sections || hz_sections->sections().empty())
+            width_to_height_ratio() = 0.0;
+    }
+    LayoutElement::prepare(stage);
+
+} // acmacs::tal::v3::HzSectionMarker::prepare
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) const
+{
+    if (const auto* hz_sections = tal().draw().layout().find<HzSections>(); hz_sections && !hz_sections->sections().empty()) {
+        if (const auto* draw_tree = tal().draw().layout().find_draw_tree(); draw_tree) {
+            const auto& viewport = surface.viewport();
+            for (const auto& section : hz_sections->sections()) {
+                const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
+                const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
+                const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
+                surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
+                // surface.line({viewport.left(), pos_y_bottom}, {viewport.right(), pos_y_bottom}, parameters().line.color, parameters().line.line_width);
+                // surface.line({viewport.left(), pos_y_bottom}, {viewport.right(), pos_y_bottom}, parameters().line.color, parameters().line.line_width);
+            }
+        }
+    }
+
+} // acmacs::tal::v3::HzSectionMarker::draw
 
 // ----------------------------------------------------------------------
 /// Local Variables:

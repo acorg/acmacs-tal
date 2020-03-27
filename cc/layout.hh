@@ -25,6 +25,7 @@ namespace acmacs::tal::inline v3
     class DashBar;
     class DashBarClades;
     class HzSections;
+    class HzSectionMarker;
 
     using LayoutElementId = named_string_t<struct LayoutElementId_tag>;
 
@@ -66,6 +67,7 @@ namespace acmacs::tal::inline v3
     extern template const DashBar* Layout::find<DashBar>(const LayoutElementId& id) const;
     extern template const DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id) const;
     extern template const HzSections* Layout::find<HzSections>(const LayoutElementId& id) const;
+    extern template const HzSectionMarker* Layout::find<HzSectionMarker>(const LayoutElementId& id) const;
 
     extern template DrawTree* Layout::find<DrawTree>(const LayoutElementId& id);
     extern template DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id);
@@ -78,10 +80,12 @@ namespace acmacs::tal::inline v3
     extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
     extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
     extern template HzSections* Layout::find<HzSections>(const LayoutElementId& id);
+    extern template HzSectionMarker* Layout::find<HzSectionMarker>(const LayoutElementId& id);
 
     extern template void Layout::prepare_element<DrawTree>(preparation_stage_t stage);
     extern template void Layout::prepare_element<TimeSeries>(preparation_stage_t stage);
     extern template void Layout::prepare_element<Clades>(preparation_stage_t stage);
+    extern template void Layout::prepare_element<HzSections>(preparation_stage_t stage);
 
     // ======================================================================
 

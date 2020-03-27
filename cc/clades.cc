@@ -1,4 +1,5 @@
 #include "acmacs-base/enumerate.hh"
+#include "acmacs-tal/log.hh"
 #include "acmacs-tal/clades.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
@@ -76,6 +77,7 @@ void acmacs::tal::v3::Clades::make_sections()
 {
     const auto& tree_clades = tal().tree().clades();
     for (const auto& tree_clade : tree_clades) {
+        // AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
         // fmt::print(stderr, "DEBUG parameters_for_clade \"{}\": slot:{} display_name:{} hidden:{}\n", tree_clade.name, clade_param.slot_no, clade_param.display_name, clade_param.hidden);
         if (!clade_param.hidden) {
@@ -178,7 +180,7 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
         for (const auto& clade : clades_) {
             const auto& clade_param = parameters_for_clade(clade.name);
             for (const auto& section : clade.sections) {
-                AD_DEBUG("clade {} {}: {} .. {}", clade.name, section.display_name, section.first->seq_id, section.last ? section.last->seq_id : seq_id_t{});
+                AD_LOG(acmacs::log::clades, "\"{}\" \"{}\": {} .. {}", clade.name, section.display_name, section.first->seq_id, section.last ? section.last->seq_id : seq_id_t{});
                 if (clade_param.time_series_top_separator)
                     time_series->add_horizontal_line_above(section.first, clade_param.horizontal_line, true);
                 if (clade_param.time_series_bottom_separator) {
@@ -196,7 +198,7 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
 void acmacs::tal::v3::Clades::report_clades()
 {
     if (parameters_.report) {
-        fmt::print("INFO ==================== Clades ({}) ==================================================\n", clades_.size());
+        fmt::print(">>> ==================== Clades ({}) ==================================================\n", clades_.size());
         for (const auto& clade : clades_) {
             const auto& clade_param = parameters_for_clade(clade.name);
             fmt::print("Clade {} ({})    {{\"name\": \"{}\", \"display_name\": \"{}\", \"section_inclusion_tolerance\": {}, \"section_exclusion_tolerance\": {}, \"show\": {}}}\n", clade.name,
@@ -209,7 +211,7 @@ void acmacs::tal::v3::Clades::report_clades()
                     fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id.vertical - section.last->node_id.vertical - 1);
             }
         }
-        fmt::print("INFO ===================================================================================\n", clades_.size());
+        fmt::print(">>> ===================================================================================\n", clades_.size());
     }
 
 } // acmacs::tal::v3::Clades::report_clades

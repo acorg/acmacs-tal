@@ -3,9 +3,9 @@
 #include "acmacs-base/filesystem.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
-#include "acmacs-base/debug.hh"
 // #include "acmacs-base/string-split.hh"
 #include "seqdb-3/seqdb.hh"
+#include "acmacs-tal/log.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/settings.hh"
 
@@ -44,19 +44,12 @@ struct Options : public argv
     // option<bool>      no_draw{*this, "no-draw", desc{"do not generate pdf"}};
 };
 
-namespace acmacs::log
-{
-    enum {
-        hz_sections = 16
-    };
-
-}
-
 int main(int argc, const char *argv[])
 {
     using namespace std::string_view_literals;
     try {
         acmacs::log::register_enabler_acmacs_base();
+        acmacs::log::register_enabler("clades"sv, acmacs::log::clades);
         acmacs::log::register_enabler("hz-sections"sv, acmacs::log::hz_sections);
 
         Options opt(argc, argv);
@@ -94,18 +87,18 @@ int main(int argc, const char *argv[])
         }
         time_loading_settings.report();
 
-        Timeit time_applying_settings("DEBUG Applying settings: ", report);
+        Timeit time_applying_settings(">>>> Applying settings: ", report);
         settings.apply("main"sv);
         time_applying_settings.report();
 
-        Timeit time_preparing("DEBUG preparing: ", report);
+        Timeit time_preparing(">>>> preparing: ", report);
         tal.prepare();
         time_preparing.report();
 
         if (opt.first_last_leaves.has_value())
             tal.tree().report_first_last_leaves(opt.first_last_leaves);
 
-        Timeit time_exporting("DEBUG exporting: ", report);
+        Timeit time_exporting(">>>> exporting: ", report);
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
         time_exporting.report();

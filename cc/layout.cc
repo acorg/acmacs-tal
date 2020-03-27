@@ -86,6 +86,7 @@ template const acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::
 template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id) const;
 
 template <typename Element> inline Element* acmacs::tal::v3::Layout::find(const LayoutElementId& id)
 {
@@ -107,6 +108,7 @@ template acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Ga
 template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);
 template acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id);
+template acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id);
 
 // ----------------------------------------------------------------------
 
@@ -122,6 +124,7 @@ template <typename Element> void acmacs::tal::v3::Layout::prepare_element(prepar
 template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::DrawTree>(preparation_stage_t stage);
 template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::TimeSeries>(preparation_stage_t stage);
 template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::Clades>(preparation_stage_t stage);
+template void acmacs::tal::v3::Layout::prepare_element<acmacs::tal::v3::HzSections>(preparation_stage_t stage);
 
 // ----------------------------------------------------------------------
 
