@@ -101,6 +101,8 @@ namespace acmacs::tal::inline v3
         struct Parameters
         {
             LineParameters line{BLACK, Pixels{1.0}, surface::Dash::NoDash};
+            Pixels label_size{11};
+            Color label_color{BLACK};
         };
 
         constexpr Parameters& parameters() { return parameters_; }

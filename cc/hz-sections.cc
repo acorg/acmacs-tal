@@ -192,6 +192,9 @@ void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) c
                     tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
                     tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
                 }
+                const auto prefix_size = surface.text_size(section.prefix, parameters().label_size);
+                surface.rectangle_filled({viewport.right() - prefix_size.width * 0.7, pos_y_top + prefix_size.height * 0.5}, {prefix_size.width * 1.4, prefix_size.height * 1.4}, parameters().line.color, Pixels{0.5}, WHITE);
+                surface.text({viewport.right() - prefix_size.width * 0.5, pos_y_top + prefix_size.height * 1.7}, section.prefix, parameters().label_color, parameters().label_size);
             }
         }
     }
