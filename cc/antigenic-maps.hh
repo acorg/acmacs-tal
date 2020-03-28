@@ -6,6 +6,8 @@
 
 namespace acmacs::tal::inline v3
 {
+    struct HzSection;
+
     class AntigenicMaps : public LayoutElement
     {
       public:
@@ -30,6 +32,7 @@ namespace acmacs::tal::inline v3
         size_t columns_{0}, rows_{0};
 
         void columns_rows();
+        void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;
 
     }; // class AntigenicMaps
 

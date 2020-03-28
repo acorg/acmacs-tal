@@ -10,6 +10,21 @@ namespace acmacs::tal::inline v3
 {
     class Node;
 
+    using hz_section_id_t = acmacs::named_string_t<struct acmacs_tal_hz_section_id_t_tag>;
+
+    struct HzSection
+    {
+        HzSection(std::string_view a_id) : id{hz_section_id_t{a_id}} {}
+        HzSection(std::string_view a_id, const Node* a_first, const Node* a_last, std::string_view a_label) : id{hz_section_id_t{a_id}}, first{a_first}, last{a_last}, label{a_label} {}
+        hz_section_id_t id;
+        const Node* first{nullptr};
+        const Node* last{nullptr};
+        bool shown{true};
+        std::string label;
+        std::string prefix; // A, B, C, etc.
+        AA_Transitions aa_transitions{};
+    };
+
     class HzSections : public LayoutElement
     {
       public:
@@ -17,23 +32,6 @@ namespace acmacs::tal::inline v3
 
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
-
-        // ----------------------------------------------------------------------
-
-        using section_id_t = acmacs::named_string_t<struct acmacs_tal_section_id_t_tag>;
-
-        struct Section
-        {
-            Section(std::string_view a_id) : id{section_id_t{a_id}} {}
-            Section(std::string_view a_id, const Node* a_first, const Node* a_last, std::string_view a_label) : id{section_id_t{a_id}}, first{a_first}, last{a_last}, label{a_label} {}
-            section_id_t id;
-            const Node* first{nullptr};
-            const Node* last{nullptr};
-            bool shown{true};
-            std::string label;
-            std::string prefix; // A, B, C, etc.
-            AA_Transitions aa_transitions{};
-        };
 
         // ----------------------------------------------------------------------
 
@@ -54,22 +52,19 @@ namespace acmacs::tal::inline v3
             LineParameters line{GREY, Pixels{1.0}, surface::Dash::NoDash};
             double tree_top_gap{50.0}, tree_bottom_gap{50.0};
 
-            SectionParameters& find_add_section(std::string_view id)
-            {
-                return HzSections::find_add_section(sections, id);
-            }
+            SectionParameters& find_add_section(std::string_view id) { return HzSections::find_add_section(sections, id); }
         };
 
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
 
-        void add_section(Section&& section) { sections_.push_back(std::move(section)); }
+        void add_section(HzSection&& section) { sections_.push_back(std::move(section)); }
 
         constexpr const auto& sections() const { return sections_; }
 
       private:
         Parameters parameters_;
-        std::vector<Section> sections_;
+        std::vector<HzSection> sections_;
 
         void update_from_parameters();
         void set_aa_transitions();
@@ -80,12 +75,12 @@ namespace acmacs::tal::inline v3
         void report() const;
 
         template <typename Sec> inline static Sec& find_add_section(std::vector<Sec>& sections, std::string_view id)
-            {
-                if (auto found = std::find_if(std::begin(sections), std::end(sections), [id](const auto& section) { return section.id == id; }); found != std::end(sections))
-                    return *found;
-                else
-                    return sections.emplace_back(id);
-            }
+        {
+            if (auto found = std::find_if(std::begin(sections), std::end(sections), [id](const auto& section) { return section.id == id; }); found != std::end(sections))
+                return *found;
+            else
+                return sections.emplace_back(id);
+        }
     }; // class HzSections
 
     // ----------------------------------------------------------------------
@@ -114,7 +109,7 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
     }; // class HzSectionMarker
 
-} // namespace acmacs::tal::inline v3
+} // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------
 /// Local Variables:

@@ -50,11 +50,19 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
         for (auto [section_no, section] : acmacs::enumerate(hz_sections->sections())) {
             const auto left = (section_no % columns_) * map_size;
             const auto top = (section_no / columns_) * map_size;
-            surface.rectangle({left, top}, {map_size, map_size}, BLUE, Pixels{1});
+            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, false), section);
         }
     }
 
 } // acmacs::tal::v3::AntigenicMaps::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& section) const
+{
+    surface.rectangle(surface.viewport().origin, surface.viewport().size, BLUE, Pixels{1});
+
+} // acmacs::tal::v3::AntigenicMaps::draw_map
 
 // ----------------------------------------------------------------------
 /// Local Variables:

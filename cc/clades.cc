@@ -63,7 +63,7 @@ void acmacs::tal::v3::Clades::make_clades()
     if (auto hz_sections = tal().draw().layout().find<HzSections>(); hz_sections) {
         for (const auto& clade : clades_) {
             for (auto [section_no, clade_section] : acmacs::enumerate(clade.sections)) {
-                hz_sections->add_section(HzSections::Section{HzSections::section_id_t{fmt::format("{}-{}", clade.name, section_no)}, clade_section.first, clade_section.last,
+                hz_sections->add_section(HzSection{hz_section_id_t{fmt::format("{}-{}", clade.name, section_no)}, clade_section.first, clade_section.last,
                                                              clade_section.display_name});
             }
         }
