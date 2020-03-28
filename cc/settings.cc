@@ -106,7 +106,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "draw-on-tree"sv)
             add_draw_on_tree();
         else if (name == "gap"sv)
-            add_element<Gap>(add_unique::yes);
+            add_gap();
         else if (name == "hz-sections"sv || name == "hz_sections"sv)
             hz_sections();
         else if (name == "hz-section-marker"sv)
@@ -466,6 +466,20 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         element.coloring(std::move(coloring));
 
 } // acmacs::tal::v3::Settings::process_color_by
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_gap()
+{
+    using namespace std::string_view_literals;
+
+    auto& gap_element = add_element<Gap>(add_unique::yes);
+    auto& param = gap_element.parameters();
+
+    if (const auto& pixels_value = getenv("pixels"sv); !pixels_value.is_null())
+        param.pixels = pixels_value.to<double>();
+
+} // acmacs::tal::v3::Settings::add_gap
 
 // ----------------------------------------------------------------------
 

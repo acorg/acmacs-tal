@@ -20,7 +20,7 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
-            double gap{10};
+            double gap{20};
             size_t columns{0};
         };
 

@@ -241,6 +241,18 @@ double acmacs::tal::v3::LayoutElement::pos_y_below(const Node& node, double vert
 } // acmacs::tal::v3::LayoutElement::pos_y_below
 
 // ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Gap::prepare(preparation_stage_t stage)
+{
+    if (stage == 1 && prepared_ < stage) {
+        if (parameters().pixels.has_value())
+            width_to_height_ratio() = *parameters().pixels / tal().draw().canvas_height();
+    }
+    LayoutElement::prepare(stage);
+
+} // acmacs::tal::v3::Gap::prepare
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

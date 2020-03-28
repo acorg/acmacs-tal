@@ -41,6 +41,7 @@ namespace acmacs::tal::inline v3
         void margins();
         void outline(DrawOutline& draw_outline);
         void process_color_by(LayoutElementWithColoring& element);
+        void add_gap();
         void add_tree();
         void add_time_series();
         void add_clades();

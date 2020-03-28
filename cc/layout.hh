@@ -208,7 +208,19 @@ namespace acmacs::tal::inline v3
       public:
         Gap(Tal& tal) : LayoutElement(tal, 0.05) {}
 
+        void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& /*surface*/) const override {}
+
+        struct Parameters
+        {
+            std::optional<double> pixels;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
     };
 
     // ----------------------------------------------------------------------

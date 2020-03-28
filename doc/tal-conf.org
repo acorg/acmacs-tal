@@ -1,4 +1,4 @@
-# Time-stamp: <2020-03-27 18:36:26 eu>
+# Time-stamp: <2020-03-28 11:58:43 eu>
 
 * Command line defines
 
@@ -132,7 +132,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Gap
 
-{"N": "gap", "width-to-height-ratio": 0.1, "debug-outline": <[[Debug outline][debug-outline]]>},
+{"N": "gap", "?pixels": 10, "width-to-height-ratio": 0.1, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 *** Tree
 
@@ -230,7 +230,7 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Antigenic maps
 
 {"N": "antigenic-maps",
- "gap": 10.0, "columns": 0
+ "gap": 20.0, "columns": 0
 }
 
 *** Title
