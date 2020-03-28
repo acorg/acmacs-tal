@@ -29,8 +29,8 @@ namespace acmacs::tal::inline v3
         Tree& tree() const { return tal_.tree(); }
         Draw& draw() const { return tal_.draw(); }
 
-        template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args);
-        template <typename ElementType, typename ... Args> ElementType& add_unique_element(Args&& ... args);
+        enum class add_unique { no, yes };
+        template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args, add_unique uniq = add_unique::no);
         void init_element(LayoutElement& element);
 
         void apply_nodes() const;

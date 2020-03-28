@@ -62,7 +62,7 @@
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
         {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
-        {"N": "gap", "width-to-height-ratio": 0.05, "?debug-outline": "red"},
+        {"N": "gap", "width-to-height-ratio": 0.01, "?debug-outline": "red"},
         {"N": "antigenic-maps"}
     ],
 

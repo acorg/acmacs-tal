@@ -18,10 +18,11 @@
 
 // ----------------------------------------------------------------------
 
-template <typename ElementType, typename... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&&... args)
+template <typename ElementType, typename... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&&... args, add_unique uniq)
 {
     using namespace std::string_view_literals;
-    const LayoutElementId element_id{getenv("id"sv, "")};
+    static size_t uniq_id{0};   // thread unsafe!
+    const LayoutElementId element_id{getenv("id"sv, uniq == add_unique::yes ? fmt::format("-unique-{}", ++uniq_id) : std::string{})};
     if (auto* found = draw().layout().find<ElementType>(element_id); found) {
         init_element(*found);
         return *found;
@@ -105,7 +106,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "draw-on-tree"sv)
             add_draw_on_tree();
         else if (name == "gap"sv)
-            add_element<Gap>();
+            add_element<Gap>(add_unique::yes);
         else if (name == "hz-sections"sv || name == "hz_sections"sv)
             hz_sections();
         else if (name == "hz-section-marker"sv)
