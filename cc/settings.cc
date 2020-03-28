@@ -301,7 +301,7 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
                     rjson::copy_if_not_null(val.get("width"sv), draw_outline.outline_width);
                 }
                 else {
-                    fmt::print(stderr, "WARNING unrecognized debug-outline value: {}\n", val);
+                    AD_WARNING("unrecognized debug-outline value: {}", val);
                 }
             },
             debug_outline.val_());
@@ -370,7 +370,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             else if (match_type == "passage")
                 mt = Tree::serum_match_t::passage_type;
             else if (match_type != "name")
-                fmt::print(stderr, "WARNING unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed\n", match_type);
+                AD_WARNING("unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed", match_type);
             tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id") {
@@ -444,7 +444,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             return std::make_unique<ColoringUniform>(Color{rjson::get_or(fields, "color", "black")});
         }
         else {
-            fmt::print(stderr, "WARNING unrecognized \"color_by\": {}, uniform(PINK) assumed\n", key);
+            AD_WARNING("unrecognized \"color_by\": {}, uniform(PINK) assumed", key);
             return std::make_unique<ColoringUniform>(PINK);
         }
     };
@@ -539,7 +539,7 @@ void acmacs::tal::v3::Settings::add_time_series()
             else if (rot == "anticlockwise" || rot == "counterclockwise")
                 param.slot.label.rotation = Rotation90DegreesAnticlockwise;
             else
-                fmt::print(stderr, "WARNING unrecognzied label rotation value in the time series parameters: \"{}\"\n", rot);
+                AD_WARNING("unrecognzied label rotation value in the time series parameters: \"{}\"", rot);
         });
     }
 
@@ -671,7 +671,7 @@ void acmacs::tal::v3::Settings::hz_sections()
             rjson::copy_if_not_null(for_section.get("label"sv), section.label);
         }
         else if (for_section.get("?id"sv).is_null() && for_section.get("? id"sv).is_null())
-            fmt::print(stderr, "WARNING settings hz-section without \"id\" ignored: {}\n", for_section);
+            AD_WARNING("settings hz-section without \"id\" ignored: {}", for_section);
     });
 
 } // acmacs::tal::v3::Settings::hz_sections
@@ -720,7 +720,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
             else if (position == "bottom"sv)
                 param.vpos = Clades::vertical_position::bottom;
             else
-                fmt::print(stderr, "WARNING unrecognized clade label position: \"{}\"\n", position);
+                AD_WARNING("unrecognized clade label position: \"{}\"", position);
         });
         rjson::call_if_not_null<std::string_view>(substitute(source.get("horizontal_position"sv)), [&param](auto position) {
             if (position == "middle"sv)
@@ -730,7 +730,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
             else if (position == "right"sv)
                 param.hpos = Clades::horizontal_position::right;
             else
-                fmt::print(stderr, "WARNING unrecognized clade label position: \"{}\"\n", position);
+                AD_WARNING("unrecognized clade label position: \"{}\"", position);
         });
         rjson::copy_if_not_null(source.get("offset"sv), param.offset);
         rjson::copy_if_not_null(substitute(source.get("text"sv)), param.text);
@@ -878,7 +878,7 @@ void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, 
                 dot_parameters.coordinates = PointCoordinates{found.latitude(), found.longitude()};
             }
             catch (std::exception&) {
-                fmt::print(stderr, "WARNING \"location\" for world map dot not found: {}\n", source);
+                AD_WARNING("\"location\" for world map dot not found: {}", source);
             }
         }
         rjson::copy(source.get("coordinates"sv), dot_parameters.coordinates);
@@ -896,7 +896,7 @@ void acmacs::tal::v3::Settings::add_legend()
 {
     using namespace std::string_view_literals;
 
-    std::string_view legend_type{"world-map"};
+    std::string legend_type{"world-map"};
     getenv_copy_if_present("type"sv, legend_type);
 
     if (legend_type == "world-map") {
