@@ -45,7 +45,7 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 {
     if (columns_ && rows_) {
         const auto& viewport = surface.viewport();
-        const auto gap = surface.convert(Pixels{parameters().gap}).value();
+        const auto gap = surface.convert(Pixels{parameters().gap_between_maps}).value();
         const auto map_size = viewport.size.height / rows_ - gap * (rows_ - 1) / rows_;
         const auto* hz_sections = tal().draw().layout().find<HzSections>();
         for (auto [section_no, section] : acmacs::enumerate(hz_sections->sections())) {

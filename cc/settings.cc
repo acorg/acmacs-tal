@@ -710,7 +710,7 @@ void acmacs::tal::v3::Settings::antigenic_maps()
     auto& element = add_element<AntigenicMaps>();
     auto& param = element.parameters();
 
-    getenv_copy_if_present("gap"sv, param.gap);
+    getenv_copy_if_present("gap-between-maps"sv, param.gap_between_maps);
     getenv_copy_if_present("columns"sv, param.columns);
 
 } // acmacs::tal::v3::Settings::antigenic_maps

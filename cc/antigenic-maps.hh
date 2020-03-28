@@ -20,7 +20,7 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
-            double gap{20};
+            double gap_between_maps{20}; // pixels
             size_t columns{0};
         };
 
