@@ -126,7 +126,7 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
 
 void acmacs::tal::v3::DrawAATransitions::report() const
 {
-    fmt::print("INFO ==================== AA transitions ({}) ==================================================\n", transitions_.size());
+    AD_INFO("==================== AA transitions ({}) ==================================================", transitions_.size());
     size_t max_id{0}, max_name{0};
     for (const auto& transition : transitions_) {
         max_id = std::max(max_id, fmt::format("{}", transition.node->node_id).size());
@@ -145,7 +145,7 @@ void acmacs::tal::v3::DrawAATransitions::report() const
         comma = true;
     }
     fmt::print("\n]\n");
-    fmt::print("INFO ============================================================================================\n", transitions_.size());
+    AD_INFO("============================================================================================", transitions_.size());
 
 } // acmacs::tal::v3::DrawAATransitions::report
 

@@ -150,7 +150,7 @@ const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool th
     else if (throw_error)
         throw error{"No tree section in the layout"};
     else {
-        fmt::print(stderr, "WARNING No tree section in the layout\n");
+        AD_WARNING("No tree section in the layout");
         return nullptr;
     }
 

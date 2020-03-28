@@ -25,7 +25,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         make_color_scale();
         if (width_to_height_ratio() <= 0.0)
             width_to_height_ratio() = series_.size() * parameters().slot.width;
-        // fmt::print(stderr, "DEBUG time series: {} {}\n", series_.size(), series_);
+        // AD_DEBUG("time series: {} {}", series_.size(), series_);
     }
     LayoutElementWithColoring::prepare(stage);
 
@@ -35,7 +35,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
 void acmacs::tal::v3::TimeSeries::add_horizontal_line_above(const Node* node, const LineParameters& line, bool warn_if_present)
 {
-    // fmt::print(stderr, "DEBUG TimeSeries::add_horizontal_line_above: {}\n", node->seq_id);
+    // AD_DEBUG("TimeSeries::add_horizontal_line_above: {}", node->seq_id);
     if (const auto found = std::find_if(std::begin(horizontal_lines_), std::end(horizontal_lines_), [node](const auto& hl) { return hl.node == node; }); found != std::end(horizontal_lines_)) {
         if ((found->color != line.color || found->line_width != line.line_width) && warn_if_present)
             AD_WARNING("time series horizontal line above {} {} already added with different parameters", node->node_id, node->seq_id);

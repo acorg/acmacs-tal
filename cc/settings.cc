@@ -53,7 +53,7 @@ void acmacs::tal::v3::Settings::init_element(LayoutElement& element)
 void acmacs::tal::v3::Settings::update_env()
 {
     const auto virus_type = tal_.tree().virus_type();
-    if (!virus_type.empty()) {
+    if (!virus_type.empty()) {  // might be updated later upon seqdb matching
         const auto lineage = tal_.tree().lineage();
         AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
         setenv_toplevel("virus-type", virus_type);
@@ -63,13 +63,10 @@ void acmacs::tal::v3::Settings::update_env()
         else
             setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
     }
-    else
-        AD_WARNING("no virus type inferred from the tree");
     setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
     setenv_toplevel("chart-present", tal_.chart_present());
-    if (tal_.chart_present()) {
+    if (tal_.chart_present())
         setenv_toplevel("chart-assay", tal_.chart().info()->assay().hi_or_neut());
-    }
 
 } // acmacs::tal::v3::Settings::update_env
 
@@ -134,7 +131,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_time_series(Tree::report_size::detailed));
             else
-                fmt::print("INFO {}\n", tree().report_time_series(Tree::report_size::brief));
+                AD_INFO("{}", tree().report_time_series(Tree::report_size::brief));
         }
         else if (name == "seqdb"sv) {
             tree().match_seqdb(getenv("filename"sv, ""));

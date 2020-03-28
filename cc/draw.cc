@@ -15,7 +15,7 @@ void acmacs::tal::v3::Draw::prepare()
 void acmacs::tal::v3::Draw::set_width_to_height_ratio()
 {
     width_to_height_ratio_ = (layout().width_relative_to_height() + margins().left + margins().right) / (1.0 + margins().top + margins().bottom);
-    fmt::print("INFO pdf width_to_height_ratio: {:.4f}\n", width_to_height_ratio_);
+    AD_INFO("pdf width_to_height_ratio: {:.4f}", width_to_height_ratio_);
 
 } // acmacs::tal::v3::Draw::set_width_to_height_ratio
 

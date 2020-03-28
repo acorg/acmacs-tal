@@ -241,7 +241,8 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     cumulative_calculate();
     number_leaves_in_subtree();
 
-    fmt::print("max cumulative: {}\n", max_cumulative_shown().as_number());
+    AD_INFO("edge report");
+    fmt::print("  max cumulative: {}\n", max_cumulative_shown().as_number());
 
 
     // const auto collect = [&nodes](const Node& node) { nodes.push_back(&node); };
@@ -259,17 +260,17 @@ void acmacs::tal::v3::Tree::branches_by_edge()
 
     std::vector<const Node*> nodes = sorted_by_edge();
 
-    fmt::print("mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0));
-    fmt::print("mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge_of(0.2));
-    fmt::print("mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge_of(0.1));
-    fmt::print("mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge_of(0.05));
-    fmt::print("mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge_of(0.01));
-    fmt::print("mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge_of(0.005));
-    fmt::print("HINT: hide by edge, if edge > mean of top 1%\n\n");
+    fmt::print("  mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0));
+    fmt::print("  mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge_of(0.2));
+    fmt::print("  mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge_of(0.1));
+    fmt::print("  mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge_of(0.05));
+    fmt::print("  mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge_of(0.01));
+    fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge_of(0.005));
+    fmt::print("  HINT: hide by edge, if edge > mean of top 1%\n\n");
 
-    fmt::print("    Edge       Cumulative     Seq Id\n");
+    fmt::print("        Edge       Cumulative     Seq Id\n");
     for (auto [no, node] : acmacs::enumerate(nodes)) {
-        fmt::print("{:.10f}  {:.10f}   {} [{}]\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id, node->number_leaves_in_subtree());
+        fmt::print("    {:.10f}  {:.10f}   {} [{}]\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id, node->number_leaves_in_subtree());
         if (no > nodes.size() / 100)
             break;
     }
@@ -278,7 +279,7 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     NodeSet selected;
     select_if_edge_more_than(selected, Select::init, mean_edge_of(0.01));
     for (Node* node : selected) {
-        fmt::print(stderr, "DEBUG long edge {} {} {}\n", node->edge_length, node->node_id, node->seq_id);
+        fmt::print("  long edge {} {} {}", node->edge_length, node->node_id, node->seq_id);
         node->color_edge_line = RED;
     }
 
@@ -447,14 +448,14 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
             if (virus_type_.empty())
                 virus_type_ = node.ref.entry->virus_type;
             else if (virus_type_ != node.ref.entry->virus_type)
-                fmt::print(stderr, "WARNING multiple virus_types from seqdb for \"{}\": {} and {}\n", node.seq_id, virus_type_, node.ref.entry->virus_type);
+                AD_WARNING("multiple virus_types from seqdb for \"{}\": {} and {}", node.seq_id, virus_type_, node.ref.entry->virus_type);
             if (lineage_.empty())
                 lineage_ = node.ref.entry->lineage;
             else if (lineage_ != node.ref.entry->lineage && !node.ref.entry->lineage.empty())
-                fmt::print(stderr, "WARNING multiple lineages from seqdb for \"{}\": {} and {}\n", node.seq_id, lineage_, node.ref.entry->lineage);
+                AD_WARNING("multiple lineages from seqdb for \"{}\": {} and {}", node.seq_id, lineage_, node.ref.entry->lineage);
         }
         else {
-            fmt::print(stderr, "WARNING seq_id \"{}\" not found in seqdb\n", node.seq_id);
+            AD_WARNING("seq_id \"{}\" not found in seqdb", node.seq_id);
         }
     });
 
@@ -513,7 +514,7 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
 
     set_first_last_next_node_id();
 
-    fmt::print("INFO populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}\n", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
+    AD_INFO("populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
 
 } // acmacs::tal::v3::Tree::populate_with_nuc_duplicates
 
@@ -646,16 +647,16 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 
     switch (method) {
         case Ladderize::MaxEdgeLength:
-            fmt::print(stderr, "INFO ladderizing by MaxEdgeLength\n");
+            AD_INFO("ladderizing by MaxEdgeLength");
             tree::iterate_post(*this, [reorder_by_max_edge_length](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_max_edge_length); });
             break;
         case Ladderize::NumberOfLeaves:
-            fmt::print(stderr, "INFO ladderizing by NumberOfLeaves\n");
+            AD_INFO("ladderizing by NumberOfLeaves");
             number_leaves_in_subtree();
             tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
             break;
         case Ladderize::None:
-            fmt::print(stderr, "WARNING no ladderizing\n");
+            AD_WARNING("no ladderizing");
             break;
     }
 
@@ -891,7 +892,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                     }
                 }
                 // if (pos == seqdb::pos1_t{484})
-                //     fmt::print(stderr, "DEBUG node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}\n", node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                //     AD_DEBUG("node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", node.node_id, node.number_leaves_in_subtree(), pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
@@ -1017,7 +1018,7 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs:
     //     std::end(clade_sections));
 
     AD_LOG(acmacs::log::clades, "\"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
-    // fmt::print(stderr, "DEBUG clade \"{}\": {} leaves, {} sections\n", clade_name, num, clade_sections.size());
+    // AD_DEBUG("clade \"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
 } // acmacs::tal::v3::Tree::clade_set
 
 // ----------------------------------------------------------------------
@@ -1061,7 +1062,7 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view clade_name_to_report) 
     else if (const auto* found = find_clade(clade_name_to_report); found)
         report(clade_name_to_report, found->sections);
     else
-        fmt::print(stderr, "WARNING no clade \"{}\" defined\n", clade_name_to_report);
+        AD_WARNING("no clade \"{}\" defined", clade_name_to_report);
 
 } // acmacs::tal::v3::Tree::clade_report
 

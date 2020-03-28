@@ -32,13 +32,10 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
     if (aa == 'X')
         return BLACK;
     const auto color = colors_.emplace_not_replace(aa, acmacs::color::distinct(colors_.size())).second;
-    fmt::print(stderr, "DEBUG ColoringByPos {} {}: {}\n", pos_, aa, color);
+    AD_DEBUG("ColoringByPos {} {}: {}", pos_, aa, color);
     return color;
 
 } // acmacs::tal::v3::ColoringByPos::color
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:
