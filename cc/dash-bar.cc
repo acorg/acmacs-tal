@@ -26,7 +26,7 @@ void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
     for (const auto& label : parameters().labels) {
         const Scaled label_size{viewport.size.height * label.scale};
         const auto text_size = surface.text_size(label.text, label_size, label.text_style);
-        double pos_y;
+        double pos_y{0};
         switch (label.vpos) {
             case vertical_position::top:
                 pos_y = viewport.top() + label.offset[1] + text_size.height;
@@ -38,7 +38,7 @@ void acmacs::tal::v3::DashBar::draw(acmacs::surface::Surface& surface) const
                 pos_y = viewport.bottom() + label.offset[1];
                 break;
         }
-        double pos_x;
+        double pos_x{0};
         switch (label.hpos) {
             case horizontal_position::left:
                 pos_x = viewport.left() + label.offset[0] - text_size.width;
@@ -83,7 +83,7 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
         if (!clade.label.text.empty()) {
             const Scaled label_size{viewport.size.height * clade.label.scale};
             const auto text_size = surface.text_size(clade.label.text, label_size, clade.label.text_style);
-            double pos_y;
+            double pos_y{0};
             switch (clade.label.vpos) {
                 case vertical_position::top:
                     pos_y = first_line_pos_y + clade.label.offset[1] + text_size.height;
@@ -95,7 +95,7 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
                     pos_y = last_line_pos_y + clade.label.offset[1];
                     break;
             }
-            double pos_x;
+            double pos_x{0};
             switch (clade.label.hpos) {
                 case horizontal_position::left:
                     pos_x = viewport.left() + clade.label.offset[0] - text_size.width;
