@@ -31,7 +31,7 @@ void acmacs::tal::v3::Clades::prepare(preparation_stage_t stage)
 
         make_clades();
         if (width_to_height_ratio() <= 0.0 && number_of_slots())
-            width_to_height_ratio() = (number_of_slots() + 1) * parameters_.slot.width;
+            width_to_height_ratio() = static_cast<double>(number_of_slots() + 1) * parameters_.slot.width;
 
     }
     LayoutElement::prepare(stage);
@@ -243,8 +243,8 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
             const auto pos_x = time_series_to_the_left_ ?
-                    (viewport.left() + parameters_.slot.width * (*section.slot_no + 1)) :
-                    (viewport.right() - parameters_.slot.width * (*section.slot_no + 1));
+                    (viewport.left() + parameters_.slot.width * static_cast<double>(*section.slot_no + 1)) :
+                    (viewport.right() - parameters_.slot.width * static_cast<double>(*section.slot_no + 1));
             const auto pos_y_top = pos_y_above(*section.first, vertical_step);
             const auto pos_y_bottom = pos_y_below(*section.last, vertical_step);
 

@@ -89,7 +89,7 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
                     pos_y = first_line_pos_y + clade.label.offset[1] + text_size.height;
                     break;
                 case vertical_position::middle:
-                    pos_y = sum_line_pos_y / num_lines + clade.label.offset[1] + text_size.height / 2.0;
+                    pos_y = sum_line_pos_y / static_cast<double>(num_lines) + clade.label.offset[1] + text_size.height / 2.0;
                     break;
                 case vertical_position::bottom:
                     pos_y = last_line_pos_y + clade.label.offset[1];

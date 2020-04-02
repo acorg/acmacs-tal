@@ -24,7 +24,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         series_ = acmacs::time_series::make(parameters().time_series);
         make_color_scale();
         if (width_to_height_ratio() <= 0.0)
-            width_to_height_ratio() = series_.size() * parameters().slot.width;
+            width_to_height_ratio() = static_cast<double>(series_.size()) * parameters().slot.width;
         // AD_DEBUG("time series: {} {}", series_.size(), series_);
     }
     LayoutElementWithColoring::prepare(stage);
@@ -76,7 +76,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
                 // const auto dash_color = specific && specific->color.has_value() ? *specific->color : color(leaf);
                 // const auto dash_line_width = specific && specific->line_width.has_value() ? *specific->line_width : parameters().dash.line_width;
                 // const auto dash_width = specific && specific->width.has_value() ? *specific->width : parameters().dash.width;
-                const auto dash_offset_x = viewport.left() + slot_no * slot_width + parameters().slot.width * (1.0 - dash_width) * 0.5;
+                const auto dash_offset_x = viewport.left() + static_cast<double>(slot_no) * slot_width + parameters().slot.width * (1.0 - dash_width) * 0.5;
                 surface.line({dash_offset_x, vertical_step * leaf.cumulative_vertical_offset_}, {dash_offset_x + slot_width * dash_width, vertical_step * leaf.cumulative_vertical_offset_},
                              dash_color, dash_line_width, surface::LineCap::Round);
             }

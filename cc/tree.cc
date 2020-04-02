@@ -228,7 +228,7 @@ double acmacs::tal::v3::Tree::mean_edge_of(double fraction_or_number) const
     const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
     std::vector<const Node*> nodes = sorted_by_edge();
     if (fraction_or_number <= 1.0)
-        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(nodes.size() * fraction_or_number)), edge);
+        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(static_cast<double>(nodes.size()) * fraction_or_number)), edge);
     else
         return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(fraction_or_number)), edge);
 
@@ -261,11 +261,11 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     std::vector<const Node*> nodes = sorted_by_edge();
 
     fmt::print("  mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0));
-    fmt::print("  mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.2), mean_edge_of(0.2));
-    fmt::print("  mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.1), mean_edge_of(0.1));
-    fmt::print("  mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.05), mean_edge_of(0.05));
-    fmt::print("  mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.01), mean_edge_of(0.01));
-    fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(nodes.size() * 0.005), mean_edge_of(0.005));
+    fmt::print("  mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.2), mean_edge_of(0.2));
+    fmt::print("  mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.1), mean_edge_of(0.1));
+    fmt::print("  mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.05), mean_edge_of(0.05));
+    fmt::print("  mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.01), mean_edge_of(0.01));
+    fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.005), mean_edge_of(0.005));
     fmt::print("  HINT: hide by edge, if edge > mean of top 1%\n\n");
 
     fmt::print("        Edge       Cumulative     Seq Id\n");

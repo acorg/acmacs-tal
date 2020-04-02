@@ -61,7 +61,7 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
             return Size{std::max(result.width, name_size.width), result.height + name_size.height};
         });
         interleave = text_line_interleave * transition.name_sizes.front().height;
-        transition.box.size.height += (names.size() - 1) * interleave;
+        transition.box.size.height += static_cast<double>(names.size() - 1) * interleave;
 
         transition.at_edge_line.x(horizontal_step * (transition.node->cumulative_edge_length.as_number() - transition.node->edge_length.as_number() / 2.0));
         transition.at_edge_line.y(vertical_step * transition.node->cumulative_vertical_offset_);
