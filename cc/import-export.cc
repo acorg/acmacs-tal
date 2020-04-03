@@ -1,3 +1,4 @@
+#include "acmacs-base/filesystem.hh"
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/fmt.hh"
 #include "acmacs-tal/import-export.hh"
