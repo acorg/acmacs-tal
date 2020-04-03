@@ -5,10 +5,10 @@ TARGETS = \
   $(DIST)/tal
 
 SOURCES = \
+  settings.cc \
   tal.cc tal-data.cc tree.cc aa-transition.cc \
   draw.cc layout.cc coloring.cc draw-tree.cc time-series.cc clades.cc title.cc legend.cc dash-bar.cc draw-aa-transitions.cc \
   hz-sections.cc antigenic-maps.cc \
-  settings.cc \
   import-export.cc json-export.cc json-import.cc newick.cc html-export.cc
 
 # ----------------------------------------------------------------------
