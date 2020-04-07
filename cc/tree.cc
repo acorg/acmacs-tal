@@ -4,7 +4,7 @@
 
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
-#include "acmacs-virus/virus-name.hh"
+#include "acmacs-virus/virus-name-parse.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tree.hh"

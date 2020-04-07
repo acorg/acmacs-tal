@@ -92,7 +92,7 @@
             {"N": "seqdb", "filename": "{seqdb-filename}"},
             {"N": "populate-with-nuc-duplicates"}
         ]},
-        {"N": "if", "condition": {"empty": "{virus-type}"}, "then": [{"N": "warning", "message": "no virus type inferred from the tree"}]},
+        {"?N": "if", "condition": {"empty": "{virus-type}"}, "then": [{"N": "warning", "message": "no virus type inferred from the tree"}]},
         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
         {"N": "report-time-series", "output": "{report-time-series-output}"},
         {"N": "ladderize", "method": "{ladderize-method}"},

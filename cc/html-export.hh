@@ -11,6 +11,7 @@ namespace acmacs::tal::inline v3
     class Tree;
 
     std::string html_export(const Tree& tree);
+    std::string names_export(const Tree& tree);
 }
 
 // ----------------------------------------------------------------------

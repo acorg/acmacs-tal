@@ -2,7 +2,7 @@
 #include "acmacs-base/range-v3.hh"
 #include "acmacs-base/string.hh"
 #include "locationdb/locdb.hh"
-#include "acmacs-virus/virus-name.hh"
+#include "acmacs-virus/virus-name-parse.hh"
 #include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/log.hh"

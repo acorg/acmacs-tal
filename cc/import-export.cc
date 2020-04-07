@@ -71,6 +71,14 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
             throw ExportError{fmt::format("cannot export to html: {}", err)};
         }
     }
+    else if (ext == ".names") {
+        try {
+            exported = names_export(tree);
+        }
+        catch (JsonExportError& err) {
+            throw ExportError{fmt::format("cannot export names: {}", err)};
+        }
+    }
     else
         throw ExportError{fmt::format("cannot infer export method from filename: {}", filename)};
     acmacs::file::write(filename, exported);

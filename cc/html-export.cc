@@ -17,6 +17,18 @@ static void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& nod
 
 // ----------------------------------------------------------------------
 
+std::string acmacs::tal::v3::names_export(const Tree& tree)
+{
+    fmt::memory_buffer names;
+    tree::iterate_leaf(tree, [&names](const auto& node) {
+        fmt::format_to(names, "{}\n", node.seq_id);
+    });
+    return fmt::to_string(names);
+
+} // acmacs::tal::v3::names_export
+
+// ----------------------------------------------------------------------
+
 std::string acmacs::tal::v3::html_export(const Tree& tree)
 {
     tree.cumulative_calculate();
