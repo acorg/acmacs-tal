@@ -886,7 +886,7 @@ void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, 
     if (!source.is_null()) {
         if (const auto& loc = source.get("location"sv); !loc.is_null()) {
             try {
-                const auto found = acmacs::locationdb::get().find(loc.to<std::string_view>());
+                const auto found = acmacs::locationdb::get().find_or_throw(loc.to<std::string_view>());
                 dot_parameters.coordinates = PointCoordinates{found.latitude(), found.longitude()};
             }
             catch (std::exception&) {
