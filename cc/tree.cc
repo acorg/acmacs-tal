@@ -4,7 +4,7 @@
 
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
-#include "acmacs-virus/virus-name-parse.hh"
+#include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tree.hh"
@@ -1086,8 +1086,8 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
                     break;
                 }
             }
-            const auto parsed_seq_id = acmacs::virus::parse_name(node.seq_id);
-            if (const auto found = serum_names.find(parsed_seq_id.name); found != std::end(serum_names)) {
+            const auto parsed_seq_id = acmacs::virus::name::parse(node.seq_id);
+            if (const auto found = serum_names.find(parsed_seq_id.name()); found != std::end(serum_names)) {
                 for (auto serum_index : found->second)
                     node.serum_index_in_chart_.emplace_back(serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant, sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg());
             }

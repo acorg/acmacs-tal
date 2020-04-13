@@ -2,7 +2,7 @@
 #include "acmacs-base/range-v3.hh"
 #include "acmacs-base/string.hh"
 #include "locationdb/locdb.hh"
-#include "acmacs-virus/virus-name-parse.hh"
+#include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-whocc-data/vaccines.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/log.hh"
@@ -975,6 +975,8 @@ void acmacs::tal::v3::Settings::add_draw_on_tree()
 
 void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const
 {
+    using namespace std::string_view_literals;
+
     const auto names = ranges::to<std::vector<std::string>>(
         acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv("virus-type", "")}, acmacs::virus::lineage_t{getenv("lineage", "")})
         | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::get_or(criteria, "type", "any"))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
@@ -990,13 +992,13 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
 
     if (const auto passage = ::string::lower(rjson::get_or(criteria, "passage", "")); !passage.empty()) {
         const auto exclude_by_passage = [&passage](const auto* node) {
-            const auto& name_parts = acmacs::virus::parse_name(node->seq_id, acmacs::virus::parse_name_f::none);
-            if (passage == "cell")
-                return !name_parts.passage.is_cell();
-            else if (passage == "egg")
-                return !name_parts.passage.is_egg();
-            else if (passage == "reassortant")
-                return name_parts.reassortant.empty();
+            const auto name = acmacs::virus::name::parse(node->seq_id);
+            if (passage == "cell"sv)
+                return !name.passage.is_cell();
+            else if (passage == "egg"sv)
+                return !name.passage.is_egg();
+            else if (passage == "reassortant"sv)
+                return name.reassortant.empty();
             else
                 return false;
         };
