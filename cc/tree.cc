@@ -5,6 +5,7 @@
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
+#include "acmacs-virus/virus-name-v1.hh"
 #include "acmacs-chart-2/chart.hh"
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tree.hh"
