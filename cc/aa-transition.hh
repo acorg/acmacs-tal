@@ -48,8 +48,9 @@ namespace acmacs::tal::inline v3
         AA_Transition(seqdb::pos0_t aPos, char aRight) : left(Empty), right(aRight), pos(aPos) /*, for_left(nullptr) */ {}
         std::string display() const { return fmt::format("{}{}{}", left, pos, right); }
         constexpr bool empty_left() const { return left == Empty; }
+        constexpr bool empty_right() const { return right == Empty; }
         constexpr bool left_right_same() const { return left == right; }
-        constexpr operator bool() const { return !empty_left() && !left_right_same(); } // if transition is good for display
+        constexpr operator bool() const { return !empty_left() && !empty_right() && !left_right_same(); } // if transition is good for display
 
         char left;
         char right;
