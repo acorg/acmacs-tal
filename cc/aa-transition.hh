@@ -80,6 +80,7 @@ namespace acmacs::tal::inline v3
         bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }
         bool remove(seqdb::pos0_t pos, char right) { return remove_if([pos,right](const auto& en) { return en.pos == pos && en.right == right; }); }
         void remove_left_right_same() { remove_if([](const auto& en) { return en.left_right_same(); }); }
+        void remove_empty_right() { remove_if([](const auto& en) { return en.empty_right(); }); }
 
         const AA_Transition* find(seqdb::pos0_t pos) const
         {
