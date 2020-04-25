@@ -1,4 +1,4 @@
-# Time-stamp: <2020-04-25 10:42:44 eu>
+# Time-stamp: <2020-04-25 13:22:01 eu>
 
 * Command line defines
 
@@ -39,6 +39,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"all": true}
 {"aa": ["192Q", "!123E"]}
 {"cumulative >=": 0.01, "report": true}
+{"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >= 
 {"edge >=": 0.01, "report": true}
 {"date": ["start >=", "end <", "report": true}
 {"seq_id": "regexp", "report": true}
@@ -123,6 +124,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-branches-by-edge"}
+{"N": "report-branches-by-cumulative-edge"}
 {"N": "report-time-series", "output": "{report-time-series-output}"}
 
 ** Draw

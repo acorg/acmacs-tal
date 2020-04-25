@@ -514,6 +514,37 @@ void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select upd
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::select_by_top_cumulative_gap(NodeSet& nodes, Select update, double top_gap_rel)
+{
+    if (top_gap_rel <= 1.0) {
+        AD_WARNING("invalid value for \"top-cumulative-gap\": {}, must be >1.0, node selection criterium ignored", top_gap_rel);
+        return;
+    }
+
+    if (const std::vector<const Node*> sorted = sorted_by_cumulative_edge(); sorted.size() > 10) {
+        std::vector<double> cumulative_gaps(sorted.size() - 1);
+        for (auto ps = std::next(sorted.begin()); ps != sorted.end(); ++ps)
+            cumulative_gaps[static_cast<size_t>(ps - sorted.begin() - 1)] = (*std::prev(ps))->cumulative_edge_length.as_number() - (*ps)->cumulative_edge_length.as_number();
+        std::sort(std::begin(cumulative_gaps), std::end(cumulative_gaps), [](double g1, double g2) { return g1 > g2; });
+        if ((cumulative_gaps[0] / cumulative_gaps[1]) > top_gap_rel) {
+            double cut_off_cumulative_edge{0.0};
+            for (auto ps = std::next(sorted.begin()); ps != sorted.end(); ++ps) {
+                if (const auto gap = (*std::prev(ps))->cumulative_edge_length.as_number() - (*ps)->cumulative_edge_length.as_number(); float_equal(gap, cumulative_gaps[0])) {
+                    cut_off_cumulative_edge = (*std::prev(ps))->cumulative_edge_length.as_number();
+                    break;
+                }
+            }
+            AD_INFO("\"top-cumulative-gap\": {}: cut_off_gap: {:.8f}  cut_off_cumulative_edge: {:.8f}", top_gap_rel, cumulative_gaps[0], cut_off_cumulative_edge);
+            select_if_cumulative_more_than(nodes, update, cut_off_cumulative_edge, Descent::no);
+        }
+        else
+            AD_INFO("\"top-cumulative-gap\" not applied, ratio of top cumul gaps: {} <= {}", cumulative_gaps[0] / cumulative_gaps[1], top_gap_rel);
+    }
+
+} // acmacs::tal::v3::Tree::select_by_top_cumulative_gap
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Node::hide()
 {
     hidden = true;

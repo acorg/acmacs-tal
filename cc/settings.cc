@@ -123,10 +123,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             tree().populate_with_nuc_duplicates();
         else if (name == "re-root"sv)
             tree().re_root(seq_id_t{getenv("new-root"sv, "re-root: new-root not specified")});
-        else if (name == "report-branches-by-edge"sv) {
-            tree().branches_by_edge();
+        else if (name == "report-branches-by-cumulative-edge"sv)
             tree().branches_by_cumulative_edge();
-        }
+        else if (name == "report-branches-by-edge"sv)
+            tree().branches_by_edge();
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
@@ -380,6 +380,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
         }
         else if (key == "report") {
             report = substitute(val).to<bool>();
+        }
+        else if (key == "top-cumulative-gap") {
+            tree().select_by_top_cumulative_gap(selected, update, substitute(val).to<double>());
         }
         else if (key == "vaccine") {
             select_vaccine(selected, update, substitute(val));

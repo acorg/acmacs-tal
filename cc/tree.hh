@@ -206,6 +206,7 @@ namespace acmacs::tal::inline v3
         void select_if_cumulative_more_than(NodeSet& nodes, Select update, double cumulative_min, Descent descent = Descent::no);
         void select_if_edge_more_than(NodeSet& nodes, Select update, double edge_min);
         void select_if_edge_more_than_mean_edge_of(NodeSet& nodes, Select update, double fraction_or_number);
+        void select_by_top_cumulative_gap(NodeSet& nodes, Select update, double top_gap_rel);
         EdgeLength max_cumulative_shown() const;
 
         void select_all(NodeSet& nodes, Select update);
