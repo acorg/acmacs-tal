@@ -557,6 +557,8 @@ void acmacs::tal::v3::Node::hide()
 
 void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
 {
+    AD_INFO("hiding {} nodes", nodes.size());
+
     for (Node* node : nodes)
         node->hide();
 
@@ -743,7 +745,7 @@ void acmacs::tal::v3::Tree::report_first_last_leaves(size_t min_number_of_leaves
 
 void acmacs::tal::v3::Tree::ladderize(Ladderize method)
 {
-    Timeit time_ladderize(">>>> [time] ladderize: ");
+    // Timeit time_ladderize(">>>> [time] ladderize: ");
 
     const auto set_leaf = [](Node& node) { node.ladderize_helper_ = ladderize_helper_t{node.edge_length, node.date, node.seq_id}; };
 
@@ -1126,8 +1128,9 @@ bool acmacs::tal::v3::Tree::has_sequences() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set_by_aa_at_pos(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
 {
+    AD_DEBUG("clade_set_by_aa_at_pos nodes_hidden_:{}", nodes_hidden_);
     if (nodes_hidden_) {
         clades_reset();
         set_first_last_next_node_id();
@@ -1155,11 +1158,11 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs:
 
     AD_LOG(acmacs::log::clades, "\"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
     // AD_DEBUG("clade \"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
-} // acmacs::tal::v3::Tree::clade_set
+} // acmacs::tal::v3::Tree::clade_set_by_aa_at_pos
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
+void acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos(std::string_view clade_name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
 {
     size_t num = 0;
     const std::string clade_name_s{clade_name};
@@ -1175,7 +1178,7 @@ void acmacs::tal::v3::Tree::clade_set(std::string_view clade_name, const acmacs:
         }
     });
 
-} // acmacs::tal::v3::Tree::clade_set
+} // acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos
 
 // ----------------------------------------------------------------------
 

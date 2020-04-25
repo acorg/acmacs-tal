@@ -273,8 +273,8 @@ namespace acmacs::tal::inline v3
         constexpr const clades_t& clades() const { return clades_; }
 
         void clades_reset();
-        void clade_set(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name);
-        void clade_set(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name);
+        void clade_set_by_aa_at_pos(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name);
+        void clade_set_by_nuc_at_pos(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name);
         void clade_report(std::string_view name={}) const;
 
         // ----------------------------------------------------------------------
@@ -321,6 +321,7 @@ namespace acmacs::tal::inline v3
 // ======================================================================
 
 // {:4.3} -> {:>4d}.{:<3d}
+// {:.0} -> {:d}
 template <> struct fmt::formatter<acmacs::tal::node_id_t>
 {
     template <typename ParseContext> constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin())
@@ -348,13 +349,15 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
     template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx)
     {
         if (v_size_.has_value())
-            format_to(ctx.out(), "{:>{}d}.", node_id.vertical, *v_size_);
+            format_to(ctx.out(), "{:>{}d}", node_id.vertical, *v_size_);
         else
-            format_to(ctx.out(), "{}.", node_id.vertical);
-        if (h_size_.has_value())
-            format_to(ctx.out(), "{:<{}d}", node_id.horizontal, *h_size_);
+            format_to(ctx.out(), "{}", node_id.vertical);
+        if (h_size_.has_value()) {
+            if (*h_size_ > 0)
+                format_to(ctx.out(), ".{:<{}d}", node_id.horizontal, *h_size_);
+        }
         else
-            format_to(ctx.out(), "{}", node_id.horizontal);
+            format_to(ctx.out(), ".{}", node_id.horizontal);
         return ctx.out();
     }
 

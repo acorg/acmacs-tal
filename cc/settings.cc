@@ -413,11 +413,11 @@ void acmacs::tal::v3::Settings::clade() const
 
     if (const auto& aa_at_pos = getenv("aa"sv); !aa_at_pos.is_null()) {
         AD_LOG(acmacs::log::clades, "settings \"{}\" aa: {}", clade_name, aa_at_pos);
-        tree().clade_set(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(aa_at_pos), display_name);
+        tree().clade_set_by_aa_at_pos(clade_name, acmacs::seqdb::extract_aa_at_pos1_eq_list(aa_at_pos), display_name);
     }
     else if (const auto& nuc_at_pos = getenv("nuc"sv); !nuc_at_pos.is_null()) {
         AD_LOG(acmacs::log::clades, "settings \"{}\" nuc: {}", clade_name, nuc_at_pos);
-        tree().clade_set(clade_name, acmacs::seqdb::extract_nuc_at_pos1_eq_list(nuc_at_pos), display_name);
+        tree().clade_set_by_nuc_at_pos(clade_name, acmacs::seqdb::extract_nuc_at_pos1_eq_list(nuc_at_pos), display_name);
     }
     else
         throw error{"neither \"aa\" nor \"nuc\" provided"};

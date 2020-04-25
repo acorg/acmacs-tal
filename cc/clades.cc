@@ -198,20 +198,20 @@ void acmacs::tal::v3::Clades::add_separators_to_time_series()
 void acmacs::tal::v3::Clades::report_clades()
 {
     if (parameters_.report) {
-        fmt::print(">>> ==================== Clades ({}) ==================================================\n", clades_.size());
+        AD_INFO(" vvvvvvvvvvvvvvvvvvvv Clades ({}) vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv", clades_.size());
         for (const auto& clade : clades_) {
             const auto& clade_param = parameters_for_clade(clade.name);
             fmt::print("Clade {} ({})    {{\"name\": \"{}\", \"display_name\": \"{}\", \"section_inclusion_tolerance\": {}, \"section_exclusion_tolerance\": {}, \"show\": {}}}\n", clade.name,
                        clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, !clade_param.hidden);
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  {} [{}] slot:{} {} {} .. {} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
+                fmt::print("  {} [{}] slot:{} {:.0} {} .. {:.0} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
                            section.last->seq_id);
                 if (section_no < (clade.sections.size() - 1))
                     fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id.vertical - section.last->node_id.vertical - 1);
             }
         }
-        fmt::print(">>> ===================================================================================\n", clades_.size());
+        AD_INFO(" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", clades_.size());
     }
 
 } // acmacs::tal::v3::Clades::report_clades
@@ -248,6 +248,7 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
             const auto pos_y_top = pos_y_above(*section.first, vertical_step);
             const auto pos_y_bottom = pos_y_below(*section.last, vertical_step);
 
+            AD_DEBUG("{} {} slot:{}   {:.0} .. {:.0}", clade.name, section.display_name, section.slot_no, section.first->node_id, section.last->node_id);
             // arrow
             surface.double_arrow({pos_x, pos_y_top}, {pos_x, pos_y_bottom}, section.arrow.color, section.arrow.line_width, section.arrow.arrow_width);
 
