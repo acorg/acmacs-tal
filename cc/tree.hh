@@ -199,6 +199,7 @@ namespace acmacs::tal::inline v3
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
         void branches_by_edge();
+        void branches_by_cumulative_edge();
 
         enum class Select { init, update };
         enum class Descent { no, yes };
@@ -297,7 +298,9 @@ namespace acmacs::tal::inline v3
         const clade_t* find_clade(std::string_view name) const;
         clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
         std::vector<const Node*> sorted_by_edge() const;
-        double mean_edge_of(double fraction_or_number) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
+        std::vector<const Node*> sorted_by_cumulative_edge() const;
+        double mean_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
+        double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
         void set_first_last_next_node_id();
 
         std::string data_buffer_;

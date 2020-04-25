@@ -224,16 +224,40 @@ std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_edge(
 
 // ----------------------------------------------------------------------
 
-double acmacs::tal::v3::Tree::mean_edge_of(double fraction_or_number) const
+std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_cumulative_edge() const
+{
+    cumulative_calculate();
+    std::vector<const Node*> sorted;
+    const auto collect = [&sorted](const Node& node) { sorted.push_back(&node); };
+    tree::iterate_leaf_pre(*this, collect, collect);
+    std::sort(std::begin(sorted), std::end(sorted), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; });
+    return sorted;
+
+} // acmacs::tal::v3::Tree::sorted_by_cumulative_edge
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::Tree::mean_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const
 {
     const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
-    std::vector<const Node*> nodes = sorted_by_edge();
     if (fraction_or_number <= 1.0)
-        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(static_cast<double>(nodes.size()) * fraction_or_number)), edge);
+        return acmacs::statistics::mean(std::begin(sorted), std::next(std::begin(sorted), static_cast<ssize_t>(static_cast<double>(sorted.size()) * fraction_or_number)), edge);
     else
-        return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(fraction_or_number)), edge);
+        return acmacs::statistics::mean(std::begin(sorted), std::next(std::begin(sorted), static_cast<ssize_t>(fraction_or_number)), edge);
 
 } // acmacs::tal::v3::Tree::mean_edge_of
+
+// ----------------------------------------------------------------------
+
+double acmacs::tal::v3::Tree::mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const
+{
+    const auto cumulative_edge = [](const Node* node) { return node->cumulative_edge_length.as_number(); };
+    if (fraction_or_number <= 1.0)
+        return acmacs::statistics::mean(std::begin(sorted), std::next(std::begin(sorted), static_cast<ssize_t>(static_cast<double>(sorted.size()) * fraction_or_number)), cumulative_edge);
+    else
+        return acmacs::statistics::mean(std::begin(sorted), std::next(std::begin(sorted), static_cast<ssize_t>(fraction_or_number)), cumulative_edge);
+
+} // acmacs::tal::v3::Tree::mean_cumulative_edge_of
 
 // ----------------------------------------------------------------------
 
@@ -257,14 +281,14 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     // sort_by_cumulative(nodes);
     // sort_by_edge(nodes);
 
-    std::vector<const Node*> nodes = sorted_by_edge();
+    const std::vector<const Node*> nodes = sorted_by_edge();
 
-    fmt::print("  mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0));
-    fmt::print("  mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.2), mean_edge_of(0.2));
-    fmt::print("  mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.1), mean_edge_of(0.1));
-    fmt::print("  mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.05), mean_edge_of(0.05));
-    fmt::print("  mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.01), mean_edge_of(0.01));
-    fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.005), mean_edge_of(0.005));
+    fmt::print("  mean edge (all      : {:4d}) {}\n", nodes.size(), mean_edge_of(1.0, nodes));
+    fmt::print("  mean edge (top 20%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.2), mean_edge_of(0.2, nodes));
+    fmt::print("  mean edge (top 10%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.1), mean_edge_of(0.1, nodes));
+    fmt::print("  mean edge (top  5%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.05), mean_edge_of(0.05, nodes));
+    fmt::print("  mean edge (top  1%  : {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.01), mean_edge_of(0.01, nodes));
+    fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.005), mean_edge_of(0.005, nodes));
     fmt::print("  HINT: hide by edge, if edge > mean of top 1%\n\n");
 
     fmt::print("        Edge     Cumulative     Seq Id\n");
@@ -287,7 +311,7 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     fmt::print("\n");
 
     NodeSet selected;
-    const auto mean_edge = mean_edge_of(0.01);
+    const auto mean_edge = mean_edge_of(0.01, nodes);
     select_if_edge_more_than(selected, Select::init, mean_edge);
     fmt::print("  selected with edge > {}: {}\n", mean_edge, selected.size());
     if (!selected.empty()) {
@@ -299,6 +323,70 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     }
 
 } // acmacs::tal::v3::Tree::branches_by_edge
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::branches_by_cumulative_edge()
+{
+    number_leaves_in_subtree();
+
+    AD_INFO("cumulative edge report");
+    const std::vector<const Node*> nodes = sorted_by_cumulative_edge();
+
+    std::vector<double> cumulative_gaps(nodes.size() - 1);
+    const Node* prev{nullptr};
+    std::vector<double>::iterator cur_gap{cumulative_gaps.begin()};
+    for (const auto* node : nodes) {
+        if (prev) {
+            *cur_gap = prev->cumulative_edge_length.as_number() - node->cumulative_edge_length.as_number();
+            ++cur_gap;
+        }
+        prev = node;
+    }
+    std::sort(std::begin(cumulative_gaps), std::end(cumulative_gaps), [](double g1, double g2) { return g1 > g2; });
+
+    const size_t num_top = cumulative_gaps.size() / 200 + 1; // +1 to avoid div by zero
+    const auto mean_top = std::accumulate(std::begin(cumulative_gaps), std::next(std::begin(cumulative_gaps), static_cast<ssize_t>(num_top)), 0.0) / static_cast<double>(num_top);
+
+    fmt::print("  cumulative_gaps   mean {} top: {:.8f}\n", num_top, mean_top);
+    for (auto gp = std::begin(cumulative_gaps); gp != std::end(cumulative_gaps); ++gp) {
+        fmt::print("    {:.8f}\n", *gp);
+        if ((gp - std::begin(cumulative_gaps)) > 20)
+            break;
+    }
+
+    fmt::print("        Edge     Cumulative     Seq Id\n");
+    for (auto [no, node] : acmacs::enumerate(nodes)) {
+        if (node->number_leaves_in_subtree() > 1) {
+            fmt::print("    {:.8f}  {:.8f}    [{}]", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->number_leaves_in_subtree());
+            size_t no2{0};
+            tree::iterate_leaf_stop(*node, [&no2](const auto& subnode) {
+                fmt::print("  {}", subnode.seq_id);
+                ++no2;
+                return no2 > 2;
+            });
+            fmt::print("\n");
+        }
+        else
+            fmt::print("    {:.8f}  {:.8f}   {}\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id);
+        if (no > 20) // nodes.size() / 100)
+            break;
+    }
+    fmt::print("\n");
+
+    // NodeSet selected;
+    // const auto mean_edge = mean_edge_of(0.01, nodes);
+    // select_if_edge_more_than(selected, Select::init, mean_edge);
+    // fmt::print("  selected with edge > {}: {}\n", mean_edge, selected.size());
+    // if (!selected.empty()) {
+    //     fmt::print("       edge   node-id   Seq Id\n");
+    //     for (Node* node : selected) {
+    //         fmt::print("    {} {:4.4} {}\n", node->edge_length, node->node_id, node->seq_id);
+    //         node->color_edge_line = RED;
+    //     }
+    // }
+
+} // acmacs::tal::v3::Tree::branches_by_cumulative_edge
 
 // ----------------------------------------------------------------------
 
@@ -343,7 +431,8 @@ void acmacs::tal::v3::Tree::select_if_edge_more_than(NodeSet& nodes, Select upda
 
 void acmacs::tal::v3::Tree::select_if_edge_more_than_mean_edge_of(NodeSet& nodes, Select update, double fraction_or_number)
 {
-    select_update(nodes, update, Descent::yes, *this, [edge_min=EdgeLength{mean_edge_of(fraction_or_number)}](Node& node) { return !node.hidden && node.edge_length >= edge_min; });
+    const std::vector<const Node*> sorted = sorted_by_edge();
+    select_update(nodes, update, Descent::yes, *this, [edge_min=EdgeLength{mean_edge_of(fraction_or_number, sorted)}](Node& node) { return !node.hidden && node.edge_length >= edge_min; });
 
 } // acmacs::tal::v3::Tree::select_if_edge_more_than_mean_edge_of
 

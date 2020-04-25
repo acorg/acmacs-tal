@@ -123,8 +123,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             tree().populate_with_nuc_duplicates();
         else if (name == "re-root"sv)
             tree().re_root(seq_id_t{getenv("new-root"sv, "re-root: new-root not specified")});
-        else if (name == "report-branches-by-edge"sv)
+        else if (name == "report-branches-by-edge"sv) {
             tree().branches_by_edge();
+            tree().branches_by_cumulative_edge();
+        }
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
             if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
