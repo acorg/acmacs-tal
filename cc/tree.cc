@@ -245,14 +245,12 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     AD_INFO("edge report");
     fmt::print("  max cumulative: {}\n", max_cumulative_shown().as_number());
 
-
     // const auto collect = [&nodes](const Node& node) { nodes.push_back(&node); };
     // tree::iterate_leaf_pre(*this, collect, collect);
 
     // const auto sort_by_edge = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->edge_length > n2->edge_length; }); };
-    // const auto sort_by_cumulative = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; }); };
-    // const auto edge = [](const Node* node) { return node->edge_length.as_number(); };
-    // const auto mean_edge = [&nodes, edge](double fraction) {
+    // const auto sort_by_cumulative = [](auto& nods) { std::sort(std::begin(nods), std::end(nods), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length;
+    // }); }; const auto edge = [](const Node* node) { return node->edge_length.as_number(); }; const auto mean_edge = [&nodes, edge](double fraction) {
     //     return acmacs::statistics::mean(std::begin(nodes), std::next(std::begin(nodes), static_cast<ssize_t>(nodes.size() * fraction)), edge);
     // };
 
@@ -269,19 +267,35 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     fmt::print("  mean edge (top  0.5%: {:4d}) {}\n", static_cast<size_t>(static_cast<double>(nodes.size()) * 0.005), mean_edge_of(0.005));
     fmt::print("  HINT: hide by edge, if edge > mean of top 1%\n\n");
 
-    fmt::print("        Edge       Cumulative     Seq Id\n");
+    fmt::print("        Edge     Cumulative     Seq Id\n");
     for (auto [no, node] : acmacs::enumerate(nodes)) {
-        fmt::print("    {:.10f}  {:.10f}   {} [{}]\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id, node->number_leaves_in_subtree());
-        if (no > nodes.size() / 100)
+        if (node->number_leaves_in_subtree() > 1) {
+            fmt::print("    {:.8f}  {:.8f}    [{}]", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->number_leaves_in_subtree());
+            size_t no2{0};
+            tree::iterate_leaf_stop(*node, [&no2](const auto& subnode) {
+                fmt::print("  {}", subnode.seq_id);
+                ++no2;
+                return no2 > 2;
+            });
+            fmt::print("\n");
+        }
+        else
+            fmt::print("    {:.8f}  {:.8f}   {}\n", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->seq_id);
+        if (no > 20) // nodes.size() / 100)
             break;
     }
     fmt::print("\n");
 
     NodeSet selected;
-    select_if_edge_more_than(selected, Select::init, mean_edge_of(0.01));
-    for (Node* node : selected) {
-        fmt::print("  long edge {} {} {}", node->edge_length, node->node_id, node->seq_id);
-        node->color_edge_line = RED;
+    const auto mean_edge = mean_edge_of(0.01);
+    select_if_edge_more_than(selected, Select::init, mean_edge);
+    fmt::print("  selected with edge > {}: {}\n", mean_edge, selected.size());
+    if (!selected.empty()) {
+        fmt::print("       edge   node-id   Seq Id\n");
+        for (Node* node : selected) {
+            fmt::print("    {} {:4.4} {}\n", node->edge_length, node->node_id, node->seq_id);
+            node->color_edge_line = RED;
+        }
     }
 
 } // acmacs::tal::v3::Tree::branches_by_edge
