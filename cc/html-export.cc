@@ -52,13 +52,13 @@ void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, cons
         fmt::format_to(html,
                        "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td><td class='seq-name' style='color: "
                        "{color_tree_label}'>{seq_id}</td></tr></table></li>\n",
-                       fmt::arg("prefix", acmacs::string::join("", prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""),
+                       fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)), fmt::arg("node_edge_last", last ? "node-edge-last" : ""),
                        fmt::arg("edge", static_cast<int>(node.edge_length.as_number() * edge_scale)), fmt::arg("seq_id", node.seq_id),
                        fmt::arg("color_tree_label", "black" /*node.color_tree_label.to_hex_string()*/));
     }
     else {
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);
-        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", acmacs::string::join("", prefix)),
+        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='node-edge {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
                        fmt::arg("node_edge_last", last ? "node-edge-last" : ""), fmt::arg("edge", edge));
         // if (node.number_leaves_in_subtree() >= 20) {
             // if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
