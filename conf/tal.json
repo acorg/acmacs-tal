@@ -4,6 +4,7 @@
     "modifications": [
         {"?N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
         "clades-whocc",
+        "report-branches-by-edge",
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
         {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},
@@ -48,7 +49,7 @@
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
         "dash-bar-clades-tal",
-        {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}},
+        {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}},
         {"N": "clades"}
     ],
 
