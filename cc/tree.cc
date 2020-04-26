@@ -91,14 +91,6 @@ acmacs::tal::v3::EdgeLength acmacs::tal::v3::Tree::max_cumulative_shown() const
 
 // ----------------------------------------------------------------------
 
-// void acmacs::tal::v3::Tree::cumulative_reset() const
-// {
-//     tree::iterate_leaf(*this, [](const Node& node) { node.cumulative_edge_length = EdgeLengthNotSet; });
-
-// } // acmacs::tal::v3::Tree::cumulative_reset
-
-// ----------------------------------------------------------------------
-
 std::string acmacs::tal::v3::Tree::report_cumulative() const
 {
     cumulative_calculate();
@@ -113,102 +105,6 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
     return result;
 
 } // acmacs::tal::v3::Tree::report_cumulative
-
-// ----------------------------------------------------------------------
-
-// enum class CumulativeReport { clusters, all };
-// std::string x_report_cumulative(CumulativeReport report)
-// {
-//     struct CumulativeEntry
-//     {
-//         acmacs::tal::seq_id_t seq_id;
-//         acmacs::tal::EdgeLength edge_length;
-//         acmacs::tal::EdgeLength cumulative_edge_length;
-//         acmacs::tal::EdgeLength gap_to_next{acmacs::tal::EdgeLengthNotSet};
-
-//         CumulativeEntry(const acmacs::tal::seq_id_t& a_seq_id, acmacs::tal::EdgeLength a_edge, acmacs::tal::EdgeLength a_cumulative)
-//             : seq_id{a_seq_id}, edge_length{a_edge}, cumulative_edge_length{a_cumulative}
-//         {
-//         }
-
-//         void set_gap(const CumulativeEntry& next, bool cumulative)
-//         {
-//             if (cumulative)
-//                 gap_to_next = cumulative_edge_length - next.cumulative_edge_length;
-//             else
-//                 gap_to_next = edge_length - next.edge_length;
-//         }
-
-//         static std::string header(bool cumulative_first)
-//         {
-//             if (cumulative_first)
-//                 return " cumulative       edge      gap to next   seq id\n";
-//             else
-//                 return "    edge       cumulative   gap to next   seq id\n";
-//         }
-
-//         std::string format(bool cumulative_first) const
-//         {
-//             if (cumulative_first)
-//                 return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", cumulative_edge_length.as_number(), edge_length.as_number(), gap_to_next.as_number(), seq_id);
-//             else
-//                 return fmt::format("{:.10f}  {:.10f}  {:.10f}  {}\n", edge_length.as_number(), cumulative_edge_length.as_number(), gap_to_next.as_number(), seq_id);
-//         }
-//     };
-
-//     cumulative_calculate();
-
-//     std::vector<CumulativeEntry> nodes;
-//     tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.emplace_back(node.seq_id, node.edge_length, node.cumulative_edge_length); });
-//     std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
-//     for (auto it = std::begin(nodes); it != std::prev(std::end(nodes)); ++it)
-//         it->set_gap(*std::next(it), true);
-//     // const auto gap_average = std::accumulate(std::begin(nodes), std::prev(std::end(nodes)), EdgeLength{0.0}, [](EdgeLength sum, const auto& en) { return sum + en.gap_to_next; }) / (nodes.size() -
-//     // 1);
-
-//     std::sort(std::begin(nodes), std::end(nodes), [](const auto& e1, const auto& e2) { return e1.gap_to_next > e2.gap_to_next; });
-
-//     EdgeLength sum_gap_top{0.0};
-//     const auto top_size = std::min(20L, static_cast<ssize_t>(nodes.size()));
-//     for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
-//         sum_gap_top += it->gap_to_next;
-//     const EdgeLength ave_gap_top = sum_gap_top / top_size;
-//     const EdgeLength gap_cut = (nodes.front().gap_to_next - ave_gap_top) * 0.1 + ave_gap_top;
-//     auto to_cut = nodes.begin();
-//     for (auto it = std::next(std::begin(nodes)); it != std::next(std::begin(nodes), top_size); ++it) {
-//         if (it->gap_to_next > gap_cut && it->edge_length < to_cut->edge_length)
-//             to_cut = it;
-//     }
-
-//     std::string result{"Cumulative edges and cut suggestion\n\n"};
-//     // result.append(fmt::format("Ave Gap: {}\n", gap_average.as_number()));
-//     // result.append(fmt::format("Ave Top Gap: {}\n", ave_gap_top.as_number()));
-//     result.append(CumulativeEntry::header(true));
-//     result.append(to_cut->format(true));
-//     if (to_cut != nodes.begin()) {
-//         const auto after_cut = std::prev(to_cut);
-//         result.append(after_cut->format(true));
-//     }
-//     result.append(1, '\n');
-//     // if (verb == verbose::yes) {
-//     //     fmt::print(result);
-//     //     fmt::print("{{\"N\": \"nodes\", \"select\": {{\"cumulative >=\": {:.10f}, \"report\": true}}, \"apply\": \"hide\"}}\n", to_cut->cumulative_edge_length.as_number());
-//     // }
-//     result.append("Top nodes sorted by gap to next\n");
-//     result.append(CumulativeEntry::header(true));
-//     for (auto it = std::begin(nodes); it != std::next(std::begin(nodes), top_size); ++it)
-//         result.append(it->format(true));
-
-//     if (report == CumulativeReport::all) {
-//         std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1.cumulative_edge_length > en2.cumulative_edge_length; });
-//         result.append("\nAll nodes sorted by cumulative\n");
-//         result.append(CumulativeEntry::header(true));
-//         for (const auto& entry : nodes)
-//             result.append(entry.format(true));
-//     }
-//     return result;
-
-// } // x_report_cumulative
 
 // ----------------------------------------------------------------------
 
@@ -373,18 +269,6 @@ void acmacs::tal::v3::Tree::branches_by_cumulative_edge()
             break;
     }
     fmt::print("\n");
-
-    // NodeSet selected;
-    // const auto mean_edge = mean_edge_of(0.01, nodes);
-    // select_if_edge_more_than(selected, Select::init, mean_edge);
-    // fmt::print("  selected with edge > {}: {}\n", mean_edge, selected.size());
-    // if (!selected.empty()) {
-    //     fmt::print("       edge   node-id   Seq Id\n");
-    //     for (Node* node : selected) {
-    //         fmt::print("    {} {:4.4} {}\n", node->edge_length, node->node_id, node->seq_id);
-    //         node->color_edge_line = RED;
-    //     }
-    // }
 
 } // acmacs::tal::v3::Tree::branches_by_cumulative_edge
 
@@ -568,7 +452,7 @@ void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
             node.hidden = true;
     });
 
-    nodes_hidden_ = true;
+    structure_modified_ = true;
 
 } // acmacs::tal::v3::Tree::hide
 
@@ -649,73 +533,64 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
     };
     tree::iterate_post(*this, post);
 
-    set_first_last_next_node_id();
-
     AD_INFO("populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
 
 } // acmacs::tal::v3::Tree::populate_with_nuc_duplicates
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::just_imported()
-{
-    set_first_last_next_node_id();
-
-} // acmacs::tal::v3::Tree::just_imported
-
-// ----------------------------------------------------------------------
-
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
-    // Timeit time_set_first_last_next_node_id(">>>> [time] set_first_last_next_node_id: ");
+    if (structure_modified_) {
+        Timeit time_set_first_last_next_node_id(">>>> [time] set_first_last_next_node_id: ");
 
-    node_id_t::value_type vertical{0};
-    Node* prev_leaf{nullptr};
-    std::vector<Node*> parents;
+        node_id_t::value_type vertical{0};
+        Node* prev_leaf{nullptr};
+        std::vector<Node*> parents;
 
-    const auto leaf = [&vertical, &prev_leaf, &parents](Node& node) {
-        if (!node.hidden) {
-            node.node_id.vertical = vertical;
-            node.node_id.horizontal = 0;
-            if (prev_leaf) {
-                prev_leaf->last_next_leaf = &node;
-                node.first_prev_leaf = prev_leaf;
+        const auto leaf = [&vertical, &prev_leaf, &parents](Node& node) {
+            if (!node.hidden) {
+                node.node_id.vertical = vertical;
+                node.node_id.horizontal = 0;
+                if (prev_leaf) {
+                    prev_leaf->last_next_leaf = &node;
+                    node.first_prev_leaf = prev_leaf;
+                }
+                else
+                    node.first_prev_leaf = nullptr;
+                node.last_next_leaf = nullptr;
+                prev_leaf = &node;
+                for (Node* parent : parents) {
+                    if (!parent->first_prev_leaf)
+                        parent->first_prev_leaf = &node;
+                    parent->last_next_leaf = &node;
+                }
+                ++vertical;
+            }
+        };
+
+        const auto pre = [&parents](Node& node) {
+            node.first_prev_leaf = nullptr; // reset
+            parents.push_back(&node);
+            if (node.subtree.size() > 1) {
+                node.subtree.front().leaf_pos = leaf_position::first;
+                node.subtree.back().leaf_pos = leaf_position::last;
+                for (auto child = std::next(std::begin(node.subtree)); child != std::prev(std::end(node.subtree)); ++child)
+                    child->leaf_pos = leaf_position::middle;
             }
             else
-                node.first_prev_leaf = nullptr;
-            node.last_next_leaf = nullptr;
-            prev_leaf = &node;
-            for (Node* parent : parents) {
-                if (!parent->first_prev_leaf)
-                    parent->first_prev_leaf = &node;
-                parent->last_next_leaf = &node;
-            }
-            ++vertical;
-        }
-    };
+                node.subtree.front().leaf_pos = leaf_position::single;
+        };
 
-    const auto pre = [&parents](Node& node) {
-        node.first_prev_leaf = nullptr; // reset
-        parents.push_back(&node);
-        if (node.subtree.size() > 1) {
-            node.subtree.front().leaf_pos = leaf_position::first;
-            node.subtree.back().leaf_pos = leaf_position::last;
-            for (auto child = std::next(std::begin(node.subtree)); child != std::prev(std::end(node.subtree)); ++child)
-                child->leaf_pos = leaf_position::middle;
-        }
-        else
-            node.subtree.front().leaf_pos = leaf_position::single;
-    };
+        const auto post = [&parents](Node& node) {
+            node.node_id.vertical = (node.subtree.front().node_id.vertical + node.subtree.back().node_id.vertical) / 2;
+            node.node_id.horizontal = std::max(node.subtree.front().node_id.horizontal, node.subtree.back().node_id.horizontal) + 1;
+            parents.pop_back();
+        };
 
-    const auto post = [&parents](Node& node) {
-        node.node_id.vertical = (node.subtree.front().node_id.vertical + node.subtree.back().node_id.vertical) / 2;
-        node.node_id.horizontal = std::max(node.subtree.front().node_id.horizontal, node.subtree.back().node_id.horizontal) + 1;
-        // if (parents.back() != &node)
-        //     throw std::runtime_error("Tree::find_first_last_leaves::post: internal");
-        parents.pop_back();
-    };
-
-    tree::iterate_leaf_pre_post(*this, leaf, pre, post);
+        tree::iterate_leaf_pre_post(*this, leaf, pre, post);
+        structure_modified_ = false;
+    }
 
 } // acmacs::tal::v3::Tree::set_first_last_next_node_id
 
@@ -761,9 +636,6 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
         node.ladderize_helper_.seq_id = max_subtree_name_node->ladderize_helper_.seq_id;
     };
 
-    // set max_edge_length field for every node
-    tree::iterate_leaf_post(*this, set_leaf, set_parent);
-
     const auto reorder_by_max_edge_length = [](const Node& node1, const Node& node2) -> bool {
         if (node1.ladderize_helper_.edge == node2.ladderize_helper_.edge) {
             if (node1.ladderize_helper_.date == node2.ladderize_helper_.date)
@@ -782,6 +654,13 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
             return node1.number_leaves_in_subtree() < node2.number_leaves_in_subtree();
     };
 
+    // ----------------------------------------------------------------------
+
+    set_first_last_next_node_id();
+
+    // set max_edge_length field for every node
+    tree::iterate_leaf_post(*this, set_leaf, set_parent);
+
     switch (method) {
         case Ladderize::MaxEdgeLength:
             AD_INFO("ladderizing by MaxEdgeLength");
@@ -797,8 +676,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
             break;
     }
 
-    clades_reset();
-    set_first_last_next_node_id();
+    structure_modified_ = true;
 
 } // acmacs::tal::v3::Tree::ladderize
 
@@ -889,8 +767,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
     if (cumulative_edge_length != EdgeLengthNotSet)
         cumulative_calculate(true);
 
-    clades_reset();
-    set_first_last_next_node_id();
+    structure_modified_ = true;
 
 } // acmacs::tal::v3::Tree::re_root
 
@@ -1104,16 +981,23 @@ const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::str
 
 } // acmacs::tal::v3::Tree::find_clade
 
-// ----------------------------------------------------------------------
-
-acmacs::tal::v3::Tree::clade_t& acmacs::tal::v3::Tree::find_or_add_clade(std::string_view clade_name, std::string_view display_name)
+acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::string_view clade_name)
 {
     if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [clade_name](const auto& cl) { return cl.name == clade_name; }); found != std::end(clades_))
-        return *found;
+        return &*found;
     else
-        return clades_.emplace_back(clade_name, display_name);
+        return nullptr;
 
-} // acmacs::tal::v3::Tree::find_or_add_clade
+} // acmacs::tal::v3::Tree::find_clade
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::add_clade(std::string_view clade_name, std::string_view display_name)
+{
+    if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [clade_name](const auto& cl) { return cl.name == clade_name; }); found == std::end(clades_))
+        clades_.emplace_back(clade_name, display_name);
+
+} // acmacs::tal::v3::Tree::add_clade
 
 // ----------------------------------------------------------------------
 
@@ -1128,57 +1012,56 @@ bool acmacs::tal::v3::Tree::has_sequences() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::clade_set_by_aa_at_pos(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
+template <typename AA_AT> static inline void clade_set_by(std::string_view clade_name, AA_AT&& aa_at_pos, std::string_view display_name, acmacs::tal::Tree& tree)
 {
-    AD_DEBUG("clade_set_by_aa_at_pos nodes_hidden_:{}", nodes_hidden_);
-    if (nodes_hidden_) {
-        clades_reset();
-        set_first_last_next_node_id();
-        nodes_hidden_ = false;
-    }
-
+    tree.add_clade(clade_name, display_name);
     size_t num = 0;
-    const std::string clade_name_s{clade_name};
-    auto& clade_sections = find_or_add_clade(clade_name, display_name).sections;
-    tree::iterate_leaf(*this, [&aa_at_pos, clade_name_s, &num, &clade_sections](Node& node) {
-        if (!node.hidden && acmacs::seqdb::matches(node.aa_sequence, aa_at_pos)) {
-            node.clades.add(clade_name_s);
+    acmacs::tal::tree::iterate_leaf(tree, [&aa_at_pos, clade_name, &num](acmacs::tal::Node& node) {
+        if (acmacs::seqdb::matches(node.aa_sequence, std::forward<AA_AT>(aa_at_pos))) {
+            node.clades.add(clade_name);
             ++num;
-            if (clade_sections.empty() || (node.node_id.vertical - clade_sections.back().last->node_id.vertical) > 1)
-                clade_sections.emplace_back(&node);
-            else
-                clade_sections.back().last = &node;
         }
     });
+    AD_LOG(acmacs::log::clades, "\"{}\": {} leaves", clade_name, num);
 
-    // // remove small sections
-    // clade_sections.erase(
-    //     std::remove_if(std::begin(clade_sections), std::end(clade_sections), [exclusion_tolerance](const auto& section) { return (section.last->node_id.vertical - section.first->node_id.vertical) < exclusion_tolerance; }),
-    //     std::end(clade_sections));
+}
 
-    AD_LOG(acmacs::log::clades, "\"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
-    // AD_DEBUG("clade \"{}\": {} leaves, {} sections", clade_name, num, clade_sections.size());
+void acmacs::tal::v3::Tree::clade_set_by_aa_at_pos(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)
+{
+    ::clade_set_by(clade_name, aa_at_pos, display_name, *this);
+
 } // acmacs::tal::v3::Tree::clade_set_by_aa_at_pos
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos(std::string_view clade_name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name)
 {
-    size_t num = 0;
-    const std::string clade_name_s{clade_name};
-    auto& clade_sections = find_or_add_clade(clade_name, display_name).sections;
-    tree::iterate_leaf(*this, [&nuc_at_pos, clade_name_s, &num, &clade_sections](Node& node) {
-        if (!node.hidden && acmacs::seqdb::matches(node.nuc_sequence, nuc_at_pos)) {
-            node.clades.add(clade_name_s);
-            ++num;
-            if (clade_sections.empty() || (node.node_id.vertical - clade_sections.back().last->node_id.vertical) > 1)
-                clade_sections.emplace_back(&node);
-            else
-                clade_sections.back().last = &node;
+    ::clade_set_by(clade_name, nuc_at_pos, display_name, *this);
+
+} // acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::make_clade_sections()
+{
+    Timeit timer(">>>> [time] make_clade_sections: ");
+
+    set_first_last_next_node_id();
+
+    tree::iterate_leaf(*this, [this](Node& node) {
+        if (!node.hidden) {
+            for (const auto& clade_name : node.clades) {
+                if (clade_t* clade = find_clade(clade_name); clade) {
+                    if (clade->sections.empty() || (node.node_id.vertical - clade->sections.back().last->node_id.vertical) > 1)
+                        clade->sections.emplace_back(&node);
+                    else
+                        clade->sections.back().last = &node;
+                }
+            }
         }
     });
 
-} // acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos
+} // acmacs::tal::v3::Tree::make_clade_sections
 
 // ----------------------------------------------------------------------
 

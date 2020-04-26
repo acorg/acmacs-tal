@@ -48,9 +48,11 @@ namespace acmacs::tal::inline v3
         struct clade_t
         {
             std::string name;
+            std::string display_name; // set from acmacs-whocc-data/conf/clades.json in Tree::clade_set_by_aa_at_pos()
             std::vector<clade_section_t> sections;
 
             clade_t(std::string_view nam) : name{nam} {}
+            clade_t(std::string_view nam, std::string_view disp) : name{nam}, display_name{disp} {}
             bool intersects(const clade_t& rhs) const;
         };
 

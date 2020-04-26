@@ -61,13 +61,17 @@ void acmacs::tal::v3::HzSections::update_from_parameters()
 void acmacs::tal::v3::HzSections::set_aa_transitions()
 {
     auto pre = [this](const Node& node) {
-        if (!node.aa_transitions_.empty()) {
+        if (!node.hidden && !node.aa_transitions_.empty()) {
             for (auto& section : sections_) {
+                if (!node.first_prev_leaf || !node.last_next_leaf)
+                    AD_WARNING("hz section {}  node:{} {} node.first_prev_leaf:{} node.last_next_leaf:{}", section.id, node.node_id, node.seq_id, fmt::ptr(node.first_prev_leaf), fmt::ptr(node.last_next_leaf));
                 if (section.first && section.last && section.first->node_id.vertical >= node.first_prev_leaf->node_id.vertical && section.last->node_id.vertical <= node.last_next_leaf->node_id.vertical)
                     section.aa_transitions.add_or_replace(node.aa_transitions_);
             }
         }
     };
+
+    tal().tree().set_first_last_next_node_id();
     tree::iterate_pre(tal().tree(), pre);
 
 } // acmacs::tal::v3::HzSections::set_aa_transitions

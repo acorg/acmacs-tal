@@ -69,12 +69,15 @@ void acmacs::tal::v3::Clades::make_clades()
         }
     }
 
+    AD_DEBUG("Clades::make_clades done");
+
 } // acmacs::tal::v3::Clades::make_clades
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Clades::make_sections()
 {
+    tal().tree().make_clade_sections();
     const auto& tree_clades = tal().tree().clades();
     for (const auto& tree_clade : tree_clades) {
         // AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);

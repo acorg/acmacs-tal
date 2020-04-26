@@ -7,7 +7,10 @@
 
 void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
-    if (stage == 3 && prepared_ < stage) {
+    if (stage == 1 && prepared_ < stage) {
+        tal().tree().set_first_last_next_node_id();
+    }
+    else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
         tal().tree().number_leaves_in_subtree();
         AD_INFO("tree [{}] Shown leaves: {}", id(), tal().tree().number_leaves_in_subtree());

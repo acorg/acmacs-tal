@@ -88,7 +88,7 @@ namespace acmacs::tal::inline v3
         acmacs::seqdb::ref ref;
         acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
         acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
-        std::string_view strain_name;  // from seqdb
+        std::string_view strain_name; // from seqdb
         std::string_view date;
         std::string_view continent;
         std::string_view country;
@@ -107,10 +107,10 @@ namespace acmacs::tal::inline v3
 
         // -------------------- not exported --------------------
         Node* first_prev_leaf{nullptr}; // first leaf for non-leaf nodes, prev leaf for leaves, nullptr for the top of the tree
-        Node* last_next_leaf{nullptr}; // last leaf for non-leaf nodes, next leaf for leaves, nullptr for the last leaf
+        Node* last_next_leaf{nullptr};  // last leaf for non-leaf nodes, next leaf for leaves, nullptr for the last leaf
         enum class leaf_position { first, middle, last, single };
         leaf_position leaf_pos{leaf_position::middle};
-        node_id_t node_id;            // includes vertical leaf number for leaves
+        node_id_t node_id; // includes vertical leaf number for leaves
 
         // all nodes
         ladderize_helper_t ladderize_helper_;
@@ -122,14 +122,17 @@ namespace acmacs::tal::inline v3
         mutable CommonAA common_aa_;
         mutable AA_Transitions aa_transitions_;
         mutable const Node* node_for_left_aa_transitions_{nullptr};
-        Subtree to_populate;    // populate_with_nuc_duplicates()
+        Subtree to_populate; // populate_with_nuc_duplicates()
 
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
         constexpr static const double default_vertical_offset{1.0};
         mutable double vertical_offset_{default_vertical_offset}; // mutalbe for adjusting via const Node* in clade sections
 
-        bool children_are_shown() const { return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); })); }
+        bool children_are_shown() const
+        {
+            return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); }));
+        }
         void remove_aa_transition(seqdb::pos0_t pos, char right) const;
         std::vector<const Node*> shown_children() const;
 
@@ -166,7 +169,10 @@ namespace acmacs::tal::inline v3
         NodeSetT() = default;
 
         void add(const NodeSetT<N>& another) { std::copy(std::begin(another), std::end(another), std::back_inserter(*this)); }
-        void filter(const NodeSetT<N>& another) { this->erase(std::remove_if(this->begin(), this->end(), [&another](const auto& en) { return std::find(std::begin(another), std::end(another), en) == std::end(another); }), this->end()); }
+        void filter(const NodeSetT<N>& another)
+        {
+            this->erase(std::remove_if(this->begin(), this->end(), [&another](const auto& en) { return std::find(std::begin(another), std::end(another), en) == std::end(another); }), this->end());
+        }
     };
 
     using NodeSet = NodeSetT<Node*>;
@@ -224,8 +230,6 @@ namespace acmacs::tal::inline v3
 
         void hide(const NodeSet& nodes);
 
-        void just_imported();
-
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);
 
@@ -275,7 +279,7 @@ namespace acmacs::tal::inline v3
         void clades_reset();
         void clade_set_by_aa_at_pos(std::string_view name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name);
         void clade_set_by_nuc_at_pos(std::string_view name, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos, std::string_view display_name);
-        void clade_report(std::string_view name={}) const;
+        void clade_report(std::string_view name = {}) const;
 
         // ----------------------------------------------------------------------
 
@@ -295,14 +299,19 @@ namespace acmacs::tal::inline v3
                 set_top_gap(*node.last_next_leaf, gap);
         }
 
+        void add_clade(std::string_view name, std::string_view display_name);
+        void make_clade_sections();
+
+        void set_first_last_next_node_id();
+
       private:
         const clade_t* find_clade(std::string_view name) const;
-        clade_t& find_or_add_clade(std::string_view name, std::string_view display_name = {});
+        clade_t* find_clade(std::string_view name);
         std::vector<const Node*> sorted_by_edge() const;
         std::vector<const Node*> sorted_by_cumulative_edge() const;
-        double mean_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
+        double mean_edge_of(double fraction_or_number,
+                            const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
         double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
-        void set_first_last_next_node_id();
 
         std::string data_buffer_;
         std::string virus_type_;
@@ -310,13 +319,13 @@ namespace acmacs::tal::inline v3
         clades_t clades_;
         mutable bool chart_matched_{false};
         mutable seqdb::pos0_t longest_sequence_{0};
-        bool nodes_hidden_{false};
+        bool structure_modified_{true};
 
     }; // class Tree
 
     // ----------------------------------------------------------------------
 
-} // namespace acmacs::tal::inlinev3
+} // namespace acmacs::tal::inline v3
 
 // ======================================================================
 
