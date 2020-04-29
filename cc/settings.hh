@@ -21,7 +21,7 @@ namespace acmacs::tal::inline v3
         bool apply_built_in(std::string_view name) override; // returns true if built-in command with that name found and applied
 
         void report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const;
-        NodeSet select_nodes(const rjson::value& criteria) const;
+        NodeSet select_nodes(const rjson::v3::value& criteria) const;
 
       private:
         Tal& tal_;
@@ -36,7 +36,7 @@ namespace acmacs::tal::inline v3
         void apply_nodes() const;
         void update_env();
         void clade() const;
-        void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const;
+        void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::v3::value& criteria) const;
         void ladderize();
         void margins();
         void outline(DrawOutline& draw_outline);
@@ -56,13 +56,13 @@ namespace acmacs::tal::inline v3
         void antigenic_maps();
 
         void read_dash_parameters(LayoutElement::DashParameters& param);
-        void read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param);
-        void read_clade_parameters(const rjson::value& source, Clades::CladeParameters& clade_parameters);
+        void read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param);
+        void read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters);
         void read_per_clade(Clades::Parameters& parameters);
-        void read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters) const;
-        void read_line_parameters(const rjson::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const;
-        void read_line_parameters(const rjson::value& source, LayoutElement::LineParameters& line_parameters) const;
-        void read_dot_parameters(const rjson::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const;
+        void read_text_parameters(const rjson::v3::value& source, LayoutElement::TextParameters& text_parameters) const;
+        void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const;
+        void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineParameters& line_parameters) const;
+        void read_dot_parameters(const rjson::v3::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const;
     };
 
 } // namespace acmacs::tal::inlinev3

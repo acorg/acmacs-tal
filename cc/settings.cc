@@ -166,7 +166,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
     const auto selected = select_nodes(getenv("select"));
 
-    const auto apply_one = [this, &selected](std::string_view key, const rjson::value& value) {
+    const auto apply_one = [this, &selected](std::string_view key, const rjson::v3::value& value) {
         if (key == "hide") {
             if (value.is_bool()) {
                 if (value.to<bool>())
@@ -192,9 +192,9 @@ void acmacs::tal::v3::Settings::apply_nodes() const
             if (auto* time_series = draw().layout().find<TimeSeries>(); time_series) {
                 for (Node* node : selected) {
                     auto& entry = time_series->parameters().per_nodes.emplace_not_replace(node->seq_id).second;
-                    rjson::copy_if_not_null(value.get("color"sv), entry.color);
-                    rjson::copy_if_not_null(value.get("width"sv), entry.width);
-                    rjson::copy_if_not_null(value.get("line_width_pixels"sv), entry.line_width);
+                    rjson::v3::copy_if_not_null(value["color"sv], entry.color);
+                    rjson::v3::copy_if_not_null(value["width"sv], entry.width);
+                    rjson::v3::copy_if_not_null(value["line_width_pixels"sv], entry.line_width);
                 }
             }
             else {
@@ -229,30 +229,28 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         }
     };
 
-    const auto apply_value = [apply_one](const rjson::value& value_val) {
-        std::visit(
-            [apply_one]<typename ArgX>(ArgX && arg) {
-                using Arg = std::decay_t<ArgX>;
-                if constexpr (std::is_same_v<Arg, std::string>)
-                    apply_one(arg, true);
-                else if constexpr (std::is_same_v<Arg, rjson::object>)
-                    arg.for_each([apply_one](std::string_view key, const rjson::value& val) { apply_one(key, val); });
-                else
-                    throw error{fmt::format("don't know how to apply for \"nodes\": {}", arg)};
-            },
-            value_val.val_());
+    const auto apply_value = [apply_one](const rjson::v3::value& value_val) {
+        value_val.visit([apply_one,&value_val]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, std::string>)
+                apply_one(arg, true);
+            else if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
+                for (const auto& [key, val] : arg)
+                    apply_one(key, val);
+            }
+            else
+                throw error{fmt::format("don't know how to apply for \"nodes\": {}", value_val)};
+        });
     };
 
-    const rjson::value& to_apply = getenv("apply");
-    std::visit(
-        [apply_value, &to_apply]<typename ArgX>(ArgX && arg) {
-            using Arg = std::decay_t<ArgX>;
-            if constexpr (std::is_same_v<Arg, rjson::array>)
-                arg.for_each([apply_value](const rjson::value& elt) { apply_value(elt); });
-            else
-                apply_value(to_apply);
-        },
-        to_apply.val_());
+    const rjson::v3::value& to_apply = getenv("apply");
+    to_apply.visit([apply_value, &to_apply]<typename Arg>(const Arg& arg) {
+        if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+            for (const rjson::v3::value& elt : arg)
+                apply_value(elt);
+        }
+        else
+            apply_value(to_apply);
+    });
 
 } // acmacs::tal::v3::Settings::apply_nodes
 
@@ -288,25 +286,24 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
 {
     using namespace std::string_view_literals;
     if (const auto debug_outline = getenv("debug-outline"sv); !debug_outline.is_null()) {
-        std::visit(
-            [&draw_outline]<typename T>(T && val) {
-                if constexpr (std::is_same_v<std::decay_t<T>, bool>) {
-                    draw_outline.outline = val;
+        debug_outline.visit(
+            [&draw_outline,&debug_outline]<typename T>(const T& val) {
+                if constexpr (std::is_same_v<T, bool>) {
+                    draw_outline.outline = val.template to<bool>();
                 }
-                else if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                else if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
                     draw_outline.outline = true;
-                    draw_outline.outline_color = Color{val};
+                    draw_outline.outline_color = Color{val.template to<std::string_view>()};
                 }
-                else if constexpr (std::is_same_v<std::decay_t<T>, rjson::object>) {
-                    draw_outline.outline = rjson::get_or(val.get("show"sv), true);
-                    rjson::copy_if_not_null(val.get("color"sv), draw_outline.outline_color);
-                    rjson::copy_if_not_null(val.get("width"sv), draw_outline.outline_width);
+                else if constexpr (std::is_same_v<T, rjson::v3::detail::object>) {
+                    draw_outline.outline = rjson::v3::get_or(val["show"sv], true);
+                    rjson::v3::copy_if_not_null(val["color"sv], draw_outline.outline_color);
+                    rjson::v3::copy_if_not_null(val["width"sv], draw_outline.outline_width);
                 }
                 else {
-                    AD_WARNING("unrecognized debug-outline value: {}", val);
+                    AD_WARNING("unrecognized debug-outline value: {}", debug_outline);
                 }
-            },
-            debug_outline.val_());
+            });
     }
 
 } // acmacs::tal::v3::Settings::outline
@@ -327,11 +324,12 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
 
 // ----------------------------------------------------------------------
 
-acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::value& criteria) const
+acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3::value& criteria) const
 {
     NodeSet selected;
     bool report = false;
-    rjson::for_each(criteria, [&selected, this, update = Tree::Select::init, &report](std::string_view key, const rjson::value& val) mutable {
+    auto update = Tree::Select::init;
+    for (const auto& [key, val] : criteria.object()) {
         if (key == "all") {
             tree().select_all(selected, update);
         }
@@ -391,7 +389,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::va
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
         if (key != "report")
             update = Tree::Select::update;
-    });
+    }
     if (report)
         report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
     return selected;
@@ -433,7 +431,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 {
     using namespace std::string_view_literals;
 
-    const auto color_by = [](std::string_view key, const rjson::value& fields) -> std::unique_ptr<Coloring> {
+    const auto color_by = [](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
         if (key == "continent") {
             auto cb = std::make_unique<ColoringByContinent>();
             for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
@@ -443,10 +441,10 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             return cb;
         }
         else if (key == "pos") {
-            return std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::get_or(fields, "pos", 192)});
+            return std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
         }
         else if (key == "uniform") {
-            return std::make_unique<ColoringUniform>(Color{rjson::get_or(fields, "color", "black")});
+            return std::make_unique<ColoringUniform>(Color{rjson::v3::get_or(fields, "color"sv, "black"sv)});
         }
         else {
             AD_WARNING("unrecognized \"color_by\": {}, uniform(PINK) assumed", key);
@@ -455,20 +453,18 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
     };
 
     const auto& cb_val = getenv("color_by"sv);
-    auto coloring = std::visit(
-        [color_by,&cb_val]<typename T>(T && arg) -> std::unique_ptr<Coloring> {
-            if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                return color_by(arg, rjson::object{});
-            }
-            else if constexpr (std::is_same_v<std::decay_t<T>, rjson::object>) {
-                return color_by(rjson::get_or(cb_val, "N", "uniform"), cb_val);
-            }
-            else if constexpr (!std::is_same_v<std::decay_t<T>, rjson::null> && !std::is_same_v<std::decay_t<T>, rjson::const_null>)
-                throw error{"unsupported value type for \"color_by\""};
-            else
-                return {};
-        },
-        cb_val.val_());
+    auto coloring = cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
+        if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
+            return color_by(arg.template to<std::string_view>(), rjson::v3::detail::object{});
+        }
+        else if constexpr (std::is_same_v<T, rjson::v3::detail::object>) {
+            return color_by(rjson::v3::get_or(cb_val, "N"sv, "uniform"sv), cb_val);
+        }
+        else if constexpr (!std::is_same_v<T, rjson::v3::detail::null>)
+            throw error{"unsupported value type for \"color_by\""};
+        else
+            return {};
+    });
     if (coloring)
         element.coloring(std::move(coloring));
 
@@ -510,61 +506,79 @@ void acmacs::tal::v3::Settings::add_time_series()
     process_color_by(element);
     read_dash_parameters(param.dash);
 
-    acmacs::time_series::update(rjson::object{{"start"sv, getenv("start"sv)}, {"end"sv, getenv("end"sv)}, {"interval"sv, getenv("interval"sv)}}, param.time_series);
+    std::optional<std::string_view> interval{std::nullopt};
+    std::optional<size_t> number_of_intervals{std::nullopt};
+    if (const auto& interval_v = getenv("interval"sv); !interval_v.is_null()) {
+        if (interval_v.is_object()) {
+            for (const auto& interval_n : {"year"sv, "month"sv, "week"sv, "day"sv}) {
+                if (const auto& num = interval_v[interval_n]; !num.is_null()) {
+                    interval = interval_n;
+                    number_of_intervals = num.to<size_t>();
+                    break;
+                }
+            }
+            if (!interval.has_value())
+                AD_WARNING("unrecognized interval specification: {}, month assumed", interval_v);
+        }
+        else if (interval_v.is_string())
+            interval = interval_v.to<std::string_view>();
+        else
+            AD_WARNING("unrecognized interval specification: {}, month assumed", interval_v);
+    }
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
-        rjson::copy_if_not_null(slot_val.get("width"sv), param.slot.width);
+        rjson::v3::copy_if_not_null(slot_val["width"sv], param.slot.width);
 
-        if (const auto& separator = slot_val.get("separator"sv); !separator.is_null()) {
-            if (const auto& width_pixels = separator.get("width_pixels"sv); !width_pixels.is_null()) {
-                rjson::copy_if_not_null(width_pixels, param.slot.separator[0].line_width);
+        if (const auto& separator = slot_val["separator"sv]; !separator.is_null()) {
+            if (const auto& width_pixels = separator["width_pixels"sv]; !width_pixels.is_null()) {
+                rjson::v3::copy_if_not_null(width_pixels, param.slot.separator[0].line_width);
                 for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
                     mp->line_width = param.slot.separator[0].line_width;
             }
-            if (const auto& color = separator.get("color"sv); !color.is_null()) {
-                rjson::copy_if_not_null(color, param.slot.separator[0].color);
+            if (const auto& color = separator["color"sv]; !color.is_null()) {
+                rjson::v3::copy_if_not_null(color, param.slot.separator[0].color);
                 for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
                     mp->color = param.slot.separator[0].color;
             }
-            rjson::for_each(separator.get("per_month"sv), [&param](const rjson::value& for_month) {
-                if (const auto& month = for_month.get("month"sv); !month.is_null()) {
+            for (const rjson::v3::value& for_month : separator["per_month"sv].array()) {
+                if (const auto& month = for_month["month"sv]; !month.is_null()) {
                     const auto month_no = month.to<size_t>() - 1;
-                    rjson::copy_if_not_null(for_month.get("width_pixels"sv), param.slot.separator[month_no].line_width);
-                    rjson::copy_if_not_null(for_month.get("color"sv), param.slot.separator[month_no].color);
+                    rjson::v3::copy_if_not_null(for_month["width_pixels"sv], param.slot.separator[month_no].line_width);
+                    rjson::v3::copy_if_not_null(for_month["color"], param.slot.separator[month_no].color);
                 }
-            });
+            }
         }
 
-        if (const auto& background = slot_val.get("background"sv); !background.is_null()) {
-            if (const auto& color = background.get("color"sv); !color.is_null()) {
-                rjson::copy_if_not_null(color, param.slot.background[0]);
+        if (const auto& background = slot_val["background"sv]; !background.is_null()) {
+            if (const auto& color = background["color"sv]; !color.is_null()) {
+                rjson::v3::copy_if_not_null(color, param.slot.background[0]);
                 for (auto mp = std::next(std::begin(param.slot.background)); mp != std::end(param.slot.background); ++mp)
                     *mp = param.slot.background[0];
             }
-            rjson::for_each(background.get("per_month"sv), [&param](const rjson::value& for_month) {
-                if (const auto& month = for_month.get("month"sv); !month.is_null()) {
+            for (const rjson::v3::value& for_month : background["per_month"sv].array()) {
+                if (const auto& month = for_month["month"sv]; !month.is_null()) {
                     const auto month_no = month.to<size_t>() - 1;
-                    rjson::copy_if_not_null(for_month.get("color"sv), param.slot.background[month_no]);
+                    rjson::v3::copy_if_not_null(for_month["color"sv], param.slot.background[month_no]);
                 }
-            });
+            }
         }
 
-        rjson::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
-        rjson::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
-        rjson::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);
-        rjson::call_if_not_null<std::string_view>(slot_val.get("label"sv, "rotation"sv), [&param](auto rot) {
-            if (rot == "clockwise")
+        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
+        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
+        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);
+        if (const auto& rot_v = slot_val.get("label"sv, "rotation"sv); !rot_v.is_null()) {
+            if (const auto rot = rot_v.to<std::string_view>(); rot == "clockwise"sv)
                 param.slot.label.rotation = Rotation90DegreesClockwise;
-            else if (rot == "anticlockwise" || rot == "counterclockwise")
+            else if (rot == "anticlockwise"sv || rot == "counterclockwise"sv)
                 param.slot.label.rotation = Rotation90DegreesAnticlockwise;
             else
                 AD_WARNING("unrecognzied label rotation value in the time series parameters: \"{}\"", rot);
-        });
+        }
     }
 
     if (const auto& color_scale_val = getenv("color-scale"sv); !color_scale_val.is_null()) {
-        rjson::copy_if_not_null(color_scale_val.get("show"sv), param.color_scale.show);
-        if (const auto& type_val = color_scale_val.get("type"sv); !type_val.is_null()) {
+        rjson::v3::copy_if_not_null(color_scale_val["show"sv], param.color_scale.show);
+        if (const auto& type_val = color_scale_val["type"sv]; !type_val.is_null()) {
             if (const auto type = type_val.to<std::string_view>(); type == "bezier_gradient" || type == "bezier-gradient")
                 param.color_scale.type = TimeSeries::color_scale_type::bezier_gradient;
             else
@@ -572,16 +586,18 @@ void acmacs::tal::v3::Settings::add_time_series()
         }
         switch (param.color_scale.type) {
             case TimeSeries::color_scale_type::bezier_gradient:
-                if (const auto& colors_val = color_scale_val.get("colors"sv); !colors_val.is_null()) {
-                    if (colors_val.is_array() && colors_val.size() == 3)
-                        rjson::transform(colors_val, std::begin(param.color_scale.colors), [](const rjson::value& val) { return Color{val.to<std::string_view>()}; });
+                if (const auto& colors_val = color_scale_val["colors"sv]; !colors_val.is_null()) {
+                    if (colors_val.is_array() && colors_val.size() == 3) {
+                        for (size_t index = 0; index < colors_val.size(); ++index)
+                            param.color_scale.colors[index] = Color{colors_val[index].to<std::string_view>()};
+                    }
                     else
                         AD_WARNING("invalid number of colors in time-series color-scale colors (3 strings expected): {}", colors_val);
                 }
                 break;
         }
-        rjson::copy_if_not_null(color_scale_val.get("offset"sv), param.color_scale.offset);
-        rjson::copy_if_not_null(color_scale_val.get("height"sv), param.color_scale.height);
+        rjson::v3::copy_if_not_null(color_scale_val["offset"sv], param.color_scale.offset);
+        rjson::v3::copy_if_not_null(color_scale_val["height"sv], param.color_scale.height);
     }
 
 } // acmacs::tal::v3::Settings::add_time_series
@@ -593,40 +609,40 @@ void acmacs::tal::v3::Settings::read_dash_parameters(LayoutElement::DashParamete
     using namespace std::string_view_literals;
 
     if (const auto& dash_val = getenv("dash"sv); !dash_val.is_null()) {
-        rjson::copy_if_not_null(dash_val.get("width"sv), param.width);
-        rjson::copy_if_not_null(dash_val.get("line_width_pixels"sv), param.line_width);
+        rjson::v3::copy_if_not_null(dash_val["width"sv], param.width);
+        rjson::v3::copy_if_not_null(dash_val["line_width_pixels"sv], param.line_width);
     }
 
 } // acmacs::tal::v3::Settings::read_dash_parameters
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::value& source, Clades::CladeParameters& clade_parameters)
+void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters)
 {
     using namespace std::string_view_literals;
-    rjson::copy_if_not_null(source.get("display_name"sv), clade_parameters.display_name);
-    if (const auto& shown = source.get("shown"sv); !shown.is_null())
+    rjson::v3::copy_if_not_null(source["display_name"sv], clade_parameters.display_name);
+    if (const auto& shown = source["shown"sv]; !shown.is_null())
         clade_parameters.hidden = !shown.template to<bool>();
-    else if (const auto& show = source.get("show"sv); !show.is_null())
+    else if (const auto& show = source["show"sv]; !show.is_null())
         clade_parameters.hidden = !show.template to<bool>();
     else
-        rjson::copy_if_not_null(source.get("hidden"sv), clade_parameters.hidden);
-    rjson::copy_if_not_null(source.get("section_inclusion_tolerance"sv), clade_parameters.section_inclusion_tolerance);
-    rjson::copy_if_not_null(source.get("section_exclusion_tolerance"sv), clade_parameters.section_exclusion_tolerance);
-    rjson::copy_if_not_null(source.get("slot"sv), clade_parameters.slot_no);
+        rjson::v3::copy_if_not_null(source["hidden"sv], clade_parameters.hidden);
+    rjson::v3::copy_if_not_null(source["section_inclusion_tolerance"sv], clade_parameters.section_inclusion_tolerance);
+    rjson::v3::copy_if_not_null(source["section_exclusion_tolerance"sv], clade_parameters.section_exclusion_tolerance);
+    rjson::v3::copy_if_not_null(source["slot"sv], clade_parameters.slot_no);
 
-    read_label_parameters(source.get("label"sv), clade_parameters.label);
+    read_label_parameters(source["label"sv], clade_parameters.label);
 
-    rjson::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
-    rjson::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
-    rjson::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
+    rjson::v3::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
+    rjson::v3::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
+    rjson::v3::copy_if_not_null(source.get("arrow"sv, "arrow_width"sv), clade_parameters.arrow.arrow_width);
 
-    read_line_parameters(source.get("horizontal_line"sv), clade_parameters.horizontal_line);
+    read_line_parameters(source["horizontal_line"sv], clade_parameters.horizontal_line);
 
-    rjson::copy_if_not_null(source.get("top_gap"sv), clade_parameters.tree_top_gap);
-    rjson::copy_if_not_null(source.get("bottom_gap"sv), clade_parameters.tree_bottom_gap);
-    rjson::copy_if_not_null(source.get("time_series_top_separator"sv), clade_parameters.time_series_top_separator);
-    rjson::copy_if_not_null(source.get("time_series_bottom_separator"sv), clade_parameters.time_series_bottom_separator);
+    rjson::v3::copy_if_not_null(source["top_gap"sv], clade_parameters.tree_top_gap);
+    rjson::v3::copy_if_not_null(source["bottom_gap"sv], clade_parameters.tree_bottom_gap);
+    rjson::v3::copy_if_not_null(source["time_series_top_separator"sv], clade_parameters.time_series_top_separator);
+    rjson::v3::copy_if_not_null(source["time_series_bottom_separator"sv], clade_parameters.time_series_bottom_separator);
 
 } // acmacs::tal::v3::Settings::read_clade_parameters
 
@@ -635,10 +651,10 @@ void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::value& source
 void acmacs::tal::v3::Settings::read_per_clade(Clades::Parameters& parameters)
 {
     using namespace std::string_view_literals;
-    rjson::for_each(getenv("per_clade"sv), [this,&parameters](const rjson::value& for_clade) {
-        if (const auto& name = for_clade.get("name"sv); !name.is_null())
+    for (const rjson::v3::value& for_clade : getenv("per_clade"sv).array()) {
+        if (const auto& name = for_clade["name"sv]; !name.is_null())
             read_clade_parameters(for_clade, parameters.find_or_add_pre_clade(name.to<std::string_view>()));
-    });
+    }
 
 } // acmacs::tal::v3::Settings::read_per_clade
 
@@ -656,7 +672,7 @@ void acmacs::tal::v3::Settings::add_clades()
     getenv_copy_if_present("report"sv, param.report);
 
     if (const auto& slot_val = substitute(getenv("slot"sv)); !slot_val.is_null()) {
-        rjson::copy_if_not_null(substitute(slot_val.get("width"sv)), param.slot.width);
+        rjson::v3::copy_if_not_null(substitute(slot_val["width"sv]), param.slot.width);
     }
 
     // ----------------------------------------------------------------------
@@ -678,20 +694,20 @@ void acmacs::tal::v3::Settings::hz_sections()
 
     getenv_copy_if_present("report"sv, param.report);
     read_line_parameters(substitute(getenv("line"sv)), param.line);
-    rjson::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
-    rjson::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
+    rjson::v3::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
+    rjson::v3::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
 
-    rjson::for_each(getenv("sections"sv), [&param](const rjson::value& for_section) {
-        if (const auto& id = for_section.get("id"sv); !id.is_null()) {
+    for (const rjson::v3::value& for_section : getenv("sections"sv).array()) {
+        if (const auto& id = for_section["id"sv]; !id.is_null()) {
             auto& section = param.find_add_section(id.to<std::string_view>());
-            section.shown = rjson::get_or(for_section, "show"sv, true);
-            rjson::copy_if_not_null(for_section.get("first"sv), section.first);
-            rjson::copy_if_not_null(for_section.get("last"sv), section.last);
-            rjson::copy_if_not_null(for_section.get("label"sv), section.label);
+            section.shown = rjson::v3::get_or(for_section, "show"sv, true);
+            rjson::v3::copy_if_not_null(for_section["first"sv], section.first);
+            rjson::v3::copy_if_not_null(for_section["last"sv], section.last);
+            rjson::v3::copy_if_not_null(for_section["label"sv], section.label);
         }
-        else if (for_section.get("?id"sv).is_null() && for_section.get("? id"sv).is_null())
+        else if (for_section["?id"sv].is_null() && for_section["? id"sv].is_null())
             AD_WARNING("settings hz-section without \"id\" ignored: {}", for_section);
-    });
+    }
 
 } // acmacs::tal::v3::Settings::hz_sections
 
@@ -724,15 +740,15 @@ void acmacs::tal::v3::Settings::antigenic_maps()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source, LayoutElement::LabelParameters& param)
+void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param)
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::copy_if_not_null(substitute(source.get("color"sv)), param.color);
-        rjson::copy_if_not_null(substitute(source.get("scale"sv)), param.scale);
-        rjson::call_if_not_null<std::string_view>(substitute(source.get("vertical_position"sv)), [&param](auto position) {
-            if (position == "middle"sv)
+        rjson::v3::copy_if_not_null(substitute(source["color"sv]), param.color);
+        rjson::v3::copy_if_not_null(substitute(source["scale"sv]), param.scale);
+        if (const auto& position_v = substitute(source["vertical_position"sv]); !position_v.is_null()) {
+            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.vpos = Clades::vertical_position::middle;
             else if (position == "top"sv)
                 param.vpos = Clades::vertical_position::top;
@@ -740,9 +756,9 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
                 param.vpos = Clades::vertical_position::bottom;
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
-        });
-        rjson::call_if_not_null<std::string_view>(substitute(source.get("horizontal_position"sv)), [&param](auto position) {
-            if (position == "middle"sv)
+        }
+        if (const auto& position_v = substitute(source["horizontal_position"sv]); !position_v.is_null()) {
+            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.hpos = Clades::horizontal_position::middle;
             else if (position == "left"sv)
                 param.hpos = Clades::horizontal_position::left;
@@ -750,18 +766,19 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::value& source
                 param.hpos = Clades::horizontal_position::right;
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
-        });
-        rjson::copy_if_not_null(source.get("offset"sv), param.offset);
-        rjson::copy_if_not_null(substitute(source.get("text"sv)), param.text);
-        rjson::call_if_not_null<double>(substitute(source.get("rotation_degrees"sv)), [&param](auto rotation_degrees) { param.rotation = RotationDegrees(rotation_degrees); });
+        }
+        rjson::v3::copy_if_not_null(source["offset"sv], param.offset);
+        rjson::v3::copy_if_not_null(substitute(source["text"sv]), param.text);
+        if (const auto& rotation_degrees_v = substitute(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
+            param.rotation = RotationDegrees(rotation_degrees_v.to<double>());
 
-        rjson::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
-        rjson::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
-        rjson::copy_if_not_null(source.get("tether"sv, "line_width"sv), param.tether.line.line_width);
+        rjson::v3::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
+        rjson::v3::copy_if_not_null(source.get("tether"sv, "color"sv), param.tether.line.color);
+        rjson::v3::copy_if_not_null(source.get("tether"sv, "line_width"sv), param.tether.line.line_width);
 
-        rjson::copy_if_not_null(source.get("text_style"sv, "font"sv), param.text_style.font_family);
-        rjson::copy_if_not_null(source.get("text_style"sv, "slant"sv), param.text_style.slant);
-        rjson::copy_if_not_null(source.get("text_style"sv, "weight"sv), param.text_style.weight);
+        rjson::v3::copy_if_not_null(source.get("text_style"sv, "font"sv), param.text_style.font_family);
+        rjson::v3::copy_if_not_null(source.get("text_style"sv, "slant"sv), param.text_style.slant);
+        rjson::v3::copy_if_not_null(source.get("text_style"sv, "weight"sv), param.text_style.weight);
     }
 
 } // acmacs::tal::v3::Settings::read_label_parameters
@@ -777,15 +794,14 @@ void acmacs::tal::v3::Settings::add_dash_bar()
 
     read_dash_parameters(param.dash);
 
-    rjson::for_each(getenv("nodes"sv), [this, &param](const rjson::value& entry) {
+    for (const rjson::v3::value& entry : getenv("nodes"sv).array()) {
         auto& for_nodes = param.for_nodes.emplace_back();
-        for_nodes.nodes = select_nodes(entry.get("select"sv));
-        rjson::copy_if_not_null(substitute(entry.get("color"sv)), for_nodes.color);
-    });
+        for_nodes.nodes = select_nodes(entry["select"sv]);
+        rjson::v3::copy_if_not_null(substitute(entry["color"sv]), for_nodes.color);
+    }
 
-    rjson::for_each(getenv("labels"sv), [this, &param](const rjson::value& label_data) {
+    for (const rjson::v3::value& label_data : getenv("labels"sv).array())
         read_label_parameters(label_data, param.labels.emplace_back());
-    });
 
 } // acmacs::tal::v3::Settings::add_dash_bar
 
@@ -800,12 +816,12 @@ void acmacs::tal::v3::Settings::add_dash_bar_clades()
 
     read_dash_parameters(param.dash);
 
-    rjson::for_each(getenv("clades"sv), [this, &param](const rjson::value& for_clade) {
+    for (const rjson::v3::value& for_clade : getenv("clades"sv).array()) {
         auto& clade = param.clades.emplace_back();
-        rjson::copy_if_not_null(for_clade.get("name"sv), clade.name);
-        rjson::copy_if_not_null(for_clade.get("color"sv), clade.color);
-        read_label_parameters(for_clade.get("label"sv), clade.label);
-    });
+        rjson::v3::copy_if_not_null(for_clade["name"sv], clade.name);
+        rjson::v3::copy_if_not_null(for_clade["color"sv], clade.color);
+        read_label_parameters(for_clade["label"sv], clade.label);
+    }
 
 } // acmacs::tal::v3::Settings::add_dash_bar_clades
 
@@ -818,43 +834,51 @@ void acmacs::tal::v3::Settings::add_title()
     auto& element = add_element<Title>();
     auto& param = element.parameters();
 
-    const rjson::object source{
-        {"text", getenv("text"sv)},
-        {"offset", getenv("offset"sv)},
-        {"color", getenv("color"sv)},
-        {"size", getenv("size"sv)}
-    };
-    read_text_parameters(source, param);
+    read_text_parameters(rjson::v3::parse_string(getenv_to_json("text"sv, "offset"sv, "color"sv, "size"sv)), param);
 
 } // acmacs::tal::v3::Settings::add_title
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_text_parameters(const rjson::value& source, LayoutElement::TextParameters& text_parameters) const
+inline void extract_coordinates(const rjson::v3::value& source, acmacs::PointCoordinates& target)
+{
+    if (!source.is_null()) {
+        if (source.size() == *target.number_of_dimensions()) {
+            for (acmacs::number_of_dimensions_t dim{0}; dim < target.number_of_dimensions(); ++dim)
+                target[dim] = source[*dim].to<double>();
+        }
+        else
+            AD_WARNING("invalid number of elements in offset: {}, not extracted", source);
+    }
+}
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::read_text_parameters(const rjson::v3::value& source, LayoutElement::TextParameters& text_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::copy_if_not_null(source.get("text"sv), text_parameters.text);
-        rjson::copy(source.get("offset"sv), text_parameters.offset);
-        rjson::copy_if_not_null(source.get("absolute_x"sv), text_parameters.absolute_x);
-        rjson::copy_if_not_null(source.get("color"sv), text_parameters.color);
-        rjson::copy_if_not_null(source.get("size"sv), text_parameters.size);
+        rjson::v3::copy_if_not_null(source["text"sv], text_parameters.text);
+        extract_coordinates(source["offset"sv], text_parameters.offset);
+        rjson::v3::copy_if_not_null(source["absolute_x"sv], text_parameters.absolute_x);
+        rjson::v3::copy_if_not_null(source["color"sv], text_parameters.color);
+        rjson::v3::copy_if_not_null(source["size"sv], text_parameters.size);
     }
 
 } // acmacs::tal::v3::Settings::read_text_parameters
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source, LayoutElement::LineParameters& line_parameters) const
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, LayoutElement::LineParameters& line_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::copy_if_not_null(source.get("color"sv), line_parameters.color);
-        rjson::copy_if_not_null(source.get("line_width"sv), line_parameters.line_width);
+        rjson::v3::copy_if_not_null(source["color"sv], line_parameters.color);
+        rjson::v3::copy_if_not_null(source["line_width"sv], line_parameters.line_width);
 
-        if (const auto& dash_val = source.get("dash"sv); !dash_val.is_null()) {
+        if (const auto& dash_val = source["dash"sv]; !dash_val.is_null()) {
             const auto dash = dash_val.to<std::string_view>();
             if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash")
                 line_parameters.dash = surface::Dash::NoDash;
@@ -871,27 +895,27 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source,
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_line_parameters(const rjson::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
         read_line_parameters(source, static_cast<LayoutElement::LineParameters&>(line_parameters));
-        rjson::copy(source.get("c1"sv), line_parameters.offset[0]);
-        rjson::copy(source.get("c2"sv), line_parameters.offset[1]);
-        rjson::copy_if_not_null(source.get("absolute_x"sv), line_parameters.absolute_x);
+        extract_coordinates(source["c1"sv], line_parameters.offset[0]);
+        extract_coordinates(source["c2"sv], line_parameters.offset[1]);
+        rjson::v3::copy_if_not_null(source["absolute_x"sv], line_parameters.absolute_x);
     }
 
 } // acmacs::tal::v3::Settings::read_line_parameters
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const
+void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::v3::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        if (const auto& loc = source.get("location"sv); !loc.is_null()) {
+        if (const auto& loc = source["location"sv]; !loc.is_null()) {
             try {
                 const auto found = acmacs::locationdb::get().find_or_throw(loc.to<std::string_view>());
                 dot_parameters.coordinates = PointCoordinates{found.latitude(), found.longitude()};
@@ -900,11 +924,11 @@ void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::value& source, 
                 AD_WARNING("\"location\" for world map dot not found: {}", source);
             }
         }
-        rjson::copy(source.get("coordinates"sv), dot_parameters.coordinates);
-        rjson::copy_if_not_null(source.get("outline"sv), dot_parameters.outline);
-        rjson::copy_if_not_null(source.get("fill"sv), dot_parameters.fill);
-        rjson::copy_if_not_null(source.get("outline_width"sv), dot_parameters.outline_width);
-        rjson::copy_if_not_null(source.get("size"sv), dot_parameters.size);
+        extract_coordinates(source["coordinates"sv], dot_parameters.coordinates);
+        rjson::v3::copy_if_not_null(source["outline"sv], dot_parameters.outline);
+        rjson::v3::copy_if_not_null(source["fill"sv], dot_parameters.fill);
+        rjson::v3::copy_if_not_null(source["outline_width"sv], dot_parameters.outline_width);
+        rjson::v3::copy_if_not_null(source["size"sv], dot_parameters.size);
     }
 
 } // acmacs::tal::v3::Settings::read_dot_parameters
@@ -921,11 +945,12 @@ void acmacs::tal::v3::Settings::add_legend()
     if (legend_type == "world-map") {
         auto& element = add_element<LegendContinentMap>();
         auto& param = element.parameters();
-        rjson::copy(getenv("offset"sv), param.offset);
+        extract_coordinates(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);
         read_line_parameters(getenv("equator"sv), param.equator);
         read_line_parameters(getenv("tropics"sv), param.tropics);
-        rjson::for_each(getenv("dots"sv), [&param, this](const rjson::value& for_dot) { read_dot_parameters(for_dot, param.dots.emplace_back()); });
+        for (const rjson::v3::value& for_dot : getenv("dots"sv).array())
+            read_dot_parameters(for_dot, param.dots.emplace_back());
     }
     else
         AD_WARNING("unrecognized legend type: \"{}\"", legend_type);
@@ -947,18 +972,18 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     // ----------------------------------------------------------------------
 
     enum class ignore_name { no, yes };
-    const auto read_node_parameters = [this](const rjson::value& source, DrawAATransitions::TransitionParameters& parameters, ignore_name ign) {
+    const auto read_node_parameters = [this](const rjson::v3::value& source, DrawAATransitions::TransitionParameters& parameters, ignore_name ign) {
         if (ign == ignore_name::no)
-            rjson::copy_if_not_null(source.get("node_id"sv), parameters.node_id);
-        read_label_parameters(source.get("label"sv), parameters.label);
+            rjson::v3::copy_if_not_null(source["node_id"sv], parameters.node_id);
+        read_label_parameters(source["label"sv], parameters.label);
     };
 
     if (const auto& all_nodes_val = getenv("all_nodes"sv); !all_nodes_val.is_null())
         read_node_parameters(all_nodes_val, param.all_nodes, ignore_name::yes);
-    rjson::for_each(getenv("per_node"sv), [&param,read_node_parameters](const rjson::value& for_node) {
+    for (const rjson::v3::value& for_node : getenv("per_node"sv).array()) {
         param.per_node.push_back(param.all_nodes);
         read_node_parameters(for_node, param.per_node.back(), ignore_name::no);
-    });
+    }
 
 } // acmacs::tal::v3::Settings::add_draw_aa_transitions
 
@@ -971,22 +996,22 @@ void acmacs::tal::v3::Settings::add_draw_on_tree()
     auto& element = add_element<DrawOnTree>();
     auto& param = element.parameters();
 
-    rjson::for_each(getenv("texts"sv), [&param,this](const rjson::value& text_entry) {
+    for (const rjson::v3::value& text_entry : getenv("texts"sv).array()) {
         auto& text_param = param.texts.emplace_back();
         read_text_parameters(text_entry, text_param);
-    });
+    }
 
 } // acmacs::tal::v3::Settings::add_draw_on_tree
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::value& criteria) const
+void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::v3::value& criteria) const
 {
     using namespace std::string_view_literals;
 
     const auto names = ranges::to<std::vector<std::string>>(
-        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv("virus-type", "")}, acmacs::virus::lineage_t{getenv("lineage", "")})
-        | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::get_or(criteria, "type", "any"))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
+        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv("virus-type"sv, ""sv)}, acmacs::virus::lineage_t{getenv("lineage"sv, ""sv)})
+        | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::v3::get_or(criteria, "type"sv, "any"sv))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
         | ranges::views::transform([](const auto& en) { return en.name; }));
 
     AD_LOG(acmacs::log::vaccines, "{}", names);
@@ -997,7 +1022,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
         selected_nodes.add(some_nodes);
     }
 
-    if (const auto passage = ::string::lower(rjson::get_or(criteria, "passage", "")); !passage.empty()) {
+    if (const auto passage = ::string::lower(rjson::v3::get_or(criteria, "passage"sv, ""sv)); !passage.empty()) {
         const auto exclude_by_passage = [&passage](const auto* node) {
             const auto name = acmacs::virus::name::parse(node->seq_id);
             if (passage == "cell"sv)

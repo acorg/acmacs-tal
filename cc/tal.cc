@@ -81,9 +81,9 @@ int main(int argc, const char *argv[])
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
             if (const auto pos = def.find('='); pos != std::string_view::npos)
-                settings.setenv_from_string(def.substr(0, pos), def.substr(pos + 1));
+                settings.setenv(def.substr(0, pos), def.substr(pos + 1)); // settings.setenv_from_string(def.substr(0, pos), def.substr(pos + 1));
             else
-                settings.setenv(def, true);
+                settings.setenv(def, "true"sv);
         }
         time_loading_settings.report();
 
