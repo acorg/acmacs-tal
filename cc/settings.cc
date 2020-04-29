@@ -69,6 +69,8 @@ void acmacs::tal::v3::Settings::update_env()
     if (tal_.chart_present())
         setenv_toplevel("chart-assay", tal_.chart().info()->assay().hi_or_neut());
 
+    AD_DEBUG("\"virus-type/lineage\": \"{}\"", getenv("virus-type/lineage"));
+
 } // acmacs::tal::v3::Settings::update_env
 
 // ----------------------------------------------------------------------
@@ -230,9 +232,9 @@ void acmacs::tal::v3::Settings::apply_nodes() const
     };
 
     const auto apply_value = [apply_one](const rjson::v3::value& value_val) {
-        value_val.visit([apply_one,&value_val]<typename Arg>(const Arg& arg) {
-            if constexpr (std::is_same_v<Arg, std::string>)
-                apply_one(arg, true);
+        value_val.visit([apply_one, &value_val]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, rjson::v3::detail::string>)
+                apply_one(arg.template to<std::string_view>(), rjson::v3::detail::boolean{true});
             else if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
                 for (const auto& [key, val] : arg)
                     apply_one(key, val);
@@ -438,7 +440,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             auto cb = std::make_unique<ColoringByContinent>();
             for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
                 if (const auto& val = fields.get(continent); val.is_string())
-                    cb->set(continent, Color{val.to<std::string>()});
+                    cb->set(continent, Color{val.to<std::string_view>()});
             }
             return cb;
         }
