@@ -69,8 +69,6 @@ void acmacs::tal::v3::Settings::update_env()
     if (tal_.chart_present())
         setenv_toplevel("chart-assay", tal_.chart().info()->assay().hi_or_neut());
 
-    AD_DEBUG("\"virus-type/lineage\": \"{}\"", getenv("virus-type/lineage"));
-
 } // acmacs::tal::v3::Settings::update_env
 
 // ----------------------------------------------------------------------

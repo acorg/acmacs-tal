@@ -69,7 +69,7 @@ void acmacs::tal::v3::Clades::make_clades()
         }
     }
 
-    AD_DEBUG("Clades::make_clades done");
+    // AD_DEBUG("Clades::make_clades done");
 
 } // acmacs::tal::v3::Clades::make_clades
 
@@ -251,7 +251,8 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
             const auto pos_y_top = pos_y_above(*section.first, vertical_step);
             const auto pos_y_bottom = pos_y_below(*section.last, vertical_step);
 
-            AD_DEBUG("{} {} slot:{}   {:.0} .. {:.0}", clade.name, section.display_name, section.slot_no, section.first->node_id, section.last->node_id);
+            // AD_DEBUG("{} {} slot:{}   {:.0} .. {:.0}", clade.name, section.display_name, section.slot_no, section.first->node_id, section.last->node_id);
+
             // arrow
             surface.double_arrow({pos_x, pos_y_top}, {pos_x, pos_y_bottom}, section.arrow.color, section.arrow.line_width, section.arrow.arrow_width);
 
