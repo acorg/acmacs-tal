@@ -122,24 +122,24 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "populate-with-nuc-duplicates"sv)
             tree().populate_with_nuc_duplicates();
         else if (name == "re-root"sv)
-            tree().re_root(seq_id_t{getenv("new-root"sv, "re-root: new-root not specified")});
+            tree().re_root(seq_id_t{getenv("new-root"sv, "re-root: new-root not specified"sv)});
         else if (name == "report-branches-by-cumulative-edge"sv)
             tree().branches_by_cumulative_edge();
         else if (name == "report-branches-by-edge"sv)
             tree().branches_by_edge();
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
-            if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
+            if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
         else if (name == "report-time-series"sv) {
-            if (const auto output_filename = getenv("output"sv, ""); !output_filename.empty())
+            if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_time_series(Tree::report_size::detailed));
             else
                 AD_INFO("{}", tree().report_time_series(Tree::report_size::brief));
         }
         else if (name == "seqdb"sv) {
-            tree().match_seqdb(getenv("filename"sv, ""));
+            tree().match_seqdb(getenv("filename"sv, ""sv));
             update_env();
         }
         else if (name == "time-series"sv)
@@ -164,10 +164,10 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 {
     using namespace std::string_view_literals;
 
-    const auto selected = select_nodes(getenv("select"));
+    const auto selected = select_nodes(getenv("select"sv));
 
     const auto apply_one = [this, &selected](std::string_view key, const rjson::v3::value& value) {
-        if (key == "hide") {
+        if (key == "hide"sv) {
             if (value.is_bool()) {
                 if (value.to<bool>())
                     tree().hide(selected);
@@ -175,7 +175,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
             else
                 throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
         }
-        else if (key == "line") {
+        else if (key == "line"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
                 LayoutElement::LineWithOffsetParameters line;
                 read_line_parameters(value, line);
@@ -183,12 +183,12 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                     draw_on_tree->parameters().per_node.push_back({node->seq_id, {}, line});
             }
         }
-        else if (key == "tree-label-color") {
+        else if (key == "tree-label-color"sv) {
             const Color color{value.to<std::string_view>()};
             for (Node* node : selected)
                 node->label_color = color;
         }
-        else if (key == "time-series-dash") {
+        else if (key == "time-series-dash"sv) {
             if (auto* time_series = draw().layout().find<TimeSeries>(); time_series) {
                 for (Node* node : selected) {
                     auto& entry = time_series->parameters().per_nodes.emplace_not_replace(node->seq_id).second;
@@ -201,7 +201,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 throw error{"time_series element is not added yet, use \"nodes\" mod after \"layout\""};
             }
         }
-        else if (key == "text") {
+        else if (key == "text"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
                 LayoutElement::TextParameters text;
                 read_text_parameters(value, text);
@@ -209,23 +209,23 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                     draw_on_tree->parameters().per_node.push_back({node->seq_id, text, {}});
             }
         }
-        else if (key == "tree-label-scale") {
+        else if (key == "tree-label-scale"sv) {
             const auto scale{value.to<double>()};
             for (Node* node : selected)
                 node->label_scale = scale;
         }
-        else if (key == "tree-edge-line-color") {
+        else if (key == "tree-edge-line-color"sv) {
             const Color color{value.to<std::string_view>()};
             for (Node* node : selected)
                 node->color_edge_line = color;
         }
-        else if (key == "tree-edge-line-width") {
+        else if (key == "tree-edge-line-width"sv) {
             const auto line_width_scale = value.to<double>();
             for (Node* node : selected)
                 node->edge_line_width_scale = line_width_scale;
         }
-        else if (key == "report") {
-            report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), getenv("select")), "  ", selected);
+        else if (key == "report"sv) {
+            report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), getenv("select"sv)), "  ", selected);
         }
     };
 
@@ -242,7 +242,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         });
     };
 
-    const rjson::v3::value& to_apply = getenv("apply");
+    const rjson::v3::value& to_apply = getenv("apply"sv);
     to_apply.visit([apply_value, &to_apply]<typename Arg>(const Arg& arg) {
         if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
             for (const rjson::v3::value& elt : arg)
@@ -258,9 +258,10 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
 void acmacs::tal::v3::Settings::ladderize()
 {
-    if (const auto method = getenv("method", "number-of-leaves"); method == "number-of-leaves")
+    using namespace std::string_view_literals;
+    if (const auto method = getenv("method"sv, "number-of-leaves"sv); method == "number-of-leaves"sv)
         tree().ladderize(Tree::Ladderize::NumberOfLeaves);
-    else if (method == "max-edge-length")
+    else if (method == "max-edge-length"sv)
         tree().ladderize(Tree::Ladderize::MaxEdgeLength);
     else
         throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
@@ -326,68 +327,69 @@ void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::strin
 
 acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3::value& criteria) const
 {
+    using namespace std::string_view_literals;
     NodeSet selected;
     bool report = false;
     auto update = Tree::Select::init;
     for (const auto& [key, val] : criteria.object()) {
-        if (key == "all") {
+        if (key == "all"sv) {
             tree().select_all(selected, update);
         }
-        else if (key == "aa") {
+        else if (key == "aa"sv) {
             tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute(val)));
         }
-        else if (key == "country") {
+        else if (key == "country"sv) {
             tree().select_by_country(selected, update, substitute(val).to<std::string_view>());
         }
-        else if (key == "cumulative >=") {
+        else if (key == "cumulative >="sv) {
             tree().select_if_cumulative_more_than(selected, update, substitute(val).to<double>());
         }
-        else if (key == "date") {
+        else if (key == "date"sv) {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
-        else if (key == "edge >=") {
+        else if (key == "edge >="sv) {
             tree().select_if_edge_more_than(selected, update, substitute(val).to<double>());
         }
-        else if (key == "edge >= mean_edge of") {
+        else if (key == "edge >= mean_edge of"sv) {
             tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute(val).to<double>());
         }
-        else if (key == "location") {
+        else if (key == "location"sv) {
             tree().select_by_location(selected, update, substitute(val).to<std::string_view>());
         }
-        else if (key == "matches-chart-antigen") {
+        else if (key == "matches-chart-antigen"sv) {
             if (!tal_.chart_present())
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             tree().select_matches_chart_antigens(selected, update);
         }
-        else if (key == "matches-chart-serum") {
+        else if (key == "matches-chart-serum"sv) {
             if (!tal_.chart_present())
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
-            if (const auto match_type = substitute(val).to<std::string_view>(); match_type == "reassortant")
+            if (const auto match_type = substitute(val).to<std::string_view>(); match_type == "reassortant"sv)
                 mt = Tree::serum_match_t::reassortant;
-            else if (match_type == "passage")
+            else if (match_type == "passage"sv)
                 mt = Tree::serum_match_t::passage_type;
-            else if (match_type != "name")
+            else if (match_type != "name"sv)
                 AD_WARNING("unrecognized \"matches-chart-serum\" value: \"{}\", \"name\" assumed", match_type);
             tree().select_matches_chart_sera(selected, update, mt);
         }
-        else if (key == "seq_id") {
+        else if (key == "seq_id"sv) {
             tree().select_by_seq_id(selected, update, substitute(val).to<std::string_view>());
         }
-        else if (key == "report") {
+        else if (key == "report"sv) {
             report = substitute(val).to<bool>();
         }
-        else if (key == "top-cumulative-gap") {
+        else if (key == "top-cumulative-gap"sv) {
             tree().select_by_top_cumulative_gap(selected, update, substitute(val).to<double>());
         }
-        else if (key == "vaccine") {
+        else if (key == "vaccine"sv) {
             select_vaccine(selected, update, substitute(val));
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
-        if (key != "report")
+        if (key != "report"sv)
             update = Tree::Select::update;
     }
     if (report)
@@ -401,7 +403,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
 void acmacs::tal::v3::Settings::clade() const
 {
     using namespace std::string_view_literals;
-    const auto clade_name = getenv("name"sv, "");
+    const auto clade_name = getenv("name"sv, ""sv);
     if (clade_name.empty())
         throw error{"empty clade name"};
     const auto display_name = getenv("display_name"sv, clade_name);
@@ -432,7 +434,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
     using namespace std::string_view_literals;
 
     const auto color_by = [](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
-        if (key == "continent") {
+        if (key == "continent"sv) {
             auto cb = std::make_unique<ColoringByContinent>();
             for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
                 if (const auto& val = fields.get(continent); val.is_string())
@@ -440,10 +442,10 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             }
             return cb;
         }
-        else if (key == "pos") {
+        else if (key == "pos"sv) {
             return std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
         }
-        else if (key == "uniform") {
+        else if (key == "uniform"sv) {
             return std::make_unique<ColoringUniform>(Color{rjson::v3::get_or(fields, "color"sv, "black"sv)});
         }
         else {
@@ -579,7 +581,7 @@ void acmacs::tal::v3::Settings::add_time_series()
     if (const auto& color_scale_val = getenv("color-scale"sv); !color_scale_val.is_null()) {
         rjson::v3::copy_if_not_null(color_scale_val["show"sv], param.color_scale.show);
         if (const auto& type_val = color_scale_val["type"sv]; !type_val.is_null()) {
-            if (const auto type = type_val.to<std::string_view>(); type == "bezier_gradient" || type == "bezier-gradient")
+            if (const auto type = type_val.to<std::string_view>(); type == "bezier_gradient" || type == "bezier-gradient"sv)
                 param.color_scale.type = TimeSeries::color_scale_type::bezier_gradient;
             else
                 AD_WARNING("unrecognized time-series color-scale type (\"bezier-gradient\" expected): {}", type);
@@ -880,13 +882,13 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& sou
 
         if (const auto& dash_val = source["dash"sv]; !dash_val.is_null()) {
             const auto dash = dash_val.to<std::string_view>();
-            if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash")
+            if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash"sv)
                 line_parameters.dash = surface::Dash::NoDash;
-            else if (dash == "dash1")
+            else if (dash == "dash1"sv)
                 line_parameters.dash = surface::Dash::Dash1;
-            else if (dash == "dash2")
+            else if (dash == "dash2"sv)
                 line_parameters.dash = surface::Dash::Dash2;
-            else if (dash == "dash3")
+            else if (dash == "dash3"sv)
                 line_parameters.dash = surface::Dash::Dash3;
         }
     }
@@ -942,7 +944,7 @@ void acmacs::tal::v3::Settings::add_legend()
     std::string legend_type{"world-map"};
     getenv_copy_if_present("type"sv, legend_type);
 
-    if (legend_type == "world-map") {
+    if (legend_type == "world-map"sv) {
         auto& element = add_element<LegendContinentMap>();
         auto& param = element.parameters();
         extract_coordinates(getenv("offset"sv), param.offset);
