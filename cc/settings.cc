@@ -769,7 +769,14 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
-        rjson::v3::copy_if_not_null(source["offset"sv], param.offset);
+        if (const auto& offset_v = source["offset"sv]; !offset_v.is_null()) {
+            if (offset_v.size() == param.offset.size()) {
+                for (size_t index = 0; index < param.offset.size(); ++index)
+                    param.offset[index] = offset_v[index].to<double>();
+            }
+            else
+                AD_WARNING("Invalid label offset, two numbers expected: {}", source);
+        }
         rjson::v3::copy_if_not_null(substitute(source["text"sv]), param.text);
         if (const auto& rotation_degrees_v = substitute(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
             param.rotation = RotationDegrees(rotation_degrees_v.to<double>());
