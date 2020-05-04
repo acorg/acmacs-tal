@@ -33,9 +33,9 @@ LDLIBS = $(ACMACSD_LIBS) $(CAIRO_LIBS) $(XZ_LIBS)
 # ----------------------------------------------------------------------
 
 install: $(TARGETS)
+	$(call symbolic_link_wildcard,$(abspath conf)/*.json,$(AD_CONF))
 	$(call symbolic_link,$(DIST)/tal,$(AD_BIN))
-	if [ ! -f $(AD_SHARE)/conf/tal.json ]; then mkdir -p $(AD_SHARE)/conf; ln -sf $(abspath conf/tal.json) $(AD_SHARE)/conf; fi
-	if [ ! -f $(AD_SHARE)/doc/tal-conf.org ]; then mkdir -p $(AD_SHARE)/doc; ln -sf $(abspath doc/tal-conf.org) $(AD_SHARE)/doc; fi
+	$(call symbolic_link_wildcard,$(abspath doc)/*.org,$(AD_DOC))
 
 test: install $(DIST)/tal
 	test/test
