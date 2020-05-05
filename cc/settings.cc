@@ -338,25 +338,25 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             tree().select_all(selected, update);
         }
         else if (key == "aa"sv) {
-            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute(val)));
+            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute_to_value(val)));
         }
         else if (key == "country"sv) {
-            tree().select_by_country(selected, update, substitute(val).to<std::string_view>());
+            tree().select_by_country(selected, update, substitute_to_value(val).to<std::string_view>());
         }
         else if (key == "cumulative >="sv) {
-            tree().select_if_cumulative_more_than(selected, update, substitute(val).to<double>());
+            tree().select_if_cumulative_more_than(selected, update, substitute_to_value(val).to<double>());
         }
         else if (key == "date"sv) {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
         else if (key == "edge >="sv) {
-            tree().select_if_edge_more_than(selected, update, substitute(val).to<double>());
+            tree().select_if_edge_more_than(selected, update, substitute_to_value(val).to<double>());
         }
         else if (key == "edge >= mean_edge of"sv) {
-            tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute(val).to<double>());
+            tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute_to_value(val).to<double>());
         }
         else if (key == "location"sv) {
-            tree().select_by_location(selected, update, substitute(val).to<std::string_view>());
+            tree().select_by_location(selected, update, substitute_to_value(val).to<std::string_view>());
         }
         else if (key == "matches-chart-antigen"sv) {
             if (!tal_.chart_present())
@@ -369,7 +369,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
                 throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
-            if (const auto match_type = substitute(val).to<std::string_view>(); match_type == "reassortant"sv)
+            if (const auto match_type = substitute_to_value(val).to<std::string_view>(); match_type == "reassortant"sv)
                 mt = Tree::serum_match_t::reassortant;
             else if (match_type == "passage"sv)
                 mt = Tree::serum_match_t::passage_type;
@@ -378,16 +378,16 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id"sv) {
-            tree().select_by_seq_id(selected, update, substitute(val).to<std::string_view>());
+            tree().select_by_seq_id(selected, update, substitute_to_value(val).to<std::string_view>());
         }
         else if (key == "report"sv) {
-            report = substitute(val).to<bool>();
+            report = substitute_to_value(val).to<bool>();
         }
         else if (key == "top-cumulative-gap"sv) {
-            tree().select_by_top_cumulative_gap(selected, update, substitute(val).to<double>());
+            tree().select_by_top_cumulative_gap(selected, update, substitute_to_value(val).to<double>());
         }
         else if (key == "vaccine"sv) {
-            select_vaccine(selected, update, substitute(val));
+            select_vaccine(selected, update, substitute_to_value(val));
         }
         else
             throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
@@ -675,8 +675,8 @@ void acmacs::tal::v3::Settings::add_clades()
 
     getenv_copy_if_present("report"sv, param.report);
 
-    if (const auto& slot_val = substitute(getenv("slot"sv)); !slot_val.is_null()) {
-        rjson::v3::copy_if_not_null(substitute(slot_val["width"sv]), param.slot.width);
+    if (const auto& slot_val = substitute_to_value(getenv("slot"sv)); !slot_val.is_null()) {
+        rjson::v3::copy_if_not_null(substitute_to_value(slot_val["width"sv]), param.slot.width);
     }
 
     // ----------------------------------------------------------------------
@@ -697,7 +697,7 @@ void acmacs::tal::v3::Settings::hz_sections()
     auto& param = element.parameters();
 
     getenv_copy_if_present("report"sv, param.report);
-    read_line_parameters(substitute(getenv("line"sv)), param.line);
+    read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
     rjson::v3::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
     rjson::v3::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
 
@@ -724,7 +724,7 @@ void acmacs::tal::v3::Settings::hz_section_marker()
     auto& element = add_element<HzSectionMarker>();
     auto& param = element.parameters();
 
-    read_line_parameters(substitute(getenv("line"sv)), param.line);
+    read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
 
 } // acmacs::tal::v3::Settings::hz_section_marker
 
@@ -749,9 +749,9 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::v3::copy_if_not_null(substitute(source["color"sv]), param.color);
-        rjson::v3::copy_if_not_null(substitute(source["scale"sv]), param.scale);
-        if (const auto& position_v = substitute(source["vertical_position"sv]); !position_v.is_null()) {
+        rjson::v3::copy_if_not_null(substitute_to_value(source["color"sv]), param.color);
+        rjson::v3::copy_if_not_null(substitute_to_value(source["scale"sv]), param.scale);
+        if (const auto& position_v = substitute_to_value(source["vertical_position"sv]); !position_v.is_null()) {
             if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.vpos = Clades::vertical_position::middle;
             else if (position == "top"sv)
@@ -761,7 +761,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
-        if (const auto& position_v = substitute(source["horizontal_position"sv]); !position_v.is_null()) {
+        if (const auto& position_v = substitute_to_value(source["horizontal_position"sv]); !position_v.is_null()) {
             if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.hpos = Clades::horizontal_position::middle;
             else if (position == "left"sv)
@@ -779,8 +779,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("Invalid label offset, two numbers expected: {}", source);
         }
-        rjson::v3::copy_if_not_null(substitute(source["text"sv]), param.text);
-        if (const auto& rotation_degrees_v = substitute(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
+        rjson::v3::copy_if_not_null(substitute_to_value(source["text"sv]), param.text);
+        if (const auto& rotation_degrees_v = substitute_to_value(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
             param.rotation = RotationDegrees(rotation_degrees_v.to<double>());
 
         rjson::v3::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
@@ -808,7 +808,7 @@ void acmacs::tal::v3::Settings::add_dash_bar()
     for (const rjson::v3::value& entry : getenv("nodes"sv).array()) {
         auto& for_nodes = param.for_nodes.emplace_back();
         for_nodes.nodes = select_nodes(entry["select"sv]);
-        rjson::v3::copy_if_not_null(substitute(entry["color"sv]), for_nodes.color);
+        rjson::v3::copy_if_not_null(substitute_to_value(entry["color"sv]), for_nodes.color);
     }
 
     for (const rjson::v3::value& label_data : getenv("labels"sv).array())
