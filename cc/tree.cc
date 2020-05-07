@@ -957,6 +957,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
         }
 
         node.aa_transitions_.remove_left_right_same();
+        // node.aa_transitions_.remove_if([](const auto& en) { return en.pos != acmacs::seqdb::pos1_t{156} && en.pos != acmacs::seqdb::pos1_t{193} && en.left_right_same(); });
         node.aa_transitions_.remove_empty_right();
     };
     tree::iterate_leaf_pre(*this, add_left_part, add_left_part);

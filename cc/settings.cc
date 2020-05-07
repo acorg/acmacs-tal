@@ -959,6 +959,7 @@ void acmacs::tal::v3::Settings::add_legend()
     if (legend_type == "world-map"sv) {
         auto& element = add_element<LegendContinentMap>();
         auto& param = element.parameters();
+        param.show = getenv("show"sv, true);
         extract_coordinates(getenv("offset"sv), param.offset);
         getenv_extract_copy_if_present<double>("size"sv, param.size);
         read_line_parameters(getenv("equator"sv), param.equator);

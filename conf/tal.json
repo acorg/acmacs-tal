@@ -41,14 +41,14 @@
          "else": [{"N": "layout-tree-only"}]
         },
         {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015},
-        {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
-        {"?N": "legend", "type": "colored by AA at pos"},
         {"?N": "vaccine, most recent cell --> modifications-tal mark vaccine"}
     ],
 
     "layout-tree-only": [
         {"N": "margins", "?left": 0.1, "?debug-outline": "cyan"},
         {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "debug-outline": false},
+        {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+        {"?N": "legend", "type": "colored by AA at pos (not implemented)"},
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
         "dash-bar-clades-tal",
@@ -59,6 +59,8 @@
     "layout-with-maps": [
         {"N": "margins", "?left": 0.1, "?debug-outline": "cyan"},
         {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "debug-outline": false},
+        {"N": "legend", "?type": "world-map", "?offset": [0.0, 0.93], "?size": 0.15},
+        {"?N": "legend", "type": "colored by AA at pos (not implemented)"},
         {"N": "draw-on-tree"},
         "dash-bar-clades-tal",
         {"N": "clades"},

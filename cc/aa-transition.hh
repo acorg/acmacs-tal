@@ -63,7 +63,7 @@ namespace acmacs::tal::inline v3
 
     class AA_Transitions
     {
-      private:
+      public:
         // returns if anything was removed
         template <typename Func> bool remove_if(Func predicate)
         {
@@ -74,7 +74,6 @@ namespace acmacs::tal::inline v3
             return anything_to_remove;
         }
 
-      public:
         bool empty() const { return data_.empty(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
         bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }

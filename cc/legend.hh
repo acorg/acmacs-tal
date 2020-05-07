@@ -21,6 +21,7 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
+            bool show{true};
             PointCoordinates offset{0.0, 0.93};
             Scaled size{0.15};
         };
