@@ -513,14 +513,13 @@ void acmacs::tal::v3::Settings::add_time_series()
     process_color_by(element);
     read_dash_parameters(param.dash);
 
-    std::optional<std::string_view> interval{std::nullopt};
-    std::optional<size_t> number_of_intervals{std::nullopt};
     if (const auto& interval_v = getenv("interval"sv); !interval_v.is_null()) {
+        std::optional<std::string_view> interval{std::nullopt};
         if (interval_v.is_object()) {
             for (const auto& interval_n : {"year"sv, "month"sv, "week"sv, "day"sv}) {
                 if (const auto& num = interval_v[interval_n]; !num.is_null()) {
                     interval = interval_n;
-                    number_of_intervals = num.to<size_t>();
+                    param.time_series.number_of_intervals = num.to<size_t>();
                     break;
                 }
             }
@@ -531,7 +530,14 @@ void acmacs::tal::v3::Settings::add_time_series()
             interval = interval_v.to<std::string_view>();
         else
             AD_WARNING("unrecognized interval specification: {}, month assumed", interval_v);
+        if (interval)
+            param.time_series.intervl = acmacs::time_series::interval_from_string(*interval);
     }
+
+    if (const auto& start = getenv("start"sv); !start.is_null())
+        param.time_series.first = date::from_string(start.to<std::string_view>(), date::allow_incomplete::yes, date::throw_on_error::yes);
+    if (const auto& end = getenv("end"sv); !end.is_null())
+        param.time_series.after_last = date::from_string(end.to<std::string_view>(), date::allow_incomplete::yes, date::throw_on_error::yes);
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
         rjson::v3::copy_if_not_null(slot_val["width"sv], param.slot.width);

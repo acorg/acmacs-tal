@@ -14,6 +14,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
         if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
             const auto month_stat = tal().tree().stat_by_month();
+            // AD_DEBUG("time series stat:\n{}", month_stat.report_sorted_max_first("    {first}  {second:6d}\n"));
             const auto [first, last] = tal().tree().suggest_time_series_start_end(month_stat);
             AD_INFO("time series range suggested: {} {}", first, last);
             if (parameters().time_series.first == date::invalid_date())
