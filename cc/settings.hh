@@ -63,7 +63,10 @@ namespace acmacs::tal::inline v3
         void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const;
         void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineParameters& line_parameters) const;
         void read_dot_parameters(const rjson::v3::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const;
-    };
+
+        void report_aa_at() const;
+
+    }; // class Settings
 
 } // namespace acmacs::tal::inlinev3
 

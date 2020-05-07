@@ -4,6 +4,7 @@
 
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
+#include "acmacs-base/counter.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-virus/virus-name-v1.hh"
 #include "acmacs-chart-2/chart.hh"
@@ -842,6 +843,23 @@ std::string acmacs::tal::v3::Tree::report_time_series(report_size rs) const
         return "No dates for sequences available";
 
 } // acmacs::tal::v3::Tree::report_time_series
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool names) const
+{
+    std::vector<acmacs::CounterChar> counter(pos.size());
+    tree::iterate_leaf(*this, [&pos, &counter](const Node& leaf) {
+        for (auto it = pos.begin(); it != pos.end(); ++it)
+            counter[static_cast<size_t>(it - pos.begin())].count(acmacs::seqdb::at_pos(leaf.aa_sequence, *it));
+    });
+    std::string result;
+    for (auto it = pos.begin(); it != pos.end(); ++it) {
+        result += fmt::format("  {}\n{}\n", *it, counter[static_cast<size_t>(it - pos.begin())].report_sorted_max_first("    {first} {second:5d}\n"));
+    }
+    return result;
+
+} // acmacs::tal::v3::Tree::report_aa_at
 
 // ----------------------------------------------------------------------
 

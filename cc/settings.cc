@@ -138,6 +138,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             else
                 AD_INFO("{}", tree().report_time_series(Tree::report_size::brief));
         }
+        else if (name == "report-aa-at"sv) {
+            report_aa_at();
+        }
         else if (name == "seqdb"sv) {
             tree().match_seqdb(getenv("filename"sv, ""sv));
             update_env();
@@ -289,7 +292,7 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
     if (const auto debug_outline = getenv("debug-outline"sv); !debug_outline.is_null()) {
         debug_outline.visit(
             [&draw_outline,&debug_outline]<typename T>(const T& val) {
-                if constexpr (std::is_same_v<T, bool>) {
+                if constexpr (std::is_same_v<T, rjson::v3::detail::boolean>) {
                     draw_outline.outline = val.template to<bool>();
                 }
                 else if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
@@ -1013,6 +1016,47 @@ void acmacs::tal::v3::Settings::add_draw_on_tree()
     }
 
 } // acmacs::tal::v3::Settings::add_draw_on_tree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::report_aa_at() const
+{
+    using namespace std::string_view_literals;
+
+    const auto extract = []<typename From>(const From& from) -> size_t {
+        if constexpr (std::is_same_v<From, rjson::v3::detail::string>)
+            return acmacs::string::from_chars<size_t>(from.template to<std::string_view>());
+        else if constexpr (std::is_same_v<From, rjson::v3::detail::number>)
+            return from.template to<size_t>();
+        throw std::exception{};
+    };
+
+    std::vector<acmacs::seqdb::pos1_t> pos_to_report;
+    try {
+        substitute_to_value(getenv("pos")).visit([&pos_to_report, extract]<typename Val>(const Val& value) {
+            if constexpr (std::is_same_v<Val, rjson::v3::detail::string> || std::is_same_v<Val, rjson::v3::detail::number>) {
+                pos_to_report.emplace_back(extract(value));
+            }
+            else if constexpr (std::is_same_v<Val, rjson::v3::detail::array>) {
+                for (const auto& subval : value)
+                    pos_to_report.emplace_back(subval.visit([extract]<typename Sub>(const Sub& sub) -> size_t { return extract(sub); }));
+            }
+            else
+                throw std::exception{};
+        });
+    }
+    catch (std::exception&) {
+        const auto& pos = getenv("pos");
+        throw error{AD_FORMAT("unsupported value for report_pos_at \"pos\": {} substituted: {}", pos, substitute_to_value(pos))};
+    }
+
+    const auto output = tree().report_aa_at(pos_to_report, substitute_to_value(getenv("names"sv)).to<bool>());
+    if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty() && output_filename != "-"sv)
+        acmacs::file::write(output_filename, output);
+    else
+        AD_INFO("AA at:\n{}", output);
+
+} // acmacs::tal::v3::Settings::report_aa_at
 
 // ----------------------------------------------------------------------
 

@@ -246,6 +246,7 @@ namespace acmacs::tal::inline v3
 
         enum class report_size { brief, detailed };
         std::string report_time_series(report_size rs) const;
+        std::string report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool names) const;
 
         // ----------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-04-25 13:22:01 eu>
+# Time-stamp: <2020-05-07 14:56:45 eu>
 
 * Command line defines
 
@@ -126,6 +126,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "report-branches-by-edge"}
 {"N": "report-branches-by-cumulative-edge"}
 {"N": "report-time-series", "output": "{report-time-series-output}"}
+{"N": "report-aa-at", "pos": [145, 156, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
 
 ** Draw
 
