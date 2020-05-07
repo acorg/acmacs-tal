@@ -16,6 +16,7 @@ namespace acmacs::tal::inline v3
         virtual ~Coloring() = default;
 
         virtual Color color(const Node& node) const = 0;
+        virtual std::string report() const = 0;
     };
 
     // ----------------------------------------------------------------------
@@ -26,6 +27,7 @@ namespace acmacs::tal::inline v3
         ColoringUniform(Color color) : color_{color} {}
 
         Color color(const Node& node) const override;
+        std::string report() const override;
 
         void set(Color color) { color_ = color; }
 
@@ -40,6 +42,7 @@ namespace acmacs::tal::inline v3
       public:
         ColoringByContinent() : colors_{continent_colors_dark()} {}
         Color color(const Node& node) const override;
+        std::string report() const override;
 
         void set(std::string_view continent, Color color) { colors_.emplace_or_replace(continent, color); }
 
@@ -54,6 +57,7 @@ namespace acmacs::tal::inline v3
       public:
         ColoringByPos(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
         Color color(const Node& node) const override;
+        std::string report() const override;
 
       private:
         acmacs::seqdb::pos1_t pos_;
