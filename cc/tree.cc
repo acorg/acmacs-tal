@@ -822,13 +822,14 @@ void acmacs::tal::v3::Tree::update_common_aa() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::report_common_aa() const
+void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to_report) const
 {
+    AD_INFO("common AA");
     number_leaves_in_subtree();
-    tree::iterate_pre_parent(*this, [](const Node& node, const Node& parent) {
+    tree::iterate_pre_parent(*this, [&pos_to_report](const Node& node, const Node& parent) {
         if (node.number_leaves_in_subtree() >= 100) {
-            if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
-                fmt::print("node:{:4.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
+            if (const auto rep = node.common_aa_.report(parent.common_aa_, pos_to_report); !rep.empty())
+                fmt::print(stderr, "    node:{:4.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
     });
 
@@ -907,15 +908,17 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::report_aa_transitions() const
+void acmacs::tal::v3::Tree::report_aa_transitions(std::optional<seqdb::pos1_t> pos) const
 {
+    AD_INFO("AA transitions");
     number_leaves_in_subtree();
-    tree::iterate_pre(*this, [](const Node& node) {
+    tree::iterate_pre(*this, [&pos](const Node& node) {
         if (node.number_leaves_in_subtree() >= 20) {
-            if (const auto rep = node.aa_transitions_.display(); !rep.empty())
-                fmt::print("{} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
+            if (const auto rep = node.aa_transitions_.display(pos, AA_Transitions::show_empty_left::yes); !rep.empty())
+                fmt::print(stderr, "   {:5.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
     });
+    report_common_aa(std::nullopt /*pos*/);
 
 } // acmacs::tal::v3::Tree::report_aa_transitions
 

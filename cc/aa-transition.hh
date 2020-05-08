@@ -35,7 +35,7 @@ namespace acmacs::tal::inline v3
         void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
 
         std::string report() const;
-        std::string report(const CommonAA& parent) const;
+        std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
     };
 
     // ----------------------------------------------------------------------
@@ -91,7 +91,8 @@ namespace acmacs::tal::inline v3
 
         operator bool() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en; }); }
 
-        std::string display(bool show_empty_left = false) const;
+        enum class show_empty_left { no, yes };
+        std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
         std::vector<std::string> names() const;
 
         bool contains(std::string_view label) const

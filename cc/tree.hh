@@ -249,9 +249,9 @@ namespace acmacs::tal::inline v3
         // ----------------------------------------------------------------------
 
         void update_common_aa() const;
-        void report_common_aa() const;
+        void report_common_aa(std::optional<seqdb::pos1_t> pos) const;
         void update_aa_transitions() const;
-        void report_aa_transitions() const;
+        void report_aa_transitions(std::optional<seqdb::pos1_t> pos) const;
 
         // ----------------------------------------------------------------------
 

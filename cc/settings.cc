@@ -88,8 +88,12 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             // Timeit time_update_aa_transitions(">>>> update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
             // time_update_aa_transitions.report();
-            if (getenv("report"sv, false))
-                tree().report_aa_transitions();
+            if (getenv("report"sv, false)) {
+                std::optional<seqdb::pos1_t> pos;
+                if (const auto& pos_v = getenv("pos"sv); !pos_v.is_null())
+                    pos = pos_v.to<seqdb::pos1_t>();
+                tree().report_aa_transitions(pos);
+            }
         }
         else if (name == "clades-reset"sv)
             tree().clades_reset();

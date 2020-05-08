@@ -60,12 +60,12 @@ std::string acmacs::tal::v3::CommonAA::report() const
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent) const
+std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report) const
 {
     fmt::memory_buffer out;
     size_t num_common = 0;
     for (seqdb::pos0_t pos{0}; *pos < size(); ++pos) {
-        if (is_common(pos) && !parent.is_common(pos)) {
+        if (is_common(pos) && !parent.is_common(pos) && (!pos_to_report || pos_to_report == pos)) {
             fmt::format_to(out, " {}{}", pos, at(pos));
             ++num_common;
         }
@@ -99,11 +99,11 @@ void acmacs::tal::v3::AA_Transitions::add_or_replace(const AA_Transitions& trans
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::AA_Transitions::display(bool show_empty_left) const
+std::string acmacs::tal::v3::AA_Transitions::display(std::optional<seqdb::pos1_t> pos1, show_empty_left sel) const
 {
     fmt::memory_buffer output;
     for (const auto& en : data_) {
-        if ((show_empty_left || !en.empty_left()) && !en.empty_right())
+        if ((sel == show_empty_left::yes || !en.empty_left()) && !en.empty_right() && (!pos1 || *pos1 == en.pos))
             fmt::format_to(output, " {}", en);
     }
     if (const auto result = fmt::to_string(output); result.size() > 1)

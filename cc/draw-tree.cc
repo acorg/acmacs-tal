@@ -15,6 +15,9 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
                 coloring().prepare(leaf);
         });
         coloring().prepare();
+
+        // AD_DEBUG("common aa");
+        // tal().tree().report_common_aa();
     }
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
