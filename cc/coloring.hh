@@ -55,6 +55,12 @@ namespace acmacs::tal::inline v3
     class ColoringByPos : public Coloring
     {
       public:
+        struct color_count_t
+        {
+            Color color{PINK};
+            size_t count{0};
+        };
+
         ColoringByPos(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
         Color color(const Node& node) const override;
         std::string report() const override;
@@ -63,7 +69,7 @@ namespace acmacs::tal::inline v3
 
       private:
         acmacs::seqdb::pos1_t pos_;
-        mutable acmacs::small_map_with_unique_keys_t<char, Color> colors_;
+        mutable acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
     };
 
     // ----------------------------------------------------------------------

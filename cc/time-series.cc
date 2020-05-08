@@ -28,7 +28,6 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
             width_to_height_ratio() = static_cast<double>(series_.size()) * parameters().slot.width;
 
         const auto long_report = [&ts_stat]() -> std::string { return fmt::format("time series report:\n{}", ts_stat.report("    {value}  {counter:6d}\n")); };
-
         if (parameters().report == "-"sv)
             AD_INFO("{}", long_report());
         else if (!parameters().report.empty())
@@ -38,9 +37,45 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         AD_INFO("time series suggested  {} .. {}", first, after_last);
         AD_INFO("time series used       {} .. {}", parameters().time_series.first, parameters().time_series.after_last);
     }
+    else if (stage == 3 && prepared_ < stage) {
+        tal().draw().layout().prepare_element<DrawTree>(stage);
+        prepare_dashes();
+    }
     LayoutElementWithColoring::prepare(stage);
 
 } // acmacs::tal::v3::TimeSeries::prepare
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::prepare_dashes()
+{
+    dashes_.clear();
+    tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+        if (!leaf.hidden && !leaf.date.empty()) {
+            try {
+                const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
+                if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
+                    auto dash_color = color(leaf);
+                    auto dash_line_width = parameters().dash.line_width;
+                    auto dash_width = parameters().dash.width;
+                    parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
+                        if (per_node.color.has_value())
+                            dash_color = *per_node.color;
+                        if (per_node.line_width.has_value())
+                            dash_line_width = *per_node.line_width;
+                        if (per_node.width.has_value())
+                            dash_width = *per_node.width;
+                    });
+                    dashes_.push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no, .y = leaf.cumulative_vertical_offset_});
+                }
+            }
+            catch (date::date_parse_error& err) {
+                AD_WARNING("{}", err);
+            }
+        }
+    });
+
+} // acmacs::tal::v3::TimeSeries::prepare_colors
 
 // ----------------------------------------------------------------------
 
@@ -69,36 +104,11 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     const auto vertical_step = draw_tree->vertical_step();
     const auto& viewport = surface.viewport();
 
-    tree::iterate_leaf(tal().tree(), [&, this, slot_width = parameters().slot.width](const Node& leaf) {
-        if (!leaf.hidden && !leaf.date.empty()) {
-            try {
-                const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
-                if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
-                    auto dash_color = color(leaf);
-                    auto dash_line_width = parameters().dash.line_width;
-                    auto dash_width = parameters().dash.width;
-                    parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
-                        if (per_node.color.has_value())
-                            dash_color = *per_node.color;
-                        if (per_node.line_width.has_value())
-                            dash_line_width = *per_node.line_width;
-                        if (per_node.width.has_value())
-                            dash_width = *per_node.width;
-                    });
-                    // const auto specific = parameters().per_nodes.at_ptr(leaf.seq_id);
-                    // const auto dash_color = specific && specific->color.has_value() ? *specific->color : color(leaf);
-                    // const auto dash_line_width = specific && specific->line_width.has_value() ? *specific->line_width : parameters().dash.line_width;
-                    // const auto dash_width = specific && specific->width.has_value() ? *specific->width : parameters().dash.width;
-                    const auto dash_offset_x = viewport.left() + static_cast<double>(slot_no) * slot_width + parameters().slot.width * (1.0 - dash_width) * 0.5;
-                    surface.line({dash_offset_x, vertical_step * leaf.cumulative_vertical_offset_}, {dash_offset_x + slot_width * dash_width, vertical_step * leaf.cumulative_vertical_offset_},
-                                 dash_color, dash_line_width, surface::LineCap::Round);
-                }
-            }
-            catch (date::date_parse_error& err) {
-                AD_WARNING("{}", err);
-            }
-        }
-    });
+    for (const auto& dash : dashes_) {
+        const auto dash_offset_x = viewport.left() + static_cast<double>(dash.slot) * parameters().slot.width + parameters().slot.width * (1.0 - dash.width) * 0.5;
+        surface.line({dash_offset_x, vertical_step * dash.y}, {dash_offset_x + parameters().slot.width * dash.width, vertical_step * dash.y},
+                     dash.color, dash.line_width, surface::LineCap::Round);
+    }
 
     draw_horizontal_lines(surface, draw_tree);
 
@@ -274,24 +284,24 @@ void acmacs::tal::v3::TimeSeries::draw_color_scale(acmacs::surface::Surface& sur
 
 void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface) const
 {
-    AD_DEBUG("TimeSeries coloring");
-    coloring_report();
+    AD_INFO("Time series {}", coloring_report());
 
     if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
         const Scaled text_size{parameters().legend.scale};
         const TextStyle text_style{};
-        const auto gap = surface.text_size("W", text_size, text_style).width;
+        const auto gap = *text_size * parameters().legend.gap_scale;
 
         const auto& viewport = surface.viewport();
         const auto text_y = viewport.origin.y() + viewport.size.height + parameters().legend.offset;
         auto text_x = viewport.origin.x();
         const auto pos_text = fmt::format("{}", col->pos());
-        surface.text({text_x, text_y}, pos_text, BLACK, text_size, text_style, NoRotation);
+        surface.text({text_x, text_y}, pos_text, parameters().legend.pos_color, text_size, text_style, NoRotation);
         text_x += surface.text_size(pos_text, text_size, text_style).width + gap;
-        for (const auto& [aa, color] : col->colors()) {
-            // surface.text({text_x, text_y}, std::string(1, aa), color, text_size, text_style, NoRotation);
-            surface.text({text_x, text_y}, "E", RED, text_size, text_style, NoRotation);
-            text_x += surface.text_size(std::string(1, aa), text_size, text_style).width + gap;
+        for (const auto& [aa, color_count] : col->colors()) {
+            surface.text({text_x, text_y}, std::string(1, aa), color_count.color, text_size, text_style, NoRotation);
+            text_x += surface.text_size(std::string(1, aa), text_size, text_style).width;
+            surface.text({text_x, text_y}, fmt::format("{}", color_count.count), parameters().legend.count_color, text_size * parameters().legend.count_scale, text_style, NoRotation);
+            text_x += gap;
         }
     }
 

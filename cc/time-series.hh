@@ -66,6 +66,10 @@ namespace acmacs::tal::inline v3
             bool show{false};
             double scale{0.012}; // relative to the time series area height
             double offset{0.022}; // relative to the time series area height
+            double gap_scale{1.2}; // relative to scale
+            double count_scale{0.4}; // relative to scale
+            Color pos_color{BLACK};
+            Color count_color{BLACK};
         };
 
         struct Parameters
@@ -92,11 +96,22 @@ namespace acmacs::tal::inline v3
             constexpr horizontal_line_t(const Node* a_node, const LineParameters& a_line) : LineParameters(a_line), node(a_node) {}
         };
 
+        struct dash_t
+        {
+            Color color{PINK};
+            Pixels line_width{0.0};
+            double width{0.0};
+            size_t slot{0};
+            double y;
+        };
+
         Parameters parameters_;
         acmacs::time_series::series series_;
         std::vector<horizontal_line_t> horizontal_lines_;
         std::vector<Color> color_scale_;
+        std::vector<dash_t> dashes_;
 
+        void prepare_dashes();
         void make_color_scale();
         void draw_color_scale(acmacs::surface::Surface& surface) const;
 

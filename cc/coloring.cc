@@ -50,9 +50,10 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
     const auto aa = node.aa_sequence.at(pos_);
     if (aa == 'X')
         return BLACK;
-    const auto color = colors_.emplace_not_replace(aa, acmacs::color::distinct(colors_.size())).second;
+    auto& entry = colors_.emplace_not_replace(aa, color_count_t{acmacs::color::distinct(colors_.size()), 0});
+    ++entry.second.count;
     // AD_DEBUG("ColoringByPos {} {}: {}", pos_, aa, color);
-    return color;
+    return entry.second.color;
 
 } // acmacs::tal::v3::ColoringByPos::color
 
@@ -61,8 +62,8 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
 std::string acmacs::tal::v3::ColoringByPos::report() const
 {
     std::string result = fmt::format("coloring by AA at {}:\n", pos_);
-    for (const auto& [aa, color] : colors_)
-        result += fmt::format("  {}  \"{}\"\n", aa, color);
+    for (const auto& [aa, color_count] : colors_)
+        result += fmt::format("  {}  \"{}\" {:6d}\n", aa, color_count.color, color_count.count);
     return result;
 
 } // acmacs::tal::v3::ColoringByPos::report
