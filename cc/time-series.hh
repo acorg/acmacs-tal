@@ -66,8 +66,8 @@ namespace acmacs::tal::inline v3
             bool show{false};
             double scale{0.012}; // relative to the time series area height
             double offset{0.022}; // relative to the time series area height
-            double gap_scale{1.2}; // relative to scale
-            double count_scale{0.4}; // relative to scale
+            double gap_scale{1.1}; // relative to scale
+            double count_scale{0.3}; // relative to scale
             Color pos_color{BLACK};
             Color count_color{BLACK};
         };

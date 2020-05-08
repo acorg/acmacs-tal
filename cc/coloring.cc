@@ -45,25 +45,51 @@ std::string acmacs::tal::v3::ColoringByContinent::report() const
 
 // ----------------------------------------------------------------------
 
-Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
+void acmacs::tal::v3::ColoringByPos::prepare(const Node& node)
 {
-    const auto aa = node.aa_sequence.at(pos_);
-    if (aa == 'X')
-        return BLACK;
-    auto& entry = colors_.emplace_not_replace(aa, color_count_t{acmacs::color::distinct(colors_.size()), 0});
+    auto& entry = colors_.emplace_not_replace(node.aa_sequence.at(pos_), color_count_t{PINK, 0});
     ++entry.second.count;
-    // AD_DEBUG("ColoringByPos {} {}: {}", pos_, aa, color);
-    return entry.second.color;
 
-} // acmacs::tal::v3::ColoringByPos::color
+} // acmacs::tal::v3::ColoringByPos::prepare
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::ColoringByPos::sort_by_count() const
+void acmacs::tal::v3::ColoringByPos::prepare()
 {
     colors_.sort([](const auto& e1, const auto& e2) -> bool { return e1.second.count > e2.second.count; });
 
-} // acmacs::tal::v3::ColoringByPos::sort_by_count
+    size_t color_no{0};
+    for (auto& [aa, color_count] : colors_) {
+        if (aa == 'X') {
+            color_count.color = BLACK;
+        }
+        else {
+            color_count.color = acmacs::color::distinct(color_no);
+            ++color_no;
+        }
+    }
+
+} // acmacs::tal::v3::ColoringByPos::prepare
+
+// ----------------------------------------------------------------------
+
+Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
+{
+    try {
+        return colors_.get(node.aa_sequence.at(pos_)).color;
+    }
+    catch (std::out_of_range&) {
+        throw coloring_error{fmt::format("ColoringByPos: no color for {} {}, forgot to call ColoringByPos::prepare?", pos_, node.aa_sequence.at(pos_))};
+    }
+    // const auto aa = node.aa_sequence.at(pos_);
+    // if (aa == 'X')
+    //     return BLACK;
+    // auto& entry = colors_.emplace_not_replace(aa, color_count_t{acmacs::color::distinct(colors_.size()), 0});
+    // ++entry.second.count;
+    // // AD_DEBUG("ColoringByPos {} {}: {}", pos_, aa, color);
+    // return entry.second.color;
+
+} // acmacs::tal::v3::ColoringByPos::color
 
 // ----------------------------------------------------------------------
 

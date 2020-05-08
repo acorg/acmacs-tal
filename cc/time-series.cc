@@ -49,13 +49,19 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
 void acmacs::tal::v3::TimeSeries::prepare_dashes()
 {
+    tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+        if (!leaf.hidden && !leaf.date.empty())
+            coloring().prepare(leaf);
+    });
+    coloring().prepare();
+
     dashes_.clear();
     tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
         if (!leaf.hidden && !leaf.date.empty()) {
             try {
                 const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
                 if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
-                    auto dash_color = color(leaf);
+                    auto dash_color = coloring().color(leaf);
                     auto dash_line_width = parameters().dash.line_width;
                     auto dash_width = parameters().dash.width;
                     parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
@@ -284,11 +290,9 @@ void acmacs::tal::v3::TimeSeries::draw_color_scale(acmacs::surface::Surface& sur
 
 void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface) const
 {
-    AD_INFO("Time series {}", coloring_report());
+    AD_INFO("Time series {}", coloring().report());
 
     if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
-        col->sort_by_count();
-
         const Scaled text_size{parameters().legend.scale};
         const TextStyle text_style{};
         const auto gap = *text_size * parameters().legend.gap_scale;

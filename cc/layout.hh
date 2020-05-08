@@ -233,8 +233,9 @@ namespace acmacs::tal::inline v3
         void coloring(std::unique_ptr<Coloring> coloring) { coloring_ = std::move(coloring); }
 
       protected:
-        Color color(const Node& node) const { return coloring_->color(node); }
-        std::string coloring_report() const { return coloring_->report(); }
+        // Color color(const Node& node) const { return coloring_->color(node); }
+        // std::string coloring_report() const { return coloring_->report(); }
+        Coloring& coloring() { return *coloring_; }
         const Coloring& coloring() const { return *coloring_; }
 
       private:

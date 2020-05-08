@@ -9,6 +9,12 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
     if (stage == 1 && prepared_ < stage) {
         tal().tree().set_first_last_next_node_id();
+
+        tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+            if (!leaf.hidden)
+                coloring().prepare(leaf);
+        });
+        coloring().prepare();
     }
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
@@ -37,7 +43,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                              {horizontal_step_ * leaf.cumulative_edge_length.as_number(), vertical_step() * leaf.cumulative_vertical_offset_}, leaf.color_edge_line,
                              line_width * leaf.edge_line_width_scale);
                 const auto label_size = text_size.value() * leaf.label_scale;
-                const auto label_color = leaf.label_color.has_value() ? *leaf.label_color : color(leaf);
+                const auto label_color = leaf.label_color.has_value() ? *leaf.label_color : coloring().color(leaf);
                 surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + label_size * 0.3},
                              std::string{leaf.seq_id}, label_color, Scaled{label_size});
             }
@@ -64,7 +70,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
     if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
         draw_on_tree->draw_on_tree(surface, *this);
 
-    AD_INFO("tree {}", coloring_report());
+    AD_INFO("tree {}", coloring().report());
 
 } // acmacs::tal::v3::DrawTree::draw
 

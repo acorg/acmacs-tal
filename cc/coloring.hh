@@ -10,11 +10,18 @@ namespace acmacs::tal::inline v3
 {
     class Node;
 
+    class coloring_error : public std::runtime_error
+    {
+        using std::runtime_error::runtime_error;
+    };
+
     class Coloring
     {
       public:
         virtual ~Coloring() = default;
 
+        virtual void prepare(const Node& /*node*/) {}
+        virtual void prepare() {} // to be called after coloring prepare(Node) for each node
         virtual Color color(const Node& node) const = 0;
         virtual std::string report() const = 0;
     };
@@ -62,15 +69,16 @@ namespace acmacs::tal::inline v3
         };
 
         ColoringByPos(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
+        void prepare(const Node& node) override;
+        void prepare() override; // to be called after coloring prepare(Node) for each node
         Color color(const Node& node) const override;
         std::string report() const override;
         acmacs::seqdb::pos1_t pos() const { return pos_; }
-        void sort_by_count() const;
         constexpr const auto& colors() const { return colors_; }
 
       private:
         acmacs::seqdb::pos1_t pos_;
-        mutable acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
+        /*mutable*/ acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
     };
 
     // ----------------------------------------------------------------------
