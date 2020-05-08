@@ -157,6 +157,8 @@ void acmacs::tal::v3::TimeSeries::draw_labels(acmacs::surface::Surface& surface)
         year_top = origin_y - parameters().slot.label.offset - longest_month_label_size.width;
         year_bottom = origin_y + viewport.size.height + year_label_offset_y;
     }
+    if (parameters().time_series.intervl == acmacs::time_series::interval::year)
+        year_top = month_top;
 
     double line_offset_x = viewport.left();
     for (const auto& slot : series_) {
