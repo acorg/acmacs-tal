@@ -68,6 +68,7 @@ namespace acmacs::tal::inline v3
             DashParameters dash;
             small_map_with_unique_keys_t<seq_id_t, PerNodeParameters> per_nodes;
             ColorScaleParameters color_scale;
+            std::string report;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

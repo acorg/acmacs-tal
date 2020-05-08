@@ -52,7 +52,7 @@
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
         "dash-bar-clades-tal",
-        {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}},
+        {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}, "report": "{report-time-series-output}"},
         {"N": "clades"}
     ],
 
@@ -64,7 +64,7 @@
         {"N": "draw-on-tree"},
         "dash-bar-clades-tal",
         {"N": "clades"},
-        {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}},
+        {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "{report-time-series-output}"},
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
         {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
@@ -100,7 +100,6 @@
         ]},
         {"?N": "if", "condition": {"empty": "{virus-type}"}, "then": [{"N": "warning", "message": "no virus type inferred from the tree"}]},
         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
-        {"N": "report-time-series", "output": "{report-time-series-output}"},
         {"N": "ladderize", "method": "{ladderize-method}"},
         {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
             {"N": "aa-transitions", "report": false}

@@ -1,3 +1,4 @@
+#include "acmacs-base/read-file.hh"
 #include "acmacs-base/color-gradient.hh"
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/time-series.hh"
@@ -9,24 +10,33 @@
 
 void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 {
+    using namespace std::string_view_literals;
+
     if (!prepared_) {
         tal().draw().layout().prepare_element<DrawTree>(stage);
 
-        if (parameters().time_series.first == date::invalid_date() || parameters().time_series.after_last == date::invalid_date()) {
-            const auto month_stat = tal().tree().stat_by_month();
-            // AD_DEBUG("time series stat:\n{}", month_stat.report_sorted_max_first("    {first}  {second:6d}\n"));
-            const auto [first, last] = tal().tree().suggest_time_series_start_end(month_stat);
-            AD_INFO("time series range suggested: {} {}", first, last);
-            if (parameters().time_series.first == date::invalid_date())
-                parameters().time_series.first = first;
-            if (parameters().time_series.after_last == date::invalid_date())
-                parameters().time_series.after_last = date::next_month(last);
-        }
+        const auto ts_stat = acmacs::time_series::stat(parameters().time_series, tal().tree().all_dates());
+        const auto [first, after_last] = acmacs::time_series::suggest_start_end(parameters().time_series, ts_stat);
+        if (parameters().time_series.first == date::invalid_date())
+            parameters().time_series.first = first;
+        if (parameters().time_series.after_last == date::invalid_date())
+            parameters().time_series.after_last = after_last;
+
         series_ = acmacs::time_series::make(parameters().time_series);
         make_color_scale();
         if (width_to_height_ratio() <= 0.0)
             width_to_height_ratio() = static_cast<double>(series_.size()) * parameters().slot.width;
-        // AD_DEBUG("time series: {} {}", series_.size(), series_);
+
+        const auto long_report = [&ts_stat]() -> std::string { return fmt::format("time series report:\n{}", ts_stat.report("    {value}  {counter:6d}\n")); };
+
+        if (parameters().report == "-"sv)
+            AD_INFO("{}", long_report());
+        else if (!parameters().report.empty())
+            acmacs::file::write(parameters().report, long_report());
+        if (!ts_stat.counter().empty())
+            AD_INFO("time series full range {} .. {}", ts_stat.counter().begin()->first, ts_stat.counter().rbegin()->first);
+        AD_INFO("time series suggested  {} .. {}", first, after_last);
+        AD_INFO("time series used       {} .. {}", parameters().time_series.first, parameters().time_series.after_last);
     }
     LayoutElementWithColoring::prepare(stage);
 

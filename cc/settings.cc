@@ -132,12 +132,6 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
-        else if (name == "report-time-series"sv) {
-            if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty())
-                acmacs::file::write(output_filename, tree().report_time_series(Tree::report_size::detailed));
-            else
-                AD_INFO("{}", tree().report_time_series(Tree::report_size::brief));
-        }
         else if (name == "report-aa-at"sv) {
             report_aa_at();
         }
@@ -519,7 +513,7 @@ void acmacs::tal::v3::Settings::add_time_series()
             for (const auto& interval_n : {"year"sv, "month"sv, "week"sv, "day"sv}) {
                 if (const auto& num = interval_v[interval_n]; !num.is_null()) {
                     interval = interval_n;
-                    param.time_series.number_of_intervals = num.to<size_t>();
+                    param.time_series.number_of_intervals = num.to<date::period_diff_t>();
                     break;
                 }
             }
@@ -538,6 +532,7 @@ void acmacs::tal::v3::Settings::add_time_series()
         param.time_series.first = date::from_string(start.to<std::string_view>(), date::allow_incomplete::yes, date::throw_on_error::yes);
     if (const auto& end = getenv("end"sv); !end.is_null())
         param.time_series.after_last = date::from_string(end.to<std::string_view>(), date::allow_incomplete::yes, date::throw_on_error::yes);
+    rjson::v3::copy_if_not_null(getenv("report"sv), param.report);
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
         rjson::v3::copy_if_not_null(slot_val["width"sv], param.slot.width);

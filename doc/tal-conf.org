@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-07 14:56:45 eu>
+# Time-stamp: <2020-05-08 11:51:31 eu>
 
 * Command line defines
 
@@ -125,7 +125,6 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
 {"N": "report-branches-by-edge"}
 {"N": "report-branches-by-cumulative-edge"}
-{"N": "report-time-series", "output": "{report-time-series-output}"}
 {"N": "report-aa-at", "pos": [145, 156, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
 
 ** Draw
@@ -150,7 +149,8 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Time series
 
 {"N": "time-series", "color_by": <[[Color by][color-by]]>,
- "start": "2019-01", "end": "2019-11", "?": "start is inclusive, end is exclusive",
+ "?start": "2019-01", "?end": "2019-11", #-- "start is inclusive, end is exclusive",
+ "report": "{report-time-series-output}",
  "interval": {"month": 1}, "?": "month, week, year, day",
  "?interval": "month"
  "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",

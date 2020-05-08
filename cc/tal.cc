@@ -79,8 +79,20 @@ int main(int argc, const char *argv[])
         }
         settings.load(opt.settings_files);
         for (const auto& def : *opt.defines) {
-            if (const auto pos = def.find('='); pos != std::string_view::npos)
-                settings.setenv(def.substr(0, pos), def.substr(pos + 1)); // settings.setenv_from_string(def.substr(0, pos), def.substr(pos + 1));
+            if (const auto pos = def.find('='); pos != std::string_view::npos) {
+                const auto val_s = def.substr(pos + 1);
+                if (val_s == "-") { // parsed as -0
+                    settings.setenv(def.substr(0, pos), rjson::v3::parse_string(fmt::format("\"{}\"", val_s)));
+                }
+                else {
+                    try {
+                        settings.setenv(def.substr(0, pos), rjson::v3::parse_string(val_s));
+                    }
+                    catch (std::exception&) {
+                        settings.setenv(def.substr(0, pos), rjson::v3::parse_string(fmt::format("\"{}\"", val_s)));
+                    }
+                }
+            }
             else
                 settings.setenv(def, "true"sv);
         }
@@ -105,7 +117,7 @@ int main(int argc, const char *argv[])
         if (opt.open || opt.ql) {
             for (const auto& output : *opt.outputs) {
                 if (output.substr(output.size() - 4) == ".pdf")
-                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 1);
+                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
             }
         }
 
