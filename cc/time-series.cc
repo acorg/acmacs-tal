@@ -287,6 +287,8 @@ void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface)
     AD_INFO("Time series {}", coloring_report());
 
     if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
+        col->sort_by_count();
+
         const Scaled text_size{parameters().legend.scale};
         const TextStyle text_style{};
         const auto gap = *text_size * parameters().legend.gap_scale;

@@ -65,6 +65,7 @@ namespace acmacs::tal::inline v3
         Color color(const Node& node) const override;
         std::string report() const override;
         acmacs::seqdb::pos1_t pos() const { return pos_; }
+        void sort_by_count() const;
         constexpr const auto& colors() const { return colors_; }
 
       private:

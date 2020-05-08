@@ -59,6 +59,14 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::ColoringByPos::sort_by_count() const
+{
+    colors_.sort([](const auto& e1, const auto& e2) -> bool { return e1.second.count > e2.second.count; });
+
+} // acmacs::tal::v3::ColoringByPos::sort_by_count
+
+// ----------------------------------------------------------------------
+
 std::string acmacs::tal::v3::ColoringByPos::report() const
 {
     std::string result = fmt::format("coloring by AA at {}:\n", pos_);
