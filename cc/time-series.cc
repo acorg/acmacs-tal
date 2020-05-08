@@ -290,24 +290,26 @@ void acmacs::tal::v3::TimeSeries::draw_color_scale(acmacs::surface::Surface& sur
 
 void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface) const
 {
-    AD_INFO("Time series {}", coloring().report());
+    // AD_INFO("Time series {}", coloring().report());
 
-    if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
-        const Scaled text_size{parameters().legend.scale};
-        const TextStyle text_style{};
-        const auto gap = *text_size * parameters().legend.gap_scale;
+    if (parameters().legend.show) {
+        if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
+            const Scaled text_size{parameters().legend.scale};
+            const TextStyle text_style{};
+            const auto gap = *text_size * parameters().legend.gap_scale;
 
-        const auto& viewport = surface.viewport();
-        const auto text_y = viewport.origin.y() + viewport.size.height + parameters().legend.offset;
-        auto text_x = viewport.origin.x();
-        const auto pos_text = fmt::format("{}", col->pos());
-        surface.text({text_x, text_y}, pos_text, parameters().legend.pos_color, text_size, text_style, NoRotation);
-        text_x += surface.text_size(pos_text, text_size, text_style).width + gap;
-        for (const auto& [aa, color_count] : col->colors()) {
-            surface.text({text_x, text_y}, std::string(1, aa), color_count.color, text_size, text_style, NoRotation);
-            text_x += surface.text_size(std::string(1, aa), text_size, text_style).width;
-            surface.text({text_x, text_y}, fmt::format("{}", color_count.count), parameters().legend.count_color, text_size * parameters().legend.count_scale, text_style, NoRotation);
-            text_x += gap;
+            const auto& viewport = surface.viewport();
+            const auto text_y = viewport.origin.y() + viewport.size.height + parameters().legend.offset;
+            auto text_x = viewport.origin.x();
+            const auto pos_text = fmt::format("{}", col->pos());
+            surface.text({text_x, text_y}, pos_text, parameters().legend.pos_color, text_size, text_style, NoRotation);
+            text_x += surface.text_size(pos_text, text_size, text_style).width + gap;
+            for (const auto& [aa, color_count] : col->colors()) {
+                surface.text({text_x, text_y}, std::string(1, aa), color_count.color, text_size, text_style, NoRotation);
+                text_x += surface.text_size(std::string(1, aa), text_size, text_style).width;
+                surface.text({text_x, text_y}, fmt::format("{}", color_count.count), parameters().legend.count_color, text_size * parameters().legend.count_scale, text_style, NoRotation);
+                text_x += gap;
+            }
         }
     }
 

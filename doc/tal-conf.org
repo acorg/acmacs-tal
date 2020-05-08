@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-08 16:19:00 eu>
+# Time-stamp: <2020-05-08 16:56:47 eu>
 
 * Command line defines
 
@@ -152,7 +152,7 @@ If multiple criteria specified within single "select" object, they all used (con
  "?start": "2019-01", "?end": "2019-11", #-- "start is inclusive, end is exclusive",
  "report": "{report-time-series-output}",
  "interval": {"month": 1}, #-- month, week, year, day ("interval": "month" also supported)
- #-- not yet implemented (applicable to color-by-pos) "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}},
+ "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}}, #-- applicable to color-by-pos
  "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
  "slot": {"width": 0.01, "?": "fraction of the time series area height",
           "separator": {
@@ -295,7 +295,6 @@ If multiple criteria specified within single "select" object, they all used (con
 "color_by": {"N": "continent", "EUROPE": "#00A800", "CENTRAL-AMERICA": "#70A4A8", "MIDDLE-EAST": "#8000FF", "NORTH-AMERICA": "#00008B", "AFRICA": "#FF8000", "ASIA": "#FF0000", "RUSSIA": "#B03060", "AUSTRALIA-OCEANIA": "#FF69B4", "SOUTH-AMERICA": "#40E0D0", "ANTARCTICA": "#808080", "CHINA-SOUTH": "#FF0000", "CHINA-NORTH": "#6495ED", "CHINA-UNKNOWN": "#808080", "UNKNOWN": "#808080"}
 
 "color_by": {"N": "pos", "pos": 192, "colors": ["red", "green", "blue"]} -- acmacs::color::distinct are used if absent or too few given, X is always black
-             
 
 * COMMENT ====== local vars
 :PROPERTIES:

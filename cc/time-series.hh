@@ -63,7 +63,7 @@ namespace acmacs::tal::inline v3
 
         struct LegendParameters
         {
-            bool show{false};
+            bool show{true};
             double scale{0.012}; // relative to the time series area height
             double offset{0.022}; // relative to the time series area height
             double gap_scale{1.1}; // relative to scale

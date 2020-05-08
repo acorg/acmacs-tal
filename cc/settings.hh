@@ -55,6 +55,7 @@ namespace acmacs::tal::inline v3
         void hz_section_marker();
         void antigenic_maps();
 
+        void process_legend(TimeSeries& time_series);
         void read_dash_parameters(LayoutElement::DashParameters& param);
         void read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param);
         void read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters);

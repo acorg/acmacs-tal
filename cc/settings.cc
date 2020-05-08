@@ -432,16 +432,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 {
     using namespace std::string_view_literals;
 
-    const auto color_by = [this](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
-        if (key == "continent"sv) {
-            auto cb = std::make_unique<ColoringByContinent>();
-            for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
-                if (const auto& val = fields.get(continent); val.is_string())
-                    cb->set(continent, Color{val.to<std::string_view>()});
-            }
-            return cb;
-        }
-        else if (key == "pos"sv) {
+    const auto color_by_pos = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
             auto coloring_by_pos = std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
             if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
                 if (colors_v.is_array()) {
@@ -452,6 +443,19 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
                     AD_WARNING("color_by \"colors\" must be array: {}", fields);
             }
             return coloring_by_pos;
+    };
+
+    const auto color_by = [color_by_pos](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
+        if (key == "continent"sv) {
+            auto cb = std::make_unique<ColoringByContinent>();
+            for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
+                if (const auto& val = fields.get(continent); val.is_string())
+                    cb->set(continent, Color{val.to<std::string_view>()});
+            }
+            return cb;
+        }
+        else if (key == "pos"sv) {
+            return color_by_pos(fields);
         }
         else if (key == "uniform"sv) {
             return std::make_unique<ColoringUniform>(Color{rjson::v3::get_or(fields, "color"sv, "black"sv)});
@@ -514,6 +518,7 @@ void acmacs::tal::v3::Settings::add_time_series()
     auto& param = element.parameters();
 
     process_color_by(element);
+    process_legend(element);
     read_dash_parameters(param.dash);
 
     if (const auto& interval_v = getenv("interval"sv); !interval_v.is_null()) {
@@ -618,6 +623,25 @@ void acmacs::tal::v3::Settings::add_time_series()
     }
 
 } // acmacs::tal::v3::Settings::add_time_series
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::process_legend(TimeSeries& time_series)
+{
+    using namespace std::string_view_literals;
+
+    if (const auto& legend = getenv("legend"sv); !legend.is_null()) {
+        auto& legend_param = time_series.parameters().legend;
+        rjson::v3::copy_if_not_null(legend["show"sv], legend_param.show);
+        rjson::v3::copy_if_not_null(legend["scale"sv], legend_param.scale);
+        rjson::v3::copy_if_not_null(legend["offset"sv], legend_param.offset);
+        rjson::v3::copy_if_not_null(legend["gap_scale"sv], legend_param.gap_scale);
+        rjson::v3::copy_if_not_null(legend["count_scale"sv], legend_param.count_scale);
+        rjson::v3::copy_if_not_null(legend["pos_color"sv], legend_param.pos_color);
+        rjson::v3::copy_if_not_null(legend["count_color"sv], legend_param.count_color);
+    }
+
+} // acmacs::tal::v3::Settings::process_legend
 
 // ----------------------------------------------------------------------
 
