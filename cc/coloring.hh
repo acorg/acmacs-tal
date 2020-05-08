@@ -75,10 +75,12 @@ namespace acmacs::tal::inline v3
         std::string report() const override;
         acmacs::seqdb::pos1_t pos() const { return pos_; }
         constexpr const auto& colors() const { return colors_; }
+        void add_color(Color color) { color_order_.push_back(color); }
 
       private:
         acmacs::seqdb::pos1_t pos_;
-        /*mutable*/ acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
+        acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
+        std::vector<Color> color_order_;
     };
 
     // ----------------------------------------------------------------------

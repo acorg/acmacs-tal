@@ -442,7 +442,16 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             return cb;
         }
         else if (key == "pos"sv) {
-            return std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
+            auto coloring_by_pos = std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
+            if (const auto& colors_v = fields.get("colors"sv); !colors_v.is_null()) {
+                if (colors_v.is_array()) {
+                    for (const auto& en : colors_v.array())
+                        coloring_by_pos->add_color(en.to<Color>());
+                }
+                else
+                    AD_WARNING("color_by \"colors\" must be array: {}", fields);
+            }
+            return coloring_by_pos;
         }
         else if (key == "uniform"sv) {
             return std::make_unique<ColoringUniform>(Color{rjson::v3::get_or(fields, "color"sv, "black"sv)});

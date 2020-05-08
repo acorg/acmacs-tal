@@ -64,7 +64,10 @@ void acmacs::tal::v3::ColoringByPos::prepare()
             color_count.color = BLACK;
         }
         else {
-            color_count.color = acmacs::color::distinct(color_no);
+            if (color_no < color_order_.size())
+                color_count.color = color_order_[color_no];
+            else
+                color_count.color = acmacs::color::distinct(color_no - color_order_.size());
             ++color_no;
         }
     }
@@ -81,13 +84,6 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
     catch (std::out_of_range&) {
         throw coloring_error{fmt::format("ColoringByPos: no color for {} {}, forgot to call ColoringByPos::prepare?", pos_, node.aa_sequence.at(pos_))};
     }
-    // const auto aa = node.aa_sequence.at(pos_);
-    // if (aa == 'X')
-    //     return BLACK;
-    // auto& entry = colors_.emplace_not_replace(aa, color_count_t{acmacs::color::distinct(colors_.size()), 0});
-    // ++entry.second.count;
-    // // AD_DEBUG("ColoringByPos {} {}: {}", pos_, aa, color);
-    // return entry.second.color;
 
 } // acmacs::tal::v3::ColoringByPos::color
 
