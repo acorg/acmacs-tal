@@ -58,6 +58,8 @@ namespace acmacs::tal::inline v3
         ColoringByPos(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
         Color color(const Node& node) const override;
         std::string report() const override;
+        acmacs::seqdb::pos1_t pos() const { return pos_; }
+        constexpr const auto& colors() const { return colors_; }
 
       private:
         acmacs::seqdb::pos1_t pos_;

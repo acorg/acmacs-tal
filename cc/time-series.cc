@@ -63,6 +63,7 @@ void acmacs::tal::v3::TimeSeries::draw(acmacs::surface::Surface& surface) const
     draw_color_scale(surface);
     draw_background_separators(surface);
     draw_labels(surface);
+    draw_legend(surface);
 
     const auto* draw_tree = tal().draw().layout().find_draw_tree();
     const auto vertical_step = draw_tree->vertical_step();
@@ -268,6 +269,33 @@ void acmacs::tal::v3::TimeSeries::draw_color_scale(acmacs::surface::Surface& sur
     }
 
 } // acmacs::tal::v3::TimeSeries::draw_color_scale
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface) const
+{
+    AD_DEBUG("TimeSeries coloring");
+    coloring_report();
+
+    if (const auto* col = dynamic_cast<const ColoringByPos*>(&coloring()); col) {
+        const Scaled text_size{parameters().legend.scale};
+        const TextStyle text_style{};
+        const auto gap = surface.text_size("W", text_size, text_style).width;
+
+        const auto& viewport = surface.viewport();
+        const auto text_y = viewport.origin.y() + viewport.size.height + parameters().legend.offset;
+        auto text_x = viewport.origin.x();
+        const auto pos_text = fmt::format("{}", col->pos());
+        surface.text({text_x, text_y}, pos_text, BLACK, text_size, text_style, NoRotation);
+        text_x += surface.text_size(pos_text, text_size, text_style).width + gap;
+        for (const auto& [aa, color] : col->colors()) {
+            // surface.text({text_x, text_y}, std::string(1, aa), color, text_size, text_style, NoRotation);
+            surface.text({text_x, text_y}, "E", RED, text_size, text_style, NoRotation);
+            text_x += surface.text_size(std::string(1, aa), text_size, text_style).width + gap;
+        }
+    }
+
+} // acmacs::tal::v3::TimeSeries::draw_legend
 
 // ----------------------------------------------------------------------
 /// Local Variables:

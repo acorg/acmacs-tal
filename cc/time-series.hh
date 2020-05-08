@@ -61,6 +61,13 @@ namespace acmacs::tal::inline v3
             double height{0.01};
         };
 
+        struct LegendParameters
+        {
+            bool show{false};
+            double scale{0.012}; // relative to the time series area height
+            double offset{0.022}; // relative to the time series area height
+        };
+
         struct Parameters
         {
             acmacs::time_series::parameters time_series;
@@ -69,6 +76,7 @@ namespace acmacs::tal::inline v3
             small_map_with_unique_keys_t<seq_id_t, PerNodeParameters> per_nodes;
             ColorScaleParameters color_scale;
             std::string report;
+            LegendParameters legend;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
@@ -94,6 +102,7 @@ namespace acmacs::tal::inline v3
 
         void draw_background_separators(acmacs::surface::Surface& surface) const;
         void draw_labels(acmacs::surface::Surface& surface) const;
+        void draw_legend(acmacs::surface::Surface& surface) const;
         std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
         size_t slot_month(const acmacs::time_series::slot& slot) const;
         void draw_horizontal_lines(acmacs::surface::Surface& surface, const DrawTree* draw_tree) const;
