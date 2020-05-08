@@ -432,7 +432,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 {
     using namespace std::string_view_literals;
 
-    const auto color_by = [](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
+    const auto color_by = [this](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
         if (key == "continent"sv) {
             auto cb = std::make_unique<ColoringByContinent>();
             for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
@@ -443,7 +443,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         }
         else if (key == "pos"sv) {
             auto coloring_by_pos = std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
-            if (const auto& colors_v = fields.get("colors"sv); !colors_v.is_null()) {
+            if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
                 if (colors_v.is_array()) {
                     for (const auto& en : colors_v.array())
                         coloring_by_pos->add_color(en.to<Color>());
