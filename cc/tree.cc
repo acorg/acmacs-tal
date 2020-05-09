@@ -122,12 +122,15 @@ std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_edge(
 
 // ----------------------------------------------------------------------
 
-std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_cumulative_edge() const
+std::vector<const acmacs::tal::v3::Node*> acmacs::tal::v3::Tree::sorted_by_cumulative_edge(leaves_only lo) const
 {
     cumulative_calculate();
     std::vector<const Node*> sorted;
     const auto collect = [&sorted](const Node& node) { sorted.push_back(&node); };
-    tree::iterate_leaf_pre(*this, collect, collect);
+    if (lo == leaves_only::yes)
+        tree::iterate_leaf(*this, collect);
+    else
+        tree::iterate_leaf_pre(*this, collect, collect);
     std::sort(std::begin(sorted), std::end(sorted), [](const Node* n1, const Node* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; });
     return sorted;
 
@@ -229,7 +232,7 @@ void acmacs::tal::v3::Tree::branches_by_cumulative_edge()
     number_leaves_in_subtree();
 
     AD_INFO("cumulative edge report");
-    const std::vector<const Node*> nodes = sorted_by_cumulative_edge();
+    const std::vector<const Node*> nodes = sorted_by_cumulative_edge(leaves_only::no);
 
     std::vector<double> cumulative_gaps(nodes.size() - 1);
     const Node* prev{nullptr};
@@ -407,7 +410,7 @@ void acmacs::tal::v3::Tree::select_by_top_cumulative_gap(NodeSet& nodes, Select 
         return;
     }
 
-    if (const std::vector<const Node*> sorted = sorted_by_cumulative_edge(); sorted.size() > 10) {
+    if (const std::vector<const Node*> sorted = sorted_by_cumulative_edge(leaves_only::no); sorted.size() > 10) {
         std::vector<double> cumulative_gaps(sorted.size() - 1);
         for (auto ps = std::next(sorted.begin()); ps != sorted.end(); ++ps)
             cumulative_gaps[static_cast<size_t>(ps - sorted.begin() - 1)] = (*std::prev(ps))->cumulative_edge_length.as_number() - (*ps)->cumulative_edge_length.as_number();
@@ -860,6 +863,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
     Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
     tree::iterate_post(*this, [aa_at, this, &debug_pos](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
+            if (debug_pos && pos == *debug_pos)
+                AD_DEBUG("update_aa_transitions counting {} node:{:4.3s} is_no_common:{}", pos, node.node_id, node.common_aa_.is_no_common(pos));
             if (node.common_aa_.is_no_common(pos)) {
                 CounterChar counter;
                 for (auto& child : node.subtree) {
@@ -872,7 +877,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
                     }
                 }
                 if (debug_pos && pos == *debug_pos)
-                    AD_DEBUG("update_aa_transitions {} node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                    AD_DEBUG("  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
@@ -882,13 +887,9 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
     });
     time2.report();
 
-    Timeit time3(">>>> update_aa_transitions sorted_leaf_nodes: ", report_time::no);
-    std::vector<const Node*> sorted_leaf_nodes;
-    tree::iterate_leaf(*this, [&sorted_leaf_nodes](const Node& node) { sorted_leaf_nodes.push_back(&node); });
-    const auto sorted_leaf_nodes_cmp = [](const auto* n1, const auto* n2) { return n1->cumulative_edge_length > n2->cumulative_edge_length; };
-    std::sort(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), sorted_leaf_nodes_cmp); // bigger cumul length first
-    time3.report();
+    const std::vector<const Node*> sorted_leaf_nodes = sorted_by_cumulative_edge(leaves_only::yes); // bigger cumul length first
 
+    AD_DEBUG("update_aa_transitions adding left part");
     Timeit time4(">>>> update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
     auto add_left_part = [&sorted_leaf_nodes](Node& node) {

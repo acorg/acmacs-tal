@@ -303,10 +303,12 @@ namespace acmacs::tal::inline v3
         void set_first_last_next_node_id();
 
       private:
+        enum class leaves_only { no, yes };
+
         const clade_t* find_clade(std::string_view name) const;
         clade_t* find_clade(std::string_view name);
         std::vector<const Node*> sorted_by_edge() const;
-        std::vector<const Node*> sorted_by_cumulative_edge() const;
+        std::vector<const Node*> sorted_by_cumulative_edge(leaves_only lo) const; // bigger cumul length first
         double mean_edge_of(double fraction_or_number,
                             const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
         double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
