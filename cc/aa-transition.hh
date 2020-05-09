@@ -17,7 +17,7 @@ namespace acmacs::tal::inline v3
         char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
         constexpr static bool is_common(char aa) { return aa != NoCommon && aa != Any; }
         bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
-        bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
+        // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
         ssize_t num_common() const
         {
             return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NoCommon; });
@@ -93,6 +93,7 @@ namespace acmacs::tal::inline v3
 
         enum class show_empty_left { no, yes };
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
+        bool has(seqdb::pos1_t pos) const;
         std::vector<std::string> names() const;
 
         bool contains(std::string_view label) const

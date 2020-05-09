@@ -863,9 +863,10 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
     Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
     tree::iterate_post(*this, [aa_at, this, &debug_pos](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
+            const auto common_aa_at = node.common_aa_.at(pos);
             if (debug_pos && pos == *debug_pos)
-                AD_DEBUG("update_aa_transitions counting {} node:{:4.3s} is_no_common:{}", pos, node.node_id, node.common_aa_.is_no_common(pos));
-            if (node.common_aa_.is_no_common(pos)) {
+                AD_DEBUG("update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(), common_aa_at, common_aa_at == CommonAA::NoCommon);
+            if (common_aa_at == CommonAA::NoCommon) {
                 CounterChar counter;
                 for (auto& child : node.subtree) {
                     if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
@@ -877,11 +878,19 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
                     }
                 }
                 if (debug_pos && pos == *debug_pos)
-                    AD_DEBUG("  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                    AD_DEBUG("  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
                 }
+            }
+            else {
+                if (node.aa_transitions_.has(pos))
+                    AD_WARNING("update_aa_transitions (the only common) has for pos {}", pos);
+                node.remove_aa_transition(pos, common_aa_at);
+                node.aa_transitions_.add(pos, common_aa_at);
+                if (debug_pos && pos == *debug_pos)
+                    AD_DEBUG("  update_aa_transitions (the only common) {}", node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
             }
         }
     });

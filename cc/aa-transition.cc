@@ -115,6 +115,18 @@ std::string acmacs::tal::v3::AA_Transitions::display(std::optional<seqdb::pos1_t
 
 // ----------------------------------------------------------------------
 
+bool acmacs::tal::v3::AA_Transitions::has(seqdb::pos1_t pos) const
+{
+    for (const auto& en : data_) {
+        if (en.pos == pos && !en.empty_right())
+            return true;
+    }
+    return false;
+
+} // acmacs::tal::v3::AA_Transitions::has
+
+// ----------------------------------------------------------------------
+
 std::vector<std::string> acmacs::tal::v3::AA_Transitions::names() const
 {
     std::vector<std::string> result;
