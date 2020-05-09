@@ -99,6 +99,7 @@ namespace acmacs::tal::inline v3
         enum class show_empty_left { no, yes };
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
         bool has(seqdb::pos1_t pos) const;
+        bool has_same_left_right() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); }); }
         std::vector<std::string> names() const;
 
         bool contains(std::string_view label) const
