@@ -887,10 +887,10 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
             else {
                 if (node.aa_transitions_.has(pos))
                     AD_WARNING("update_aa_transitions (the only common) has for pos {}", pos);
-                node.remove_aa_transition(pos, common_aa_at);
-                node.aa_transitions_.add(pos, common_aa_at);
-                if (debug_pos && pos == *debug_pos)
-                    AD_DEBUG("  update_aa_transitions (the only common) {}", node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
+                // node.remove_aa_transition(pos, common_aa_at);
+                // node.aa_transitions_.add(pos, common_aa_at);
+                // if (debug_pos && pos == *debug_pos)
+                //     AD_DEBUG("  update_aa_transitions (the only common) {}", node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
             }
         }
     });
@@ -901,7 +901,11 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
     AD_DEBUG("update_aa_transitions adding left part");
     Timeit time4(">>>> update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
-    auto add_left_part = [&sorted_leaf_nodes](Node& node) {
+    auto add_left_part = [&sorted_leaf_nodes, &debug_pos](Node& node) {
+        if (debug_pos) {
+            if (node.aa_transitions_.has(*debug_pos))
+                AD_DEBUG("update_aa_transitions (add left) {:4.3s} aa-transitions: {}  empty:{}", node.node_id, node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes), node.aa_transitions_.empty());
+        }
         if (!node.aa_transitions_.empty()) {
             const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
 
@@ -911,6 +915,10 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
             if (node_for_left != std::end(sorted_leaf_nodes)) {
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
                 node.node_for_left_aa_transitions_ = *node_for_left;
+            }
+            else {
+                if (debug_pos && node.aa_transitions_.has(*debug_pos))
+                    AD_DEBUG("update_aa_transitions (add left) no node for left {:4.3s} {}", node.node_id, node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
             }
         }
 
