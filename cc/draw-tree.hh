@@ -9,6 +9,26 @@ namespace acmacs::tal::inline v3
 {
     class Tal;
 
+    namespace draw_tree
+    {
+        struct AATransitionsParameters
+        {
+            bool calculate{false};
+            bool report{false};
+            bool debug{false};
+            std::optional<seqdb::pos1_t> report_pos;
+            size_t report_number_leaves_threshold{20};
+            std::optional<seqdb::pos1_t> show_same_left_right_for_pos;
+        };
+
+        struct Parameters
+        {
+            AATransitionsParameters aa_transitions;
+        };
+    }
+
+    // ----------------------------------------------------------------------
+
     class DrawTree : public LayoutElementWithColoring
     {
       public:
@@ -20,25 +40,11 @@ namespace acmacs::tal::inline v3
         constexpr double vertical_step() const { return vertical_step_; }
         constexpr double horizontal_step() const { return horizontal_step_; }
 
-        struct AATransitionsParameters
-        {
-            bool calculate{false};
-            bool report{false};
-            bool debug{false};
-            std::optional<seqdb::pos1_t> report_pos;
-            size_t report_number_leaves_threshold{20};
-        };
-
-        struct Parameters
-        {
-            AATransitionsParameters aa_transitions;
-        };
-
-        constexpr Parameters& parameters() { return parameters_; }
-        constexpr const Parameters& parameters() const { return parameters_; }
+        constexpr draw_tree::Parameters& parameters() { return parameters_; }
+        constexpr const draw_tree::Parameters& parameters() const { return parameters_; }
 
       private:
-        Parameters parameters_;
+        draw_tree::Parameters parameters_;
         const double height_{1.0};
         double vertical_step_{0};
         double horizontal_step_{0};

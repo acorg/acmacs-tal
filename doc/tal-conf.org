@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-09 12:21:08 eu>
+# Time-stamp: <2020-05-09 17:15:36 eu>
 
 * Command line defines
 
@@ -112,7 +112,8 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
 
-{"N": "aa-transitions", "report": false, "debug": false, "pos": 193, "number_leaves_threshold": 10} -- use upon hiding nodes, specify pos to debug
+{"N": "aa-transitions", "report": false, "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+"show-same-left-right-for-pos": 193}
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 

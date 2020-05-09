@@ -11,7 +11,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
         AD_DEBUG("DrawTree::prepare");
         tal().tree().set_first_last_next_node_id();
         if (parameters().aa_transitions.calculate)
-            tal().tree().update_aa_transitions(parameters().aa_transitions.debug ? parameters().aa_transitions.report_pos : std::nullopt);
+            tal().tree().update_aa_transitions(parameters().aa_transitions);
 
         tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
             if (!leaf.hidden)
@@ -22,7 +22,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 
         if (parameters().aa_transitions.report) {
             tal().tree().report_common_aa(parameters().aa_transitions.report_pos, parameters().aa_transitions.report_number_leaves_threshold);
-            tal().tree().report_aa_transitions(parameters().aa_transitions.report_pos, parameters().aa_transitions.report_number_leaves_threshold);
+            tal().tree().report_aa_transitions(parameters().aa_transitions);
         }
     }
     else if (stage == 3 && prepared_ < stage) {

@@ -1,4 +1,5 @@
 #include "acmacs-tal/aa-transition.hh"
+#include "acmacs-tal/draw-tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -76,6 +77,16 @@ std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optio
         return fmt::format("common:{} {}", num_common, fmt::to_string(out));
 
 } // acmacs::tal::v3::CommonAA::report
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::AA_Transitions::remove_left_right_same(const draw_tree::AATransitionsParameters& parameters)
+{
+    // AD_DEBUG_IF(debug_from(!data_.empty()), "remove_left_right_same {}", display());
+    remove_if([&parameters](const auto& en) { return en.left_right_same() && (!parameters.show_same_left_right_for_pos || en.pos != *parameters.show_same_left_right_for_pos); });
+    // AD_DEBUG_IF(debug_from(!data_.empty()), "  --> {}", display());
+
+} // acmacs::tal::v3::AA_Transitions::remove_left_right_same
 
 // ----------------------------------------------------------------------
 

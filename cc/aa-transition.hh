@@ -7,6 +7,11 @@
 
 namespace acmacs::tal::inline v3
 {
+    namespace draw_tree
+    {
+        struct AATransitionsParameters; // draw-tree.hh
+    }
+
     class CommonAA : public acmacs::named_string_t<struct acmacs_tal_CommonAA_tag>
     {
       public:
@@ -50,7 +55,7 @@ namespace acmacs::tal::inline v3
         constexpr bool empty_left() const { return left == Empty; }
         constexpr bool empty_right() const { return right == Empty; }
         constexpr bool left_right_same() const { return left == right; }
-        constexpr operator bool() const { return !empty_left() && !empty_right() && !left_right_same(); } // if transition is good for display
+        constexpr operator bool() const { return !empty_left() && !empty_right(); } //  ignore left_right_same flag to allow drawing them if "show-same-left-right-for-pos" is true
 
         char left;
         char right;
@@ -78,7 +83,7 @@ namespace acmacs::tal::inline v3
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
         bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }
         bool remove(seqdb::pos0_t pos, char right) { return remove_if([pos,right](const auto& en) { return en.pos == pos && en.right == right; }); }
-        void remove_left_right_same() { remove_if([](const auto& en) { return en.left_right_same(); }); }
+        void remove_left_right_same(const draw_tree::AATransitionsParameters& parameters);
         void remove_empty_right() { remove_if([](const auto& en) { return en.empty_right(); }); }
 
         const AA_Transition* find(seqdb::pos0_t pos) const

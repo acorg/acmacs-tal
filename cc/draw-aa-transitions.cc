@@ -52,22 +52,23 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     auto interleave{0.0};
 
     for (auto& transition : transitions_) {
-        const auto names = transition.node->aa_transitions_.names();
+        if (const auto names = transition.node->aa_transitions_.names(); !names.empty()) {
 
-        const Scaled text_size{transition.label.scale};
-        transition.name_sizes.resize(names.size());
-        std::transform(std::begin(names), std::end(names), std::begin(transition.name_sizes),
-                       [&surface, &transition, text_size](const auto& name) { return surface.text_size(name, text_size, transition.label.text_style); });
-        transition.box.size = std::accumulate(std::begin(transition.name_sizes), std::end(transition.name_sizes), Size{}, [](const Size& result, const Size& name_size) {
-            return Size{std::max(result.width, name_size.width), result.height + name_size.height};
-        });
-        interleave = text_line_interleave * transition.name_sizes.front().height;
-        transition.box.size.height += static_cast<double>(names.size() - 1) * interleave;
+            const Scaled text_size{transition.label.scale};
+            transition.name_sizes.resize(names.size());
+            std::transform(std::begin(names), std::end(names), std::begin(transition.name_sizes),
+                           [&surface, &transition, text_size](const auto& name) { return surface.text_size(name, text_size, transition.label.text_style); });
+            transition.box.size = std::accumulate(std::begin(transition.name_sizes), std::end(transition.name_sizes), Size{}, [](const Size& result, const Size& name_size) {
+                return Size{std::max(result.width, name_size.width), result.height + name_size.height};
+            });
+            interleave = text_line_interleave * transition.name_sizes.front().height;
+            transition.box.size.height += static_cast<double>(names.size() - 1) * interleave;
 
-        transition.at_edge_line.x(horizontal_step * (transition.node->cumulative_edge_length.as_number() - transition.node->edge_length.as_number() / 2.0));
-        transition.at_edge_line.y(vertical_step * transition.node->cumulative_vertical_offset_);
-        transition.box.origin.x(transition.at_edge_line.x() + transition.label.offset[0]);
-        transition.box.origin.y(transition.at_edge_line.y() + transition.label.offset[1]);
+            transition.at_edge_line.x(horizontal_step * (transition.node->cumulative_edge_length.as_number() - transition.node->edge_length.as_number() / 2.0));
+            transition.at_edge_line.y(vertical_step * transition.node->cumulative_vertical_offset_);
+            transition.box.origin.x(transition.at_edge_line.x() + transition.label.offset[0]);
+            transition.box.origin.y(transition.at_edge_line.y() + transition.label.offset[1]);
+        }
     }
 
     // overlapping detection
@@ -163,37 +164,45 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
         // if (!transition.node->aa_transitions_.find(seqdb::pos1_t{484}))
         //     continue;
 
-        const auto names = transition.node->aa_transitions_.names();
-        const Scaled text_size{transition.label.scale};
+        if (const auto names = transition.node->aa_transitions_.names(); !names.empty()) { // prevent from crashing during debugging aa transitions
+            const Scaled text_size{transition.label.scale};
 
-        //const PointCoordinates box_top_left{transition.at_edge_line.x() + transition.label.offset[0], transition.at_edge_line.y() + transition.label.offset[1]};
-        // surface.rectangle(transition.box.origin, transition.box.size, GREY, Pixels{1});
+            // const PointCoordinates box_top_left{transition.at_edge_line.x() + transition.label.offset[0], transition.at_edge_line.y() + transition.label.offset[1]};
+            // surface.rectangle(transition.box.origin, transition.box.size, GREY, Pixels{1});
 
-        if (transition.label.tether.show) {
-            const auto vspace = transition.name_sizes.front().height * text_line_interleave;
-            PointCoordinates at_box{transition.box.center().x(), transition.box.top() - vspace};
-            if (transition.box.top() <= transition.at_edge_line.y() && transition.box.bottom() >= transition.at_edge_line.y()) {
-                if (transition.box.left() >= transition.at_edge_line.x())
-                    at_box.x(transition.box.left());
-                else
-                    at_box.x(transition.box.right());
-                at_box.y(transition.box.center().y());
+            if (transition.label.tether.show) {
+                const auto vspace = transition.name_sizes.front().height * text_line_interleave;
+                PointCoordinates at_box{transition.box.center().x(), transition.box.top() - vspace};
+                if (transition.box.top() <= transition.at_edge_line.y() && transition.box.bottom() >= transition.at_edge_line.y()) {
+                    if (transition.box.left() >= transition.at_edge_line.x())
+                        at_box.x(transition.box.left());
+                    else
+                        at_box.x(transition.box.right());
+                    at_box.y(transition.box.center().y());
+                }
+                else if (transition.box.bottom() < transition.at_edge_line.y())
+                    at_box.y(transition.box.bottom() + vspace);
+                if (distance(transition.at_edge_line, at_box) > distance(transition.box.origin, transition.box.bottom_right()) * 0.2)
+                    surface.line(transition.at_edge_line, at_box, transition.label.tether.line.color, transition.label.tether.line.line_width);
             }
-            else if (transition.box.bottom() < transition.at_edge_line.y())
-                at_box.y(transition.box.bottom() + vspace);
-            if (distance(transition.at_edge_line, at_box) > distance(transition.box.origin, transition.box.bottom_right()) * 0.2)
-                surface.line(transition.at_edge_line, at_box, transition.label.tether.line.color, transition.label.tether.line.line_width);
-        }
 
-        auto pos_x = transition.box.left();
-        auto pos_y = transition.box.top();
-        for (auto [index, name] : acmacs::enumerate(names)) {
-            if (index)
-                pos_y += transition.name_sizes[index].height * (1.0 + text_line_interleave);
-            else
-                pos_y += transition.name_sizes[index].height;
-            surface.text({pos_x + (transition.box.size.width - transition.name_sizes[index].width) / 2.0, pos_y}, name, transition.label.color, text_size, transition.label.text_style);
+            auto pos_x = transition.box.left();
+            auto pos_y = transition.box.top();
+            for (auto [index, name] : acmacs::enumerate(names)) {
+                if (!name.empty()) {
+                    if (index)
+                        pos_y += transition.name_sizes[index].height * (1.0 + text_line_interleave);
+                    else
+                        pos_y += transition.name_sizes[index].height;
+                    const Color color{name.front() == name.back() ? GREY : transition.label.color};
+                    surface.text({pos_x + (transition.box.size.width - transition.name_sizes[index].width) / 2.0, pos_y}, name, color, text_size, transition.label.text_style);
+                }
+                else
+                    AD_WARNING("DrawAATransitions::draw_transitions: name is empty in {}", names);
+            }
         }
+        else
+            AD_WARNING("draw_transitions names empty for {}", transition.node->node_id);
     }
 
 } // acmacs::tal::v3::DrawAATransitions::draw_transitions

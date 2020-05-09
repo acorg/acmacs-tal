@@ -61,6 +61,11 @@ namespace acmacs::tal::inline v3
         constexpr bool operator<(const node_id_t& rhs) const { return vertical < rhs.vertical; }
     };
 
+    namespace draw_tree
+    {
+        struct AATransitionsParameters; // draw-tree.hh
+    }
+
     // ----------------------------------------------------------------------
 
     class Node
@@ -249,8 +254,8 @@ namespace acmacs::tal::inline v3
         // ----------------------------------------------------------------------
 
         void report_common_aa(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
-        void update_aa_transitions(std::optional<seqdb::pos1_t> debug_pos);
-        void report_aa_transitions(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
+        void update_aa_transitions(const draw_tree::AATransitionsParameters& parameters);
+        void report_aa_transitions(const draw_tree::AATransitionsParameters& parameters) const;
 
         // ----------------------------------------------------------------------
 

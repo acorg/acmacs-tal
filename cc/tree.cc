@@ -11,6 +11,7 @@
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
+#include "acmacs-tal/draw-tree.hh"
 
 // ----------------------------------------------------------------------
 
@@ -846,9 +847,9 @@ void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> debug_pos)
+void acmacs::tal::v3::Tree::update_aa_transitions(const draw_tree::AATransitionsParameters& parameters)
 {
-    AD_DEBUG("update_aa_transitions");
+    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions");
 
     cumulative_calculate();
     update_common_aa();
@@ -861,11 +862,12 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
     };
 
     Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
-    tree::iterate_post(*this, [aa_at, this, &debug_pos](Node& node) {
+    tree::iterate_post(*this, [aa_at, this, &parameters](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
+            const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
             const auto common_aa_at = node.common_aa_.at(pos);
-            if (debug_pos && pos == *debug_pos)
-                AD_DEBUG("update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(), common_aa_at, common_aa_at == CommonAA::NoCommon);
+            AD_DEBUG_IF(dbg, "update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(), common_aa_at,
+                        common_aa_at == CommonAA::NoCommon);
             if (common_aa_at == CommonAA::NoCommon) {
                 CounterChar counter;
                 for (auto& child : node.subtree) {
@@ -877,53 +879,50 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
                         counter.count(found->right);
                     }
                 }
-                if (debug_pos && pos == *debug_pos)
-                    AD_DEBUG("  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
+                AD_DEBUG_IF(dbg, "  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
                 }
             }
-            else {
-                if (node.aa_transitions_.has(pos))
-                    AD_WARNING("update_aa_transitions (the only common) has for pos {}", pos);
-                // node.remove_aa_transition(pos, common_aa_at);
-                // node.aa_transitions_.add(pos, common_aa_at);
-                // if (debug_pos && pos == *debug_pos)
-                //     AD_DEBUG("  update_aa_transitions (the only common) {}", node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
-            }
+            // else {
+            //     if (node.aa_transitions_.has(pos))
+            //         AD_WARNING("update_aa_transitions (the only common) has for pos {}", pos);
+            // }
         }
     });
     time2.report();
 
     const std::vector<const Node*> sorted_leaf_nodes = sorted_by_cumulative_edge(leaves_only::yes); // bigger cumul length first
 
-    AD_DEBUG("update_aa_transitions adding left part");
+    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions adding left part");
     Timeit time4(">>>> update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
-    auto add_left_part = [&sorted_leaf_nodes, &debug_pos](Node& node) {
-        if (debug_pos) {
-            if (node.aa_transitions_.has(*debug_pos))
-                AD_DEBUG("update_aa_transitions (add left) {:4.3s} aa-transitions: {}  empty:{}", node.node_id, node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes), node.aa_transitions_.empty());
-        }
+    auto add_left_part = [&sorted_leaf_nodes, &parameters](Node& node) {
+        const auto dbg = debug_from(parameters.debug && parameters.report_pos && node.aa_transitions_.has(*parameters.report_pos));
+        AD_DEBUG_IF(dbg, "update_aa_transitions (add left) {:4.3s} aa-transitions: {}  empty:{}", node.node_id,
+                    node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes), node.aa_transitions_.empty());
         if (!node.aa_transitions_.empty()) {
             const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
 
             const auto node_for_left = std::upper_bound(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), node_left_edge,
                                                         [](const auto& a_node_left_edge, const auto* nd) { return a_node_left_edge > nd->cumulative_edge_length; });
-            // const auto node_for_left = std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length < node_left_edge; });
+            // const auto node_for_left = std::find_if(std::begin(sorted_leaf_nodes), std::end(sorted_leaf_nodes), [node_left_edge](const auto* nd) { return nd->cumulative_edge_length <
+            // node_left_edge; });
             if (node_for_left != std::end(sorted_leaf_nodes)) {
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
                 node.node_for_left_aa_transitions_ = *node_for_left;
+                AD_DEBUG_IF(dbg, "update_aa_transitions (add left) {:4.3s} {} node-for-left: {} {}", node.node_id,
+                            node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes), node.node_for_left_aa_transitions_->node_id,
+                            node.node_for_left_aa_transitions_->seq_id);
             }
             else {
-                if (debug_pos && node.aa_transitions_.has(*debug_pos))
-                    AD_DEBUG("update_aa_transitions (add left) no node for left {:4.3s} {}", node.node_id, node.aa_transitions_.display(debug_pos, AA_Transitions::show_empty_left::yes));
+                AD_DEBUG_IF(dbg, "update_aa_transitions (add left) no node for left {:4.3s} {}", node.node_id,
+                            node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes));
             }
         }
 
-        node.aa_transitions_.remove_left_right_same();
-        // node.aa_transitions_.remove_if([](const auto& en) { return en.pos != acmacs::seqdb::pos1_t{156} && en.pos != acmacs::seqdb::pos1_t{193} && en.left_right_same(); });
+        node.aa_transitions_.remove_left_right_same(parameters);
         node.aa_transitions_.remove_empty_right();
     };
     tree::iterate_leaf_pre(*this, add_left_part, add_left_part);
@@ -933,13 +932,13 @@ void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> d
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::report_aa_transitions(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const
+void acmacs::tal::v3::Tree::report_aa_transitions(const draw_tree::AATransitionsParameters& parameters) const
 {
     AD_INFO("AA transitions");
     number_leaves_in_subtree();
-    tree::iterate_pre(*this, [&pos, number_leaves_threshold](const Node& node) {
-        if (node.number_leaves_in_subtree() >= number_leaves_threshold) {
-            if (const auto rep = node.aa_transitions_.display(pos, AA_Transitions::show_empty_left::yes); !rep.empty())
+    tree::iterate_pre(*this, [&parameters](const Node& node) {
+        if (node.number_leaves_in_subtree() >= parameters.report_number_leaves_threshold) {
+            if (const auto rep = node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes); !rep.empty())
                 fmt::print(stderr, "   {:5.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
     });

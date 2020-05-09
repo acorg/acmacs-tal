@@ -87,9 +87,11 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
                 param.calculate = true;
                 param.report = getenv("report"sv, false);
                 param.debug = getenv("debug"sv, true);
-                if (const auto& pos_v = getenv("pos"sv); !pos_v.is_null())
-                    param.report_pos = pos_v.to<seqdb::pos1_t>();
-                param.report_number_leaves_threshold = getenv("number_leaves_threshold"sv, 20ul);
+                if (const auto& pos = getenv("pos"sv); !pos.is_null())
+                    param.report_pos = pos.to<seqdb::pos1_t>();
+                param.report_number_leaves_threshold = getenv("number-leaves-threshold"sv, 20ul);
+                if (const auto& pos = getenv("show-same-left-right-for-pos"sv); !pos.is_null())
+                    param.show_same_left_right_for_pos = pos.to<seqdb::pos1_t>();
             }
             else
                 AD_WARNING("\"aa-transitions\" requested but no darw_tree found");
