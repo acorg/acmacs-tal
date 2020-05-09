@@ -24,6 +24,7 @@ namespace acmacs::tal::inline v3
         {
             bool calculate{false};
             bool report{false};
+            bool debug{false};
             std::optional<seqdb::pos1_t> report_pos;
             size_t report_number_leaves_threshold{20};
         };

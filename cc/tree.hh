@@ -249,7 +249,7 @@ namespace acmacs::tal::inline v3
         // ----------------------------------------------------------------------
 
         void report_common_aa(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
-        void update_aa_transitions();
+        void update_aa_transitions(std::optional<seqdb::pos1_t> debug_pos);
         void report_aa_transitions(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
 
         // ----------------------------------------------------------------------
@@ -311,7 +311,7 @@ namespace acmacs::tal::inline v3
                             const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
         double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
 
-        void structure_modified(std::string_view on_action) { structure_modified_ = true; } // AD_DEBUG("structure_modified: {}", on_action);
+        void structure_modified([[maybe_unused]] std::string_view on_action) { structure_modified_ = true; } // AD_DEBUG("structure_modified: {}", on_action);
 
         void update_common_aa();
 

@@ -843,7 +843,7 @@ void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::update_aa_transitions()
+void acmacs::tal::v3::Tree::update_aa_transitions(std::optional<seqdb::pos1_t> debug_pos)
 {
     AD_DEBUG("update_aa_transitions");
 
@@ -858,7 +858,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions()
     };
 
     Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
-    tree::iterate_post(*this, [aa_at, this](Node& node) {
+    tree::iterate_post(*this, [aa_at, this, &debug_pos](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
             if (node.common_aa_.is_no_common(pos)) {
                 CounterChar counter;
@@ -871,8 +871,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions()
                         counter.count(found->right);
                     }
                 }
-                if (pos == seqdb::pos1_t{193})
-                    AD_DEBUG("update_aa_transitions-193 node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                if (debug_pos && pos == *debug_pos)
+                    AD_DEBUG("update_aa_transitions {} node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);

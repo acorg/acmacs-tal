@@ -11,7 +11,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
         AD_DEBUG("DrawTree::prepare");
         tal().tree().set_first_last_next_node_id();
         if (parameters().aa_transitions.calculate)
-            tal().tree().update_aa_transitions();
+            tal().tree().update_aa_transitions(parameters().aa_transitions.debug ? parameters().aa_transitions.report_pos : std::nullopt);
 
         tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
             if (!leaf.hidden)
