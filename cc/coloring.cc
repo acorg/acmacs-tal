@@ -93,7 +93,7 @@ std::string acmacs::tal::v3::ColoringByPos::report() const
 {
     std::string result = fmt::format("coloring by AA at {}:\n", pos_);
     for (const auto& [aa, color_count] : colors_)
-        result += fmt::format("  {}  \"{}\" {:6d}\n", aa, color_count.color, color_count.count);
+        result += fmt::format("  {}  {:12s} {:6d}\n", aa, fmt::format("\"{}\"", color_count.color), color_count.count);
     return result;
 
 } // acmacs::tal::v3::ColoringByPos::report
