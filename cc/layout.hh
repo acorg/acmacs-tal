@@ -9,6 +9,7 @@
 namespace acmacs::tal::inline v3
 {
     enum class Position { normal, absolute };
+    enum class throw_error { no, yes };
 
     // ----------------------------------------------------------------------
 
@@ -51,7 +52,8 @@ namespace acmacs::tal::inline v3
 
         size_t index_of(const LayoutElement* look_for) const;
 
-        const DrawTree* find_draw_tree(bool throw_error = true) const; // throws error or prints warning if not found
+        const DrawTree* find_draw_tree(throw_error te = throw_error::yes) const; // throws error or prints warning if not found
+        DrawTree* find_draw_tree(throw_error te = throw_error::yes); // throws error or prints warning if not found
 
         void draw_horizontal_line_between(const LayoutElement* elt1, const LayoutElement* elt2, double y_pos, Color line_color, Pixels line_width) const;
 

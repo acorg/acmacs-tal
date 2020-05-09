@@ -20,7 +20,23 @@ namespace acmacs::tal::inline v3
         constexpr double vertical_step() const { return vertical_step_; }
         constexpr double horizontal_step() const { return horizontal_step_; }
 
+        struct AATransitionsParameters
+        {
+            bool report{false};
+            std::optional<seqdb::pos1_t> pos;
+            size_t number_leaves_threshold{20};
+        };
+
+        struct Parameters
+        {
+            AATransitionsParameters aa_transitions;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
       private:
+        Parameters parameters_;
         const double height_{1.0};
         double vertical_step_{0};
         double horizontal_step_{0};

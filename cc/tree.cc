@@ -543,6 +543,7 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
     if (structure_modified_) {
+        AD_DEBUG("set_first_last_next_node_id");
         // Timeit time_set_first_last_next_node_id(">>>> [time] set_first_last_next_node_id: ");
 
         node_id_t::value_type vertical{0};
@@ -677,6 +678,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
             break;
     }
 
+    // AD_DEBUG("ladderized");
     structure_modified_ = true;
 
 } // acmacs::tal::v3::Tree::ladderize
@@ -745,6 +747,7 @@ void acmacs::tal::v3::Tree::re_root(const seq_id_t& new_root)
 
 void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
 {
+    AD_INFO("re-rooting");
     if (new_root->front() != this)
         throw error("Invalid path passed to Tree::re_root");
 
@@ -768,6 +771,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
     if (cumulative_edge_length != EdgeLengthNotSet)
         cumulative_calculate(true);
 
+    // AD_DEBUG("re-rooted");
     structure_modified_ = true;
 
 } // acmacs::tal::v3::Tree::re_root
@@ -822,12 +826,12 @@ void acmacs::tal::v3::Tree::update_common_aa() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to_report) const
+void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold) const
 {
     AD_INFO("common AA");
     number_leaves_in_subtree();
-    tree::iterate_pre_parent(*this, [&pos_to_report](const Node& node, const Node& parent) {
-        if (node.number_leaves_in_subtree() >= 100) {
+    tree::iterate_pre_parent(*this, [&pos_to_report, number_leaves_threshold](const Node& node, const Node& parent) {
+        if (node.number_leaves_in_subtree() >= number_leaves_threshold) {
             if (const auto rep = node.common_aa_.report(parent.common_aa_, pos_to_report); !rep.empty())
                 fmt::print(stderr, "    node:{:4.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
@@ -908,17 +912,16 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::report_aa_transitions(std::optional<seqdb::pos1_t> pos) const
+void acmacs::tal::v3::Tree::report_aa_transitions(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const
 {
     AD_INFO("AA transitions");
     number_leaves_in_subtree();
-    tree::iterate_pre(*this, [&pos](const Node& node) {
-        if (node.number_leaves_in_subtree() >= 20) {
+    tree::iterate_pre(*this, [&pos, number_leaves_threshold](const Node& node) {
+        if (node.number_leaves_in_subtree() >= number_leaves_threshold) {
             if (const auto rep = node.aa_transitions_.display(pos, AA_Transitions::show_empty_left::yes); !rep.empty())
                 fmt::print(stderr, "   {:5.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
     });
-    report_common_aa(std::nullopt /*pos*/);
 
 } // acmacs::tal::v3::Tree::report_aa_transitions
 

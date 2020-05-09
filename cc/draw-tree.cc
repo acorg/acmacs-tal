@@ -8,6 +8,7 @@
 void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
     if (stage == 1 && prepared_ < stage) {
+        AD_DEBUG("DrawTree::prepare");
         tal().tree().set_first_last_next_node_id();
 
         tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
@@ -15,9 +16,12 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
                 coloring().prepare(leaf);
         });
         coloring().prepare();
+        AD_INFO("tree {}", coloring().report());
 
-        // AD_DEBUG("common aa");
-        // tal().tree().report_common_aa();
+        if (parameters().aa_transitions.report) {
+            tal().tree().report_common_aa(parameters().aa_transitions.pos, parameters().aa_transitions.number_leaves_threshold);
+            tal().tree().report_aa_transitions(parameters().aa_transitions.pos, parameters().aa_transitions.number_leaves_threshold);
+        }
     }
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
@@ -45,14 +49,14 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                 surface.line({horizontal_step_ * (leaf.cumulative_edge_length - leaf.edge_length).as_number(), vertical_step() * leaf.cumulative_vertical_offset_},
                              {horizontal_step_ * leaf.cumulative_edge_length.as_number(), vertical_step() * leaf.cumulative_vertical_offset_}, leaf.color_edge_line,
                              line_width * leaf.edge_line_width_scale);
-                const auto label_size = text_size.value() * leaf.label_scale;
+                const auto label_size = text_size * leaf.label_scale;
                 const auto label_color = leaf.label_color.has_value() ? *leaf.label_color : coloring().color(leaf);
-                surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + label_size * 0.3},
-                             std::string{leaf.seq_id}, label_color, Scaled{label_size});
+                surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + *label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + *label_size * 0.3},
+                             std::string{leaf.seq_id}, label_color, label_size);
             }
         },
         // pre
-        [&surface, this, line_width, vertical_additon = line_width.value() / 2.0](const Node& node) {
+        [&surface, this, line_width, vertical_additon = line_width.value() / 2.0, &text_size](const Node& node) {
             if (!node.hidden) {
                 if (const auto shown_children = node.shown_children(); !shown_children.empty()) {
                     surface.line({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number(), vertical_step() * node.cumulative_vertical_offset_},
@@ -62,6 +66,9 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                     surface.line({horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.front()->cumulative_vertical_offset_ - vertical_additon},
                                  {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.back()->cumulative_vertical_offset_ + vertical_additon}, BLACK,
                                  line_width);
+
+                    surface.text({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *text_size, vertical_step() * node.cumulative_vertical_offset_ - *line_width},
+                                 fmt::format("{}", node.node_id), BLACK, text_size);
                 }
                 else
                     AD_WARNING("node is not hidden but all ist children are hidden {} total children: {}", node.node_id, node.subtree.size());
@@ -72,8 +79,6 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
         draw_aa_transitions->draw_transitions(surface, *this);
     if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
         draw_on_tree->draw_on_tree(surface, *this);
-
-    AD_INFO("tree {}", coloring().report());
 
 } // acmacs::tal::v3::DrawTree::draw
 

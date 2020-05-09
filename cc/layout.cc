@@ -143,11 +143,26 @@ size_t acmacs::tal::v3::Layout::index_of(const LayoutElement* look_for) const
 
 // ----------------------------------------------------------------------
 
-const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(bool throw_error) const
+const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(throw_error te) const
 {
     if (const auto* draw_tree = find<DrawTree>(); draw_tree)
         return draw_tree;
-    else if (throw_error)
+    else if (te == throw_error::yes)
+        throw error{"No tree section in the layout"};
+    else {
+        AD_WARNING("No tree section in the layout");
+        return nullptr;
+    }
+
+} // acmacs::tal::v3::Layout::find_draw_tree
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find_draw_tree(throw_error te)
+{
+    if (auto* draw_tree = find<DrawTree>(); draw_tree)
+        return draw_tree;
+    else if (te == throw_error::yes)
         throw error{"No tree section in the layout"};
     else {
         AD_WARNING("No tree section in the layout");

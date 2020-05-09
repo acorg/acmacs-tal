@@ -81,18 +81,19 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         // printenv();
         if (name == "antigenic-maps"sv)
             antigenic_maps();
-         else if (name == "aa-transitions"sv) {
+        else if (name == "aa-transitions"sv) {
             // Timeit time_update_common_aa(">>>> update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_common_aa();
             // time_update_common_aa.report();
             // Timeit time_update_aa_transitions(">>>> update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
             tree().update_aa_transitions();
             // time_update_aa_transitions.report();
-            if (getenv("report"sv, false)) {
-                std::optional<seqdb::pos1_t> pos;
+            if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree && getenv("report"sv, false)) {
+                auto& param = draw_tree->parameters().aa_transitions;
+                param.report = true;
                 if (const auto& pos_v = getenv("pos"sv); !pos_v.is_null())
-                    pos = pos_v.to<seqdb::pos1_t>();
-                tree().report_aa_transitions(pos);
+                    param.pos = pos_v.to<seqdb::pos1_t>();
+                param.number_leaves_threshold = getenv("number_leaves_threshold"sv, 20);
             }
         }
         else if (name == "clades-reset"sv)
