@@ -22,9 +22,10 @@ namespace acmacs::tal::inline v3
 
         struct AATransitionsParameters
         {
+            bool calculate{false};
             bool report{false};
-            std::optional<seqdb::pos1_t> pos;
-            size_t number_leaves_threshold{20};
+            std::optional<seqdb::pos1_t> report_pos;
+            size_t report_number_leaves_threshold{20};
         };
 
         struct Parameters

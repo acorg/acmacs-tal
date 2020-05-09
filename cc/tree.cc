@@ -25,9 +25,9 @@ const acmacs::tal::v3::Node& acmacs::tal::v3::Node::find_first_leaf() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Node::remove_aa_transition(seqdb::pos0_t pos, char right) const
+void acmacs::tal::v3::Node::remove_aa_transition(seqdb::pos0_t pos, char right)
 {
-    auto remove = [pos,right](const Node& node) -> bool {
+    auto remove = [pos,right](Node& node) -> bool {
         const bool present_any = node.aa_transitions_.find(pos);
         node.aa_transitions_.remove(pos, right);
         return !present_any;
@@ -63,6 +63,7 @@ void acmacs::tal::v3::Tree::erase()
 void acmacs::tal::v3::Tree::cumulative_calculate(bool recalculate) const
 {
     if (recalculate || cumulative_edge_length == EdgeLengthNotSet) {
+        Timeit time1(">>>> cumulative_calculate: ", report_time::no);
         EdgeLength cumulative{0.0};
         const auto leaf = [&cumulative](const Node& node) { node.cumulative_edge_length = cumulative + node.edge_length; };
         const auto pre = [&cumulative](const Node& node) {
@@ -453,7 +454,7 @@ void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
             node.hidden = true;
     });
 
-    structure_modified_ = true;
+    structure_modified("hiding node");
 
 } // acmacs::tal::v3::Tree::hide
 
@@ -592,6 +593,7 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 
         tree::iterate_leaf_pre_post(*this, leaf, pre, post);
         structure_modified_ = false;
+        // AD_DEBUG("structure_modified_ <- false");
     }
 
 } // acmacs::tal::v3::Tree::set_first_last_next_node_id
@@ -679,7 +681,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
     }
 
     // AD_DEBUG("ladderized");
-    structure_modified_ = true;
+    structure_modified("ladderizing");
 
 } // acmacs::tal::v3::Tree::ladderize
 
@@ -772,7 +774,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
         cumulative_calculate(true);
 
     // AD_DEBUG("re-rooted");
-    structure_modified_ = true;
+    structure_modified("re_root");
 
 } // acmacs::tal::v3::Tree::re_root
 
@@ -807,10 +809,10 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::update_common_aa() const
+void acmacs::tal::v3::Tree::update_common_aa()
 {
-    tree::iterate_post(*this, [this](const Node& node) {
-        for (const auto& child : node.subtree) {
+    tree::iterate_post(*this, [this](Node& node) {
+        for (auto& child : node.subtree) {
             if (!child.hidden) {
                 if (child.is_leaf()) {
                     node.common_aa_.update(child.aa_sequence);
@@ -841,11 +843,12 @@ void acmacs::tal::v3::Tree::report_common_aa(std::optional<seqdb::pos1_t> pos_to
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::update_aa_transitions() const
+void acmacs::tal::v3::Tree::update_aa_transitions()
 {
-    Timeit time1(">>>> update_aa_transitions cumulative_calculate: ", report_time::no);
+    AD_DEBUG("update_aa_transitions");
+
     cumulative_calculate();
-    time1.report();
+    update_common_aa();
 
     const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
         if (node.is_leaf())
@@ -855,11 +858,11 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
     };
 
     Timeit time2(">>>> update_aa_transitions counting: ", report_time::no);
-    tree::iterate_post(*this, [aa_at, this](const Node& node) {
+    tree::iterate_post(*this, [aa_at, this](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence_; ++pos) {
             if (node.common_aa_.is_no_common(pos)) {
                 CounterChar counter;
-                for (const auto& child : node.subtree) {
+                for (auto& child : node.subtree) {
                     if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
                         child.aa_transitions_.add(pos, aa);
                         counter.count(aa);
@@ -868,8 +871,8 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
                         counter.count(found->right);
                     }
                 }
-                // if (pos == seqdb::pos1_t{484})
-                //     AD_DEBUG("node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", node.node_id, node.number_leaves_in_subtree(), pos, counter);
+                if (pos == seqdb::pos1_t{193})
+                    AD_DEBUG("update_aa_transitions-193 node:{:4.3s} leaves:{:4d} pos:{:3d} counter: {}", node.node_id, node.number_leaves_in_subtree(), pos, counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
@@ -888,7 +891,7 @@ void acmacs::tal::v3::Tree::update_aa_transitions() const
 
     Timeit time4(">>>> update_aa_transitions left part: ", report_time::no);
     // add left part to aa transitions (Derek's algorithm)
-    auto add_left_part = [&sorted_leaf_nodes](const Node& node) {
+    auto add_left_part = [&sorted_leaf_nodes](Node& node) {
         if (!node.aa_transitions_.empty()) {
             const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
 

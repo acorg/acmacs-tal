@@ -101,9 +101,6 @@
         {"?N": "if", "condition": {"empty": "{virus-type}"}, "then": [{"N": "warning", "message": "no virus type inferred from the tree"}]},
         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
         {"N": "ladderize", "method": "{ladderize-method}"},
-        {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
-            {"N": "aa-transitions", "report": false}
-        ]},
 
         {"?N": ""}
     ],

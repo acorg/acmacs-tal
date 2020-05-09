@@ -9,6 +9,7 @@
 void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 {
     if (!prepared_) {
+        AD_DEBUG("DrawAATransitions::prepare");
         tree::iterate_pre(tal().tree(), [this](const Node& node) {
             if (!node.hidden && node.number_leaves_in_subtree() >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
                 const auto node_id = fmt::format("{}", node.node_id);

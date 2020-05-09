@@ -119,9 +119,9 @@ namespace acmacs::tal::inline v3
         mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
 
         // middle node only
-        mutable CommonAA common_aa_;
-        mutable AA_Transitions aa_transitions_;
-        mutable const Node* node_for_left_aa_transitions_{nullptr};
+        CommonAA common_aa_;
+        AA_Transitions aa_transitions_;
+        const Node* node_for_left_aa_transitions_{nullptr};
         Subtree to_populate; // populate_with_nuc_duplicates()
 
         // -------------------- drawing support --------------------
@@ -133,7 +133,7 @@ namespace acmacs::tal::inline v3
         {
             return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); }));
         }
-        void remove_aa_transition(seqdb::pos0_t pos, char right) const;
+        void remove_aa_transition(seqdb::pos0_t pos, char right);
         std::vector<const Node*> shown_children() const;
 
         void hide();
@@ -248,9 +248,8 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        void update_common_aa() const;
         void report_common_aa(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
-        void update_aa_transitions() const;
+        void update_aa_transitions();
         void report_aa_transitions(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
 
         // ----------------------------------------------------------------------
@@ -312,12 +311,16 @@ namespace acmacs::tal::inline v3
                             const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
         double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
 
+        void structure_modified(std::string_view on_action) { structure_modified_ = true; } // AD_DEBUG("structure_modified: {}", on_action);
+
+        void update_common_aa();
+
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
         clades_t clades_;
         mutable bool chart_matched_{false};
-        mutable seqdb::pos0_t longest_sequence_{0};
+        seqdb::pos0_t longest_sequence_{0};
         bool structure_modified_{true};
 
     }; // class Tree

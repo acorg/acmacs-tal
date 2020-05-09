@@ -82,19 +82,16 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         if (name == "antigenic-maps"sv)
             antigenic_maps();
         else if (name == "aa-transitions"sv) {
-            // Timeit time_update_common_aa(">>>> update_common_aa: ", verb == verbose::yes ? report_time::yes : report_time::no);
-            tree().update_common_aa();
-            // time_update_common_aa.report();
-            // Timeit time_update_aa_transitions(">>>> update_aa_transitions: ", verb == verbose::yes ? report_time::yes : report_time::no);
-            tree().update_aa_transitions();
-            // time_update_aa_transitions.report();
-            if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree && getenv("report"sv, false)) {
+            if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree) {
                 auto& param = draw_tree->parameters().aa_transitions;
-                param.report = true;
+                param.calculate = true;
+                param.report = getenv("report"sv, false);
                 if (const auto& pos_v = getenv("pos"sv); !pos_v.is_null())
-                    param.pos = pos_v.to<seqdb::pos1_t>();
-                param.number_leaves_threshold = getenv("number_leaves_threshold"sv, 20);
+                    param.report_pos = pos_v.to<seqdb::pos1_t>();
+                param.report_number_leaves_threshold = getenv("number_leaves_threshold"sv, 20ul);
             }
+            else
+                AD_WARNING("\"aa-transitions\" requested but no darw_tree found");
         }
         else if (name == "clades-reset"sv)
             tree().clades_reset();
@@ -1016,6 +1013,9 @@ void acmacs::tal::v3::Settings::add_legend()
 void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 {
     using namespace std::string_view_literals;
+
+    if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree)
+        draw_tree->parameters().aa_transitions.calculate = true;
 
     auto& element = add_element<DrawAATransitions>();
     auto& param = element.parameters();
