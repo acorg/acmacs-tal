@@ -24,6 +24,7 @@ namespace acmacs::tal::inline v3
         virtual void prepare() {} // to be called after coloring prepare(Node) for each node
         virtual Color color(const Node& node) const = 0;
         virtual std::string report() const = 0;
+        virtual std::string_view legend_type() const { return "none"; }
     };
 
     // ----------------------------------------------------------------------
@@ -50,6 +51,7 @@ namespace acmacs::tal::inline v3
         ColoringByContinent() : colors_{continent_colors_dark()} {}
         Color color(const Node& node) const override;
         std::string report() const override;
+        std::string_view legend_type() const override { return "world-map"; }
 
         void set(std::string_view continent, Color color) { colors_.emplace_or_replace(continent, color); }
 
@@ -73,6 +75,7 @@ namespace acmacs::tal::inline v3
         void prepare() override; // to be called after coloring prepare(Node) for each node
         Color color(const Node& node) const override;
         std::string report() const override;
+        std::string_view legend_type() const override { return "color-by-pos"; }
         acmacs::seqdb::pos1_t pos() const { return pos_; }
         constexpr const auto& colors() const { return colors_; }
         void add_color(Color color) { color_order_.push_back(color); }

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-09 17:15:36 eu>
+# Time-stamp: <2020-05-11 10:48:54 eu>
 
 * Command line defines
 
@@ -140,12 +140,34 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Tree
 
-{"N": "tree", "id": "<id>", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
-{"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
- "all": {"node_id": "", "label": {<[[Label parameters]]>}},
- "per_node": [
- ]
-},
+#+BEGIN_SRC json
+  {"N": "tree", "id": "<id>", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>,
+   "legend": { "?type": "world-map|color-by-pos", # type inferred from "color-by"
+               "offset": [0.0, 0.9], # relative to tree
+               "size": 0.1,
+               "world-map": {  # world map specific
+                               "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
+                               "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
+                               "dots": [ # -- placement is *very* approximate due to world map layout is not correct
+                                         {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
+                                         {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
+                                       ]
+                            },
+               "color-by-pos": { # color by pos specific
+                                 "size": 0.05 # font size relative to height
+                               }
+             }
+  },
+#+END_SRC
+
+
+#+BEGIN_SRC json
+  {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
+   "all": {"node_id": "", "label": {<[[Label parameters]]>}},
+   "per_node": [
+   ],
+  },
+#+END_SRC
 
 *** Time series
 
@@ -244,14 +266,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Legend
 
-{"N": "legend", "type": "world-map", "offset": [0.0, 0.9], "size": 0.1,
- "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
- "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
- "dots": [ -- palcement is *very* approximate due to world map layout is not correct
-     {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
-     {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
- ]
-}
+"legend" is deprecated! "legend" must be inside "tree"
 
 *** Draw on tree
 

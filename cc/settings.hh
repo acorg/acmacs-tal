@@ -11,7 +11,6 @@
 namespace acmacs::tal::inline v3
 {
     class TimeSeries;
-    class LayoutElement;
 
     class Settings : public acmacs::settings::Settings
     {
@@ -40,22 +39,26 @@ namespace acmacs::tal::inline v3
         void ladderize();
         void margins();
         void outline(DrawOutline& draw_outline);
-        void process_color_by(LayoutElementWithColoring& element);
+
         void add_gap();
-        void add_tree();
-        void add_time_series();
         void add_clades();
         void add_dash_bar();
         void add_dash_bar_clades();
         void add_title();
-        void add_legend();
-        void add_draw_aa_transitions();
-        void add_draw_on_tree();
+        void add_legend();      // deprecated!
         void hz_sections();
         void hz_section_marker();
         void antigenic_maps();
 
+        void add_tree();
+        void process_color_by(LayoutElementWithColoring& element);
+        void process_tree_legend(DrawTree& tree);
+        void add_draw_aa_transitions();
+        void add_draw_on_tree();
+
+        void add_time_series();
         void process_legend(TimeSeries& time_series);
+
         void read_dash_parameters(LayoutElement::DashParameters& param);
         void read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param);
         void read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters);

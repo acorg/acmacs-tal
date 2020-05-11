@@ -233,6 +233,7 @@ namespace acmacs::tal::inline v3
         LayoutElementWithColoring(Tal& tal, double width_to_height_ratio) : LayoutElement(tal, width_to_height_ratio), coloring_{std::make_unique<ColoringUniform>(CYAN)} {}
 
         void coloring(std::unique_ptr<Coloring> coloring) { coloring_ = std::move(coloring); }
+        std::string_view legend_type() const { return coloring_ ? coloring_->legend_type() : std::string_view{"none"}; }
 
       protected:
         // Color color(const Node& node) const { return coloring_->color(node); }
