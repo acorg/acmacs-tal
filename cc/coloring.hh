@@ -78,6 +78,7 @@ namespace acmacs::tal::inline v3
         std::string_view legend_type() const override { return "color-by-pos"; }
         acmacs::seqdb::pos1_t pos() const { return pos_; }
         constexpr const auto& colors() const { return colors_; }
+        size_t total_count() const;
         void add_color(Color color) { color_order_.push_back(color); }
 
       private:

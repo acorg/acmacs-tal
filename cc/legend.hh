@@ -19,6 +19,7 @@ namespace acmacs::tal::inline v3
     };
 
     class Tal;
+    class Coloring;
 
     class Legend
     {
@@ -26,7 +27,7 @@ namespace acmacs::tal::inline v3
         Legend() = default;
         virtual ~Legend() = default;
 
-        virtual void draw(acmacs::surface::Surface& surface) const = 0;
+        virtual void draw(acmacs::surface::Surface& surface, const Coloring& coloring) const = 0;
 
         // ----------------------------------------------------------------------
 
@@ -51,7 +52,7 @@ namespace acmacs::tal::inline v3
       public:
         using Legend::Legend;
 
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, const Coloring& coloring) const override;
 
         struct Parameters : public Legend::Parameters
         {
@@ -76,11 +77,16 @@ namespace acmacs::tal::inline v3
       public:
         using Legend::Legend;
 
-        void draw(acmacs::surface::Surface& surface) const override;
+        void draw(acmacs::surface::Surface& surface, const Coloring& coloring) const override;
 
         struct Parameters : public Legend::Parameters
         {
-            Scaled size{0.05};
+            Scaled text_size{0.05};
+            double interleave{0.5}; // line distance, relative to text_size
+            Color title_color{BLACK};
+            bool show_count{true};
+            double count_scale{0.3};
+            Color count_color{GREY};
         };
 
         constexpr Parameters& parameters() { return parameters_; }

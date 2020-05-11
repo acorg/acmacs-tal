@@ -98,7 +98,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
     if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
         draw_on_tree->draw_on_tree(surface, *this);
     if (legend_)
-        legend_->draw(surface);
+        legend_->draw(surface, coloring());
 
 } // acmacs::tal::v3::DrawTree::draw
 

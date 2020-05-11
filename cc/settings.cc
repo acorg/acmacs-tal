@@ -133,7 +133,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "ladderize"sv)
             ladderize();
         else if (name == "legend"sv)
-            add_legend();       // deprecated! use inside "tree"
+            AD_WARNING("\"legend\" is deprecated! use \"legend\" inside \"tree\"");
         else if (name == "margins"sv)
             margins();
         else if (name == "nodes"sv)
@@ -537,13 +537,13 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
         tree.legend(std::move(legend));
     }
     else if (legend_type == "color-by-pos"sv) {
-        AD_DEBUG("legend: color_by-pos");
+        // AD_DEBUG("legend: color_by-pos");
         auto legend{std::make_unique<LegendColoredByPos>()};
         auto& param = legend->parameters();
         param.show = rjson::v3::get_or(legend_v, "show"sv, true); // shown by default
         extract_coordinates(legend_v["offset"sv], param.offset);
         if (const auto& color_by_pos = legend_v["color-by-pos"sv]; !color_by_pos.is_null()) {
-            rjson::v3::copy_if_not_null(color_by_pos["size"sv], param.size);
+            rjson::v3::copy_if_not_null(color_by_pos["text-size"sv], param.text_size);
         }
         tree.legend(std::move(legend));
     }
@@ -555,33 +555,6 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
     }
 
 } // acmacs::tal::v3::Settings::process_tree_legend
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Settings::add_legend()
-{
-    using namespace std::string_view_literals;
-
-    AD_WARNING("\"legend\" is deprecated! use \"legend\" inside \"tree\"");
-
-    // std::string legend_type{"world-map"};
-    // getenv_copy_if_present("type"sv, legend_type);
-
-    // if (legend_type == "world-map"sv) {
-    //     auto& element = add_element<LegendContinentMap>();
-    //     auto& param = element.parameters();
-    //     param.show = getenv("show"sv, true);
-    //     extract_coordinates(getenv("offset"sv), param.offset);
-    //     getenv_extract_copy_if_present<double>("size"sv, param.size);
-    //     read_line_parameters(getenv("equator"sv), param.equator);
-    //     read_line_parameters(getenv("tropics"sv), param.tropics);
-    //     for (const rjson::v3::value& for_dot : getenv("dots"sv).array())
-    //         read_dot_parameters(for_dot, param.dots.emplace_back());
-    // }
-    // else
-    //     AD_WARNING("unrecognized legend type: \"{}\"", legend_type);
-
-} // acmacs::tal::v3::Settings::add_legend
 
 // ----------------------------------------------------------------------
 

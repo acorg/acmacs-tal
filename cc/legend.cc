@@ -1,9 +1,10 @@
 #include "acmacs-draw/continent-map.hh"
 #include "acmacs-tal/legend.hh"
+#include "acmacs-tal/coloring.hh"
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface, const Coloring&) const
 {
     if (parameters().show) {
         auto& map_surface = surface.subsurface(parameters().offset, parameters().size, continent_map_size(), false);
@@ -34,8 +35,28 @@ void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface) const
+void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface, const Coloring& coloring) const
 {
+    if (parameters().show) {
+        if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPos*>(&coloring); coloring_by_pos) {
+            auto origin = parameters().offset + Size{0.0, *parameters().text_size};
+            surface.text(origin, fmt::format("{}", coloring_by_pos->pos()), parameters().title_color, parameters().text_size);
+            const auto total_percent = static_cast<double>(coloring_by_pos->total_count()) / 100.0;
+            const auto count_text_size{parameters().text_size * parameters().count_scale};
+            for (const auto& [aa, color_count] : coloring_by_pos->colors()) {
+                origin.y(origin.y() + *parameters().text_size * (1.0 + parameters().interleave));
+                const auto aa_t{fmt::format("{}", aa)};
+                surface.text(origin, aa_t, color_count.color, parameters().text_size);
+                if (parameters().show_count) {
+                    const auto [aa_height, aa_width] = surface.text_size(aa_t, parameters().text_size);
+                    surface.text({origin.x() + aa_width * 1.1, origin.y() - aa_height + *count_text_size * 0.5}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), parameters().count_color, count_text_size);
+                    surface.text({origin.x() + aa_width * 1.1, origin.y()}, fmt::format("{}", color_count.count), parameters().count_color, count_text_size);
+                }
+            }
+        }
+        else
+            AD_WARNING("legend with coloring by pos requested but tree is not colored by pos, cannot obtain data for the legend");
+    }
 
 } // acmacs::tal::v3::LegendColoredByPos::draw
 

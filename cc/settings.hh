@@ -50,7 +50,6 @@ namespace acmacs::tal::inline v3
         void add_dash_bar();
         void add_dash_bar_clades();
         void add_title();
-        void add_legend();      // deprecated!
         void hz_sections();
         void hz_section_marker();
         void antigenic_maps();

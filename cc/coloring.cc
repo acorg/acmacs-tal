@@ -89,11 +89,20 @@ Color acmacs::tal::v3::ColoringByPos::color(const Node& node) const
 
 // ----------------------------------------------------------------------
 
+size_t acmacs::tal::v3::ColoringByPos::total_count() const
+{
+    return std::accumulate(std::begin(colors_), std::end(colors_), 0ul, [](size_t sum, const auto& color_count) { return sum + color_count.second.count; });
+
+} // acmacs::tal::v3::ColoringByPos::total_count
+
+// ----------------------------------------------------------------------
+
 std::string acmacs::tal::v3::ColoringByPos::report() const
 {
     std::string result = fmt::format("coloring by AA at {}:\n", pos_);
+    const auto total = static_cast<double>(total_count());
     for (const auto& [aa, color_count] : colors_)
-        result += fmt::format("  {}  {:12s} {:6d}\n", aa, fmt::format("\"{}\"", color_count.color), color_count.count);
+        result += fmt::format("  {}  {:12s} {:6d} {:4.1f}%\n", aa, fmt::format("\"{}\"", color_count.color), color_count.count, static_cast<double>(color_count.count) / total * 100.0);
     return result;
 
 } // acmacs::tal::v3::ColoringByPos::report
