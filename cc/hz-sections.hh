@@ -49,7 +49,7 @@ namespace acmacs::tal::inline v3
         {
             bool report{true};
             std::vector<SectionParameters> sections;
-            LineParameters line{GREY, Pixels{1.0}, surface::Dash::NoDash};
+            parameters::Line line{GREY, Pixels{1.0}, surface::Dash::NoDash};
             double tree_top_gap{50.0}, tree_bottom_gap{50.0};
 
             SectionParameters& find_add_section(std::string_view id) { return HzSections::find_add_section(sections, id); }
@@ -97,7 +97,7 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
-            LineParameters line{BLACK, Pixels{1.0}, surface::Dash::NoDash};
+            parameters::Line line{BLACK, Pixels{1.0}, surface::Dash::NoDash};
             Pixels label_size{11};
             Color label_color{BLACK};
         };

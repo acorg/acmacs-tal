@@ -193,7 +193,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         }
         else if (key == "line"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
-                LayoutElement::LineWithOffsetParameters line;
+                parameters::LineWithOffset line;
                 read_line_parameters(value, line);
                 for (Node* node : selected)
                     draw_on_tree->parameters().per_node.push_back({node->seq_id, {}, line});
@@ -219,7 +219,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         }
         else if (key == "text"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
-                LayoutElement::TextParameters text;
+                parameters::Text text;
                 read_text_parameters(value, text);
                 for (Node* node : selected)
                     draw_on_tree->parameters().per_node.push_back({node->seq_id, text, {}});
@@ -447,6 +447,17 @@ void acmacs::tal::v3::Settings::clade() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Settings::add_tree()
+{
+    auto& tree_element = add_element<DrawTree>();
+    process_color_by(tree_element);
+    process_tree_legend(tree_element);
+    add_element<HzSections>();
+
+} // acmacs::tal::v3::Settings::add_tree
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& element)
 {
     using namespace std::string_view_literals;
@@ -509,18 +520,38 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
 {
     using namespace std::string_view_literals;
 
-    if (const auto& legend_v = getenv("legend"sv); !legend_v.is_null()) {
-        if (const auto legend_type = rjson::v3::get_or(legend_v, "type"sv, tree.legend_type()); legend_type == "world-map"sv) {
+    const auto& legend_v = getenv("legend"sv);
+    if (const auto legend_type = rjson::v3::get_or(legend_v, "type"sv, tree.legend_type()); legend_type == "world-map"sv) {
+        // AD_DEBUG("legend: world-map");
+        auto legend{std::make_unique<LegendContinentMap>()};
+        auto& param = legend->parameters();
+        param.show = rjson::v3::get_or(legend_v, "show"sv, true); // shown by default
+        extract_coordinates(legend_v["offset"sv], param.offset);
+        if (const auto& world_map = legend_v["world-map"sv]; !world_map.is_null()) {
+            rjson::v3::copy_if_not_null(world_map["size"sv], param.size);
+            read_line_parameters(world_map["equator"sv], param.equator);
+            read_line_parameters(world_map["tropics"sv], param.tropics);
+            for (const rjson::v3::value& for_dot : world_map["dots"sv].array())
+                read_dot_parameters(for_dot, param.dots.emplace_back());
         }
-        else if (legend_type == "color-by-pos"sv) {
+        tree.legend(std::move(legend));
+    }
+    else if (legend_type == "color-by-pos"sv) {
+        AD_DEBUG("legend: color_by-pos");
+        auto legend{std::make_unique<LegendColoredByPos>()};
+        auto& param = legend->parameters();
+        param.show = rjson::v3::get_or(legend_v, "show"sv, true); // shown by default
+        extract_coordinates(legend_v["offset"sv], param.offset);
+        if (const auto& color_by_pos = legend_v["color-by-pos"sv]; !color_by_pos.is_null()) {
+            rjson::v3::copy_if_not_null(color_by_pos["size"sv], param.size);
         }
-        else if (legend_type == "none"sv) {
-            // show = false;
-        }
-        else {
-            AD_WARNING("unrecognized legend type \"{}\", tree lgend not shown", legend_type);
-            // show = false;
-        }
+        tree.legend(std::move(legend));
+    }
+    else if (legend_type == "none"sv) {
+        // AD_DEBUG("legend: none");
+    }
+    else {
+        AD_WARNING("unrecognized legend type \"{}\", tree lgend not shown", legend_type);
     }
 
 } // acmacs::tal::v3::Settings::process_tree_legend
@@ -533,22 +564,22 @@ void acmacs::tal::v3::Settings::add_legend()
 
     AD_WARNING("\"legend\" is deprecated! use \"legend\" inside \"tree\"");
 
-    std::string legend_type{"world-map"};
-    getenv_copy_if_present("type"sv, legend_type);
+    // std::string legend_type{"world-map"};
+    // getenv_copy_if_present("type"sv, legend_type);
 
-    if (legend_type == "world-map"sv) {
-        auto& element = add_element<LegendContinentMap>();
-        auto& param = element.parameters();
-        param.show = getenv("show"sv, true);
-        extract_coordinates(getenv("offset"sv), param.offset);
-        getenv_extract_copy_if_present<double>("size"sv, param.size);
-        read_line_parameters(getenv("equator"sv), param.equator);
-        read_line_parameters(getenv("tropics"sv), param.tropics);
-        for (const rjson::v3::value& for_dot : getenv("dots"sv).array())
-            read_dot_parameters(for_dot, param.dots.emplace_back());
-    }
-    else
-        AD_WARNING("unrecognized legend type: \"{}\"", legend_type);
+    // if (legend_type == "world-map"sv) {
+    //     auto& element = add_element<LegendContinentMap>();
+    //     auto& param = element.parameters();
+    //     param.show = getenv("show"sv, true);
+    //     extract_coordinates(getenv("offset"sv), param.offset);
+    //     getenv_extract_copy_if_present<double>("size"sv, param.size);
+    //     read_line_parameters(getenv("equator"sv), param.equator);
+    //     read_line_parameters(getenv("tropics"sv), param.tropics);
+    //     for (const rjson::v3::value& for_dot : getenv("dots"sv).array())
+    //         read_dot_parameters(for_dot, param.dots.emplace_back());
+    // }
+    // else
+    //     AD_WARNING("unrecognized legend type: \"{}\"", legend_type);
 
 } // acmacs::tal::v3::Settings::add_legend
 
@@ -565,17 +596,6 @@ void acmacs::tal::v3::Settings::add_gap()
         param.pixels = pixels_value.to<double>();
 
 } // acmacs::tal::v3::Settings::add_gap
-
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::Settings::add_tree()
-{
-    auto& tree_element = add_element<DrawTree>();
-    process_color_by(tree_element);
-    process_tree_legend(tree_element);
-    add_element<HzSections>();
-
-} // acmacs::tal::v3::Settings::add_tree
 
 // ----------------------------------------------------------------------
 
@@ -714,7 +734,7 @@ void acmacs::tal::v3::Settings::process_legend(TimeSeries& time_series)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_dash_parameters(LayoutElement::DashParameters& param)
+void acmacs::tal::v3::Settings::read_dash_parameters(parameters::Dash& param)
 {
     using namespace std::string_view_literals;
 
@@ -850,7 +870,7 @@ void acmacs::tal::v3::Settings::antigenic_maps()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param)
+void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& source, parameters::Label& param)
 {
     using namespace std::string_view_literals;
 
@@ -859,21 +879,21 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
         rjson::v3::copy_if_not_null(substitute_to_value(source["scale"sv]), param.scale);
         if (const auto& position_v = substitute_to_value(source["vertical_position"sv]); !position_v.is_null()) {
             if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
-                param.vpos = Clades::vertical_position::middle;
+                param.vpos = parameters::vertical_position::middle;
             else if (position == "top"sv)
-                param.vpos = Clades::vertical_position::top;
+                param.vpos = parameters::vertical_position::top;
             else if (position == "bottom"sv)
-                param.vpos = Clades::vertical_position::bottom;
+                param.vpos = parameters::vertical_position::bottom;
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
         if (const auto& position_v = substitute_to_value(source["horizontal_position"sv]); !position_v.is_null()) {
             if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
-                param.hpos = Clades::horizontal_position::middle;
+                param.hpos = parameters::horizontal_position::middle;
             else if (position == "left"sv)
-                param.hpos = Clades::horizontal_position::left;
+                param.hpos = parameters::horizontal_position::left;
             else if (position == "right"sv)
-                param.hpos = Clades::horizontal_position::right;
+                param.hpos = parameters::horizontal_position::right;
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
@@ -957,7 +977,7 @@ void acmacs::tal::v3::Settings::add_title()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_text_parameters(const rjson::v3::value& source, LayoutElement::TextParameters& text_parameters) const
+void acmacs::tal::v3::Settings::read_text_parameters(const rjson::v3::value& source, parameters::Text& text_parameters) const
 {
     using namespace std::string_view_literals;
 
@@ -973,7 +993,7 @@ void acmacs::tal::v3::Settings::read_text_parameters(const rjson::v3::value& sou
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, LayoutElement::LineParameters& line_parameters) const
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, parameters::Line& line_parameters) const
 {
     using namespace std::string_view_literals;
 
@@ -998,12 +1018,12 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& sou
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const
+void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& source, parameters::LineWithOffset& line_parameters) const
 {
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        read_line_parameters(source, static_cast<LayoutElement::LineParameters&>(line_parameters));
+        read_line_parameters(source, static_cast<parameters::Line&>(line_parameters));
         extract_coordinates(source["c1"sv], line_parameters.offset[0]);
         extract_coordinates(source["c2"sv], line_parameters.offset[1]);
         rjson::v3::copy_if_not_null(source["absolute_x"sv], line_parameters.absolute_x);
@@ -1013,7 +1033,7 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& sou
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::v3::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const
+void acmacs::tal::v3::Settings::read_dot_parameters(const rjson::v3::value& source, parameters::WorldMapDot& dot_parameters) const
 {
     using namespace std::string_view_literals;
 

@@ -19,13 +19,13 @@ namespace acmacs::tal::inline v3
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
 
-        void add_horizontal_line_above(const Node* node, const LineParameters& line, bool warn_if_present);
+        void add_horizontal_line_above(const Node* node, const parameters::Line& line, bool warn_if_present);
 
         // ----------------------------------------------------------------------
 
-        struct SlotSeparatorParameters : LineParameters
+        struct SlotSeparatorParameters : parameters::Line
         {
-            SlotSeparatorParameters() : LineParameters{BLACK, Pixels{0.5}, surface::Dash::NoDash} {}
+            SlotSeparatorParameters() : parameters::Line{BLACK, Pixels{0.5}, surface::Dash::NoDash} {}
         };
 
         struct SlotLabelParameters
@@ -76,7 +76,7 @@ namespace acmacs::tal::inline v3
         {
             acmacs::time_series::parameters time_series;
             SlotParameters slot;
-            DashParameters dash;
+            parameters::Dash dash;
             small_map_with_unique_keys_t<seq_id_t, PerNodeParameters> per_nodes;
             ColorScaleParameters color_scale;
             std::string report;
@@ -89,11 +89,11 @@ namespace acmacs::tal::inline v3
         Color color_for(date::year_month_day date) const;
 
       private:
-        struct horizontal_line_t : public LineParameters
+        struct horizontal_line_t : public parameters::Line
         {
             const Node* node;
 
-            constexpr horizontal_line_t(const Node* a_node, const LineParameters& a_line) : LineParameters(a_line), node(a_node) {}
+            constexpr horizontal_line_t(const Node* a_node, const parameters::Line& a_line) : parameters::Line(a_line), node(a_node) {}
         };
 
         struct dash_t

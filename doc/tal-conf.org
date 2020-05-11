@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-11 10:48:54 eu>
+# Time-stamp: <2020-05-11 15:17:48 eu>
 
 * Command line defines
 
@@ -144,18 +144,18 @@ If multiple criteria specified within single "select" object, they all used (con
   {"N": "tree", "id": "<id>", "color_by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>,
    "legend": { "?type": "world-map|color-by-pos", # type inferred from "color-by"
                "offset": [0.0, 0.9], # relative to tree
-               "size": 0.1,
-               "world-map": {  # world map specific
-                               "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
-                               "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
-                               "dots": [ # -- placement is *very* approximate due to world map layout is not correct
-                                         {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
-                                         {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
-                                       ]
-                            },
-               "color-by-pos": { # color by pos specific
-                                 "size": 0.05 # font size relative to height
-                               }
+               "world-map": {
+                   "size": 0.1,   # world map width relative to tree height
+                   "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
+                   "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
+                   "dots": [ # placement is *very* approximate due to world map layout is not correct
+                             {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
+                             {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
+                           ]
+               },
+               "color-by-pos": {
+                   "size": 0.05 # font size relative to height
+               }
              }
   },
 #+END_SRC

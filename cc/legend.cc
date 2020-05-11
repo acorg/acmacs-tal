@@ -33,6 +33,13 @@ void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface
 } // acmacs::tal::v3::LegendContinentMap::draw
 
 // ----------------------------------------------------------------------
+
+void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface) const
+{
+
+} // acmacs::tal::v3::LegendColoredByPos::draw
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

@@ -3,6 +3,7 @@
 #include "acmacs-base/debug.hh"
 #include "acmacs-draw/surface.hh"
 #include "acmacs-tal/coloring.hh"
+#include "acmacs-tal/parameters.hh"
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ namespace acmacs::tal::inline v3
     class Clades;
     class DrawAATransitions;
     class Title;
-    class LegendContinentMap;
+    // class LegendContinentMap;
     class Gap;
     class DashBar;
     class DashBarClades;
@@ -68,7 +69,7 @@ namespace acmacs::tal::inline v3
     extern template const Clades* Layout::find<Clades>(const LayoutElementId& id) const;
     extern template const DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id) const;
     extern template const Title* Layout::find<Title>(const LayoutElementId& id) const;
-    extern template const LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id) const;
+    // extern template const LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id) const;
     extern template const Gap* Layout::find<Gap>(const LayoutElementId& id) const;
     extern template const DashBar* Layout::find<DashBar>(const LayoutElementId& id) const;
     extern template const DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id) const;
@@ -82,7 +83,7 @@ namespace acmacs::tal::inline v3
     extern template Clades* Layout::find<Clades>(const LayoutElementId& id);
     extern template DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id);
     extern template Title* Layout::find<Title>(const LayoutElementId& id);
-    extern template LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id);
+    // extern template LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id);
     extern template Gap* Layout::find<Gap>(const LayoutElementId& id);
     extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
     extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
@@ -129,67 +130,6 @@ namespace acmacs::tal::inline v3
 
         constexpr const LayoutElementId& id() const { return id_; }
         void id(const LayoutElementId& a_id) { id_ = a_id; }
-
-        // ----------------------------------------------------------------------
-
-        struct LineParameters
-        {
-            Color color{BLACK};
-            Pixels line_width{1.0};
-            surface::Dash dash{surface::Dash::NoDash};
-        };
-
-        struct LineWithOffsetParameters : public LineParameters
-        {
-            std::array<PointCoordinates, 2> offset{PointCoordinates{0.0, 0.0}, PointCoordinates{0.0, 0.0}}; // relative to node or {absolute_x, node-y}
-            std::optional<double> absolute_x;
-        };
-
-        struct WorldMapDotParameters
-        {
-            PointCoordinates coordinates{0.0, 0.0}; // {lat, long}: {0,0} - middle Africa, {-33.87,151.21} - Sydney, {49.25, -123.1} - Vancouver
-            Color outline{WHITE};
-            Color fill{BLACK};
-            Pixels outline_width{1.0};
-            Pixels size{3.0};
-        };
-
-        enum class vertical_position { top, middle, bottom };
-        enum class horizontal_position { left, middle, right };
-
-        struct LabelTetherParameters
-        {
-            bool show{false};
-            LineParameters line;
-        };
-
-        struct LabelParameters
-        {
-            Color color{BLACK};
-            double scale{0.7}; // relative to parameters_.slot.width
-            vertical_position vpos{vertical_position::middle};
-            horizontal_position hpos{horizontal_position::left};
-            std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
-            std::string text;
-            Rotation rotation{NoRotation};
-            LabelTetherParameters tether;
-            TextStyle text_style;
-        };
-
-        struct DashParameters
-        {
-            double width{0.5}; // fraction of slot width
-            Pixels line_width{0.5};
-        };
-
-        struct TextParameters
-        {
-            std::string text;
-            PointCoordinates offset{0.0, 0.0}; // relative to node or {absolute_x, node-y}
-            std::optional<double> absolute_x;
-            Color color{BLACK};
-            Scaled size{0.007};
-        };
 
       protected:
         preparation_stage_t prepared_{0};

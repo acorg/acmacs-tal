@@ -8,6 +8,7 @@
 namespace acmacs::tal::inline v3
 {
     class Tal;
+    class Legend;
 
     namespace draw_tree
     {
@@ -32,7 +33,7 @@ namespace acmacs::tal::inline v3
     class DrawTree : public LayoutElementWithColoring
     {
       public:
-        DrawTree(Tal& tal) : LayoutElementWithColoring(tal, 0.7) {}
+        DrawTree(Tal& tal);
 
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -43,11 +44,14 @@ namespace acmacs::tal::inline v3
         constexpr draw_tree::Parameters& parameters() { return parameters_; }
         constexpr const draw_tree::Parameters& parameters() const { return parameters_; }
 
+        void legend(std::unique_ptr<Legend>&& a_legend);
+
       private:
         draw_tree::Parameters parameters_;
         const double height_{1.0};
         double vertical_step_{0};
         double horizontal_step_{0};
+        std::unique_ptr<Legend> legend_;
     };
 
     // ----------------------------------------------------------------------
@@ -66,14 +70,14 @@ namespace acmacs::tal::inline v3
         struct PerNodeParameters
         {
             seq_id_t seq_id;
-            TextParameters text;
-            LineWithOffsetParameters line;
+            parameters::Text text;
+            parameters::LineWithOffset line;
         };
 
         struct Parameters
         {
             // bool report{false};
-            std::vector<TextParameters> texts;
+            std::vector<parameters::Text> texts;
             std::vector<PerNodeParameters> per_node;
         };
 

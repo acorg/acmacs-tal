@@ -1,14 +1,30 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tal-data.hh"
+#include "acmacs-tal/legend.hh"
 #include "acmacs-tal/tree-iterate.hh"
 #include "acmacs-tal/draw-aa-transitions.hh"
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::DrawTree::DrawTree(Tal& tal)
+    : LayoutElementWithColoring(tal, 0.7)
+{
+} // acmacs::tal::v3::DrawTree::DrawTree
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::DrawTree::legend(std::unique_ptr<Legend>&& a_legend)
+{
+    legend_ = std::move(a_legend);
+
+} // acmacs::tal::v3::DrawTree::legend
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
     if (stage == 1 && prepared_ < stage) {
-        AD_DEBUG("DrawTree::prepare");
+        // AD_DEBUG("DrawTree::prepare");
         tal().tree().set_first_last_next_node_id();
         if (parameters().aa_transitions.calculate)
             tal().tree().update_aa_transitions(parameters().aa_transitions);
@@ -81,6 +97,8 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
         draw_aa_transitions->draw_transitions(surface, *this);
     if (const auto* draw_on_tree = tal().draw().layout().find<DrawOnTree>(); draw_on_tree)
         draw_on_tree->draw_on_tree(surface, *this);
+    if (legend_)
+        legend_->draw(surface);
 
 } // acmacs::tal::v3::DrawTree::draw
 

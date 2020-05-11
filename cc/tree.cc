@@ -548,7 +548,7 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
 void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 {
     if (structure_modified_) {
-        AD_DEBUG("set_first_last_next_node_id");
+        // AD_DEBUG("set_first_last_next_node_id");
         // Timeit time_set_first_last_next_node_id(">>>> [time] set_first_last_next_node_id: ");
 
         node_id_t::value_type vertical{0};

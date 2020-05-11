@@ -12,6 +12,11 @@ namespace acmacs::tal::inline v3
 {
     class TimeSeries;
 
+    namespace parameters
+    {
+        struct WorldMapDot;
+    };
+
     class Settings : public acmacs::settings::Settings
     {
       public:
@@ -59,14 +64,14 @@ namespace acmacs::tal::inline v3
         void add_time_series();
         void process_legend(TimeSeries& time_series);
 
-        void read_dash_parameters(LayoutElement::DashParameters& param);
-        void read_label_parameters(const rjson::v3::value& source, LayoutElement::LabelParameters& param);
+        void read_dash_parameters(parameters::Dash& param);
+        void read_label_parameters(const rjson::v3::value& source, parameters::Label& param);
         void read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters);
         void read_per_clade(Clades::Parameters& parameters);
-        void read_text_parameters(const rjson::v3::value& source, LayoutElement::TextParameters& text_parameters) const;
-        void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineWithOffsetParameters& line_parameters) const;
-        void read_line_parameters(const rjson::v3::value& source, LayoutElement::LineParameters& line_parameters) const;
-        void read_dot_parameters(const rjson::v3::value& source, LayoutElement::WorldMapDotParameters& dot_parameters) const;
+        void read_text_parameters(const rjson::v3::value& source, parameters::Text& text_parameters) const;
+        void read_line_parameters(const rjson::v3::value& source, parameters::LineWithOffset& line_parameters) const;
+        void read_line_parameters(const rjson::v3::value& source, parameters::Line& line_parameters) const;
+        void read_dot_parameters(const rjson::v3::value& source, parameters::WorldMapDot& dot_parameters) const;
 
         void report_aa_at() const;
 

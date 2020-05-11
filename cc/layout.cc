@@ -82,7 +82,7 @@ template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs
 template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id) const;
-template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id) const;
+// template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
@@ -105,7 +105,7 @@ template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal:
 template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id);
 template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id);
 template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id);
-template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id);
+// template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id);
 template acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);

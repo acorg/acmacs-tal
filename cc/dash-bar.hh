@@ -19,7 +19,7 @@ namespace acmacs::tal::inline v3
         struct Parameters
         {
             bool report{false};
-            DashParameters dash{1.0, Pixels{0.5}}; // width, line_width
+            parameters::Dash dash{1.0, Pixels{0.5}}; // width, line_width
         };
 
     };
@@ -45,7 +45,7 @@ namespace acmacs::tal::inline v3
         struct Parameters : public DashBarBase::Parameters
         {
             std::vector<NodeParameters> for_nodes;
-            std::vector<LabelParameters> labels;
+            std::vector<parameters::Label> labels;
         };
 
         constexpr Parameters& parameters() { return parameters_; }
@@ -71,7 +71,7 @@ namespace acmacs::tal::inline v3
         {
             std::string name;
             Color color{PINK};
-            LabelParameters label{BLACK, 0.01, vertical_position::middle, horizontal_position::left, {-0.002, 0.0}, {}, NoRotation, LabelTetherParameters{}, TextStyle{}};
+            parameters::Label label{BLACK, 0.01, parameters::vertical_position::middle, parameters::horizontal_position::left, {-0.002, 0.0}, {}, NoRotation, parameters::LabelTether{}, TextStyle{}};
         };
 
         struct Parameters : public DashBarBase::Parameters
