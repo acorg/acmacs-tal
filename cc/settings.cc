@@ -544,6 +544,13 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
         extract_coordinates(legend_v["offset"sv], param.offset);
         if (const auto& color_by_pos = legend_v["color-by-pos"sv]; !color_by_pos.is_null()) {
             rjson::v3::copy_if_not_null(color_by_pos["text-size"sv], param.text_size);
+            rjson::v3::copy_if_not_null(color_by_pos["title-color"sv], param.title_color);
+            rjson::v3::copy_if_not_null(color_by_pos["interleave"sv], param.interleave);
+            if (const auto& count_v = color_by_pos["count"sv]; !count_v.is_null()) {
+                rjson::v3::copy_if_not_null(count_v["show"sv], param.show_count);
+                rjson::v3::copy_if_not_null(count_v["scale"sv], param.count_scale);
+                rjson::v3::copy_if_not_null(count_v["color"sv], param.count_color);
+            }
         }
         tree.legend(std::move(legend));
     }

@@ -81,7 +81,8 @@ namespace acmacs::tal::inline v3
 
         struct Parameters : public Legend::Parameters
         {
-            Scaled text_size{0.05};
+            Parameters() : Legend::Parameters{true, {0.0, 0.75}} {}
+            Scaled text_size{0.02};
             double interleave{0.5}; // line distance, relative to text_size
             Color title_color{BLACK};
             bool show_count{true};

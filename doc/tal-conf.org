@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-11 15:52:50 eu>
+# Time-stamp: <2020-05-11 16:33:04 eu>
 
 * Command line defines
 
@@ -155,7 +155,7 @@ If multiple criteria specified within single "select" object, they all used (con
                },
                "color-by-pos": {
                    "text-size": 0.05 # font size relative to height
-               }
+                   "title-color": "black", "count": {"show": true, "scale": 0.3, "color": "grey"}, "interleave": 0.5}
              }
   },
 #+END_SRC
