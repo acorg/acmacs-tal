@@ -54,7 +54,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
             throw ExportError{fmt::format("cannot export to newick: {}", err)};
         }
     }
-    else if (filename == "-" || filename == "=" || ext == ".json") {
+    else if (filename == "/json" || ext == ".json") {
         try {
             exported = json_export(tree);
         }
@@ -70,7 +70,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
             throw ExportError{fmt::format("cannot export to html: {}", err)};
         }
     }
-    else if (ext == ".names") {
+    else if (filename == "/names" || ext == ".names") {
         try {
             exported = names_export(tree);
         }
@@ -80,6 +80,8 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
     }
     else
         throw ExportError{fmt::format("cannot infer export method from filename: {}", filename)};
+    if (filename[0] == '/')
+        filename = std::string_view{"-"};
     acmacs::file::write(filename, exported);
 
 } // acmacs::tal::v3::export_tree
