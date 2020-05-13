@@ -36,7 +36,9 @@ template <typename ElementType, typename... Args> ElementType& acmacs::tal::v3::
 {
     using namespace std::string_view_literals;
     static size_t uniq_id{0};   // thread unsafe!
-    const LayoutElementId element_id{getenv("id"sv, uniq == add_unique::yes ? fmt::format("-unique-{}", ++uniq_id) : std::string{})};
+
+    const auto id = getenv_to_string("id"sv);
+    const LayoutElementId element_id{(id.empty() && uniq == add_unique::yes) ? fmt::format("-unique-{}", ++uniq_id) : id};
     if (auto* found = draw().layout().find<ElementType>(element_id); found) {
         init_element(*found);
         return *found;
@@ -99,11 +101,11 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree) {
                 auto& param = draw_tree->parameters().aa_transitions;
                 param.calculate = true;
-                param.report = getenv("report"sv, false);
-                param.debug = getenv("debug"sv, true);
+                param.report = getenv_or("report"sv, false);
+                param.debug = getenv_or("debug"sv, true);
                 if (const auto& pos = getenv("pos"sv); !pos.is_null())
                     param.report_pos = pos.to<seqdb::pos1_t>();
-                param.report_number_leaves_threshold = getenv("number-leaves-threshold"sv, 20ul);
+                param.report_number_leaves_threshold = getenv_or("number-leaves-threshold"sv, 20ul);
                 if (const auto& pos = getenv("show-same-left-right-for-pos"sv); !pos.is_null())
                     param.show_same_left_right_for_pos = pos.to<seqdb::pos1_t>();
             }
@@ -141,21 +143,21 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "populate-with-nuc-duplicates"sv)
             tree().populate_with_nuc_duplicates();
         else if (name == "re-root"sv)
-            tree().re_root(seq_id_t{getenv("new-root"sv, "re-root: new-root not specified"sv)});
+            tree().re_root(seq_id_t{getenv_or("new-root"sv, "re-root: new-root not specified"sv)});
         else if (name == "report-branches-by-cumulative-edge"sv)
             tree().branches_by_cumulative_edge();
         else if (name == "report-branches-by-edge"sv)
             tree().branches_by_edge();
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
-            if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty())
+            if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty())
                 acmacs::file::write(output_filename, tree().report_cumulative());
         }
         else if (name == "report-aa-at"sv) {
             report_aa_at();
         }
         else if (name == "seqdb"sv) {
-            tree().match_seqdb(getenv("filename"sv, ""sv));
+            tree().match_seqdb(getenv_or("filename"sv, ""sv));
             update_env();
         }
         else if (name == "time-series"sv)
@@ -275,7 +277,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 void acmacs::tal::v3::Settings::ladderize()
 {
     using namespace std::string_view_literals;
-    if (const auto method = getenv("method"sv, "number-of-leaves"sv); method == "number-of-leaves"sv)
+    if (const auto method = getenv_or("method"sv, "number-of-leaves"sv); method == "number-of-leaves"sv)
         tree().ladderize(Tree::Ladderize::NumberOfLeaves);
     else if (method == "max-edge-length"sv)
         tree().ladderize(Tree::Ladderize::MaxEdgeLength);
@@ -290,9 +292,9 @@ void acmacs::tal::v3::Settings::margins()
 {
     using namespace std::string_view_literals;
     getenv_copy_if_present("left"sv, draw().margins().left);
-    getenv("right"sv, draw().margins().right);
-    getenv("top"sv, draw().margins().top);
-    getenv("bottom"sv, draw().margins().bottom);
+    getenv_copy_if_present("right"sv, draw().margins().right);
+    getenv_copy_if_present("top"sv, draw().margins().top);
+    getenv_copy_if_present("bottom"sv, draw().margins().bottom);
     outline(draw().outline());
 
 } // acmacs::tal::v3::Settings::margins
@@ -421,11 +423,11 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
 void acmacs::tal::v3::Settings::clade() const
 {
     using namespace std::string_view_literals;
-    const auto clade_name = getenv("name"sv, ""sv);
+    const auto clade_name = getenv_or("name"sv, ""sv);
     if (clade_name.empty())
         throw error{"empty clade name"};
-    const auto display_name = getenv("display_name"sv, clade_name);
-    const auto report = getenv("report"sv, false);
+    const auto display_name = getenv_or("display_name"sv, clade_name);
+    const auto report = getenv_or("report"sv, false);
     // const auto inclusion_tolerance = getenv("inclusion_tolerance"sv, getenv("clade_section_inclusion_tolerance"sv, 10UL));
     // const auto exclusion_tolerance = getenv("exclusion_tolerance"sv, getenv("clade_section_exclusion_tolerance"sv, 5UL));
 
@@ -463,16 +465,20 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
     using namespace std::string_view_literals;
 
     const auto color_by_pos = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
-            auto coloring_by_pos = std::make_unique<ColoringByPos>(acmacs::seqdb::pos1_t{rjson::v3::get_or(fields, "pos"sv, 192)});
-            if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
-                if (colors_v.is_array()) {
-                    for (const auto& en : colors_v.array())
-                        coloring_by_pos->add_color(en.to<Color>());
-                }
-                else
-                    AD_WARNING("color_by \"colors\" must be array: {}", fields);
+        const auto& pos_v = substitute_to_value(fields["pos"sv]);
+        if (pos_v.is_null())
+            throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos\""};
+        const acmacs::seqdb::pos1_t pos{pos_v.to<acmacs::seqdb::pos1_t>()};
+        auto coloring_by_pos = std::make_unique<ColoringByPos>(pos);
+        if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
+            if (colors_v.is_array()) {
+                for (const auto& en : colors_v.array())
+                    coloring_by_pos->add_color(en.to<Color>());
             }
-            return coloring_by_pos;
+            else
+                AD_WARNING("color-by \"colors\" must be array: {}", fields);
+        }
+        return coloring_by_pos;
     };
 
     const auto color_by = [color_by_pos](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
@@ -496,7 +502,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         }
     };
 
-    const auto& cb_val = getenv("color_by"sv);
+    const auto& cb_val = getenv("color-by"sv, "color_by"sv);
     auto coloring = cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
         if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
             return color_by(arg.template to<std::string_view>(), rjson::v3::detail::object{});
@@ -505,7 +511,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             return color_by(rjson::v3::get_or(cb_val, "N"sv, "uniform"sv), cb_val);
         }
         else if constexpr (!std::is_same_v<T, rjson::v3::detail::null>)
-            throw error{"unsupported value type for \"color_by\""};
+            throw error{"unsupported value type for \"color-by\""};
         else
             return {};
     });
@@ -1119,7 +1125,7 @@ void acmacs::tal::v3::Settings::report_aa_at() const
     }
 
     const auto output = tree().report_aa_at(pos_to_report, substitute_to_value(getenv("names"sv)).to<bool>());
-    if (const auto output_filename = getenv("output"sv, ""sv); !output_filename.empty() && output_filename != "-"sv)
+    if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty() && output_filename != "-"sv)
         acmacs::file::write(output_filename, output);
     else
         AD_INFO("AA at:\n{}", output);
@@ -1133,7 +1139,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
     using namespace std::string_view_literals;
 
     const auto names = ranges::to<std::vector<std::string>>(
-        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv("virus-type"sv, ""sv)}, acmacs::virus::lineage_t{getenv("lineage"sv, ""sv)})
+        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv_or("virus-type"sv, ""sv)}, acmacs::virus::lineage_t{getenv_or("lineage"sv, ""sv)})
         | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::v3::get_or(criteria, "type"sv, "any"sv))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
         | ranges::views::transform([](const auto& en) { return en.name; }));
 
