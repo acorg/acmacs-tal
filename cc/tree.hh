@@ -253,12 +253,6 @@ namespace acmacs::tal::inline v3
 
         // ----------------------------------------------------------------------
 
-        void report_common_aa(std::optional<seqdb::pos1_t> pos, size_t number_leaves_threshold) const;
-        void update_aa_transitions(const draw_tree::AATransitionsParameters& parameters);
-        void report_aa_transitions(const draw_tree::AATransitionsParameters& parameters) const;
-
-        // ----------------------------------------------------------------------
-
         struct clade_section_t
         {
             clade_section_t(const Node* node) : first{node}, last{node} {}
@@ -307,27 +301,24 @@ namespace acmacs::tal::inline v3
 
         void set_first_last_next_node_id();
 
-      private:
         enum class leaves_only { no, yes };
+        std::vector<const Node*> sorted_by_cumulative_edge(leaves_only lo) const; // bigger cumul length first
 
+      private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t* find_clade(std::string_view name);
         std::vector<const Node*> sorted_by_edge() const;
-        std::vector<const Node*> sorted_by_cumulative_edge(leaves_only lo) const; // bigger cumul length first
         double mean_edge_of(double fraction_or_number,
                             const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
         double mean_cumulative_edge_of(double fraction_or_number, const std::vector<const Node*>& sorted) const;
 
         void structure_modified([[maybe_unused]] std::string_view on_action) { structure_modified_ = true; } // AD_DEBUG("structure_modified: {}", on_action);
 
-        void update_common_aa();
-
         std::string data_buffer_;
         std::string virus_type_;
         std::string lineage_;
         clades_t clades_;
         mutable bool chart_matched_{false};
-        seqdb::pos0_t longest_sequence_{0};
         bool structure_modified_{true};
 
     }; // class Tree

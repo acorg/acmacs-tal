@@ -23,13 +23,14 @@ void acmacs::tal::v3::DrawTree::legend(std::unique_ptr<Legend>&& a_legend)
 
 void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
 {
+    auto& tree = tal().tree();
     if (stage == 1 && prepared_ < stage) {
         // AD_DEBUG("DrawTree::prepare");
-        tal().tree().set_first_last_next_node_id();
+        tree.set_first_last_next_node_id();
         if (parameters().aa_transitions.calculate)
-            tal().tree().update_aa_transitions(parameters().aa_transitions);
+            update_aa_transitions(tree, parameters().aa_transitions);
 
-        tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+        tree::iterate_leaf(tree, [this](const Node& leaf) {
             if (!leaf.hidden)
                 coloring().prepare(leaf);
         });
@@ -37,16 +38,16 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
         AD_INFO("tree {}", coloring().report());
 
         if (parameters().aa_transitions.report) {
-            tal().tree().report_common_aa(parameters().aa_transitions.report_pos, parameters().aa_transitions.report_number_leaves_threshold);
-            tal().tree().report_aa_transitions(parameters().aa_transitions);
+            report_common_aa(tree, parameters().aa_transitions.report_pos, parameters().aa_transitions.report_number_leaves_threshold);
+            report_aa_transitions(tree, parameters().aa_transitions);
         }
     }
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
-        tal().tree().number_leaves_in_subtree();
-        AD_INFO("tree [{}] Shown leaves: {}", id(), tal().tree().number_leaves_in_subtree());
+        tree.number_leaves_in_subtree();
+        AD_INFO("tree [{}] Shown leaves: {}", id(), tree.number_leaves_in_subtree());
         vertical_step_ = height_ / tree_height;
-        horizontal_step_ = width_to_height_ratio() * height_ / tal().tree().max_cumulative_shown().as_number();
+        horizontal_step_ = width_to_height_ratio() * height_ / tree.max_cumulative_shown().as_number();
     }
     LayoutElementWithColoring::prepare(stage);
 

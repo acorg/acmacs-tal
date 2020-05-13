@@ -59,7 +59,7 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& section) const
+void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& /*section*/) const
 {
     surface.rectangle(surface.viewport().origin, surface.viewport().size, BLUE, Pixels{1});
 

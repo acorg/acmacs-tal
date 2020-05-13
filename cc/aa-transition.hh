@@ -7,10 +7,15 @@
 
 namespace acmacs::tal::inline v3
 {
+    class Node;
+    class Tree;
+
     namespace draw_tree
     {
         struct AATransitionsParameters; // draw-tree.hh
     }
+
+    // ======================================================================
 
     class CommonAA : public acmacs::named_string_t<struct acmacs_tal_CommonAA_tag>
     {
@@ -43,7 +48,9 @@ namespace acmacs::tal::inline v3
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
     };
 
-    // ----------------------------------------------------------------------
+    void report_common_aa(const Node& root, std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold);
+
+    // ======================================================================
 
     class AA_Transition
     {
@@ -125,6 +132,9 @@ namespace acmacs::tal::inline v3
         std::vector<AA_Transition> data_;
 
     }; // class AA_Transitions
+
+    void update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
+    void report_aa_transitions(const Node& root, const draw_tree::AATransitionsParameters& parameters);
 
 } // namespace acmacs::tal::inlinev3
 
