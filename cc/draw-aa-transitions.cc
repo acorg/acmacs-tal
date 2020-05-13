@@ -10,8 +10,16 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 {
     if (!prepared_) {
         // AD_DEBUG("DrawAATransitions::prepare");
-        tree::iterate_pre(tal().tree(), [this](const Node& node) {
-            if (!node.hidden && node.number_leaves_in_subtree() >= parameters().minimum_number_leaves_in_subtree && node.aa_transitions_) {
+
+        const auto aa_transitions_valid = [this](const AA_Transitions& aa_transitions) -> bool {
+            if (parameters().only_for_pos.empty())
+                return aa_transitions.has_data();
+            else
+                return aa_transitions.has_data_for(parameters().only_for_pos);
+        };
+
+        tree::iterate_pre(tal().tree(), [this, aa_transitions_valid](const Node& node) {
+            if (!node.hidden && node.number_leaves_in_subtree() >= parameters().minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) {
                 const auto node_id = fmt::format("{}", node.node_id);
                 transitions_.emplace_back(&node, parameters_for_node(node_id).label);
             }
@@ -52,7 +60,7 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
     auto interleave{0.0};
 
     for (auto& transition : transitions_) {
-        if (const auto names = transition.node->aa_transitions_.names(); !names.empty()) {
+        if (const auto names = transition.node->aa_transitions_.names(parameters().only_for_pos); !names.empty()) {
 
             const Scaled text_size{transition.label.scale};
             transition.name_sizes.resize(names.size());
@@ -162,10 +170,7 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
     const auto text_line_interleave = parameters().text_line_interleave;
 
     for (const auto& transition : transitions_) {
-        // if (!transition.node->aa_transitions_.find(seqdb::pos1_t{484}))
-        //     continue;
-
-        if (const auto names = transition.node->aa_transitions_.names(); !names.empty()) { // prevent from crashing during debugging aa transitions
+        if (const auto names = transition.node->aa_transitions_.names(parameters().only_for_pos); !names.empty()) { // prevent from crashing during debugging aa transitions
             const Scaled text_size{transition.label.scale};
 
             // const PointCoordinates box_top_left{transition.at_edge_line.x() + transition.label.offset[0], transition.at_edge_line.y() + transition.label.offset[1]};

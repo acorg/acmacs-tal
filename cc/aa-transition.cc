@@ -138,11 +138,11 @@ bool acmacs::tal::v3::AA_Transitions::has(seqdb::pos1_t pos) const
 
 // ----------------------------------------------------------------------
 
-std::vector<std::string> acmacs::tal::v3::AA_Transitions::names() const
+std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const
 {
     std::vector<std::string> result;
     for (const auto& en : data_) {
-        if (!en.empty_left())
+        if (!en.empty_left() && (selected_pos.empty() || en.pos_is_in(selected_pos)))
             result.push_back(en.display());
     }
     return result;

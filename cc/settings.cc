@@ -1057,6 +1057,17 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
     getenv_copy_if_present("text_line_interleave"sv, param.text_line_interleave);
 
+    getenv("only-for"sv).visit([&param, this]<typename Val>(const Val& value) {
+        if constexpr (std::is_same_v<Val, rjson::v3::detail::array>) {
+            for (const auto& pos_v : value)
+                param.only_for_pos.emplace_back(substitute_to_value(pos_v).template to<size_t>());
+        }
+        else if constexpr (std::is_same_v<Val, rjson::v3::detail::number>)
+            param.only_for_pos.emplace_back(value.template to<size_t>());
+        else if constexpr (!std::is_same_v<Val, rjson::v3::detail::null>)
+            throw error{"\"draw-aa-transitions\": invalid \"only-for\", array or number expected"};
+    });
+
     // ----------------------------------------------------------------------
 
     enum class ignore_name { no, yes };

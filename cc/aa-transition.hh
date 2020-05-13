@@ -55,7 +55,8 @@ namespace acmacs::tal::inline v3
         constexpr bool empty_left() const { return left == Empty; }
         constexpr bool empty_right() const { return right == Empty; }
         constexpr bool left_right_same() const { return left == right; }
-        constexpr operator bool() const { return !empty_left() && !empty_right(); } //  ignore left_right_same flag to allow drawing them if "show-same-left-right-for-pos" is true
+        constexpr bool has_data() const { return !empty_left() && !empty_right(); } //  ignore left_right_same flag to allow drawing them if "show-same-left-right-for-pos" is true
+        bool pos_is_in(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const { return std::find(std::begin(selected_pos), std::end(selected_pos), pos) != std::end(selected_pos); }
 
         char left;
         char right;
@@ -94,13 +95,17 @@ namespace acmacs::tal::inline v3
                 return nullptr;
         }
 
-        operator bool() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en; }); }
+        bool has_data() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.has_data(); }); }
+        bool has_data_for(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const
+        {
+            return std::any_of(std::begin(data_), std::end(data_), [&selected_pos](const auto& en) -> bool { return en.has_data() && en.pos_is_in(selected_pos); });
+        }
 
         enum class show_empty_left { no, yes };
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
         bool has(seqdb::pos1_t pos) const;
         bool has_same_left_right() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); }); }
-        std::vector<std::string> names() const;
+        std::vector<std::string> names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const; // for all pos if selected_pos is empty
 
         bool contains(std::string_view label) const
         {
