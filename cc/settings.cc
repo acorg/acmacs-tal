@@ -464,12 +464,18 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
 {
     using namespace std::string_view_literals;
 
-    const auto color_by_pos = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
+    const auto color_by_pos_aa_colors = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
         const auto& pos_v = substitute_to_value(fields["pos"sv]);
         if (pos_v.is_null())
-            throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos\""};
-        const acmacs::seqdb::pos1_t pos{pos_v.to<acmacs::seqdb::pos1_t>()};
-        auto coloring_by_pos = std::make_unique<ColoringByPos>(pos);
+            throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos-aa-colors\""};
+        return std::make_unique<ColoringByPosAAColors>(acmacs::seqdb::pos1_t{pos_v.to<acmacs::seqdb::pos1_t>()});
+    };
+
+    const auto color_by_pos_aa_frequency = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
+        const auto& pos_v = substitute_to_value(fields["pos"sv]);
+        if (pos_v.is_null())
+            throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos-aa-frequency\""};
+        auto coloring_by_pos = std::make_unique<ColoringByPosAAFrequency>(acmacs::seqdb::pos1_t{pos_v.to<acmacs::seqdb::pos1_t>()});
         if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
             if (colors_v.is_array()) {
                 for (const auto& en : colors_v.array())
@@ -481,7 +487,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         return coloring_by_pos;
     };
 
-    const auto color_by = [color_by_pos](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
+    const auto color_by = [color_by_pos_aa_colors, color_by_pos_aa_frequency](std::string_view key, const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
         if (key == "continent"sv) {
             auto cb = std::make_unique<ColoringByContinent>();
             for (const auto& continent : {"EUROPE"sv, "CENTRAL-AMERICA"sv, "MIDDLE-EAST"sv, "NORTH-AMERICA"sv, "AFRICA"sv, "ASIA"sv, "RUSSIA"sv, "AUSTRALIA-OCEANIA"sv, "SOUTH-AMERICA"sv}) {
@@ -490,8 +496,11 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
             }
             return cb;
         }
-        else if (key == "pos"sv) {
-            return color_by_pos(fields);
+        else if (key == "pos-aa-colors"sv) {
+            return color_by_pos_aa_colors(fields);
+        }
+        else if (key == "pos-aa-frequency"sv) {
+            return color_by_pos_aa_frequency(fields);
         }
         else if (key == "uniform"sv) {
             return std::make_unique<ColoringUniform>(Color{rjson::v3::get_or(fields, "color"sv, "black"sv)});
@@ -542,8 +551,8 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
         }
         tree.legend(std::move(legend));
     }
-    else if (legend_type == "color-by-pos"sv) {
-        // AD_DEBUG("legend: color_by-pos");
+    else if (legend_type == "color-by-pos-aa-colors"sv || legend_type == "color-by-pos-aa-frequency"sv) {
+        // AD_DEBUG("legend: color_by-pos-aa-frequency");
         auto legend{std::make_unique<LegendColoredByPos>()};
         auto& param = legend->parameters();
         param.show = rjson::v3::get_or(legend_v, "show"sv, true); // shown by default

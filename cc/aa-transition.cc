@@ -11,7 +11,7 @@ namespace acmacs::tal::inline v3
     static void update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 
     // ----------------------------------------------------------------------
-    // AA subst calculation before 2020-05-13
+    // AA subst calculation before 2020-05-13 // Obsolete? 2020-05-14
     // returns length of the longest sequence found under root
     static seqdb::pos0_t update_common_aa(Node& root);
     static void report_common_aa(const Node& root, std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold);
@@ -23,7 +23,7 @@ namespace acmacs::tal::inline v3
 void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     update_aa_transitions_20200514(tree, parameters);
-    // update_aa_transitions_before_20200513(tree, parameters);
+    // update_aa_transitions_before_20200513(tree, parameters); // Obsolete? 2020-05-14
 
 } // acmacs::tal::v3::update_aa_transitions
 
@@ -74,6 +74,7 @@ void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree
 } // acmacs::tal::v3::update_aa_transitions_20200514
 
 // ======================================================================
+// Obsolete? 2020-05-14
 
 acmacs::seqdb::pos0_t acmacs::tal::v3::update_common_aa(Node& root)
 {

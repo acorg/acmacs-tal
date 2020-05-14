@@ -38,7 +38,7 @@ void acmacs::tal::v3::LegendContinentMap::draw(acmacs::surface::Surface& surface
 void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface, const Coloring& coloring) const
 {
     if (parameters().show) {
-        if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPos*>(&coloring); coloring_by_pos) {
+        if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPosBase*>(&coloring); coloring_by_pos) {
             auto origin = parameters().offset + Size{0.0, *parameters().text_size};
             surface.text(origin, fmt::format("{}", coloring_by_pos->pos()), parameters().title_color, parameters().text_size);
             const auto total_percent = static_cast<double>(coloring_by_pos->total_count()) / 100.0;

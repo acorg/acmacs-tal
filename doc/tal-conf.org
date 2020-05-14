@@ -1,4 +1,4 @@
-# Time-stamp: <2020-05-13 14:27:47 eu>
+# Time-stamp: <2020-05-14 14:59:49 eu>
 
 * Command line defines
 
@@ -141,8 +141,8 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Tree
 
 #+BEGIN_SRC json
-  {"N": "tree", "id": "<id>", "color-by": <[[Color by][color-by]]>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>,
-   "legend": { "?type": "world-map|color-by-pos", # type inferred from "color-by"
+  {"N": "tree", "id": "<id>", "color-by": <color-by>, "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>,
+   "legend": { "?type": "world-map|color-by-pos-aa-colors|color-by-pos-aa-frequency", # type inferred from "color-by"
                "offset": [0.0, 0.9], # relative to tree
                "world-map": {
                    "size": 0.1,   # world map width relative to tree height
@@ -153,7 +153,7 @@ If multiple criteria specified within single "select" object, they all used (con
                              {"coordinates": [-33.865, 151.209444], "?location": "SYDNEY"},
                            ]
                },
-               "color-by-pos": {
+               "color-by-pos": {     # for color-by-pos-aa-colors and color-by-pos-aa-frequency
                    "text-size": 0.05 # font size relative to height
                    "title-color": "black", "count": {"show": true, "scale": 0.3, "color": "grey"}, "interleave": 0.5}
              }
@@ -170,31 +170,35 @@ If multiple criteria specified within single "select" object, they all used (con
   },
 #+END_SRC
 
+
 *** Time series
 
-{"N": "time-series", "color-by": <[[Color by][color-by]]>,
- "?start": "2019-01", "?end": "2019-11", #-- "start is inclusive, end is exclusive",
- "report": "{report-time-series-output}",
- "interval": {"month": 1}, #-- month, week, year, day ("interval": "month" also supported)
- "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}}, #-- applicable to color-by-pos
- "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
- "slot": {"width": 0.01, "?": "fraction of the time series area height",
-          "separator": {
-               "width_pixels": 0.5, "color": "black",
-               "per_month": [
-                  {"month": 1, "width_pixels": 1, "color": "red"} -- month: 1..12
-               ]
-          },
-          "background": {
-              "color": "transparent",
-               "per_month": [
-                  {"month": 1, "color": "#F0000000"} -- month: 1..12
-               ]
-          },
-          "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
-         },
- "color-scale": {"show": false, "colors": ["#440154", "#40ffff", "#fde725"], "offset": 0.008, "height": 0.01, "?type": "bezier-gradient"},
- "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
+#+BEGIN_SRC json
+  {"N": "time-series", "color-by": <[[Color by][color-by]]>,
+   "?start": "2019-01", "?end": "2019-11", #-- "start is inclusive, end is exclusive",
+   "report": "{report-time-series-output}",
+   "interval": {"month": 1}, #-- month, week, year, day ("interval": "month" also supported)
+   "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}, # applicable to color-by-pos
+   "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
+   "slot": {"width": 0.01, "?": "fraction of the time series area height",
+            "separator": {
+                "width_pixels": 0.5, "color": "black",
+                "per_month": [
+                    {"month": 1, "width_pixels": 1, "color": "red"} -- month: 1..12
+                ]
+            },
+            "background": {
+                "color": "transparent",
+                "per_month": [
+                    {"month": 1, "color": "#F0000000"} -- month: 1..12
+                ]
+            },
+            "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
+           },
+   "color-scale": {"show": false, "colors": ["#440154", "#40ffff", "#fde725"], "offset": 0.008, "height": 0.01, "?type": "bezier-gradient"},
+   "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
+#+END_SRC
+
 
 *** Clade
 
@@ -303,7 +307,7 @@ If multiple criteria specified within single "select" object, they all used (con
 "debug-outline": "pink"
 "debug-outline": {"show": true, "color": "pink", "width": 2}
 
-* Color by
+* Color by <color-by>
 
 "color-by": "uniform"
 "color-by": {"N": "uniform", "color": "red"}
@@ -311,7 +315,8 @@ If multiple criteria specified within single "select" object, they all used (con
 "color-by": "continent"
 "color-by": {"N": "continent", "EUROPE": "#00A800", "CENTRAL-AMERICA": "#70A4A8", "MIDDLE-EAST": "#8000FF", "NORTH-AMERICA": "#00008B", "AFRICA": "#FF8000", "ASIA": "#FF0000", "RUSSIA": "#B03060", "AUSTRALIA-OCEANIA": "#FF69B4", "SOUTH-AMERICA": "#40E0D0", "ANTARCTICA": "#808080", "CHINA-SOUTH": "#FF0000", "CHINA-NORTH": "#6495ED", "CHINA-UNKNOWN": "#808080", "UNKNOWN": "#808080"}
 
-"color-by": {"N": "pos", "pos": 192, "colors": ["red", "green", "blue"]} -- acmacs::color::distinct are used if absent or too few given, X is always black
+"color-by": {"N": "pos-aa-colors", "pos": 192}
+"color-by": {"N": "pos-aa-frequency", "pos": 192, "colors": ["red", "green", "blue"]} -- acmacs::color::distinct are used if absent or too few given, X is always black
 
 * COMMENT ====== local vars
 :PROPERTIES:
