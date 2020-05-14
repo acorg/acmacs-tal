@@ -26,7 +26,7 @@ namespace acmacs::tal::inline v3
 
         // char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
         constexpr static inline bool is_common(char aa) { return aa != NoCommon && aa != Any; }
-        constexpr bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
+        /*constexpr*/ bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
         // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
         ssize_t num_common() const
         {
@@ -36,7 +36,7 @@ namespace acmacs::tal::inline v3
         void update(seqdb::pos0_t pos, char aa);
         void update(acmacs::seqdb::sequence_aligned_ref_t seq);
         void update(const CommonAA& subtree);
-        constexpr void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
+        /*constexpr*/ void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
 
         std::string report() const;
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
