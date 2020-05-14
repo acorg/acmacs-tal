@@ -121,7 +121,7 @@ int main(int argc, const char *argv[])
             }
         }
 
-        fmt::print("Tal configuration docs: {}/share/doc/tal-conf.org\n", acmacs::acmacsd_root());
+        AD_INFO("tal configuration docs: {}/share/doc/tal-conf.org", acmacs::acmacsd_root());
         return 0;
     }
     catch (std::exception& err) {

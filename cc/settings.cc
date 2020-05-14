@@ -243,7 +243,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 node->edge_line_width_scale = line_width_scale;
         }
         else if (key == "report"sv) {
-            report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), getenv("select"sv)), "  ", selected);
+            AD_INFO("{} selected nodes {}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
         }
     };
 
@@ -329,17 +329,18 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const
+std::string acmacs::tal::v3::Settings::report_nodes(std::string_view indent, const NodeSet& nodes) const
 {
-    fmt::print("{}", prefix);
+    fmt::memory_buffer output;
     if (nodes.size() < 100) {
         for (const auto* node : nodes) {
             if (node->is_leaf())
-                fmt::print("{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
+                fmt::format_to(output, "{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
             else
-                fmt::print("{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
+                fmt::format_to(output, "{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
         }
     }
+    return fmt::to_string(output);
 
 } // acmacs::tal::v3::Settings::report_nodes
 
@@ -413,7 +414,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             update = Tree::Select::update;
     }
     if (report)
-        report_nodes(fmt::format("INFO {} selected nodes {}\n", selected.size(), criteria), "  ", selected);
+        AD_INFO("{} selected nodes {}\n", selected.size(), criteria, report_nodes("  ", selected));
     return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
@@ -1194,7 +1195,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
           nodes.filter(selected_nodes);
           break;
     }
-    // report_nodes(fmt::format("INFO select_vaccine: {} selected nodes {}\n", nodes.size(), criteria), "  ", nodes);
+    // AD_INFO("{} selected nodes {}\n", selected.size(), getenv("select"sv), report_nodes("  ", nodes));
 
 } // acmacs::tal::v3::Settings::select_vaccine
 

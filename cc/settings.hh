@@ -24,7 +24,7 @@ namespace acmacs::tal::inline v3
 
         bool apply_built_in(std::string_view name) override; // returns true if built-in command with that name found and applied
 
-        void report_nodes(std::string_view prefix, std::string_view indent, const NodeSet& nodes) const;
+        std::string report_nodes(std::string_view indent, const NodeSet& nodes) const;
         NodeSet select_nodes(const rjson::v3::value& criteria) const;
 
       private:
