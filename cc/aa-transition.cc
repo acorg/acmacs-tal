@@ -4,11 +4,31 @@
 
 namespace acmacs::tal::inline v3
 {
+    // ----------------------------------------------------------------------
+    // AA subst calculation before 2020-05-13
     // returns length of the longest sequence found under root
     static seqdb::pos0_t update_common_aa(Node& root);
+    static void report_common_aa(const Node& root, std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold);
+    static void update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
+    static void update_aa_transitions_before_20200513(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 }
 
 // ----------------------------------------------------------------------
+
+void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
+{
+    update_aa_transitions_before_20200513(tree, parameters);
+
+} // acmacs::tal::v3::update_aa_transitions
+
+// ======================================================================
+
+void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
+{
+
+} // acmacs::tal::v3::update_aa_transitions_20200514
+
+// ======================================================================
 
 acmacs::seqdb::pos0_t acmacs::tal::v3::update_common_aa(Node& root)
 {
@@ -46,9 +66,9 @@ void acmacs::tal::v3::report_common_aa(const Node& root, std::optional<seqdb::po
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
+void acmacs::tal::v3::update_aa_transitions_before_20200513(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
-    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions");
+    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions_before_20200513");
 
     tree.cumulative_calculate();
     const auto longest_sequence = update_common_aa(tree);
@@ -64,7 +84,7 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
             const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
             const auto common_aa_at = node.common_aa_.at(pos);
-            AD_DEBUG_IF(dbg, "update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(), common_aa_at,
+            AD_DEBUG_IF(dbg, "update_aa_transitions_before_20200513 counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(), common_aa_at,
                         common_aa_at == CommonAA::NoCommon);
             if (common_aa_at == CommonAA::NoCommon) {
                 CounterChar counter;
@@ -77,7 +97,7 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
                         counter.count(found->right);
                     }
                 }
-                AD_DEBUG_IF(dbg, "  update_aa_transitions counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
+                AD_DEBUG_IF(dbg, "  update_aa_transitions_before_20200513 counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
                 if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
                     node.remove_aa_transition(pos, max_aa);
                     node.aa_transitions_.add(pos, max_aa);
@@ -85,18 +105,18 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
             }
             // else {
             //     if (node.aa_transitions_.has(pos))
-            //         AD_WARNING("update_aa_transitions (the only common) has for pos {}", pos);
+            //         AD_WARNING("update_aa_transitions_before_20200513 (the only common) has for pos {}", pos);
             // }
         }
     });
 
     const std::vector<const Node*> sorted_leaf_nodes = tree.sorted_by_cumulative_edge(Tree::leaves_only::yes); // bigger cumul length first
 
-    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions adding left part");
+    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions_before_20200513 adding left part");
     // add left part to aa transitions (Derek's algorithm)
     auto add_left_part = [&sorted_leaf_nodes, &parameters](Node& node) {
         const auto dbg = debug_from(parameters.debug && parameters.report_pos && node.aa_transitions_.has(*parameters.report_pos));
-        AD_DEBUG_IF(dbg, "update_aa_transitions (add left) {:4.3s} aa-transitions: {}  empty:{}", node.node_id,
+        AD_DEBUG_IF(dbg, "update_aa_transitions_before_20200513 (add left) {:4.3s} aa-transitions: {}  empty:{}", node.node_id,
                     node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes), node.aa_transitions_.empty());
         if (!node.aa_transitions_.empty()) {
             const auto node_left_edge = node.cumulative_edge_length - node.edge_length;
@@ -108,12 +128,12 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
             if (node_for_left != std::end(sorted_leaf_nodes)) {
                 node.aa_transitions_.set_left((*node_for_left)->aa_sequence);
                 node.node_for_left_aa_transitions_ = *node_for_left;
-                AD_DEBUG_IF(dbg, "update_aa_transitions (add left) {:4.3s} {} node-for-left: {} {}", node.node_id,
+                AD_DEBUG_IF(dbg, "update_aa_transitions_before_20200513 (add left) {:4.3s} {} node-for-left: {} {}", node.node_id,
                             node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes), node.node_for_left_aa_transitions_->node_id,
                             node.node_for_left_aa_transitions_->seq_id);
             }
             else {
-                AD_DEBUG_IF(dbg, "update_aa_transitions (add left) no node for left {:4.3s} {}", node.node_id,
+                AD_DEBUG_IF(dbg, "update_aa_transitions_before_20200513 (add left) no node for left {:4.3s} {}", node.node_id,
                             node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes));
             }
         }
@@ -123,12 +143,13 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
     };
     tree::iterate_leaf_pre(tree, add_left_part, add_left_part);
 
-} // acmacs::tal::v3::update_aa_transitions
+} // acmacs::tal::v3::update_aa_transitions_before_20200513
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::report_aa_transitions(const Node& root, const draw_tree::AATransitionsParameters& parameters)
 {
+    report_common_aa(root, parameters.report_pos, parameters.report_number_leaves_threshold);
     AD_INFO("AA transitions");
     root.number_leaves_in_subtree();
     tree::iterate_pre(root, [&parameters](const Node& node) {

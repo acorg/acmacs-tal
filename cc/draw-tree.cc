@@ -37,10 +37,8 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
         coloring().prepare();
         AD_INFO("tree {}", coloring().report());
 
-        if (parameters().aa_transitions.report) {
-            report_common_aa(tree, parameters().aa_transitions.report_pos, parameters().aa_transitions.report_number_leaves_threshold);
+        if (parameters().aa_transitions.report)
             report_aa_transitions(tree, parameters().aa_transitions);
-        }
     }
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();

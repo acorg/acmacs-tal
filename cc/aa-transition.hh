@@ -48,8 +48,6 @@ namespace acmacs::tal::inline v3
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
     };
 
-    void report_common_aa(const Node& root, std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold);
-
     // ======================================================================
 
     class AA_Transition

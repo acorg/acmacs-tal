@@ -100,7 +100,7 @@ namespace acmacs::tal::inline v3
         std::vector<std::string_view> hi_names;
         acmacs::flat_set_t<std::string> clades;
 
-        // middle node only
+        // branch node only
         Subtree subtree;
         std::vector<std::string_view> aa_substs;
 
@@ -119,15 +119,21 @@ namespace acmacs::tal::inline v3
 
         // all nodes
         ladderize_helper_t ladderize_helper_;
+
         // leaf node only
         mutable std::optional<size_t> antigen_index_in_chart_;
         mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
-
-        // middle node only
-        CommonAA common_aa_;
-        AA_Transitions aa_transitions_;
-        const Node* node_for_left_aa_transitions_{nullptr};
         Subtree to_populate; // populate_with_nuc_duplicates()
+
+        // -------------------- AA transitions (branch node only) --------------------
+        AA_Transitions aa_transitions_;
+
+        // 20200514
+        const Node* closest_leaf{nullptr}; // child leaf with minimal cumulative_edge_length
+
+        // before_20200513
+        CommonAA common_aa_;
+        const Node* node_for_left_aa_transitions_{nullptr};
 
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
