@@ -2,14 +2,19 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 
+// ----------------------------------------------------------------------
+
 namespace acmacs::tal::inline v3
 {
+    // ----------------------------------------------------------------------
+    // AA subst calculation 2020-05-14
+    static void update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
+
     // ----------------------------------------------------------------------
     // AA subst calculation before 2020-05-13
     // returns length of the longest sequence found under root
     static seqdb::pos0_t update_common_aa(Node& root);
     static void report_common_aa(const Node& root, std::optional<seqdb::pos1_t> pos_to_report, size_t number_leaves_threshold);
-    static void update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
     static void update_aa_transitions_before_20200513(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 }
 
@@ -17,7 +22,8 @@ namespace acmacs::tal::inline v3
 
 void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
-    update_aa_transitions_before_20200513(tree, parameters);
+    update_aa_transitions_20200514(tree, parameters);
+    // update_aa_transitions_before_20200513(tree, parameters);
 
 } // acmacs::tal::v3::update_aa_transitions
 
@@ -25,6 +31,38 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
 
 void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
+    tree.cumulative_calculate();
+
+    // 1. for each branch node find closest child leaf node
+    // --
+    // 2. for each pos, for each branch node
+    // AA at pos at branch node is AA at pos for its closest_leaf
+    // if AA at pos for node differs from AA at the same pos for its
+    // parent node, add aa transition with left part being AA at
+    // parent node, right part being AA at this node
+
+    tree::iterate_post(tree, [](Node& branch) {
+        branch.closest_leaf = nullptr;
+        for (const auto& child : branch.subtree) {
+            if (const auto* leaf = child.is_leaf() ? &child : child.closest_leaf; leaf) {
+                if (branch.closest_leaf == nullptr || branch.closest_leaf->cumulative_edge_length > leaf->cumulative_edge_length)
+                    branch.closest_leaf = leaf;
+            }
+        }
+
+        if (branch.closest_leaf) {
+            for (auto& child : branch.subtree) {
+                if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
+                    for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaf->aa_sequence.size(), child.closest_leaf->aa_sequence.size()); ++pos) {
+                        if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos); left_aa != right_aa)
+                            child.aa_transitions_.add(pos, left_aa, right_aa);
+                    }
+                }
+            }
+        }
+        else
+            AD_WARNING("update_aa_transitions_20200514: closest leaf not found for the branch node {}", branch.node_id);
+    });
 
 } // acmacs::tal::v3::update_aa_transitions_20200514
 
@@ -183,9 +221,9 @@ void acmacs::tal::v3::CommonAA::update(acmacs::seqdb::sequence_aligned_ref_t seq
     }
     else {
         if (seq.size() < size())
-            get().resize(seq.size());
-        for (seqdb::pos0_t pos{0}; *pos < size(); ++pos)
-            update(pos, seq[*pos]);
+            resize(seq.size());
+        for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
+            update(pos, seq.at(pos));
     }
 
 } // acmacs::tal::v3::CommonAA::update
@@ -199,9 +237,9 @@ void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
     }
     else {
         if (subtree.size() < size())
-            get().resize(subtree.size());
-        for (seqdb::pos0_t pos{0}; *pos < size(); ++pos)
-            update(pos, subtree[*pos]);
+            resize(subtree.size());
+        for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
+            update(pos, subtree.at(pos));
     }
 
 } // acmacs::tal::v3::CommonAA::update
@@ -211,7 +249,7 @@ void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
 std::string acmacs::tal::v3::CommonAA::report() const
 {
     fmt::memory_buffer out;
-    for (seqdb::pos0_t pos{0}; *pos < size(); ++pos) {
+    for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
         if (is_common(pos))
             fmt::format_to(out, " {}{}", pos, at(pos));
     }
@@ -225,7 +263,7 @@ std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optio
 {
     fmt::memory_buffer out;
     size_t num_common = 0;
-    for (seqdb::pos0_t pos{0}; *pos < size(); ++pos) {
+    for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
         if (is_common(pos) && !parent.is_common(pos) && (!pos_to_report || pos_to_report == pos)) {
             fmt::format_to(out, " {}{}", pos, at(pos));
             ++num_common;

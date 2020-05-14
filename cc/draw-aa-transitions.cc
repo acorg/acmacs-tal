@@ -152,7 +152,7 @@ void acmacs::tal::v3::DrawAATransitions::report() const
             fmt::print(",\n");
         fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:9.6f}, {:9.6f}], \"?box_size\": {:.6f}}}, \"?first-leaf\": \"{}\"}}", node_id, max_id + 2, name, max_name + 3,
                    transition.label.offset[0], transition.label.offset[1], transition.box.size, transition.node->first_prev_leaf->seq_id);
-        AD_DEBUG_IF(debug_from(transition.node->aa_transitions_.has_same_left_right()), "same-left-right {} (cumul:{}) -> {} (cumul:{})", transition.node->node_id, transition.node->cumulative_edge_length, transition.node->node_for_left_aa_transitions_->node_id, transition.node->node_for_left_aa_transitions_->cumulative_edge_length);
+        // AD_DEBUG_IF(debug_from(transition.node->node_for_left_aa_transitions_ && transition.node->aa_transitions_.has_same_left_right()), "same-left-right {} (cumul:{}) -> {} (cumul:{})", transition.node->node_id, transition.node->cumulative_edge_length, transition.node->node_for_left_aa_transitions_->node_id, transition.node->node_for_left_aa_transitions_->cumulative_edge_length);
         comma = true;
     }
     fmt::print("\n]\n");

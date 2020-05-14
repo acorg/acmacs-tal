@@ -17,16 +17,16 @@ namespace acmacs::tal::inline v3
 
     // ======================================================================
 
-    class CommonAA : public acmacs::named_string_t<struct acmacs_tal_CommonAA_tag>
+    class CommonAA : public seqdb::sequence_aligned_t
     {
       public:
         constexpr static const char NoCommon{'.'};
         constexpr static const char Any{'X'};
-        CommonAA() = default;
+        // CommonAA() = default;
 
-        char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
-        constexpr static bool is_common(char aa) { return aa != NoCommon && aa != Any; }
-        bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
+        // char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
+        constexpr static inline bool is_common(char aa) { return aa != NoCommon && aa != Any; }
+        constexpr bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
         // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
         ssize_t num_common() const
         {
@@ -36,13 +36,7 @@ namespace acmacs::tal::inline v3
         void update(seqdb::pos0_t pos, char aa);
         void update(acmacs::seqdb::sequence_aligned_ref_t seq);
         void update(const CommonAA& subtree);
-
-        void set(seqdb::pos0_t pos, char aa)
-        {
-            if (*pos < size())
-                get()[*pos] = aa;
-        }
-        void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
+        constexpr void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
 
         std::string report() const;
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
@@ -54,8 +48,9 @@ namespace acmacs::tal::inline v3
     {
       public:
         constexpr static const char Empty = ' ';
-        AA_Transition() : left(Empty), right(Empty), pos{9999} /*, for_left(nullptr) */ {}
-        AA_Transition(seqdb::pos0_t aPos, char aRight) : left(Empty), right(aRight), pos(aPos) /*, for_left(nullptr) */ {}
+        AA_Transition() : left(Empty), right(Empty), pos{9999} {}
+        AA_Transition(seqdb::pos0_t aPos, char aLeft, char aRight) : left(aLeft), right(aRight), pos(aPos) {}
+        AA_Transition(seqdb::pos0_t aPos, char aRight) : left(Empty), right(aRight), pos(aPos) {}
         std::string display() const { return fmt::format("{}{}{}", left, pos, right); }
         constexpr bool empty_left() const { return left == Empty; }
         constexpr bool empty_right() const { return right == Empty; }
@@ -66,7 +61,6 @@ namespace acmacs::tal::inline v3
         char left;
         char right;
         seqdb::pos0_t pos;
-        // const Node* for_left; // node used to set left part, for debugging transition labels
 
     }; // class AA_Transition
 
@@ -87,6 +81,7 @@ namespace acmacs::tal::inline v3
 
         bool empty() const { return data_.empty(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
+        void add(seqdb::pos0_t pos, char left, char right) { data_.emplace_back(pos, left, right); }
         bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }
         bool remove(seqdb::pos0_t pos, char right) { return remove_if([pos,right](const auto& en) { return en.pos == pos && en.right == right; }); }
         void remove_left_right_same(const draw_tree::AATransitionsParameters& parameters);
