@@ -31,6 +31,7 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
 
 void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
+    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions_20200514");
     tree.cumulative_calculate();
 
     // 1. for each branch node find closest child leaf node
@@ -41,7 +42,7 @@ void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree
     // parent node, add aa transition with left part being AA at
     // parent node, right part being AA at this node
 
-    tree::iterate_post(tree, [](Node& branch) {
+    tree::iterate_post(tree, [&parameters](Node& branch) {
         branch.closest_leaf = nullptr;
         for (const auto& child : branch.subtree) {
             if (const auto* leaf = child.is_leaf() ? &child : child.closest_leaf; leaf) {
@@ -54,8 +55,14 @@ void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree
             for (auto& child : branch.subtree) {
                 if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
                     for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaf->aa_sequence.size(), child.closest_leaf->aa_sequence.size()); ++pos) {
-                        if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos); left_aa != right_aa)
+                        // transitions to/from X ignored
+                        // perhaps we need to look for a second closest leaf if found closest leaf has X at the pos
+                        if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos);
+                            left_aa != right_aa && left_aa != 'X' && right_aa != 'X') {
                             child.aa_transitions_.add(pos, left_aa, right_aa);
+                            AD_DEBUG_IF(debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos), "update_aa_transitions_20200514 node:{:4.3s} {}{}{}", child.node_id,
+                                        left_aa, pos, right_aa);
+                        }
                     }
                 }
             }
