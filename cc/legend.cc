@@ -48,8 +48,8 @@ void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface
                 const auto aa_t{fmt::format("{}", aa)};
                 surface.text(origin, aa_t, color_count.color, parameters().text_size);
                 if (parameters().show_count) {
-                    const auto [aa_height, aa_width] = surface.text_size(aa_t, parameters().text_size);
-                    surface.text({origin.x() + aa_width * 1.1, origin.y() - aa_height + *count_text_size * 0.5}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), parameters().count_color, count_text_size);
+                    const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W') /*aa_t*/, parameters().text_size);
+                    surface.text({origin.x() + aa_width * 1.1, origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), parameters().count_color, count_text_size);
                     surface.text({origin.x() + aa_width * 1.1, origin.y()}, fmt::format("{}", color_count.count), parameters().count_color, count_text_size);
                 }
             }
