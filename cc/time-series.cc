@@ -295,19 +295,27 @@ void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface)
     if (parameters().legend.show) {
         if (const auto* col = dynamic_cast<const ColoringByPosBase*>(&coloring()); col) {
             const Scaled text_size{parameters().legend.scale};
+            const auto count_text_size{text_size * parameters().legend.count_scale};
             const TextStyle text_style{};
             const auto gap = *text_size * parameters().legend.gap_scale;
-
             const auto& viewport = surface.viewport();
+            const auto total_percent = static_cast<double>(col->total_count()) / 100.0;
+
             const auto text_y = viewport.origin.y() + viewport.size.height + parameters().legend.offset;
             auto text_x = viewport.origin.x();
             const auto pos_text = fmt::format("{}", col->pos());
             surface.text({text_x, text_y}, pos_text, parameters().legend.pos_color, text_size, text_style, NoRotation);
             text_x += surface.text_size(pos_text, text_size, text_style).width + gap;
             for (const auto& [aa, color_count] : col->colors()) {
-                surface.text({text_x, text_y}, std::string(1, aa), color_count.color, text_size, text_style, NoRotation);
-                text_x += surface.text_size(std::string(1, aa), text_size, text_style).width;
-                surface.text({text_x, text_y}, fmt::format("{}", color_count.count), parameters().legend.count_color, text_size * parameters().legend.count_scale, text_style, NoRotation);
+                const std::string aa_t(1, aa);
+                surface.text({text_x, text_y}, aa_t, color_count.color, text_size, text_style, NoRotation);
+                if (parameters().legend.show_count) {
+                    const auto [aa_height, aa_width] = surface.text_size(aa_t, text_size, text_style);
+                    text_x += surface.text_size(std::string(1, aa), text_size, text_style).width;
+                    surface.text({text_x, text_y - aa_height + *count_text_size * 0.5}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), parameters().legend.count_color,
+                                 count_text_size, text_style, NoRotation);
+                    surface.text({text_x, text_y}, fmt::format("{}", color_count.count), parameters().legend.count_color, count_text_size, text_style, NoRotation);
+                }
                 text_x += gap;
             }
         }
