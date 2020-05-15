@@ -60,8 +60,9 @@ void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree
                         if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos);
                             left_aa != right_aa && left_aa != 'X' && right_aa != 'X') {
                             child.aa_transitions_.add(pos, left_aa, right_aa);
-                            AD_DEBUG_IF(debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos), "update_aa_transitions_20200514 node:{:4.3s} {}{}{}", child.node_id,
-                                        left_aa, pos, right_aa);
+                            AD_DEBUG_IF(debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos),
+                                        "update_aa_transitions_20200514 node:{:4.3s} {}{}{} leaves:{:5d} closest-cumul:{} closest:{}", child.node_id,
+                                        left_aa, pos, right_aa, child.number_leaves_in_subtree(), child.closest_leaf->cumulative_edge_length, child.closest_leaf->seq_id);
                         }
                     }
                 }
