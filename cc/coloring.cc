@@ -1,5 +1,6 @@
 #include "acmacs-base/color-distinct.hh"
 #include "acmacs-base/color-amino-acid.hh"
+#include "acmacs-draw/surface.hh"
 #include "acmacs-tal/coloring.hh"
 #include "acmacs-tal/tree.hh"
 
@@ -91,6 +92,40 @@ void acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency()
     });
 
 } // acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
+                                                     bool show_count, double count_scale, Color count_color) const
+{
+    auto text_origin{origin};
+    const auto pos_t{fmt::format("{}", pos())};
+    surface.text(text_origin, pos_t, title_color, text_size);
+    if (layout == legend_layout::horizontal)
+        text_origin.x(text_origin.x() + surface.text_size(pos_t, text_size).width - *text_size);
+    const auto total_percent = static_cast<double>(total_count()) / 100.0;
+    const auto count_text_size{text_size * count_scale};
+    const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W'), text_size);
+    for (const auto& [aa, color_count] : colors()) {
+        switch (layout) {
+            case legend_layout::vertical:
+                text_origin.y(text_origin.y() + *text_size * (1.0 + interleave));
+                break;
+            case legend_layout::horizontal:
+                text_origin.x(text_origin.x() + *text_size * (1.0 + interleave));
+                break;
+        }
+        const auto aa_t{fmt::format("{}", aa)};
+        surface.text(text_origin, aa_t, color_count.color, text_size);
+        if (show_count) {
+            const auto count_x{text_origin.x() + aa_width * 1.1};
+            surface.text({count_x, text_origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), count_color,
+                         count_text_size);
+            surface.text({count_x, text_origin.y()}, fmt::format("{}", color_count.count), count_color, count_text_size);
+        }
+    }
+
+} // acmacs::tal::v3::ColoringByPosBase::draw_legend
 
 // ----------------------------------------------------------------------
 

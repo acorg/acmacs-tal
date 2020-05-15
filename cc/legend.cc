@@ -39,20 +39,8 @@ void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface
 {
     if (parameters().show) {
         if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPosBase*>(&coloring); coloring_by_pos) {
-            auto origin = parameters().offset + Size{0.0, *parameters().text_size};
-            surface.text(origin, fmt::format("{}", coloring_by_pos->pos()), parameters().title_color, parameters().text_size);
-            const auto total_percent = static_cast<double>(coloring_by_pos->total_count()) / 100.0;
-            const auto count_text_size{parameters().text_size * parameters().count_scale};
-            for (const auto& [aa, color_count] : coloring_by_pos->colors()) {
-                origin.y(origin.y() + *parameters().text_size * (1.0 + parameters().interleave));
-                const auto aa_t{fmt::format("{}", aa)};
-                surface.text(origin, aa_t, color_count.color, parameters().text_size);
-                if (parameters().show_count) {
-                    const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W') /*aa_t*/, parameters().text_size);
-                    surface.text({origin.x() + aa_width * 1.1, origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), parameters().count_color, count_text_size);
-                    surface.text({origin.x() + aa_width * 1.1, origin.y()}, fmt::format("{}", color_count.count), parameters().count_color, count_text_size);
-                }
-            }
+            coloring_by_pos->draw_legend(surface, parameters().offset + Size{0.0, *parameters().text_size}, ColoringByPosBase::legend_layout::vertical, parameters().title_color,
+                                         parameters().text_size, parameters().interleave, parameters().show_count, parameters().count_scale, parameters().count_color);
         }
         else
             AD_WARNING("legend with coloring by pos requested but tree is not colored by pos, cannot obtain data for the legend");

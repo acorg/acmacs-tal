@@ -6,6 +6,11 @@
 
 // ----------------------------------------------------------------------
 
+namespace acmacs::surface
+{
+    class Surface;
+}
+
 namespace acmacs::tal::inline v3
 {
     class Node;
@@ -76,6 +81,10 @@ namespace acmacs::tal::inline v3
         constexpr acmacs::seqdb::pos1_t pos() const { return pos_; }
         constexpr const auto& colors() const { return colors_; }
         size_t total_count() const;
+
+        enum class legend_layout { horizontal, vertical };
+        void draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
+                                                     bool show_count, double count_scale, Color count_color) const;
 
       protected:
         constexpr auto& colors() { return colors_; }
