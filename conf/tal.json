@@ -7,7 +7,7 @@
         "? report-branches-by-cumulative-edge",
         {"N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"hide": true, "tree-edge-line-color": "red"}},
 
-         "clades-whocc",
+        "clades-whocc",
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
         {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},
@@ -141,6 +141,7 @@
     ],
 
     "clades-whocc": [
+        "clades-{virus-type/lineage}",
         {"N": "clades",
          "per_clade": [
              {"?N": "---------- H1 ----------"},
@@ -161,7 +162,7 @@
              {"name": "3C.2A", "show": false},
              {"name": "3C.2A1", "show": true},
              {"name": "3C.2A1A", "section_exclusion_tolerance": 20},
-             {"name": "3C.2A1B", "section_inclusion_tolerance": 20},
+             {"name": "3C.2A1B", "section_inclusion_tolerance": 25},
              {"?N": "---------- BVic ----------"},
              {"name": "V1B", "show": false},
              {"name": "V1A", "section_inclusion_tolerance": 20},

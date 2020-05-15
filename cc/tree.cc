@@ -895,11 +895,12 @@ void acmacs::tal::v3::Tree::clade_set_by_nuc_at_pos(std::string_view clade_name,
 
 void acmacs::tal::v3::Tree::make_clade_sections()
 {
-    Timeit timer(">>>> [time] make_clade_sections: ");
+    AD_LOG(acmacs::log::clades, "make_clade_sections");
 
     set_first_last_next_node_id();
 
-    tree::iterate_leaf(*this, [this](Node& node) {
+    bool clade_data_found = false;
+    tree::iterate_leaf(*this, [this, &clade_data_found](Node& node) {
         if (!node.hidden) {
             for (const auto& clade_name : node.clades) {
                 if (clade_t* clade = find_clade(clade_name); clade) {
@@ -907,10 +908,13 @@ void acmacs::tal::v3::Tree::make_clade_sections()
                         clade->sections.emplace_back(&node);
                     else
                         clade->sections.back().last = &node;
+                    clade_data_found = true;
                 }
             }
         }
     });
+    if (!clade_data_found)
+        AD_WARNING("no clade names found in tree nodes, forgot to add \"clades-{virus-type/lineage}\" or \"clades-whocc\" in settings?");
 
 } // acmacs::tal::v3::Tree::make_clade_sections
 

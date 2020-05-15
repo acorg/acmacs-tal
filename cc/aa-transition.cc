@@ -34,6 +34,9 @@ void acmacs::tal::v3::update_aa_transitions_20200514(Tree& tree, const draw_tree
     AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions_20200514");
     tree.cumulative_calculate();
 
+    // see https://notebooks.antigenic-cartography.org/eu/results/2020-0513-tree-aa-subst-left/
+    // for testing, methods description and known issues
+
     // 1. for each branch node find closest child leaf node
     // --
     // 2. for each pos, for each branch node

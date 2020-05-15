@@ -1,4 +1,5 @@
 #include "acmacs-tal/draw-tree.hh"
+#include "acmacs-tal/log.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/tree-iterate.hh"
@@ -35,7 +36,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
                 coloring().prepare(leaf);
         });
         coloring().prepare();
-        AD_INFO("tree {}", coloring().report());
+        AD_LOG(acmacs::log::coloring, "tree {}", coloring().report());
 
         if (parameters().aa_transitions.report)
             report_aa_transitions(tree, parameters().aa_transitions);

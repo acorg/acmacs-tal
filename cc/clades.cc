@@ -30,9 +30,10 @@ void acmacs::tal::v3::Clades::prepare(preparation_stage_t stage)
         time_series_to_the_left_ = layout.index_of(layout.find<TimeSeries>()) < layout.index_of(this);
 
         make_clades();
-        if (width_to_height_ratio() <= 0.0 && number_of_slots())
-            width_to_height_ratio() = static_cast<double>(number_of_slots() + 1) * parameters_.slot.width;
-
+        if (width_to_height_ratio() <= 0.0 && number_of_slots()) {
+            width_to_height_ratio() = static_cast<double>(number_of_slots() + 2) * parameters_.slot.width;
+            AD_LOG(acmacs::log::clades, "width to height ratio auto-set to {}", width_to_height_ratio());
+        }
     }
     LayoutElement::prepare(stage);
 
@@ -53,7 +54,7 @@ const acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::paramet
 
 void acmacs::tal::v3::Clades::make_clades()
 {
-    // AD_DEBUG("Clades::make_clades");
+    AD_LOG(acmacs::log::clades, "make_clades");
     make_sections();
     set_slots();
     add_gaps_to_tree();
@@ -69,8 +70,6 @@ void acmacs::tal::v3::Clades::make_clades()
         }
     }
 
-    // AD_DEBUG("Clades::make_clades done");
-
 } // acmacs::tal::v3::Clades::make_clades
 
 // ----------------------------------------------------------------------
@@ -80,7 +79,7 @@ void acmacs::tal::v3::Clades::make_sections()
     tal().tree().make_clade_sections();
     const auto& tree_clades = tal().tree().clades();
     for (const auto& tree_clade : tree_clades) {
-        // AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
+        AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
         // AD_DEBUG("parameters_for_clade \"{}\": slot:{} display_name:{} hidden:{}", tree_clade.name, clade_param.slot_no, clade_param.display_name, clade_param.hidden);
         if (!clade_param.hidden) {
