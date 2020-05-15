@@ -50,7 +50,10 @@ std::string acmacs::tal::v3::ColoringByContinent::report() const
 Color acmacs::tal::v3::ColoringByPosBase::color(const Node& node) const
 {
     try {
-        return colors_.get(node.aa_sequence.at(pos_)).color;
+        if (const auto aa = node.aa_sequence.at(pos_); aa != ' ')
+            return colors_.get(aa).color;
+        else
+            return GREY;        // sequence is shorter than pos or no sequence available at all
     }
     catch (std::out_of_range&) {
         throw coloring_error{fmt::format("ColoringByPosBase: no color for {} {}, forgot to call ColoringByPosBase::prepare?", pos_, node.aa_sequence.at(pos_))};
@@ -131,9 +134,10 @@ void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& s
 
 void acmacs::tal::v3::ColoringByPosAAColors::prepare(const Node& node)
 {
-    const auto aa = node.aa_sequence.at(pos());
-    auto& entry = colors().emplace_not_replace(aa, acmacs::amino_acid_color(aa));
-    ++entry.second.count;
+    if (const auto aa = node.aa_sequence.at(pos()); aa != ' ') { // ' ' means sequence is shorter than pos or no sequence available at all
+        auto& entry = colors().emplace_not_replace(aa, acmacs::amino_acid_color(aa));
+        ++entry.second.count;
+    }
 
 } // acmacs::tal::v3::ColoringByPosAAColors::prepare
 
