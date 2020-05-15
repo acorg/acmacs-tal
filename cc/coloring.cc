@@ -79,6 +79,21 @@ std::string acmacs::tal::v3::ColoringByPosBase::report() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency()
+{
+    colors().sort([](const auto& e1, const auto& e2) -> bool {
+        // X is last regardles of its frequency
+        if (e1.first == 'X')
+            return false;
+        if (e2.first == 'X')
+            return true;
+        return e1.second.count > e2.second.count;
+    });
+
+} // acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::ColoringByPosAAColors::prepare(const Node& node)
 {
     const auto aa = node.aa_sequence.at(pos());
@@ -91,6 +106,7 @@ void acmacs::tal::v3::ColoringByPosAAColors::prepare(const Node& node)
 
 void acmacs::tal::v3::ColoringByPosAAColors::prepare()
 {
+    sort_colors_by_frequency();
 
 } // acmacs::tal::v3::ColoringByPosAAColors::prepare
 
@@ -107,7 +123,7 @@ void acmacs::tal::v3::ColoringByPosAAFrequency::prepare(const Node& node)
 
 void acmacs::tal::v3::ColoringByPosAAFrequency::prepare()
 {
-    colors().sort([](const auto& e1, const auto& e2) -> bool { return e1.second.count > e2.second.count; });
+    sort_colors_by_frequency();
 
     size_t color_no{0};
     for (auto& [aa, color_count] : colors()) {
@@ -115,10 +131,10 @@ void acmacs::tal::v3::ColoringByPosAAFrequency::prepare()
             color_count.color = BLACK;
         }
         else {
-            if (color_no < color_order().size())
-                color_count.color = color_order()[color_no];
+            if (color_no < color_order_.size())
+                color_count.color = color_order_[color_no];
             else
-                color_count.color = acmacs::color::distinct(color_no - color_order().size());
+                color_count.color = acmacs::color::distinct(color_no - color_order_.size());
             ++color_no;
         }
     }

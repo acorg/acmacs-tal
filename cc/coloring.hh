@@ -79,13 +79,11 @@ namespace acmacs::tal::inline v3
 
       protected:
         constexpr auto& colors() { return colors_; }
-        constexpr auto& color_order() { return color_order_; }
-        constexpr const auto& color_order() const { return color_order_; }
+        void sort_colors_by_frequency();
 
       private:
         acmacs::seqdb::pos1_t pos_;
         acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
-        std::vector<Color> color_order_;
 
     }; // class ColoringByPosBase
 
@@ -110,7 +108,10 @@ namespace acmacs::tal::inline v3
         std::string_view legend_type() const override { return "color-by-pos-aa-frequency"; }
         void prepare(const Node& node) override;
         void prepare() override; // to be called after coloring prepare(Node) for each node
-        void add_color(Color color) { color_order().push_back(color); }
+        void add_color(Color color) { color_order_.push_back(color); }
+
+      private:
+        std::vector<Color> color_order_;
 
     }; // class ColoringByPosAAFrequency
 
