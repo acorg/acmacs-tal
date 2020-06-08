@@ -100,21 +100,21 @@ int main(int argc, const char *argv[])
         }
         time_loading_settings.report();
 
-        Timeit time_applying_settings(">>>> Applying settings: ", report);
+        // Timeit time_applying_settings(">>>> Applying settings: ", report);
         settings.apply("main"sv);
-        time_applying_settings.report();
+        // time_applying_settings.report();
 
-        Timeit time_preparing(">>>> preparing: ", report);
+        // Timeit time_preparing(">>>> preparing: ", report);
         tal.prepare();
-        time_preparing.report();
+        // time_preparing.report();
 
         if (opt.first_last_leaves.has_value())
             tal.tree().report_first_last_leaves(opt.first_last_leaves);
 
-        Timeit time_exporting(">>>> exporting: ", report);
+        // Timeit time_exporting(">>>> exporting: ", report);
         for (const auto& output : *opt.outputs)
             tal.export_tree(output);
-        time_exporting.report();
+        // time_exporting.report();
 
         if (opt.open || opt.ql) {
             for (const auto& output : *opt.outputs) {

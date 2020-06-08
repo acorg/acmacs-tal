@@ -914,7 +914,7 @@ void acmacs::tal::v3::Tree::make_clade_sections()
         }
     });
     if (!clade_data_found)
-        AD_WARNING("no clade names found in tree nodes, forgot to add \"clades-{virus-type/lineage}\" or \"clades-whocc\" in settings?");
+        AD_WARNING("no clade names found in tree nodes, forgot to add \"clades-{{virus-type/lineage}}\" or \"clades-whocc\" in settings?");
 
 } // acmacs::tal::v3::Tree::make_clade_sections
 
