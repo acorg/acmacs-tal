@@ -7,7 +7,10 @@
         "? report-branches-by-cumulative-edge",
         {"N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"hide": true, "tree-edge-line-color": "red"}},
 
-        "clades-whocc",
+        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+            "clades-whocc"
+        ]},
+        
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
         {"?N": "draw-aa-transitions", "per_node": []},
         {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},

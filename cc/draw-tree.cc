@@ -47,6 +47,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
         AD_INFO("tree [{}] Shown leaves: {}", id(), tree.number_leaves_in_subtree());
         vertical_step_ = height_ / tree_height;
         horizontal_step_ = width_to_height_ratio() * height_ / tree.max_cumulative_shown().as_number();
+        AD_LOG(acmacs::log::tree, "tree vertical step: {} (tree height: {}) horizontal step: {}", vertical_step_, tree_height, horizontal_step_);
     }
     LayoutElementWithColoring::prepare(stage);
 

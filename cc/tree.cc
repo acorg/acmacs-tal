@@ -424,8 +424,8 @@ void acmacs::tal::v3::Tree::select_by_top_cumulative_gap(NodeSet& nodes, Select 
                     break;
                 }
             }
-            AD_INFO("\"top-cumulative-gap\": {}: cut_off_gap: {:.8f}  cut_off_cumulative_edge: {:.8f}", top_gap_rel, cumulative_gaps[0], cut_off_cumulative_edge);
             select_if_cumulative_more_than(nodes, update, cut_off_cumulative_edge, Descent::no);
+            AD_INFO("\"top-cumulative-gap\": {}: cut_off_gaps: {:.8f}  cut_off_cumulative_edge: {:.8f}", top_gap_rel, cumulative_gaps[0], cut_off_cumulative_edge);
         }
         else
             AD_INFO("\"top-cumulative-gap\" not applied, ratio of top cumul gaps: {} <= {}", cumulative_gaps[0] / cumulative_gaps[1], top_gap_rel);
@@ -445,9 +445,20 @@ void acmacs::tal::v3::Node::hide()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::hide(const NodeSet& nodes)
+void acmacs::tal::v3::Tree::hide(const NodeSet& nodes, hide_if_too_many_leaves force)
 {
-    AD_INFO("hiding {} nodes", nodes.size());
+    size_t leaves_to_hide{0};
+    for (const auto& node : nodes)
+        leaves_to_hide += node->number_leaves_in_subtree();
+    const auto total_leaves{number_leaves_in_subtree()};
+    const auto percent_to_hide{double(leaves_to_hide) / double(total_leaves) * 100.0};
+
+    if ((leaves_to_hide * 2) > total_leaves && force == hide_if_too_many_leaves::no) {
+        AD_WARNING("requested to hide too many leaves (ignored): {} nodes with {} leaves ({:.1f}% of all leaves)", nodes.size(), leaves_to_hide, percent_to_hide);
+        return;
+    }
+
+    AD_INFO("hiding {} nodes with {} leaves ({:.1f}% of all leaves)", nodes.size(), leaves_to_hide, percent_to_hide);
 
     for (Node* node : nodes)
         node->hide();

@@ -239,7 +239,8 @@ namespace acmacs::tal::inline v3
         enum class serum_match_t { name, reassortant, passage_type };
         void select_matches_chart_sera(NodeSet& nodes, Select update, serum_match_t match_type);
 
-        void hide(const NodeSet& nodes);
+        enum class hide_if_too_many_leaves { no, yes };
+        void hide(const NodeSet& nodes, hide_if_too_many_leaves force);
 
         enum class Ladderize { None, MaxEdgeLength, NumberOfLeaves };
         void ladderize(Ladderize method);

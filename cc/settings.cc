@@ -1,6 +1,7 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/range-v3.hh"
 #include "acmacs-base/string.hh"
+#include "acmacs-base/rjson-v3-helper.hh"
 #include "locationdb/locdb.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-whocc-data/vaccines.hh"
@@ -186,12 +187,8 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
     const auto apply_one = [this, &selected](std::string_view key, const rjson::v3::value& value) {
         if (key == "hide"sv) {
-            if (value.is_bool()) {
-                if (value.to<bool>())
-                    tree().hide(selected);
-            }
-            else
-                throw error{fmt::format("unrecognized value for \"{}\" operation on the selected nodes", key)};
+            if (rjson::v3::read_bool(value, false))
+                tree().hide(selected, Tree::hide_if_too_many_leaves::no);
         }
         else if (key == "line"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
