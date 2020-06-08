@@ -1159,8 +1159,13 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
 {
     using namespace std::string_view_literals;
 
+    AD_LOG(acmacs::log::vaccines, "select_vaccine");
+    const acmacs::virus::type_subtype_t virus_type{getenv_or("virus-type"sv, ""sv)};
+    const acmacs::virus::lineage_t lineage{getenv_or("lineage"sv, ""sv)};
+    AD_LOG(acmacs::log::vaccines, "virus-type: \"{}\" lineage: \"{}\"", virus_type, lineage);
+
     const auto names = ranges::to<std::vector<std::string>>(
-        acmacs::whocc::vaccine_names(acmacs::virus::type_subtype_t{getenv_or("virus-type"sv, ""sv)}, acmacs::virus::lineage_t{getenv_or("lineage"sv, ""sv)})
+        acmacs::whocc::vaccine_names(virus_type, lineage)
         | ranges::views::filter([vaccine_type=acmacs::whocc::Vaccine::type_from_string(rjson::v3::get_or(criteria, "type"sv, "any"sv))](const auto& en) { return vaccine_type == acmacs::whocc::vaccine_type::any || en.type == vaccine_type; })
         | ranges::views::transform([](const auto& en) { return en.name; }));
 
