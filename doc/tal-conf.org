@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-08 17:09:45 eu>
+# Time-stamp: <2020-06-08 17:33:44 eu>
 
 * Command line defines
 
@@ -162,9 +162,11 @@ If multiple criteria specified within single "select" object, they all used (con
 
 
 #+BEGIN_SRC json
-  {"N": "draw-aa-transitions", "minimum_number_leaves_in_subtree": 20, "text_line_interleave": 0.3,
+  {"N": "draw-aa-transitions", 
+   "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
+   "text_line_interleave": 0.3,
    "show": true,
-   "?only-for": [<pos>], # draw only for the specified pos, if list is absent or empty, draw for all pos
+   "?only-for": [<pos>], -- draw only for the specified pos, if list is absent or empty, draw for all pos
    "all": {"node_id": "", "label": {<[[Label parameters]]>}},
    "per_node": [
    ],

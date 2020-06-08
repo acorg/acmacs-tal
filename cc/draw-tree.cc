@@ -44,7 +44,7 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
     else if (stage == 3 && prepared_ < stage) {
         const auto tree_height = tal().tree().compute_cumulative_vertical_offsets();
         const auto leaves_to_show = tree.number_leaves_in_subtree();
-        AD_INFO("tree [{}] Shown leaves: {}", id(), leaves_to_show);
+        AD_INFO("tree [id: {}] Shown leaves: {}", id(), leaves_to_show);
         vertical_step_ = height_ / tree_height;
         const auto reserve = leaves_to_show < 3000 ? (1.0 - double(leaves_to_show) / 3000.0) * 0.1 : 0.0; // if too few leaves, names are seen and occupy much space
         horizontal_step_ = width_to_height_ratio() * height_ * (1.0 - reserve) / tree.max_cumulative_shown().as_number();

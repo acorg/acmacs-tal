@@ -18,8 +18,10 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
                 return aa_transitions.has_data_for(parameters().only_for_pos);
         };
 
-        tree::iterate_pre(tal().tree(), [this, aa_transitions_valid](const Node& node) {
-            if (!node.hidden && node.number_leaves_in_subtree() >= parameters().minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) {
+        const auto total_leaves = static_cast<double>(tal().tree().number_leaves_in_subtree());
+        const auto minimum_number_leaves_in_subtree = static_cast<size_t>(parameters().minimum_number_leaves_in_subtree < 1 ? total_leaves * parameters().minimum_number_leaves_in_subtree : parameters().minimum_number_leaves_in_subtree);
+        tree::iterate_pre(tal().tree(), [this, aa_transitions_valid, minimum_number_leaves_in_subtree](const Node& node) {
+            if (!node.hidden && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) {
                 const auto node_id = fmt::format("{}", node.node_id);
                 transitions_.emplace_back(&node, parameters_for_node(node_id).label);
             }

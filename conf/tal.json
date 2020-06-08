@@ -74,7 +74,7 @@
     "modifications-tal": [
         {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
             {"N": "draw-aa-transitions",
-             "minimum_number_leaves_in_subtree": 20,
+             "minimum_number_leaves_in_subtree": 0.01,
              "text_line_interleave": 0.3,
              "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
             }
