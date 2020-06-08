@@ -27,7 +27,7 @@ struct Options : public argv
     option<bool>      ql{*this, "ql"};
     option<str_array> verbose{*this, 'v', "verbose", desc{"comma separated list (or multiple switches) of enablers"}};
 
-    argument<str> tree_file{*this, arg_name{"tree.newick|tree.phy|tree.json[.xz]"}, mandatory};
+    argument<str> tree_file{*this, arg_name{"tree.newick|tree.phy|tree.json[.xz]|tjz"}, mandatory};
     argument<str_array> outputs{*this, arg_name{".pdf, .json[.xz], .html, .names, /json, /names"}}; // , mandatory};
 
     // option<bool>      no_whocc{*this, "no-whocc", desc{"init settings without whocc defaults (clades, hz sections)"}};

@@ -24,7 +24,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
             throw ImportError{fmt::format("cannot import from newick: {}", err)};
         }
     }
-    else if (filename == "-" || ext == ".json") {
+    else if (filename == "-" || ext == ".json" || ext == ".tjz") {
         try {
             json_import(filename, tree);
         }
@@ -54,7 +54,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
             throw ExportError{fmt::format("cannot export to newick: {}", err)};
         }
     }
-    else if (filename == "/json" || ext == ".json") {
+    else if (filename == "/json" || ext == ".json" || ext == ".tjz") {
         try {
             exported = json_export(tree);
         }
@@ -82,7 +82,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
         throw ExportError{fmt::format("cannot infer export method from filename: {}", filename)};
     if (filename[0] == '/')
         filename = std::string_view{"-"};
-    acmacs::file::write(filename, exported);
+    acmacs::file::write(filename, exported, filename.back() == 'z' ? acmacs::file::force_compression::yes : acmacs::file::force_compression::no);
 
 } // acmacs::tal::v3::export_tree
 
