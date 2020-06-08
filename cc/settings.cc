@@ -1159,10 +1159,9 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
 {
     using namespace std::string_view_literals;
 
-    AD_LOG(acmacs::log::vaccines, "select_vaccine");
     const acmacs::virus::type_subtype_t virus_type{getenv_or("virus-type"sv, ""sv)};
     const acmacs::virus::lineage_t lineage{getenv_or("lineage"sv, ""sv)};
-    AD_LOG(acmacs::log::vaccines, "virus-type: \"{}\" lineage: \"{}\"", virus_type, lineage);
+    AD_LOG(acmacs::log::vaccines, "select_vaccine virus-type: \"{}\" lineage: \"{}\"", virus_type, lineage);
 
     const auto names = ranges::to<std::vector<std::string>>(
         acmacs::whocc::vaccine_names(virus_type, lineage)
