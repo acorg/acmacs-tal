@@ -8,7 +8,7 @@
 
 void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 {
-    if (!prepared_) {
+    if (!prepared_ && parameters().show) {
         // AD_DEBUG("DrawAATransitions::prepare");
 
         const auto aa_transitions_valid = [this](const AA_Transitions& aa_transitions) -> bool {

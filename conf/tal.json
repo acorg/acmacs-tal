@@ -10,9 +10,9 @@
         {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
             "clades-whocc"
         ]},
-        
+
+        {"?N": "draw-aa-transitions", "show": false},
         {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
-        {"?N": "draw-aa-transitions", "per_node": []},
         {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},
         {"?N": "title", "text": "{virus-type/lineage}", "?offset": [0.3, -0.005], "?color": "red"}
     ],

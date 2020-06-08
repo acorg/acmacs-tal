@@ -1061,6 +1061,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     auto& element = add_element<DrawAATransitions>();
     auto& param = element.parameters();
 
+    getenv_copy_if_present("show"sv, param.show);
     getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
     getenv_copy_if_present("text_line_interleave"sv, param.text_line_interleave);
 

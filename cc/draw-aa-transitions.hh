@@ -44,6 +44,7 @@ namespace acmacs::tal::inline v3
 
         struct Parameters
         {
+            bool show{true};
             size_t minimum_number_leaves_in_subtree{20};
             double text_line_interleave{0.3}; // fraction of the text height
             std::vector<acmacs::seqdb::pos1_t> only_for_pos;
