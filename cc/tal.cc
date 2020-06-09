@@ -1,6 +1,4 @@
 #include "acmacs-base/argv.hh"
-#include "acmacs-base/acmacsd.hh"
-#include "acmacs-base/filesystem.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
 // #include "acmacs-base/string-split.hh"
@@ -73,41 +71,21 @@ int main(int argc, const char *argv[])
 
         Timeit time_loading_settings(">>>> Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
-        for (const auto& settings_file_name : {"tal.json"sv, "clades.json"sv, "vaccines.json"sv}) {
-            if (const auto filename = fmt::format("{}/share/conf/{}", acmacs::acmacsd_root(), settings_file_name); fs::exists(filename)) {
-                AD_LOG(acmacs::log::settings, "loading {}", filename);
-                settings.load(filename);
-            }
-            else
-                fmt::print(stderr, ">> WARNING cannot load \"{}\": file not found\n", filename);
-        }
+        settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
         settings.load(opt.settings_files);
-        for (const auto& def : *opt.defines) {
-            if (const auto pos = def.find('='); pos != std::string_view::npos) {
-                const auto val_s = def.substr(pos + 1);
-                if (val_s == "-") { // parsed as -0
-                    settings.setenv(def.substr(0, pos), rjson::v3::parse_string(fmt::format("\"{}\"", val_s)));
-                }
-                else {
-                    try {
-                        settings.setenv(def.substr(0, pos), rjson::v3::parse_string(val_s));
-                    }
-                    catch (std::exception&) {
-                        settings.setenv(def.substr(0, pos), rjson::v3::parse_string(fmt::format("\"{}\"", val_s)));
-                    }
-                }
-            }
-            else
-                settings.setenv(def, "true"sv);
-        }
+        settings.set_defines(opt.defines);
         time_loading_settings.report();
 
         // Timeit time_applying_settings(">>>> Applying settings: ", report);
         settings.apply("tal-default"sv);
         // time_applying_settings.report();
 
-        if (opt.chart_file)
-            tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->chart_draw_settings().load(opt.settings_files, opt.defines);
+        if (opt.chart_file) {
+            auto& chart_draw_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->chart_draw_settings()};
+            chart_draw_settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
+            chart_draw_settings.load(opt.settings_files);
+            chart_draw_settings.set_defines(opt.defines);
+        }
 
         // Timeit time_preparing(">>>> preparing: ", report);
         tal.prepare();
@@ -128,7 +106,7 @@ int main(int argc, const char *argv[])
             }
         }
 
-        AD_INFO("tal configuration docs: {}/share/doc/tal-conf.org", acmacs::acmacsd_root());
+        // AD_INFO("tal configuration docs: {}/share/doc/tal-conf.org", acmacs::acmacsd_root());
         return 0;
     }
     catch (std::exception& err) {
