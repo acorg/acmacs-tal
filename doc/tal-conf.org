@@ -1,4 +1,18 @@
-# Time-stamp: <2020-06-08 17:33:44 eu>
+# Time-stamp: <2020-06-09 10:24:50 eu>
+
+* Sample settings
+
+Use .tal suffix
+
+#+BEGIN_SRC json
+  {
+      "tal": [
+          {"N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"hide": true, "tree-edge-line-color": "red"}},
+          "clades-whocc"
+    ]
+  }
+#+END_SRC
+
 
 * Command line defines
 
@@ -11,9 +25,6 @@
 -D report-time-series-output=filename  write time-series report to filename
 
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
-
-* TODO
-
 
 * Settings features
 

@@ -28,14 +28,14 @@
     ],
     "? end overwrite in local settings": "----------------------------------------------------------------------",
 
-    "main": [
-        "pre-tal",
+    "tal-default": [
+        "tal-pre",
         {"?N": "update-common-aa", "report": false},
         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
         {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
 
         "layout",
-        "modifications-tal"
+        "tal-modifications"
     ],
 
     "layout": [
@@ -52,7 +52,7 @@
         {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "legend": {"show": true}, "debug-outline": false},
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
-        "dash-bar-clades-tal",
+        "tal-dash-bar-clades",
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}, "report": "{report-time-series-output}"},
         {"N": "clades"}
     ],
@@ -61,7 +61,7 @@
         {"N": "margins", "?left": 0.1, "?debug-outline": "cyan"},
         {"N": "tree", "color_by": "continent", "width-to-height-ratio": 0.48, "legend": {"show": true}, "debug-outline": false},
         {"N": "draw-on-tree"},
-        "dash-bar-clades-tal",
+        "tal-dash-bar-clades",
         {"N": "clades"},
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "{report-time-series-output}"},
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
@@ -71,7 +71,7 @@
         {"N": "antigenic-maps"}
     ],
 
-    "modifications-tal": [
+    "tal-modifications": [
         {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
             {"N": "draw-aa-transitions",
              "minimum_number_leaves_in_subtree": 0.01,
@@ -89,10 +89,10 @@
             {"N": "clades-{virus-type}{lineage}", "report": false}
         ]},
 
-        "modifications"
+        "tal"
     ],
 
-    "pre-tal": [
+    "tal-pre": [
         {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
             {"N": "seqdb", "filename": "{seqdb-filename}"},
             {"N": "populate-with-nuc-duplicates"}
@@ -104,7 +104,7 @@
         {"?N": ""}
     ],
 
-    "dash-bar-clades-tal": [
+    "tal-dash-bar-clades": [
         {"?N": "---------- H1 ----------"},
         {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
             {"N": "dash-bar-clades",

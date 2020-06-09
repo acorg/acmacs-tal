@@ -102,7 +102,7 @@ int main(int argc, const char *argv[])
         time_loading_settings.report();
 
         // Timeit time_applying_settings(">>>> Applying settings: ", report);
-        settings.apply("main"sv);
+        settings.apply("tal-default"sv);
         // time_applying_settings.report();
 
         // Timeit time_preparing(">>>> preparing: ", report);
