@@ -77,9 +77,9 @@ void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface,
 
     chart_draw_settings_.apply("antigenic-map"sv);
 
-    // surface.rectangle(surface.viewport().origin, surface.viewport().size, BLUE, Pixels{1});
     chart_draw_.calculate_viewport();
-    chart_draw_.draw(surface);
+    acmacs::draw::DrawElementsToSurface painter(surface.subsurface({0.0, 0.0}, Scaled{1.0}, chart_draw_.viewport("AntigenicMaps::draw_map"sv), false));
+    chart_draw_.draw(painter);
 
 } // acmacs::tal::v3::AntigenicMaps::draw_map
 
