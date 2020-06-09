@@ -76,7 +76,7 @@ namespace acmacs::tal::inline v3
             parameters::Label label;
             arrow_t arrow;
             parameters::Line horizontal_line{GREY, Pixels{0.5}, surface::Dash::NoDash};
-            double tree_top_gap{50.0}, tree_bottom_gap{50.0};
+            double tree_top_gap{0.01}, tree_bottom_gap{0.01}; // fraction of the tree area height
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
         };
 

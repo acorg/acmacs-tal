@@ -987,6 +987,26 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::set_top_gap(const Node& node, double gap) const
+{
+    // gap is a fraction of tree height (number of shown leaves)
+    const auto gap_to_use{gap * static_cast<double>(number_leaves_in_subtree())};
+    if (node.vertical_offset_ < gap_to_use)
+        node.vertical_offset_ = gap_to_use;
+
+} // acmacs::tal::v3::Tree::set_top_gap
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::set_bottom_gap(const Node& node, double gap) const
+{
+    if (node.last_next_leaf)
+        set_top_gap(*node.last_next_leaf, gap);
+
+} // acmacs::tal::v3::Tree::set_bottom_gap
+
+// ----------------------------------------------------------------------
+
 double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
 {
     double height{0.0};

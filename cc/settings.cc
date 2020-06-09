@@ -762,8 +762,8 @@ void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::v3::value& so
 
     read_line_parameters(source["horizontal_line"sv], clade_parameters.horizontal_line);
 
-    rjson::v3::copy_if_not_null(source["top_gap"sv], clade_parameters.tree_top_gap);
-    rjson::v3::copy_if_not_null(source["bottom_gap"sv], clade_parameters.tree_bottom_gap);
+    rjson::v3::copy_if_not_null(source["top-gap"sv], clade_parameters.tree_top_gap);
+    rjson::v3::copy_if_not_null(source["bottom-gap"sv], clade_parameters.tree_bottom_gap);
     rjson::v3::copy_if_not_null(source["time_series_top_separator"sv], clade_parameters.time_series_top_separator);
     rjson::v3::copy_if_not_null(source["time_series_bottom_separator"sv], clade_parameters.time_series_bottom_separator);
 
@@ -817,8 +817,8 @@ void acmacs::tal::v3::Settings::hz_sections()
 
     getenv_copy_if_present("report"sv, param.report);
     read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
-    rjson::v3::copy_if_not_null(getenv("top_gap"sv), param.tree_top_gap);
-    rjson::v3::copy_if_not_null(getenv("bottom_gap"sv), param.tree_bottom_gap);
+    rjson::v3::copy_if_not_null(getenv("top-gap"sv), param.tree_top_gap);
+    rjson::v3::copy_if_not_null(getenv("bottom-gap"sv), param.tree_bottom_gap);
 
     for (const rjson::v3::value& for_section : getenv("sections"sv).array()) {
         if (const auto& id = for_section["id"sv]; !id.is_null()) {

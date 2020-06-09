@@ -99,8 +99,9 @@ void acmacs::tal::v3::HzSections::add_gaps_to_tree()
 {
     for (const auto& section : sections_) {
         if (section.shown) {
-            Tree::set_top_gap(*section.first, parameters().tree_top_gap);
-            Tree::set_bottom_gap(*section.last, parameters().tree_bottom_gap);
+            // AD_DEBUG("hz section {} {} gaps top:{} bottom:{}", section.prefix, section.label, parameters().tree_top_gap, parameters().tree_bottom_gap);
+            tal().tree().set_top_gap(*section.first, parameters().tree_top_gap);
+            tal().tree().set_bottom_gap(*section.last, parameters().tree_bottom_gap);
         }
     }
 

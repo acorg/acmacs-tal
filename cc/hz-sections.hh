@@ -50,7 +50,7 @@ namespace acmacs::tal::inline v3
             bool report{true};
             std::vector<SectionParameters> sections;
             parameters::Line line{GREY, Pixels{1.0}, surface::Dash::NoDash};
-            double tree_top_gap{50.0}, tree_bottom_gap{50.0};
+            double tree_top_gap{0.01}, tree_bottom_gap{0.01}; // fraction of the tree area height
 
             SectionParameters& find_add_section(std::string_view id) { return HzSections::find_add_section(sections, id); }
         };

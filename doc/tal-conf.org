@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-09 10:24:50 eu>
+# Time-stamp: <2020-06-09 11:16:03 eu>
 
 * Sample settings
 
@@ -224,64 +224,75 @@ If multiple criteria specified within single "select" object, they all used (con
 
 **** Clade parameters
 
-{"name": "183P-1", "display_name": "183P-1",
- "shown": true, "show": true, "hidden": false,
- "slot": 1,
- "top_gap": 0.05, "bottom_gap": 0.05, "?top_gap?": "fraction of area height",
- "time_series_top_separator": true, "time_series_bottom_separator": true,
- "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
- "label": {<[[Label parameters]]>},
- "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
- "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
-}
+#+BEGIN_SRC json
+  {"name": "183P-1", "display_name": "183P-1",
+   "shown": true, "show": true, "hidden": false,
+   "slot": 1,
+   "top-gap": 0.01, "bottom-gap": 0.01, -- fraction of the tree area height
+   "time_series_top_separator": true, "time_series_bottom_separator": true,
+   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+   "label": {<[[Label parameters]]>},
+   "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
+   "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
+  }
+#+END_SRC
 
 *** HZ sections
 
-{"N": "hz-sections", "report": true,
- "line": {"color": "black", "line_width": 1},
- "top_gap": 0.05, "bottom_gap": 0.05,
- "sections": [
-  {"id": "<uniq-id>", "first": "<seq_id>", "last": "<seq_id>", "label": "", "show": true}
- ]
-},
+#+BEGIN_SRC json
+  {"N": "hz-sections", "report": true,
+   "line": {"color": "black", "line_width": 1},
+   "top-gap": 0.01, "bottom-gap": 0.01, -- fraction of the tree area height
+   "sections": [
+       {"id": "<uniq-id>", "first": "<seq_id>", "last": "<seq_id>", "label": "", "show": true}
+   ]
+  }
 
-{"N": "hz-section-marker", "width-to-height-ratio": 0.1,
- "line": {"color": "black", "line_width": 1},
-},
+  {"N": "hz-section-marker", "width-to-height-ratio": 0.1, "line": {"color": "black", "line_width": 1}}
+#+END_SRC
+
 
 *** dash-bar-clades
 
-{"N": "dash-bar-clades",
- "?width-to-height-ratio": 0.009,
- "clades": [
-   {"name": "2DEL2017", "color": "#A0A0A0"},
-   {"name": "3DEL2017", "color": "#606060"}
- ],
- "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
- "?debug-outline": "lightblue"}
+#+BEGIN_SRC json
+  {"N": "dash-bar-clades",
+   "?width-to-height-ratio": 0.009,
+   "clades": [
+     {"name": "2DEL2017", "color": "#A0A0A0"},
+     {"name": "3DEL2017", "color": "#606060"}
+   ],
+   "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+   "?debug-outline": "lightblue"}
+#+END_SRC
 
 *** dash-bar - Show colored dashes for selected nodes
 
-{"N": "dash-bar",
- "?width-to-height-ratio": 0.009,
- "nodes": [
-   {"select": {<[[Select Nodes]]>}, "color": "#A0A0A0"},
- ],
- "labels": [
-   {<[[Label parameters]]>}
- ],
- "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
- "?debug-outline": "lightblue"}
+#+BEGIN_SRC json
+  {"N": "dash-bar",
+   "?width-to-height-ratio": 0.009,
+   "nodes": [
+     {"select": {<[[Select Nodes]]>}, "color": "#A0A0A0"},
+   ],
+   "labels": [
+     {<[[Label parameters]]>}
+   ],
+   "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+   "?debug-outline": "lightblue"}
+#+END_SRC
 
 *** Antigenic maps
 
-{"N": "antigenic-maps",
- "gap-between-maps": 20.0, "columns": 0
-}
+#+BEGIN_SRC json
+  {"N": "antigenic-maps",
+   "gap-between-maps": 20.0, "columns": 0
+  }
+#+END_SRC
 
 *** Title
 
-{"N": "title", "texts": [{<[[Text parameters]]>}, ...]}
+#+BEGIN_SRC json
+  {"N": "title", "texts": [{<[[Text parameters]]>}, ...]}
+#+END_SRC
 
 *** Legend
 
@@ -289,22 +300,26 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Draw on tree
 
+#+BEGIN_SRC json
 {"N": "draw-on-tree", 
  "texts": [{<[[Text parameters]]>}, ...]
 }
+#+END_SRC
 
 *** Label parameters
 
-"label": {
-  "text": "",
-  "rotation_degrees": 0, "color": "black",
-  "scale": 0.5, "?scale?": "scale is a fraction of the slot width in clades"
-  "vertical_position": "middle|top|bottom",
-  "horizontal_position": "left|middle|right",
-  "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",
-  "tether": {"show": false, "color": "black", "line_width": 1.0},
-  "text_style": {"font": "monospace", "weight": "normal", "slant": "normal"}
-}
+#+BEGIN_SRC json
+  "label": {
+    "text": "",
+    "rotation_degrees": 0, "color": "black",
+    "scale": 0.5, "?scale?": "scale is a fraction of the slot width in clades"
+    "vertical_position": "middle|top|bottom",
+    "horizontal_position": "left|middle|right",
+    "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",
+    "tether": {"show": false, "color": "black", "line_width": 1.0},
+    "text_style": {"font": "monospace", "weight": "normal", "slant": "normal"}
+  }
+#+END_SRC
 
 *** Text parameters
 
