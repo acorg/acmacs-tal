@@ -73,6 +73,10 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 
 void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& /*section*/) const
 {
+    using namespace std::string_view_literals;
+
+    chart_draw_settings_.apply("antigenic-map"sv);
+
     // surface.rectangle(surface.viewport().origin, surface.viewport().size, BLUE, Pixels{1});
     chart_draw_.calculate_viewport();
     chart_draw_.draw(surface);

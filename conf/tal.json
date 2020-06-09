@@ -17,8 +17,13 @@
         {"?N": "title", "text": "{virus-type/lineage}", "?offset": [0.3, -0.005], "?color": "red"}
     ],
 
-    "? overwrite in local settings": "",
-    "tal-mapi": [
+    "? for all antigenic maps": "",
+    "antigenic-maps-all": [
+    ],
+
+    "? for specific antigenic map": "",
+    "antigenic-map": [
+        {"N": "title", "remove-lines": true, "lines": ["prefix. label"]}
     ],
 
     "init": [
@@ -46,7 +51,7 @@
     "/tal-mapi": [
         "mapi",
         {"N": "title", "show": true, "offset": [0, 0], "padding": 0, "remove-lines": true},
-        "tal-mapi"
+        "antigenic-maps-all"
     ],
 
     "layout": [

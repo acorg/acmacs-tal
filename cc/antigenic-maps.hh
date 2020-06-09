@@ -35,7 +35,7 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
         size_t columns_{0}, rows_{0};
         ChartDraw chart_draw_;
-        acmacs::mapi::Settings chart_draw_settings_;
+        mutable acmacs::mapi::Settings chart_draw_settings_;
 
         void columns_rows();
         void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;
