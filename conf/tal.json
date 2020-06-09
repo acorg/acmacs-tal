@@ -45,6 +45,7 @@
     "? applied when chart is loaded": "",
     "/tal-mapi": [
         "mapi",
+        {"N": "title", "show": true, "offset": [0, 0], "padding": 0, "remove-lines": true},
         "tal-mapi"
     ],
 
