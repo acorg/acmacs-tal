@@ -20,7 +20,7 @@ void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
     if (stage == 2 && prepared_ < stage) {
         tal().draw().layout().prepare_element<HzSections>(stage);
         columns_rows();
-        acmacs::log::enable("settings"sv);
+        // acmacs::log::enable("settings"sv);
         chart_draw_settings_.apply_first({"/tal-mapi"sv, "mapi"sv, "mapi-default"sv}, acmacs::mapi::Settings::throw_if_nothing_applied::yes);
     }
     LayoutElement::prepare(stage);

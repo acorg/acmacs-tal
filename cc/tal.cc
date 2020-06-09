@@ -82,7 +82,7 @@ int main(int argc, const char *argv[])
 
         if (opt.chart_file) {
             auto& chart_draw_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->chart_draw_settings()};
-            chart_draw_settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
+            chart_draw_settings.load_from_conf({"mapi.json"sv, "tal.json"sv, "clades.json"sv, "vaccines.json"sv});
             chart_draw_settings.load(opt.settings_files);
             chart_draw_settings.set_defines(opt.defines);
         }

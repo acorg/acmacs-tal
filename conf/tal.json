@@ -17,6 +17,10 @@
         {"?N": "title", "text": "{virus-type/lineage}", "?offset": [0.3, -0.005], "?color": "red"}
     ],
 
+    "? overwrite in local settings": "",
+    "tal-mapi": [
+    ],
+
     "init": [
         {"N": "set",
          "report-cumulative-output": "",
@@ -36,6 +40,12 @@
 
         "layout",
         "tal-modifications"
+    ],
+
+    "? applied when chart is loaded": "",
+    "/tal-mapi": [
+        "mapi",
+        "tal-mapi"
     ],
 
     "layout": [
