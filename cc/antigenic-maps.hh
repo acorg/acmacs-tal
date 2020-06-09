@@ -1,5 +1,7 @@
 #pragma once
 
+#include "acmacs-map-draw/draw.hh"
+#include "acmacs-map-draw/mapi-settings.hh"
 #include "acmacs-tal/layout.hh"
 
 // ----------------------------------------------------------------------
@@ -11,7 +13,7 @@ namespace acmacs::tal::inline v3
     class AntigenicMaps : public LayoutElement
     {
       public:
-        AntigenicMaps(Tal& tal) : LayoutElement(tal, 0.0) {}
+        AntigenicMaps(Tal& tal);
 
         void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
@@ -27,9 +29,13 @@ namespace acmacs::tal::inline v3
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
 
+        constexpr acmacs::mapi::Settings& chart_draw_settings() { return chart_draw_settings_; }
+
       private:
         Parameters parameters_;
         size_t columns_{0}, rows_{0};
+        ChartDraw chart_draw_;
+        acmacs::mapi::Settings chart_draw_settings_;
 
         void columns_rows();
         void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;

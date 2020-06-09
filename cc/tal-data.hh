@@ -29,6 +29,7 @@ namespace acmacs::tal::inline v3
         constexpr const Tree& tree() const { return tree_; }
         bool chart_present() const { return static_cast<bool>(chart_); } // g++9 does not like constexpr here
         const acmacs::chart::Chart& chart() const { return *chart_; } // g++9 does not like constexpr here
+        acmacs::chart::ChartP chartp() const { return chart_; }
         constexpr Draw& draw() { return draw_; }
         constexpr const Draw& draw() const { return draw_; }
 
@@ -36,7 +37,9 @@ namespace acmacs::tal::inline v3
         Tree tree_;
         acmacs::chart::ChartP chart_;
         Draw draw_;
-    };
+
+    }; // class Tal
+
 } // namespace acmacs
 
 // ----------------------------------------------------------------------

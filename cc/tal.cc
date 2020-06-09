@@ -8,6 +8,7 @@
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/settings.hh"
+#include "acmacs-tal/antigenic-maps.hh"
 
 // ----------------------------------------------------------------------
 
@@ -104,6 +105,9 @@ int main(int argc, const char *argv[])
         // Timeit time_applying_settings(">>>> Applying settings: ", report);
         settings.apply("tal-default"sv);
         // time_applying_settings.report();
+
+        if (opt.chart_file)
+            tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->chart_draw_settings().load(opt.settings_files, opt.defines);
 
         // Timeit time_preparing(">>>> preparing: ", report);
         tal.prepare();

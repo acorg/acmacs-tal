@@ -5,11 +5,22 @@
 
 // ----------------------------------------------------------------------
 
+acmacs::tal::v3::AntigenicMaps::AntigenicMaps(Tal& tal)
+    : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, chart_draw_settings_{chart_draw_}
+{
+
+} // acmacs::tal::v3::AntigenicMaps::AntigenicMaps
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
 {
+    using namespace std::string_view_literals;
+
     if (stage == 2 && prepared_ < stage) {
         tal().draw().layout().prepare_element<HzSections>(stage);
         columns_rows();
+        chart_draw_settings_.apply("mapi"sv);
     }
     LayoutElement::prepare(stage);
 
@@ -62,6 +73,8 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& /*section*/) const
 {
     surface.rectangle(surface.viewport().origin, surface.viewport().size, BLUE, Pixels{1});
+    chart_draw_.calculate_viewport();
+    chart_draw_.draw(surface);
 
 } // acmacs::tal::v3::AntigenicMaps::draw_map
 
