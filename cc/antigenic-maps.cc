@@ -1,3 +1,4 @@
+#include "acmacs-base/rjson-v3-helper.hh"
 #include "acmacs-base/enumerate.hh"
 #include "acmacs-tal/antigenic-maps.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -5,14 +6,16 @@
 
 // ----------------------------------------------------------------------
 
-bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const
+bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& /*antigens*/, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const
 {
     using namespace std::string_view_literals;
 
     if (key == "in-tree"sv) {
-        AD_DEBUG("in-tree indexes in: {}", indexes.size());
-        indexes.clear();
-        AD_DEBUG("in-tree indexes out: {}", indexes.size());
+        const auto in_tree_indexes = antigenic_maps_.tal().tree().chart_antigens_in_tree();
+        if (rjson::v3::read_bool(value, false))
+            indexes.keep(ReverseSortedIndexes{*in_tree_indexes});
+        else
+            indexes.remove(ReverseSortedIndexes{*in_tree_indexes});
         return true;
     }
     else
@@ -31,7 +34,7 @@ bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Sera& /*sera*/, 
 // ----------------------------------------------------------------------
 
 acmacs::tal::v3::AntigenicMaps::AntigenicMaps(Tal& tal)
-    : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, chart_draw_settings_{chart_draw_}
+    : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, maps_settings_{*this, chart_draw_}
 {
 
 } // acmacs::tal::v3::AntigenicMaps::AntigenicMaps
@@ -47,7 +50,7 @@ void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
         tal().draw().layout().prepare_element<HzSections>(stage);
         columns_rows();
         // acmacs::log::enable("settings"sv);
-        chart_draw_settings_.apply_first({"/tal-mapi"sv, "mapi"sv, "mapi-default"sv}, acmacs::mapi::Settings::throw_if_nothing_applied::yes);
+        maps_settings_.apply_first({"/tal-mapi"sv, "mapi"sv, "mapi-default"sv}, acmacs::mapi::Settings::throw_if_nothing_applied::yes);
     }
     LayoutElement::prepare(stage);
 
@@ -101,7 +104,7 @@ void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface,
 {
     using namespace std::string_view_literals;
 
-    chart_draw_settings_.apply("antigenic-map"sv);
+    maps_settings_.apply("antigenic-map"sv);
 
     chart_draw_.calculate_viewport();
     acmacs::draw::DrawElementsToSurface painter(surface.subsurface({0.0, 0.0}, Scaled{1.0}, chart_draw_.viewport("AntigenicMaps::draw_map"sv), false));

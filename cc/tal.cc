@@ -81,10 +81,10 @@ int main(int argc, const char *argv[])
         // time_applying_settings.report();
 
         if (opt.chart_file) {
-            auto& chart_draw_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->chart_draw_settings()};
-            chart_draw_settings.load_from_conf({"mapi.json"sv, "tal.json"sv, "clades.json"sv, "vaccines.json"sv});
-            chart_draw_settings.load(opt.settings_files);
-            chart_draw_settings.set_defines(opt.defines);
+            auto& maps_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->maps_settings()};
+            maps_settings.load_from_conf({"mapi.json"sv, "tal.json"sv, "clades.json"sv, "vaccines.json"sv});
+            maps_settings.load(opt.settings_files);
+            maps_settings.set_defines(opt.defines);
         }
 
         // Timeit time_preparing(">>>> preparing: ", report);

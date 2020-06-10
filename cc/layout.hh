@@ -131,10 +131,11 @@ namespace acmacs::tal::inline v3
         constexpr const LayoutElementId& id() const { return id_; }
         void id(const LayoutElementId& a_id) { id_ = a_id; }
 
-      protected:
-        preparation_stage_t prepared_{0};
         constexpr const Tal& tal() const { return tal_; }
         constexpr Tal& tal() { return tal_; }
+
+      protected:
+        preparation_stage_t prepared_{0};
 
       private:
         Tal& tal_;

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-09 11:16:03 eu>
+# Time-stamp: <2020-06-10 10:28:30 eu>
 
 * Sample settings
 
@@ -287,6 +287,13 @@ If multiple criteria specified within single "select" object, they all used (con
    "gap-between-maps": 20.0, "columns": 0
   }
 #+END_SRC
+
+**** mapi extension to select antigens in the tree and in the current section
+
+#+BEGIN_SRC json
+  {"N": "antigens", "select": {"in-tree": true, "report": true}, "fill": "gray63", "outline": "white", "order": "raise"}
+#+END_SRC
+
 
 *** Title
 
