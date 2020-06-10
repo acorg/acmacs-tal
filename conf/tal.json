@@ -8,6 +8,17 @@
     "? for all antigenic maps": "",
     "antigenic-maps-all": [
         {"N": "legend", "show": false},
+        "/no-labels"
+    ],
+
+    "? for specific antigenic map": "",
+    "antigenic-map": [
+        "antigenic-map-reset",
+        {"N": "title", "remove-lines": true, "lines": ["prefix. label"]},
+        {"N": "antigens", "select": {"in-current-section": true, "report": true}, "fill": "red", "outline": "black", "size": 10, "order": "raise"}
+    ],
+
+    "antigenic-map-reset": [
         "/size-reset",
         {"N": "/all-color", "color": "grey88"},
         {"N": "antigens", "select": "reference", "order": "lower"},
@@ -15,12 +26,7 @@
         "/no-labels",
         {"N": "antigens", "select": {"in-tree": true, "report": true}, "fill": "gray63", "outline": "white", "order": "raise"}
     ],
-
-    "? for specific antigenic map": "",
-    "antigenic-map": [
-        {"N": "title", "remove-lines": true, "lines": ["prefix. label"]}
-    ],
-
+    
     "init": [
         {"N": "set",
          "report-cumulative-output": "",

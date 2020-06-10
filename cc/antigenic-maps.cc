@@ -18,6 +18,11 @@ bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& /*anti
             indexes.remove(ReverseSortedIndexes{*in_tree_indexes});
         return true;
     }
+    else if (key == "in-current-section"sv) {
+        AD_DEBUG("in-current-section");
+        indexes.clear();
+        return true;
+    }
     else
         return false;
 
