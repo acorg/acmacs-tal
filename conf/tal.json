@@ -2,19 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
-        {"?N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
-        "? report-branches-by-edge",
-        "? report-branches-by-cumulative-edge",
         {"N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"hide": true, "tree-edge-line-color": "red"}},
-
-        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-            "clades-whocc"
-        ]},
-
-        {"?N": "draw-aa-transitions", "show": false},
-        {"?N": "tree", "color_by": {"N": "pos", "pos": 193}, "?width-to-height-ratio": 0.2, "?debug-outline": true},
-        {"?N": "time-series", "start": "2019-01-01", "?end": "2019-12-31", "?color_by": "continent"},
-        {"?N": "title", "text": "{virus-type/lineage}", "?offset": [0.3, -0.005], "?color": "red"}
     ],
 
     "? for all antigenic maps": "",
@@ -39,10 +27,6 @@
 
     "tal-default": [
         "tal-pre",
-        {"?N": "update-common-aa", "report": false},
-        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-antigen": true}, "apply": "report"}]},
-        {"?N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [{"N": "nodes", "select": {"matches-chart-serum": "name"}, "apply": "report"}]},
-
         "layout",
         "tal-modifications"
     ],
@@ -102,7 +86,7 @@
         ]},
 
         {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
-            {"N": "clades-{virus-type}{lineage}", "report": false}
+            "clades-whocc"
         ]},
 
         "tal"
@@ -113,7 +97,6 @@
             {"N": "seqdb", "filename": "{seqdb-filename}"},
             {"N": "populate-with-nuc-duplicates"}
         ]},
-        {"?N": "if", "condition": {"empty": "{virus-type}"}, "then": [{"N": "warning", "message": "no virus type inferred from the tree"}]},
         {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
         {"N": "ladderize", "method": "{ladderize-method}"},
 
@@ -160,7 +143,7 @@
     ],
 
     "clades-whocc": [
-        "clades-{virus-type/lineage}",
+        "clades-{virus-type}{lineage}",
         {"N": "clades",
          "per_clade": [
              {"?N": "---------- H1 ----------"},
