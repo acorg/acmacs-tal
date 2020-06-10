@@ -1,7 +1,7 @@
 {   "_": "-*- js-indent-level: 4 -*-",
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
-    "modifications": [
+    "tal": [
         {"?N": "nodes", "select": {"edge >= mean_edge of": 0.005, "report": true}, "apply": "hide"},
         "? report-branches-by-edge",
         "? report-branches-by-cumulative-edge",
