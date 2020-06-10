@@ -19,6 +19,8 @@ namespace acmacs::tal::inline v3
         MapsSettings(AntigenicMaps& antigenic_maps, ChartDraw& chart_draw) : acmacs::mapi::Settings(chart_draw), antigenic_maps_{antigenic_maps} {}
 
       protected:
+        bool apply_antigens() override;
+        bool apply_sera() override;
         bool select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
         bool select(const acmacs::chart::Sera& sera, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
 

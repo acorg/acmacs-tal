@@ -6,6 +6,29 @@
 
 // ----------------------------------------------------------------------
 
+bool acmacs::tal::v3::MapsSettings::apply_antigens()
+{
+    using namespace std::string_view_literals;
+
+    acmacs::mapi::Settings::apply_antigens();
+    if (const auto& fill = getenv("fill"); fill.is_object() && rjson::v3::read_bool(fill["time-series-color-scale"sv], false)) {
+        AD_DEBUG("apply_antigens {}", getenv_toplevel());
+    }
+    return true;
+
+} // acmacs::tal::v3::MapsSettings::apply_antigens
+
+// ----------------------------------------------------------------------
+
+bool acmacs::tal::v3::MapsSettings::apply_sera()
+{
+    acmacs::mapi::Settings::apply_sera();
+    return true;
+
+} // acmacs::tal::v3::MapsSettings::apply_sera
+
+// ----------------------------------------------------------------------
+
 bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& /*antigens*/, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const
 {
     using namespace std::string_view_literals;
