@@ -969,7 +969,10 @@ void acmacs::tal::v3::Settings::add_title()
     auto& element = add_element<Title>();
     auto& param = element.parameters();
 
-    read_text_parameters(rjson::v3::parse_string(getenv_to_json("text"sv, "offset"sv, "color"sv, "size"sv)), param);
+    param.text = getenv_to_string("text"sv);
+    extract_coordinates(getenv("offset"sv), param.offset);
+    rjson::v3::copy_if_not_null(getenv("color"sv), param.color);
+    rjson::v3::copy_if_not_null(getenv("size"sv), param.size);
 
 } // acmacs::tal::v3::Settings::add_title
 

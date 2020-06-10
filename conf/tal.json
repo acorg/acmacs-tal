@@ -82,7 +82,7 @@
         {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
         {"N": "gap", "pixels": 20, "width-to-height-ratio": 0.0, "?debug-outline": "red"},
         {"N": "antigenic-maps"},
-        {"N": "title", "texts": [{"text": "{virus-type/lineage} {chart-assay} {chart-lab}"}], "color": "black", "size": 0.015}
+        {"N": "title", "text": "{virus-type/lineage} {chart-assay} {chart-lab}", "color": "black", "size": 0.015}
     ],
 
     "tal-modifications": [

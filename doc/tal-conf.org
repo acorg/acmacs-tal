@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-10 16:02:43 eu>
+# Time-stamp: <2020-06-10 16:07:41 eu>
 
 * Sample settings
 
@@ -303,7 +303,7 @@ If multiple criteria specified within single "select" object, they all used (con
 Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (hi or neut) {chart-lab} {chart-rbc} {chart-date}
 
 #+BEGIN_SRC json
-  {"N": "title", "texts": [{<[[Text parameters]]>}, ...]}
+  {"N": "title", "text": "<text with substituions>", "offset": [0, -0.005], "color": "black", "size": 0.015} -- size relative to image height
 #+END_SRC
 
 *** Legend
