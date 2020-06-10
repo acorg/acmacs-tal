@@ -5,6 +5,31 @@
 
 // ----------------------------------------------------------------------
 
+bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const
+{
+    using namespace std::string_view_literals;
+
+    if (key == "in-tree"sv) {
+        AD_DEBUG("in-tree indexes in: {}", indexes.size());
+        indexes.clear();
+        AD_DEBUG("in-tree indexes out: {}", indexes.size());
+        return true;
+    }
+    else
+        return false;
+
+} // acmacs::tal::v3::MapsSettings::select
+
+// ----------------------------------------------------------------------
+
+bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Sera& /*sera*/, acmacs::chart::PointIndexList& /*indexes*/, std::string_view /*key*/, const rjson::v3::value& /*value*/) const
+{
+    return false;
+
+} // acmacs::tal::v3::MapsSettings::select
+
+// ----------------------------------------------------------------------
+
 acmacs::tal::v3::AntigenicMaps::AntigenicMaps(Tal& tal)
     : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, chart_draw_settings_{chart_draw_}
 {

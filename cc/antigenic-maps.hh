@@ -10,6 +10,20 @@ namespace acmacs::tal::inline v3
 {
     struct HzSection;
 
+    // ----------------------------------------------------------------------
+
+    class MapsSettings : public acmacs::mapi::Settings
+    {
+      public:
+        using acmacs::mapi::Settings::Settings;
+
+      protected:
+        bool select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
+        bool select(const acmacs::chart::Sera& sera, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
+    };
+
+    // ----------------------------------------------------------------------
+
     class AntigenicMaps : public LayoutElement
     {
       public:
@@ -35,7 +49,7 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
         size_t columns_{0}, rows_{0};
         ChartDraw chart_draw_;
-        mutable acmacs::mapi::Settings chart_draw_settings_;
+        mutable MapsSettings chart_draw_settings_;
 
         void columns_rows();
         void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;
