@@ -18,6 +18,7 @@ void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
     using namespace std::string_view_literals;
 
     if (stage == 2 && prepared_ < stage) {
+        tal().tree().match(tal().chart());
         tal().draw().layout().prepare_element<HzSections>(stage);
         columns_rows();
         // acmacs::log::enable("settings"sv);
@@ -71,7 +72,7 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& /*section*/) const
+void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& section) const
 {
     using namespace std::string_view_literals;
 

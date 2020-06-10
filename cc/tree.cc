@@ -402,6 +402,41 @@ void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select upd
     select_update(nodes, update, Descent::yes, *this, serum_matches);
 }
 
+acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_antigens_in_tree() const
+{
+    acmacs::chart::PointIndexList indexes;
+    tree::iterate_leaf(*this, [&indexes](const Node& node) {
+        if (node.antigen_index_in_chart_.has_value())
+            indexes.insert(*node.antigen_index_in_chart_);
+    });
+    return indexes;
+
+} // acmacs::tal::v3::Tree::chart_antigens_in_tree
+
+acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_tree(serum_match_t match_type) const
+{
+    acmacs::chart::PointIndexList indexes;
+    tree::iterate_leaf(*this, [&indexes, match_type](const Node& node) {
+        for (const auto& [serum_index, reassortant_matches, passage_type_matches] : node.serum_index_in_chart_) {
+            switch (match_type) {
+              case serum_match_t::name:
+                  indexes.insert(serum_index);
+                  break;
+              case serum_match_t::reassortant:
+                  if (reassortant_matches)
+                      indexes.insert(serum_index);
+                  break;
+              case serum_match_t::passage_type:
+                  if (reassortant_matches && passage_type_matches)
+                      indexes.insert(serum_index);
+                  break;
+            }
+        }
+    });
+    return indexes;
+
+} // acmacs::tal::v3::Tree::chart_sera_in_tree
+
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::select_by_top_cumulative_gap(NodeSet& nodes, Select update, double top_gap_rel)

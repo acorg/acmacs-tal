@@ -234,10 +234,18 @@ namespace acmacs::tal::inline v3
         void select_by_location(NodeSet& nodes, Select update, std::string_view location);
         void select_by_aa(NodeSet& nodes, Select update, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos1);
         void select_by_nuc(NodeSet& nodes, Select update, const acmacs::seqdb::nucleotide_at_pos1_eq_list_t& nuc_at_pos1);
-        void select_matches_chart_antigens(NodeSet& nodes, Select update);
+
+        // ----------------------------------------------------------------------
 
         enum class serum_match_t { name, reassortant, passage_type };
+
+        void select_matches_chart_antigens(NodeSet& nodes, Select update);
         void select_matches_chart_sera(NodeSet& nodes, Select update, serum_match_t match_type);
+
+        acmacs::chart::PointIndexList chart_antigens_in_tree() const;
+        acmacs::chart::PointIndexList chart_sera_in_tree(serum_match_t match_type) const;
+
+        // ----------------------------------------------------------------------
 
         enum class hide_if_too_many_leaves { no, yes };
         void hide(const NodeSet& nodes, hide_if_too_many_leaves force);
