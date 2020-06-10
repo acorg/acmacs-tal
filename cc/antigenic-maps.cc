@@ -119,6 +119,7 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
         const auto map_size = viewport.size.height / static_cast<double>(rows_) - gap * static_cast<double>(rows_ - 1) / static_cast<double>(rows_);
         const auto* hz_sections = tal().draw().layout().find<HzSections>();
         for (size_t section_no{0}; section_no < hz_sections->sections().size(); ++section_no) {
+            AD_INFO("drawing section {}", section_no);
             current_section_no_ = section_no;
             const auto left = static_cast<double>(section_no % columns_) * (map_size + gap);
             const auto top = static_cast<double>(section_no / columns_) * (map_size + gap);

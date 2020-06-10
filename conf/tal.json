@@ -15,7 +15,7 @@
     "antigenic-map": [
         "antigenic-map-reset",
         {"N": "title", "remove-lines": true, "lines": ["prefix. label"]},
-        {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": "red", "outline": "black", "size": 5, "order": "raise"}
+        {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
     ],
 
     "antigenic-map-reset": [
@@ -24,7 +24,7 @@
         {"N": "antigens", "select": "reference", "order": "lower"},
         {"N": "sera",     "select": "all",       "order": "lower"},
         "/no-labels",
-        {"N": "antigens", "select": {"in-tree": true, "report": true}, "fill": "gray63", "outline": "white", "order": "raise"}
+        {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "order": "raise"}
     ],
 
     "init": [
