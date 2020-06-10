@@ -24,6 +24,8 @@ namespace acmacs::tal::inline v3
 
       private:
         AntigenicMaps& antigenic_maps_;
+
+        void select_antigens_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const;
     };
 
     // ----------------------------------------------------------------------
@@ -49,14 +51,18 @@ namespace acmacs::tal::inline v3
 
         constexpr acmacs::mapi::Settings& maps_settings() { return maps_settings_; }
 
+        acmacs::chart::PointIndexList chart_antigens_in_tree() const;
+        acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
+
       private:
         Parameters parameters_;
         size_t columns_{0}, rows_{0};
         ChartDraw chart_draw_;
         mutable MapsSettings maps_settings_;
+        mutable std::optional<size_t> current_section_no_; // during drawing
 
         void columns_rows();
-        void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;
+        void draw_map(acmacs::surface::Surface& surface, size_t section_no) const;
 
     }; // class AntigenicMaps
 

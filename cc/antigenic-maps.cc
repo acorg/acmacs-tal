@@ -1,8 +1,8 @@
 #include "acmacs-base/rjson-v3-helper.hh"
-#include "acmacs-base/enumerate.hh"
 #include "acmacs-tal/antigenic-maps.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/hz-sections.hh"
+#include "acmacs-tal/error.hh"
 
 // ----------------------------------------------------------------------
 
@@ -11,22 +11,46 @@ bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Antigens& /*anti
     using namespace std::string_view_literals;
 
     if (key == "in-tree"sv) {
-        const auto in_tree_indexes = antigenic_maps_.tal().tree().chart_antigens_in_tree();
+        const auto in_tree_indexes = antigenic_maps_.chart_antigens_in_tree();
         if (rjson::v3::read_bool(value, false))
             indexes.keep(ReverseSortedIndexes{*in_tree_indexes});
         else
             indexes.remove(ReverseSortedIndexes{*in_tree_indexes});
         return true;
     }
-    else if (key == "in-current-section"sv) {
-        AD_DEBUG("in-current-section");
-        indexes.clear();
+    else if (key == "in-section"sv) {
+        select_antigens_in_section(indexes, value);
         return true;
     }
     else
         return false;
 
 } // acmacs::tal::v3::MapsSettings::select
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::MapsSettings::select_antigens_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const
+{
+    value.visit([&indexes, this]<typename Val>(const Val& val) -> void {
+        bool keep{false};
+        acmacs::chart::PointIndexList in_section_indexes;
+        if constexpr (std::is_same_v<Val, rjson::v3::detail::boolean>) {
+            keep = val.template to<bool>();
+            in_section_indexes = antigenic_maps_.chart_antigens_in_section(std::nullopt); // current section
+        }
+        else if constexpr (std::is_same_v<Val, rjson::v3::detail::number>) {
+            keep = true;
+            in_section_indexes = antigenic_maps_.chart_antigens_in_section(val.template to<size_t>());
+        }
+        else
+            throw acmacs::mapi::unrecognized{fmt::format("unrecognized \"in-section\" clause: {}", val)};
+        if (keep)
+            indexes.keep(ReverseSortedIndexes{*in_section_indexes});
+        else
+            indexes.remove(ReverseSortedIndexes{*in_section_indexes});
+    });
+
+} // acmacs::tal::v3::MapsSettings::select_antigens_in_section
 
 // ----------------------------------------------------------------------
 
@@ -94,10 +118,12 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
         const auto gap = surface.convert(Pixels{parameters().gap_between_maps}).value();
         const auto map_size = viewport.size.height / static_cast<double>(rows_) - gap * static_cast<double>(rows_ - 1) / static_cast<double>(rows_);
         const auto* hz_sections = tal().draw().layout().find<HzSections>();
-        for (auto [section_no, section] : acmacs::enumerate(hz_sections->sections())) {
+        for (size_t section_no{0}; section_no < hz_sections->sections().size(); ++section_no) {
+            current_section_no_ = section_no;
             const auto left = static_cast<double>(section_no % columns_) * (map_size + gap);
             const auto top = static_cast<double>(section_no / columns_) * (map_size + gap);
-            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, false), section);
+            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, false), section_no);
+            current_section_no_ = std::nullopt;
         }
     }
 
@@ -105,7 +131,7 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& section) const
+void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, size_t /*section_no*/) const
 {
     using namespace std::string_view_literals;
 
@@ -116,6 +142,28 @@ void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface,
     chart_draw_.draw(painter);
 
 } // acmacs::tal::v3::AntigenicMaps::draw_map
+
+// ----------------------------------------------------------------------
+
+acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_tree() const
+{
+    return tal().tree().chart_antigens_in_tree();
+
+} // acmacs::tal::v3::AntigenicMaps::chart_antigens_in_tree
+
+// ----------------------------------------------------------------------
+
+acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_section(std::optional<size_t> section_no) const
+{
+    if (!section_no.has_value()) {
+        if (!current_section_no_.has_value())
+            throw error{"tal::AntigenicMaps::chart_antigens_in_section: no current section"};
+        section_no = current_section_no_;
+    }
+    const auto& section = tal().draw().layout().find<HzSections>()->sections().at(*section_no);
+    return tal().tree().chart_antigens_in_section(section.first, section.last);
+
+} // acmacs::tal::v3::AntigenicMaps::chart_antigens_in_section
 
 // ----------------------------------------------------------------------
 /// Local Variables:

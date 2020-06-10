@@ -83,8 +83,13 @@ void acmacs::tal::v3::Settings::update_env()
     }
     setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
     setenv_toplevel("chart-present", tal_.chart_present());
-    if (tal_.chart_present())
-        setenv_toplevel("chart-assay", tal_.chart().info()->assay().hi_or_neut());
+    if (tal_.chart_present()) {
+        auto info{tal_.chart().info()};
+        setenv_toplevel("chart-assay", info->assay().hi_or_neut());
+        setenv_toplevel("chart-lab", info->lab());
+        setenv_toplevel("chart-rbc", info->rbc_species());
+        setenv_toplevel("chart-date", info->date(chart::Info::Compute::Yes));
+    }
 
 } // acmacs::tal::v3::Settings::update_env
 

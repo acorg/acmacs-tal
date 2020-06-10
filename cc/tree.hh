@@ -14,6 +14,7 @@
 #include "acmacs-base/flat-set.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/aa-transition.hh"
+#include "acmacs-tal/error.hh"
 
 // ----------------------------------------------------------------------
 
@@ -25,11 +26,6 @@ namespace acmacs::chart
 namespace acmacs::tal::inline v3
 {
     class Node;
-
-    class error : public std::runtime_error
-    {
-        using std::runtime_error::runtime_error;
-    };
 
     using seq_id_t = acmacs::seqdb::seq_id_t; // string, not string_view to support populate_with_nuc_duplicates
 
@@ -243,6 +239,7 @@ namespace acmacs::tal::inline v3
         void select_matches_chart_sera(NodeSet& nodes, Select update, serum_match_t match_type);
 
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
+        acmacs::chart::PointIndexList chart_antigens_in_section(const Node* first, const Node* last) const;
         acmacs::chart::PointIndexList chart_sera_in_tree(serum_match_t match_type) const;
 
         // ----------------------------------------------------------------------

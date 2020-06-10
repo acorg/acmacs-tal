@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-10 10:28:30 eu>
+# Time-stamp: <2020-06-10 15:55:43 eu>
 
 * Sample settings
 
@@ -296,6 +296,8 @@ If multiple criteria specified within single "select" object, they all used (con
 
 
 *** Title
+
+Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (hi or neut) {chart-lab} {chart-rbc} {chart-date}
 
 #+BEGIN_SRC json
   {"N": "title", "texts": [{<[[Text parameters]]>}, ...]}

@@ -15,7 +15,7 @@
     "antigenic-map": [
         "antigenic-map-reset",
         {"N": "title", "remove-lines": true, "lines": ["prefix. label"]},
-        {"N": "antigens", "select": {"in-current-section": true, "report": true}, "fill": "red", "outline": "black", "size": 10, "order": "raise"}
+        {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": "red", "outline": "black", "size": 5, "order": "raise"}
     ],
 
     "antigenic-map-reset": [
@@ -26,7 +26,7 @@
         "/no-labels",
         {"N": "antigens", "select": {"in-tree": true, "report": true}, "fill": "gray63", "outline": "white", "order": "raise"}
     ],
-    
+
     "init": [
         {"N": "set",
          "report-cumulative-output": "",
@@ -47,7 +47,7 @@
     "? applied when chart is loaded": "",
     "/tal-mapi": [
         "mapi",
-        {"N": "title", "show": true, "offset": [0, 0], "padding": 0, "remove-lines": true},
+        {"N": "title", "show": true, "offset": [5, 5], "padding": 0, "remove-lines": true},
         "antigenic-maps-all"
     ],
 
@@ -56,7 +56,6 @@
          "then": [{"N": "layout-with-maps"}],
          "else": [{"N": "layout-tree-only"}]
         },
-        {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015},
         {"?N": "vaccine, most recent cell --> modifications-tal mark vaccine"}
     ],
 
@@ -67,7 +66,8 @@
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
         "tal-dash-bar-clades",
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}, "report": "{report-time-series-output}"},
-        {"N": "clades"}
+        {"N": "clades"},
+        {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015}
     ],
 
     "layout-with-maps": [
@@ -81,7 +81,8 @@
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
         {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
         {"N": "gap", "pixels": 20, "width-to-height-ratio": 0.0, "?debug-outline": "red"},
-        {"N": "antigenic-maps"}
+        {"N": "antigenic-maps"},
+        {"N": "title", "texts": [{"text": "{virus-type/lineage} {chart-assay} {chart-lab}"}], "color": "black", "size": 0.015}
     ],
 
     "tal-modifications": [

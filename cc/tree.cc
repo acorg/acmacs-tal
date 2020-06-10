@@ -413,6 +413,22 @@ acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_antigens_in_tree() co
 
 } // acmacs::tal::v3::Tree::chart_antigens_in_tree
 
+acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_antigens_in_section(const Node* first, const Node* last) const
+{
+    acmacs::chart::PointIndexList indexes;
+    bool use{first == nullptr};
+    tree::iterate_leaf(*this, [&indexes, &use, first, last](const Node& node) {
+        if (!use && &node == first)
+            use = true;
+        if (use && node.antigen_index_in_chart_.has_value())
+            indexes.insert(*node.antigen_index_in_chart_);
+        if (use && &node == last)
+            use = false;
+    });
+    return indexes;
+
+} // acmacs::tal::v3::Tree::chart_antigens_in_section
+
 acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_tree(serum_match_t match_type) const
 {
     acmacs::chart::PointIndexList indexes;
