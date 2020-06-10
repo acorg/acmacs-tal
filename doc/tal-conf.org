@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-10 15:55:43 eu>
+# Time-stamp: <2020-06-10 16:02:43 eu>
 
 * Sample settings
 
@@ -292,6 +292,9 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC json
   {"N": "antigens", "select": {"in-tree": true, "report": true}, "fill": "gray63", "outline": "white", "order": "raise"}
+
+  {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": "red", "outline": "black", "size": 5, "order": "raise"}
+  {"N": "antigens", "select": {"in-section": 2, "report": true}, "fill": "green", "outline": "black", "size": 5, "order": "raise"}
 #+END_SRC
 
 
