@@ -858,7 +858,7 @@ std::vector<std::string_view> acmacs::tal::v3::Tree::all_dates() const
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool names) const
+std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool /*names*/) const
 {
     std::vector<acmacs::CounterChar> counter(pos.size());
     tree::iterate_leaf(*this, [&pos, &counter](const Node& leaf) {

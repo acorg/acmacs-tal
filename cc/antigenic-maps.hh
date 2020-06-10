@@ -55,6 +55,7 @@ namespace acmacs::tal::inline v3
 
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
+        void antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes);
 
       private:
         Parameters parameters_;

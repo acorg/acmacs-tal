@@ -3,6 +3,7 @@
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/hz-sections.hh"
 #include "acmacs-tal/error.hh"
+#include "acmacs-tal/time-series.hh"
 
 // ----------------------------------------------------------------------
 
@@ -12,7 +13,7 @@ bool acmacs::tal::v3::MapsSettings::apply_antigens()
 
     acmacs::mapi::Settings::apply_antigens();
     if (const auto& fill = getenv("fill"); fill.is_object() && rjson::v3::read_bool(fill["time-series-color-scale"sv], false)) {
-        AD_DEBUG("apply_antigens {}", getenv_toplevel());
+        antigenic_maps_.antigen_fill_time_series_color_scale(select_antigens(getenv("select"sv)));
     }
     return true;
 
@@ -188,6 +189,24 @@ acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_
     return tal().tree().chart_antigens_in_section(section.first, section.last);
 
 } // acmacs::tal::v3::AntigenicMaps::chart_antigens_in_section
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::AntigenicMaps::antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes)
+{
+    if (const auto* time_series = tal().draw().layout().find<TimeSeries>(); time_series) {
+        auto antigens{chart_draw_.chart().antigens()};
+        for (const auto index : indexes) {
+            const auto date = date::from_string(antigens->at(index)->date(), date::allow_incomplete::yes, date::throw_on_error::no);
+            acmacs::PointStyleModified style;
+            style.fill(time_series->color_for(date));
+            chart_draw_.modify(index, style);
+        }
+    }
+    else
+        AD_WARNING("cannot color by \"time-series-color-scale\": time series not available");
+
+} // acmacs::tal::v3::AntigenicMaps::antigen_fill_time_series_color_scale
 
 // ----------------------------------------------------------------------
 /// Local Variables:

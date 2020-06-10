@@ -87,7 +87,7 @@ namespace acmacs::tal::inline v3
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
 
-        Color color_for(date::year_month_day date) const;
+        acmacs::color::Modifier color_for(date::year_month_day date) const;
 
       private:
         struct horizontal_line_t : public parameters::Line

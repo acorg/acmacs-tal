@@ -256,13 +256,13 @@ void acmacs::tal::v3::TimeSeries::make_color_scale()
 
 // ----------------------------------------------------------------------
 
-Color acmacs::tal::v3::TimeSeries::color_for(date::year_month_day date) const
+acmacs::color::Modifier acmacs::tal::v3::TimeSeries::color_for(date::year_month_day date) const
 {
     if (!series_.empty() && !color_scale_.empty()) {
         if (const auto series_slot = std::find_if(std::begin(series_), std::end(series_), [&date](const auto& slot) { return slot.within(date); }); series_slot != std::end(series_))
-            return color_scale_[static_cast<size_t>(series_slot - std::begin(series_))];
+            return acmacs::color::Modifier{color_scale_[static_cast<size_t>(series_slot - std::begin(series_))]};
     }
-    return GREEN;
+    return {};
 
 } // acmacs::tal::v3::TimeSeries::color_for
 
