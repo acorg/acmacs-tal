@@ -20,6 +20,16 @@ namespace acmacs::tal::inline v3
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::reset_aa_transitions(Tree& tree)
+{
+    const auto reset_node = [](Node& node) { node.aa_transitions_.clear(); };
+
+    tree::iterate_leaf_pre(tree, reset_node, reset_node);
+
+} // acmacs::tal::v3::reset_aa_transitions
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     update_aa_transitions_20200514(tree, parameters);

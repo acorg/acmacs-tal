@@ -2,6 +2,7 @@
 #include "acmacs-chart-2/factory-import.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/import-export.hh"
+#include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +29,7 @@ void acmacs::tal::v3::Tal::import_chart(std::string_view filename)
 
 void acmacs::tal::v3::Tal::reset()
 {
+    reset_aa_transitions(tree());
     draw().reset();
 
 } // acmacs::tal::v3::Tal::reset
@@ -54,9 +56,6 @@ void acmacs::tal::v3::Tal::export_tree(std::string_view filename)
     }
 
 } // acmacs::tal::v3::Tal::export_tree
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

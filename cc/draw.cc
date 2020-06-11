@@ -42,9 +42,6 @@ void acmacs::tal::v3::Draw::export_pdf(std::string_view filename) const
 } // acmacs::tal::v3::Draw::export_pdf
 
 // ----------------------------------------------------------------------
-
-
-// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

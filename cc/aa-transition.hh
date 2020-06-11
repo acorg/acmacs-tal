@@ -121,11 +121,14 @@ namespace acmacs::tal::inline v3
         void add_or_replace(const AA_Transition& transition);
         void add_or_replace(const AA_Transitions& transitions);
 
+        void clear() { data_.clear(); }
+
       private:
         std::vector<AA_Transition> data_;
 
     }; // class AA_Transitions
 
+    void reset_aa_transitions(Tree& tree);
     void update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
     void report_aa_transitions(const Node& root, const draw_tree::AATransitionsParameters& parameters);
 
