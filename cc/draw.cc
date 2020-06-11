@@ -3,6 +3,14 @@
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Draw::reset()
+{
+    layout_.reset();
+
+} // acmacs::tal::v3::Draw::reset
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Draw::prepare()
 {
     layout_.prepare();

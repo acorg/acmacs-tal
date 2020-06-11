@@ -15,6 +15,7 @@ namespace acmacs::tal::inline v3
     class Draw
     {
       public:
+        void reset();
         void prepare();
         void export_pdf(std::string_view filename) const;
 

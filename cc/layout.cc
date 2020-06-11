@@ -56,6 +56,14 @@ double acmacs::tal::v3::Layout::width_relative_to_height() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Layout::reset()
+{
+    elements_.clear();
+
+} // acmacs::tal::v3::Layout::reset
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Layout::prepare()
 {
     for (preparation_stage_t stage = 1; stage <= 3; ++stage) {

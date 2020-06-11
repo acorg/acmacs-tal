@@ -40,6 +40,7 @@ namespace acmacs::tal::inline v3
         LayoutElement& add(std::unique_ptr<LayoutElement> element);
 
         double width_relative_to_height() const;
+        void reset();
         void prepare();
         void draw(acmacs::surface::Surface& surface) const;
 

@@ -26,6 +26,14 @@ void acmacs::tal::v3::Tal::import_chart(std::string_view filename)
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tal::reset()
+{
+    draw().reset();
+
+} // acmacs::tal::v3::Tal::reset
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tal::prepare()
 {
     draw().prepare();

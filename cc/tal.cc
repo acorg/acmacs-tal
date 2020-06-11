@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <signal.h>
+
 #include "acmacs-base/argv.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
@@ -22,6 +25,8 @@ struct Options : public argv
     option<str_array> defines{*this, 'D', "--define", desc{"see $ACMACSD_ROOT/share/doc/tal-conf.org"}};
     option<str>       chart_file{*this, "chart", desc{"path to a chart for the signature page"}};
     option<size_t>    first_last_leaves{*this, "first-last-leaves", desc{"min num of leaves per node to print"}};
+
+    option<bool>      interactive{*this, 'i', "interactive"};
     option<bool>      open{*this, "open"};
     option<bool>      ql{*this, "ql"};
     option<str_array> verbose{*this, 'v', "verbose", desc{"comma separated list (or multiple switches) of enablers"}};
@@ -43,7 +48,9 @@ struct Options : public argv
     // option<bool>      no_draw{*this, "no-draw", desc{"do not generate pdf"}};
 };
 
-int main(int argc, const char *argv[])
+static void signal_handler(int sig_num);
+
+int main(int argc, const char* argv[])
 {
     using namespace std::string_view_literals;
     try {
@@ -60,26 +67,22 @@ int main(int argc, const char *argv[])
         acmacs::log::enable(opt.verbose);
         acmacs::log::enable("hz-sections"sv);
 
-        const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
+        // const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
 
         acmacs::tal::Tal tal;
-        Timeit time_loading_tree(">>>> Loading tree: ", report);
+        // Timeit time_loading_tree(">>>> Loading tree: ", report);
         tal.import_tree(opt.tree_file);
-        time_loading_tree.report();
-        Timeit time_loading_chart(">>>> Loading chart: ", report);
+        // time_loading_tree.report();
+        // Timeit time_loading_chart(">>>> Loading chart: ", report);
         tal.import_chart(opt.chart_file);
-        time_loading_chart.report();
+        // time_loading_chart.report();
 
-        Timeit time_loading_settings(">>>> Loading settings: ", report);
+        // Timeit time_loading_settings(">>>> Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
         settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
         settings.load(opt.settings_files);
         settings.set_defines(opt.defines);
-        time_loading_settings.report();
-
-        // Timeit time_applying_settings(">>>> Applying settings: ", report);
-        settings.apply("tal-default"sv);
-        // time_applying_settings.report();
+        // time_loading_settings.report();
 
         if (opt.chart_file) {
             auto& maps_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->maps_settings()};
@@ -88,26 +91,65 @@ int main(int argc, const char *argv[])
             maps_settings.set_defines(opt.defines);
         }
 
-        // Timeit time_preparing(">>>> preparing: ", report);
-        tal.prepare();
-        // time_preparing.report();
+        if (opt.interactive)
+            signal(SIGHUP, signal_handler);
 
-        if (opt.first_last_leaves.has_value())
-            tal.tree().report_first_last_leaves(opt.first_last_leaves);
+        for (;;) {
+            settings.apply("tal-default"sv);
 
-        // Timeit time_exporting(">>>> exporting: ", report);
-        for (const auto& output : *opt.outputs)
-            tal.export_tree(output);
-        // time_exporting.report();
+            // Timeit time_preparing(">>>> preparing: ", report);
+            tal.prepare();
+            // time_preparing.report();
 
-        if (opt.open || opt.ql) {
-            for (const auto& output : *opt.outputs) {
-                if (output.substr(output.size() - 4) == ".pdf")
-                    acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
+            if (opt.first_last_leaves.has_value())
+                tal.tree().report_first_last_leaves(opt.first_last_leaves);
+
+            // Timeit time_exporting(">>>> exporting: ", report);
+            for (const auto& output : *opt.outputs)
+                tal.export_tree(output);
+            // time_exporting.report();
+
+            if (opt.open || opt.ql) {
+                for (const auto& output : *opt.outputs) {
+                    if (output.substr(output.size() - 4) == ".pdf")
+                        acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
+                }
+            }
+
+            if (!opt.interactive)
+                break;
+
+            // ----------------------------------------------------------------------
+            // interactive
+
+            fmt::print(stderr, "tal-i >> ");
+
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(0, &set);
+            if (select(FD_SETSIZE, &set, nullptr, nullptr, nullptr) > 0) {
+                // fmt::print(stderr, " (reading)\n");
+                std::string input(20, ' ');
+                if (const auto bytes = ::read(0, input.data(), input.size()); bytes > 0) {
+                    input.resize(static_cast<size_t>(bytes));
+                    // fmt::print(stderr, " (read {} bytes)\n", bytes);
+                }
+            }
+
+            acmacs::run_and_detach({"tink"}, 0);
+
+            tal.reset();
+            try {
+                settings.reload();
+            }
+            catch (std::exception& err) {
+                AD_ERROR("{}", err);
+                acmacs::run_and_detach({"submarine"}, 0);
             }
         }
 
         // AD_INFO("tal configuration docs: {}/share/doc/tal-conf.org", acmacs::acmacsd_root());
+
         return 0;
     }
     catch (std::exception& err) {
@@ -115,6 +157,14 @@ int main(int argc, const char *argv[])
         return 1;
     }
 }
+
+// ----------------------------------------------------------------------
+
+void signal_handler(int sig_num)
+{
+    fmt::print("SIGNAL {}\n", sig_num);
+
+} // signal_handler
 
 // ----------------------------------------------------------------------
 /// Local Variables:
