@@ -10,7 +10,8 @@ namespace acmacs::log
         clades = 16,
         coloring,
         tree,
-        hz_sections
+        hz_sections,
+        time_series
     };
 
 }

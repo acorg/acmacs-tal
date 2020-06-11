@@ -52,6 +52,7 @@ int main(int argc, const char *argv[])
         acmacs::log::register_enabler("coloring"sv, acmacs::log::coloring);
         acmacs::log::register_enabler("tree"sv, acmacs::log::tree);
         acmacs::log::register_enabler("hz-sections"sv, acmacs::log::hz_sections);
+        acmacs::log::register_enabler("time-series"sv, acmacs::log::time_series);
         AD_INFO("-v arguments: {}", acmacs::log::registered_enablers());
 
         Options opt(argc, argv);

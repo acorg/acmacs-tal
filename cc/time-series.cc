@@ -5,6 +5,7 @@
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
+#include "acmacs-tal/log.hh"
 
 // ----------------------------------------------------------------------
 
@@ -55,12 +56,21 @@ void acmacs::tal::v3::TimeSeries::prepare_dashes()
     });
     coloring().prepare();
 
+    AD_LOG(acmacs::log::time_series, "slots ({})", series_.size());
+    for (size_t slot_no = 0; slot_no < series_.size(); ++slot_no)
+        AD_LOG(acmacs::log::time_series, "    {:2d} {} - {}", slot_no, series_[slot_no].first, series_[slot_no].after_last);
+
     dashes_.clear();
     tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
         if (!leaf.hidden && !leaf.date.empty()) {
             try {
-                const auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
+                auto leaf_date = date::from_string(leaf.date, date::allow_incomplete::yes, date::throw_on_error::yes);
+                if (date::get_month(leaf_date) == 0)
+                    date::increment_month(leaf_date, 6);
+                if (date::get_day(leaf_date) == 0)
+                    date::increment_day(leaf_date, 15);
                 if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
+                    AD_LOG(acmacs::log::time_series, "[{}] -> [{}] slot:{} {}", leaf.date, leaf_date, slot_no, leaf.seq_id);
                     auto dash_color = coloring().color(leaf);
                     auto dash_line_width = parameters().dash.line_width;
                     auto dash_width = parameters().dash.width;
@@ -74,6 +84,8 @@ void acmacs::tal::v3::TimeSeries::prepare_dashes()
                     });
                     dashes_.push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no, .y = leaf.cumulative_vertical_offset_});
                 }
+                else
+                    AD_LOG(acmacs::log::time_series, "[{}] -> [{}] no slot {}", leaf.date, leaf_date, leaf.seq_id);
             }
             catch (date::date_parse_error& err) {
                 AD_WARNING("{}", err);
