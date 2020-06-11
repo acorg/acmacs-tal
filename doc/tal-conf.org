@@ -1,4 +1,6 @@
-# Time-stamp: <2020-06-10 17:01:04 eu>
+# Time-stamp: <2020-06-11 19:02:58 eu>
+
+bjorn {145, 155, 156, 158, 159, 189, 193}
 
 * Sample settings
 
