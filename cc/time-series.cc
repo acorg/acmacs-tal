@@ -6,6 +6,7 @@
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
 #include "acmacs-tal/log.hh"
+#include "acmacs-tal/settings.hh"
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +14,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 {
     using namespace std::string_view_literals;
 
-    if (!prepared_) {
+    if (stage == 1 && prepared_ < stage) {
         tal().draw().layout().prepare_element<DrawTree>(stage);
 
         const auto ts_stat = acmacs::time_series::stat(parameters().time_series, tal().tree().all_dates());
@@ -34,9 +35,10 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
         else if (!parameters().report.empty())
             acmacs::file::write(parameters().report, long_report());
         if (!ts_stat.counter().empty())
-            AD_INFO("time series full range {} .. {}", ts_stat.counter().begin()->first, ts_stat.counter().rbegin()->first);
-        AD_INFO("time series suggested  {} .. {}", first, after_last);
-        AD_INFO("time series used       {} .. {}", parameters().time_series.first, parameters().time_series.after_last);
+            AD_INFO("time series {} full range {} .. {}", id(), ts_stat.counter().begin()->first, ts_stat.counter().rbegin()->first);
+        AD_INFO("time series {} suggested  {} .. {}", id(), first, after_last);
+        AD_INFO("time series {} used       {} .. {}", id(), parameters().time_series.first, parameters().time_series.after_last);
+        tal().settings().setenv_toplevel("time-series-range", acmacs::time_series::range_name(parameters().time_series, series_));
     }
     else if (stage == 3 && prepared_ < stage) {
         tal().draw().layout().prepare_element<DrawTree>(stage);

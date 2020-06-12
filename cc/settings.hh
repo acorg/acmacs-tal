@@ -20,7 +20,7 @@ namespace acmacs::tal::inline v3
     class Settings : public acmacs::settings::Settings
     {
       public:
-        Settings(Tal& tal) : tal_{tal} { update_env(); }
+        Settings(Tal& tal) : tal_{tal} { tal_.settings_ = this; update_env(); }
 
         bool apply_built_in(std::string_view name) override; // returns true if built-in command with that name found and applied
 

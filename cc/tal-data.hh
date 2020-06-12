@@ -15,6 +15,8 @@ namespace acmacs::chart
 
 namespace acmacs::tal::inline v3
 {
+    class Settings;
+
     class Tal
     {
       public:
@@ -35,10 +37,16 @@ namespace acmacs::tal::inline v3
         constexpr Draw& draw() { return draw_; }
         constexpr const Draw& draw() const { return draw_; }
 
+        constexpr Settings& settings() { return *settings_; }
+        constexpr const Settings& settings() const { return *settings_; }
+
       private:
         Tree tree_;
         acmacs::chart::ChartP chart_;
         Draw draw_;
+        Settings* settings_{nullptr};
+
+        friend class Settings;
 
     }; // class Tal
 
