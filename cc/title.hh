@@ -15,7 +15,7 @@ namespace acmacs::tal::inline v3
 
         Position position() const override { return Position::absolute; }
 
-        // void prepare(preparation_stage_t stage) override;
+        void prepare(preparation_stage_t stage) override;
         void draw(acmacs::surface::Surface& surface) const override;
 
         // ----------------------------------------------------------------------
