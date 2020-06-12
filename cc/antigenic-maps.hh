@@ -51,7 +51,7 @@ namespace acmacs::tal::inline v3
         constexpr Parameters& parameters() { return parameters_; }
         constexpr const Parameters& parameters() const { return parameters_; }
 
-        constexpr acmacs::mapi::Settings& maps_settings() { return maps_settings_; }
+        constexpr auto& maps_settings() { return maps_settings_; }
 
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt

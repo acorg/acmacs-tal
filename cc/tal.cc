@@ -84,18 +84,21 @@ int main(int argc, const char* argv[])
         settings.set_defines(opt.defines);
         // time_loading_settings.report();
 
-        if (opt.chart_file) {
-            auto& maps_settings{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()->maps_settings()};
-            maps_settings.load_from_conf({"mapi.json"sv, "tal.json"sv, "clades.json"sv, "vaccines.json"sv});
-            maps_settings.load(opt.settings_files);
-            maps_settings.set_defines(opt.defines);
-        }
-
         if (opt.interactive)
             signal(SIGHUP, signal_handler);
 
         for (;;) {
             settings.apply("tal-default"sv);
+
+            if (opt.chart_file) {
+                acmacs::tal::AntigenicMaps* maps{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()};
+                if (!maps)
+                    throw std::runtime_error{"internal: AntigenicMaps not found in layout"};
+                acmacs::tal::MapsSettings& maps_settings{maps->maps_settings()};
+                maps_settings.load_from_conf({"mapi.json"sv, "tal.json"sv, "clades.json"sv, "vaccines.json"sv});
+                maps_settings.load(opt.settings_files);
+                maps_settings.set_defines(opt.defines);
+            }
 
             // Timeit time_preparing(">>>> preparing: ", report);
             tal.prepare();
@@ -138,7 +141,8 @@ int main(int argc, const char* argv[])
 
             acmacs::run_and_detach({"tink"}, 0);
 
-            fmt::print(stderr, "{sep}\n{date}\n{sep}\n", fmt::arg("sep", "================================================================================"), fmt::arg("date", date::current_date_time()));
+            fmt::print(stderr, "{sep}\n{date}\n{sep}\n", fmt::arg("sep", "================================================================================"),
+                       fmt::arg("date", date::current_date_time()));
             tal.reset();
             try {
                 settings.reload();
