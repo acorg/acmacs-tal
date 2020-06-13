@@ -7,23 +7,32 @@
 
 // ----------------------------------------------------------------------
 
-bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
-{
-    using namespace std::string_view_literals;
-    try {
-        if (name == "title"sv) {
-            acmacs::mapi::Settings::apply_title();
-            AD_DEBUG("MapsSettings::apply_built_in title");
-            // auto& tit = title();
-            return true;
-        }
-        return acmacs::mapi::Settings::apply_built_in(name);
-    }
-    catch (std::exception& err) {
-        throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, getenv_toplevel())};
-    }
+// bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
+// {
+//     using namespace std::string_view_literals;
+//     try {
+//         if (name == "title"sv) {
+//             acmacs::mapi::Settings::apply_title();
+//             AD_DEBUG("MapsSettings::apply_built_in title");
+//             // auto& tit = title();
+//             return true;
+//         }
+//         return acmacs::mapi::Settings::apply_built_in(name);
+//     }
+//     catch (std::exception& err) {
+//         throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, getenv_toplevel())};
+//     }
 
-} // acmacs::tal::v3::MapsSettings::apply_built_in
+// } // acmacs::tal::v3::MapsSettings::apply_built_in
+
+// ----------------------------------------------------------------------
+
+map_elements::v1::Title& acmacs::tal::v3::MapsSettings::title()
+{
+    // return chart_draw().map_elements().find_or_add<MapTitle>("title");
+    return chart_draw().map_elements().find_or_add<map_elements::v1::Title>("title");
+
+} // acmacs::tal::v3::MapsSettings::title
 
 // ----------------------------------------------------------------------
 

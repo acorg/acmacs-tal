@@ -19,17 +19,27 @@ namespace acmacs::tal::inline v3
         MapsSettings(AntigenicMaps& antigenic_maps, ChartDraw& chart_draw) : acmacs::mapi::Settings(chart_draw), antigenic_maps_{antigenic_maps} {}
 
       protected:
-        bool apply_built_in(std::string_view name) override;
+        // bool apply_built_in(std::string_view name) override;
         bool apply_antigens() override;
         bool apply_sera() override;
         bool select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
         bool select(const acmacs::chart::Sera& sera, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
+        map_elements::v1::Title& title() override;
 
       private:
         AntigenicMaps& antigenic_maps_;
 
         void select_antigens_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const;
     };
+
+    // ----------------------------------------------------------------------
+
+    class MapTitle : public map_elements::v1::Title
+    {
+      public:
+        using map_elements::v1::Title::Title;
+
+    }; // class MapTitle
 
     // ----------------------------------------------------------------------
 
