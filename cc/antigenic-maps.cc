@@ -7,6 +7,26 @@
 
 // ----------------------------------------------------------------------
 
+bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
+{
+    using namespace std::string_view_literals;
+    try {
+        if (name == "title"sv) {
+            acmacs::mapi::Settings::apply_title();
+            AD_DEBUG("MapsSettings::apply_built_in title");
+            // auto& tit = title();
+            return true;
+        }
+        return acmacs::mapi::Settings::apply_built_in(name);
+    }
+    catch (std::exception& err) {
+        throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, getenv_toplevel())};
+    }
+
+} // acmacs::tal::v3::MapsSettings::apply_built_in
+
+// ----------------------------------------------------------------------
+
 bool acmacs::tal::v3::MapsSettings::apply_antigens()
 {
     using namespace std::string_view_literals;
