@@ -333,12 +333,12 @@ std::string acmacs::tal::v3::AA_Transitions::display(std::optional<seqdb::pos1_t
 {
     if (data_.empty())
         return {};
-    fmt::memory_buffer output;
+    std::vector<const AA_Transition*> res;
     for (const auto& en : data_) {
         if ((sel == show_empty_left::yes || !en.empty_left()) && !en.empty_right() && (!pos1 || *pos1 == en.pos))
-            fmt::format_to(output, " {}", en);
+            res.push_back(&en);
     }
-    return fmt::to_string(output).substr(1);
+    return acmacs::string::join(acmacs::string::join_space, res.begin(), res.end(), [](const auto* aat) { return aat->display(); });
 
 } // acmacs::tal::v3::AA_Transitions::display
 
@@ -348,15 +348,29 @@ std::string acmacs::tal::v3::AA_Transitions::display_most_important(size_t num) 
 {
     if (data_.empty())
         return {};
-    std::vector<std::string> res;
+    std::vector<const AA_Transition*> res;
     for (const auto& en : data_) {
         if (!en.empty_left() && !en.empty_right())
-            res.push_back(en.display());
+            res.push_back(&en);
     }
-    if (num == 0)
-        return acmacs::string::join(acmacs::string::join_space, res.begin(), res.end());
-    else
-        return acmacs::string::join(acmacs::string::join_space, res.size() > num ? std::next(res.begin(), static_cast<ssize_t>(res.size() - num)) : res.begin(), res.end());
+    if (num == 0 || res.size() < num)
+        return acmacs::string::join(acmacs::string::join_space, res.begin(), res.end(), [](const auto* aat) { return aat->display(); });
+
+    // HA recepter binding domain is 63 - 286 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3020035/
+    auto to_remove{res.size() - num};
+    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) {
+        if ((**resp).pos < seqdb::pos1_t{63} || (**resp).pos > seqdb::pos1_t{286}) {
+            *resp = nullptr;
+            --to_remove;
+        }
+    }
+    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) {
+        if (*resp) {
+            *resp = nullptr;
+            --to_remove;
+        }
+    }
+    return acmacs::string::join(acmacs::string::join_space, res.begin(), res.end(), [](const auto* aat) { return aat ? aat->display() : std::string{}; });
 
 } // acmacs::tal::v3::AA_Transitions::display_most_important
 
