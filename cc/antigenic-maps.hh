@@ -31,6 +31,7 @@ namespace acmacs::tal::inline v3
         AntigenicMaps& antigenic_maps_;
 
         void select_antigens_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const;
+        void select_sera_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const;
         void apply_antigenic_map_section();
     };
 
@@ -74,6 +75,7 @@ namespace acmacs::tal::inline v3
 
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
+        acmacs::chart::PointIndexList chart_sera_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
         void antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes);
 
         const HzSection& current_section() const;

@@ -241,6 +241,7 @@ namespace acmacs::tal::inline v3
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(const Node* first, const Node* last) const;
         acmacs::chart::PointIndexList chart_sera_in_tree(serum_match_t match_type) const;
+        acmacs::chart::PointIndexList chart_sera_in_section(const Node* first, const Node* last) const;
 
         // ----------------------------------------------------------------------
 

@@ -15,7 +15,8 @@
     "antigenic-map": [
         "antigenic-map-reset",
         {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} {section_aa_transitions:6}"]},
-        {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
+        {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"},
+        {"?N": "sera", "select": {"in-section": true, "report": true}, "fill": "red", "outline": "black", "size": 15, "order": "raise"}
     ],
 
     "antigenic-map-reset": [

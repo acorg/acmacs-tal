@@ -453,6 +453,24 @@ acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_tree(serum_ma
 
 } // acmacs::tal::v3::Tree::chart_sera_in_tree
 
+acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_section(const Node* first, const Node* last) const
+{
+    acmacs::chart::PointIndexList indexes;
+    bool use{first == nullptr};
+    tree::iterate_leaf(*this, [&indexes, &use, first, last](const Node& node) {
+        if (!use && &node == first)
+            use = true;
+        if (use) {
+            for (const auto& en : node.serum_index_in_chart_)
+                indexes.insert(std::get<size_t>(en));
+        }
+        if (use && &node == last)
+            use = false;
+    });
+    return indexes;
+
+} // acmacs::tal::v3::Tree::chart_sera_in_section
+
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tree::select_by_top_cumulative_gap(NodeSet& nodes, Select update, double top_gap_rel)
