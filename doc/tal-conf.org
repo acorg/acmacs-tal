@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-11 19:02:58 eu>
+# Time-stamp: <2020-06-15 15:06:52 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -297,6 +297,18 @@ If multiple criteria specified within single "select" object, they all used (con
 
   {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
   {"N": "antigens", "select": {"in-section": 2, "report": true}, "fill": "green", "outline": "black", "size": 5, "order": "raise"}
+#+END_SRC
+
+**** map title additional substitutions (besides chart meta data substs provided by mapi)
+
+{section_prefix} {section_label} {section_aa_transitions:6} - number is the number of most important aa transition labels to show
+
+#+BEGIN_SRC bash
+  "antigenic-map": [
+      "antigenic-map-reset",
+      {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} {section_aa_transitions:6}"]},
+      {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
+  ]
 #+END_SRC
 
 
