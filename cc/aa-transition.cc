@@ -344,18 +344,21 @@ std::string acmacs::tal::v3::AA_Transitions::display(std::optional<seqdb::pos1_t
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::AA_Transitions::display_last(size_t num) const
+std::string acmacs::tal::v3::AA_Transitions::display_most_important(size_t num) const
 {
-    if (data_.empty() || num == 0)
+    if (data_.empty())
         return {};
     std::vector<std::string> res;
     for (const auto& en : data_) {
         if (!en.empty_left() && !en.empty_right())
             res.push_back(en.display());
     }
-    return acmacs::string::join(acmacs::string::join_space, res.size() > num ? std::next(res.begin(), static_cast<ssize_t>(res.size() - num)) : res.begin(), res.end());
+    if (num == 0)
+        return acmacs::string::join(acmacs::string::join_space, res.begin(), res.end());
+    else
+        return acmacs::string::join(acmacs::string::join_space, res.size() > num ? std::next(res.begin(), static_cast<ssize_t>(res.size() - num)) : res.begin(), res.end());
 
-} // acmacs::tal::v3::AA_Transitions::display_last
+} // acmacs::tal::v3::AA_Transitions::display_most_important
 
 // ----------------------------------------------------------------------
 
@@ -381,9 +384,6 @@ std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vecto
     return result;
 
 } // acmacs::tal::v3::AA_Transitions::names
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

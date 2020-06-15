@@ -104,12 +104,7 @@ std::string acmacs::tal::v3::MapTitle::update_line_before_drawing(std::string_vi
         // AD_DEBUG("hz section {} {}", section.id, section.aa_transitions);
         store.push_back(fmt::arg("section_prefix", section.prefix));
         store.push_back(fmt::arg("section_label", section.label));
-        store.push_back(fmt::arg("section_aa_transitions_4", section.aa_transitions.display_last(4)));
-        store.push_back(fmt::arg("section_aa_transitions_5", section.aa_transitions.display_last(5)));
-        store.push_back(fmt::arg("section_aa_transitions_6", section.aa_transitions.display_last(6)));
-        store.push_back(fmt::arg("section_aa_transitions_7", section.aa_transitions.display_last(7)));
-        store.push_back(fmt::arg("section_aa_transitions_8", section.aa_transitions.display_last(8)));
-        store.push_back(fmt::arg("section_aa_transitions", section.aa_transitions.display()));
+        store.push_back(fmt::arg("section_aa_transitions", section.aa_transitions));
         return acmacs::string::substitute_from_store(line, store, acmacs::string::if_no_substitution_found::leave_as_is);
     }
     catch (std::exception& err) {

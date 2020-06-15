@@ -103,7 +103,7 @@ namespace acmacs::tal::inline v3
 
         enum class show_empty_left { no, yes };
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
-        std::string display_last(size_t num) const;
+        std::string display_most_important(size_t num) const;
         bool has(seqdb::pos1_t pos) const;
         bool has_same_left_right() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); }); }
         std::vector<std::string> names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const; // for all pos if selected_pos is empty
@@ -141,8 +141,27 @@ template <> struct fmt::formatter<acmacs::tal::AA_Transition> : fmt::formatter<s
     template <typename FormatCtx> auto format(const acmacs::tal::AA_Transition& tr, FormatCtx& ctx) { return fmt::formatter<std::string>::format(tr.display(), ctx); }
 };
 
+// "{}" - format all
+// "{:3} - format 3 most important or all if total number of aa transitions <= 3
 template <> struct fmt::formatter<acmacs::tal::AA_Transitions> : fmt::formatter<std::string> {
-    template <typename FormatCtx> auto format(const acmacs::tal::AA_Transitions& tr, FormatCtx& ctx) { return fmt::formatter<std::string>::format(tr.display(), ctx); }
+
+    template <typename ParseContext> constexpr auto parse(ParseContext& ctx)
+    {
+        auto it = ctx.begin();
+        if (it != ctx.end() && *it == ':')
+            ++it;
+        if (it != ctx.end() && *it != '}') {
+            char* end{nullptr};
+            most_important_ = std::strtoul(&*it, &end, 10);
+            it = std::next(it, end - &*it);
+        }
+        return std::find(it, ctx.end(), '}');
+    }
+
+    template <typename FormatCtx> auto format(const acmacs::tal::AA_Transitions& tr, FormatCtx& ctx) { return fmt::formatter<std::string>::format(tr.display_most_important(most_important_), ctx); }
+
+  private:
+    size_t most_important_{0};
 };
 
 
