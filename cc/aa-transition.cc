@@ -313,10 +313,8 @@ void acmacs::tal::v3::AA_Transitions::remove_left_right_same(const draw_tree::AA
 
 void acmacs::tal::v3::AA_Transitions::add_or_replace(const AA_Transition& to_add)
 {
-    if (const auto found = std::find_if(std::begin(data_), std::end(data_), [&to_add](const auto& en) { return en.pos == to_add.pos; }); found != std::end(data_))
-        *found = to_add;
-    else
-        data_.push_back(to_add);
+    data_.erase(std::remove_if(std::begin(data_), std::end(data_), [&to_add](const auto& en) { return en.pos == to_add.pos; }), std::end(data_));
+    data_.push_back(to_add);
 
 } // acmacs::tal::v3::AA_Transitions::add_or_replace
 
