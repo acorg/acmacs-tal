@@ -16,6 +16,10 @@ bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
             apply_antigenic_map_section();
             return true;
         }
+        else if (name == "serum-circles-remove"sv) {
+            antigenic_maps_.remove_serum_circles();
+            return true;
+        }
         return acmacs::mapi::Settings::apply_built_in(name);
     }
     catch (std::exception& err) {
@@ -241,6 +245,14 @@ const acmacs::tal::v3::HzSection& acmacs::tal::v3::AntigenicMaps::current_sectio
     return hz_sections->sections().at(*current_section_no_);
 
 } // acmacs::tal::v3::AntigenicMaps::current_section
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::AntigenicMaps::remove_serum_circles()
+{
+    chart_draw_.remove_serum_circles();
+
+} // acmacs::tal::v3::AntigenicMaps::remove_serum_circles
 
 // ----------------------------------------------------------------------
 

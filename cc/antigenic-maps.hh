@@ -79,6 +79,7 @@ namespace acmacs::tal::inline v3
         void antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes);
 
         const HzSection& current_section() const;
+        void remove_serum_circles();
 
       private:
         Parameters parameters_;

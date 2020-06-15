@@ -28,7 +28,8 @@
         {"N": "antigens", "select": "reference", "order": "lower"},
         {"N": "sera",     "select": "all",       "order": "lower"},
         "/no-labels",
-        {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "order": "raise"}
+        {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "order": "raise"},
+        {"N": "serum-circles-remove"}
     ],
 
     "init": [
