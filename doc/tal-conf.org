@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-15 15:06:52 eu>
+# Time-stamp: <2020-06-15 15:14:42 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -303,6 +303,19 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {section_prefix} {section_label} {section_aa_transitions:6} - number is the number of most important aa transition labels to show
 
+**** section specific map title
+
+#+BEGIN_SRC json
+  {"N": "antigenic-map-section", "first": "<seq-id>", "?last": "<seq-id>",
+   "apply": [
+       {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} XXXX"]}
+   ]
+  }
+#+END_SRC
+
+
+**** "antigenic-map" setting is used for every map shown
+
 #+BEGIN_SRC bash
   "antigenic-map": [
       "antigenic-map-reset",
@@ -310,7 +323,6 @@ If multiple criteria specified within single "select" object, they all used (con
       {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
   ]
 #+END_SRC
-
 
 *** Title
 
