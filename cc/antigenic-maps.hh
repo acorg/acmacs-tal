@@ -19,7 +19,6 @@ namespace acmacs::tal::inline v3
         MapsSettings(AntigenicMaps& antigenic_maps, ChartDraw& chart_draw) : acmacs::mapi::Settings(chart_draw), antigenic_maps_{antigenic_maps} {}
 
       protected:
-        // bool apply_built_in(std::string_view name) override;
         bool apply_antigens() override;
         bool apply_sera() override;
         bool select(const acmacs::chart::Antigens& antigens, acmacs::chart::PointIndexList& indexes, std::string_view key, const rjson::v3::value& value) const override;
@@ -37,7 +36,13 @@ namespace acmacs::tal::inline v3
     class MapTitle : public map_elements::v1::Title
     {
       public:
-        using map_elements::v1::Title::Title;
+        MapTitle(AntigenicMaps& antigenic_maps) : map_elements::v1::Title(), antigenic_maps_{antigenic_maps} {}
+
+     protected:
+        std::string update_line_before_drawing(std::string_view line, const ChartDraw& aChartDraw) const override;
+
+      private:
+        AntigenicMaps& antigenic_maps_;
 
     }; // class MapTitle
 
@@ -67,6 +72,8 @@ namespace acmacs::tal::inline v3
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
         void antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes);
+
+        const HzSection& current_section() const;
 
       private:
         Parameters parameters_;

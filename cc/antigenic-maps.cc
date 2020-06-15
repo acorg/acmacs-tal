@@ -1,4 +1,5 @@
 #include "acmacs-base/rjson-v3-helper.hh"
+#include "acmacs-base/string-substitute.hh"
 #include "acmacs-tal/antigenic-maps.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/hz-sections.hh"
@@ -7,30 +8,9 @@
 
 // ----------------------------------------------------------------------
 
-// bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
-// {
-//     using namespace std::string_view_literals;
-//     try {
-//         if (name == "title"sv) {
-//             acmacs::mapi::Settings::apply_title();
-//             AD_DEBUG("MapsSettings::apply_built_in title");
-//             // auto& tit = title();
-//             return true;
-//         }
-//         return acmacs::mapi::Settings::apply_built_in(name);
-//     }
-//     catch (std::exception& err) {
-//         throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, getenv_toplevel())};
-//     }
-
-// } // acmacs::tal::v3::MapsSettings::apply_built_in
-
-// ----------------------------------------------------------------------
-
 map_elements::v1::Title& acmacs::tal::v3::MapsSettings::title()
 {
-    // return chart_draw().map_elements().find_or_add<MapTitle>("title");
-    return chart_draw().map_elements().find_or_add<map_elements::v1::Title>("title");
+    return chart_draw().map_elements().find_or_add<MapTitle>("title", antigenic_maps_);
 
 } // acmacs::tal::v3::MapsSettings::title
 
@@ -115,6 +95,25 @@ bool acmacs::tal::v3::MapsSettings::select(const acmacs::chart::Sera& /*sera*/, 
 
 // ----------------------------------------------------------------------
 
+std::string acmacs::tal::v3::MapTitle::update_line_before_drawing(std::string_view line, const ChartDraw& chart_draw) const
+{
+    try {
+        fmt::dynamic_format_arg_store<fmt::format_context> store;
+        chart_draw.chart(0).chart_metadata(store);
+        const auto& section = antigenic_maps_.current_section();
+        store.push_back(fmt::arg("section_prefix", section.prefix));
+        store.push_back(fmt::arg("section_label", section.label));
+        return acmacs::string::substitute_from_store(line, store, acmacs::string::if_no_substitution_found::leave_as_is);
+    }
+    catch (std::exception& err) {
+        AD_ERROR("fmt cannot substitute in \"{}\": {}", line, err);
+        throw;
+    }
+
+} // acmacs::tal::v3::MapTitle::update_line_before_drawing
+
+// ----------------------------------------------------------------------
+
 acmacs::tal::v3::AntigenicMaps::AntigenicMaps(Tal& tal)
     : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, maps_settings_{*this, chart_draw_}
 {
@@ -161,6 +160,17 @@ void acmacs::tal::v3::AntigenicMaps::columns_rows()
     }
 
 } // acmacs::tal::v3::AntigenicMaps::columns_rows
+
+// ----------------------------------------------------------------------
+
+const acmacs::tal::v3::HzSection& acmacs::tal::v3::AntigenicMaps::current_section() const
+{
+    auto* hz_sections = tal().draw().layout().find<HzSections>();
+    if (!current_section_no_.has_value() || *current_section_no_ >= hz_sections->sections().size())
+        throw std::runtime_error{"internal: acmacs::tal::v3::AntigenicMaps: no current section"};
+    return hz_sections->sections().at(*current_section_no_);
+
+} // acmacs::tal::v3::AntigenicMaps::current_section
 
 // ----------------------------------------------------------------------
 
