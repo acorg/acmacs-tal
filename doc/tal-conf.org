@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-15 15:14:42 eu>
+# Time-stamp: <2020-06-15 15:31:57 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -321,6 +321,11 @@ If multiple criteria specified within single "select" object, they all used (con
       "antigenic-map-reset",
       {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} {section_aa_transitions:6}"]},
       {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"}
+      {"N": "antigenic-map-section", "first": "AH3N2/KHAKASSIA/249/2018_OR_hCC66CE22", "?last": "<seq-id>",
+       "apply": [
+           {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} XXXX"]}
+       ]
+      }
   ]
 #+END_SRC
 

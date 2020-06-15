@@ -18,6 +18,8 @@ namespace acmacs::tal::inline v3
       public:
         MapsSettings(AntigenicMaps& antigenic_maps, ChartDraw& chart_draw) : acmacs::mapi::Settings(chart_draw), antigenic_maps_{antigenic_maps} {}
 
+        bool apply_built_in(std::string_view name) override; // returns true if built-in command with that name found and applied
+
       protected:
         bool apply_antigens() override;
         bool apply_sera() override;
