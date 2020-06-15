@@ -13,16 +13,7 @@ bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
     using namespace std::string_view_literals;
     try {
         if (name == "antigenic-map-section"sv) {
-            const auto first_seq_id = rjson::v3::read_string(getenv("first"sv));
-            if (!first_seq_id.has_value())
-                throw error{"no \"first\" in \"antigenic-map-section\""};
-            const auto& to_apply = getenv("apply"sv);
-            if (!to_apply.is_array())
-                throw error{"no or invalid \"apply\" in \"antigenic-map-section\""};
-            const auto last_seq_id = rjson::v3::read_string(getenv("last"sv), "");
-            if (const auto& current_section = antigenic_maps_.current_section(); current_section.first && first_seq_id == current_section.first->seq_id && (last_seq_id.empty() || (current_section.last && last_seq_id == current_section.last->seq_id))) {
-                apply("apply"sv);
-            }
+            apply_antigenic_map_section();
             return true;
         }
         return acmacs::mapi::Settings::apply_built_in(name);
@@ -32,6 +23,25 @@ bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
     }
 
 } // acmacs::tal::v3::MapsSettings::apply_built_in
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::MapsSettings::apply_antigenic_map_section()
+{
+    using namespace std::string_view_literals;
+    const auto first_seq_id = rjson::v3::read_string(getenv("first"sv));
+    if (!first_seq_id.has_value())
+        throw error{"no \"first\" in \"antigenic-map-section\""};
+    const auto& to_apply = getenv("apply"sv);
+    if (!to_apply.is_array())
+        throw error{"no or invalid \"apply\" in \"antigenic-map-section\""};
+    const auto last_seq_id = rjson::v3::read_string(getenv("last"sv), "");
+    if (const auto& current_section = antigenic_maps_.current_section();
+        current_section.first && first_seq_id == current_section.first->seq_id && (last_seq_id.empty() || (current_section.last && last_seq_id == current_section.last->seq_id))) {
+        apply("apply"sv);
+    }
+
+} // acmacs::tal::v3::MapsSettings::apply_antigenic_map_section
 
 // ----------------------------------------------------------------------
 

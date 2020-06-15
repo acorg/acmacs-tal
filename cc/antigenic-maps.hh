@@ -31,6 +31,7 @@ namespace acmacs::tal::inline v3
         AntigenicMaps& antigenic_maps_;
 
         void select_antigens_in_section(acmacs::chart::PointIndexList& indexes, const rjson::v3::value& value) const;
+        void apply_antigenic_map_section();
     };
 
     // ----------------------------------------------------------------------
