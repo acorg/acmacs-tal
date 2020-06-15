@@ -65,7 +65,7 @@ void acmacs::tal::v3::HzSections::set_aa_transitions()
             for (auto& section : sections_) {
                 if (!node.first_prev_leaf || !node.last_next_leaf)
                     AD_WARNING("hz section {}  node:{} {} node.first_prev_leaf:{} node.last_next_leaf:{}", section.id, node.node_id, node.seq_id, fmt::ptr(node.first_prev_leaf), fmt::ptr(node.last_next_leaf));
-                if (section.first && section.last && section.first->node_id.vertical >= node.first_prev_leaf->node_id.vertical && section.last->node_id.vertical <= node.last_next_leaf->node_id.vertical)
+                if ((section.first ? section.first->node_id.vertical >= node.first_prev_leaf->node_id.vertical : true) && (section.last ? section.last->node_id.vertical <= node.last_next_leaf->node_id.vertical : true))
                     section.aa_transitions.add_or_replace(node.aa_transitions_);
             }
         }

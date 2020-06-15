@@ -1,3 +1,4 @@
+#include "acmacs-base/string-join.hh"
 #include "acmacs-tal/aa-transition.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
@@ -332,17 +333,31 @@ void acmacs::tal::v3::AA_Transitions::add_or_replace(const AA_Transitions& trans
 
 std::string acmacs::tal::v3::AA_Transitions::display(std::optional<seqdb::pos1_t> pos1, show_empty_left sel) const
 {
+    if (data_.empty())
+        return {};
     fmt::memory_buffer output;
     for (const auto& en : data_) {
         if ((sel == show_empty_left::yes || !en.empty_left()) && !en.empty_right() && (!pos1 || *pos1 == en.pos))
             fmt::format_to(output, " {}", en);
     }
-    if (const auto result = fmt::to_string(output); result.size() > 1)
-        return result.substr(1);
-    else
-        return result;
+    return fmt::to_string(output).substr(1);
 
 } // acmacs::tal::v3::AA_Transitions::display
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::AA_Transitions::display_last(size_t num) const
+{
+    if (data_.empty() || num == 0)
+        return {};
+    std::vector<std::string> res;
+    for (const auto& en : data_) {
+        if (!en.empty_left() && !en.empty_right())
+            res.push_back(en.display());
+    }
+    return acmacs::string::join(acmacs::string::join_space, res.size() > num ? std::next(res.begin(), static_cast<ssize_t>(res.size() - num)) : res.begin(), res.end());
+
+} // acmacs::tal::v3::AA_Transitions::display_last
 
 // ----------------------------------------------------------------------
 
