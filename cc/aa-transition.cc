@@ -358,13 +358,13 @@ std::string acmacs::tal::v3::AA_Transitions::display_most_important(size_t num) 
 
     // HA recepter binding domain is 63 - 286 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3020035/
     auto to_remove{res.size() - num};
-    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) {
+    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) { // removing entries that are out of recepter binding domain
         if ((**resp).pos < seqdb::pos1_t{63} || (**resp).pos > seqdb::pos1_t{286}) {
             *resp = nullptr;
             --to_remove;
         }
     }
-    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) {
+    for (auto resp = res.begin(); resp != res.end() && to_remove > 0; ++resp) { // removing initial (and not removed before) entries
         if (*resp) {
             *resp = nullptr;
             --to_remove;
