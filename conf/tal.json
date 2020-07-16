@@ -38,7 +38,8 @@
          "report-time-series-output": "",
          "whocc": false,
          "ladderize-method": "number-of-leaves",
-         "tree-draw-aa-transitions": true
+         "tree-draw-aa-transitions": true,
+         "virus-type/lineage": "XXX"
         }
     ],
     "? end overwrite in local settings": "----------------------------------------------------------------------",
