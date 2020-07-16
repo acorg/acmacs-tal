@@ -50,11 +50,13 @@ void add_nodes(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, cons
 {
     if (node.is_leaf()) {
         fmt::format_to(html,
-                       "<li><table><tr>{prefix}<td><div class='e {node_edge_last}' style='width: {edge}px;'></div></td><td class='seq-name' style='color: "
-                       "{color_tree_label}'>{seq_id}</td></tr></table></li>\n",
+                       "<li><table><tr>{prefix}<td><div class='e {node_edge_last}' style='width: {edge}px;'></div></td><td class='s' style='color: "
+                       "{color_tree_label}'>{seq_id} <span class='b'>{accession_numbers}</span></td></tr></table></li>\n",
                        fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)), fmt::arg("node_edge_last", last ? "n" : ""),
                        fmt::arg("edge", static_cast<int>(node.edge_length.as_number() * edge_scale)), fmt::arg("seq_id", node.seq_id),
-                       fmt::arg("color_tree_label", "black" /*node.color_tree_label.to_hex_string()*/));
+                       fmt::arg("color_tree_label", "black" /*node.color_tree_label.to_hex_string()*/),
+                       fmt::arg("accession_numbers", fmt::format("{} {}", node.gisaid.isolate_ids, node.gisaid.sample_ids_by_sample_provider))
+                       );
     }
     else {
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);
@@ -100,6 +102,7 @@ namespace
    ul.tree td.a {{ color: blue; font-size: 0.8em; }}                  /* common-aa */
    ul.tree div.e {{ height: 0.5em; border-bottom: 1px solid black; }} /* node-edge */
    ul.tree div.n {{ border-left: 1px solid black; }}                  /* node-edge-last */
+   ul.tree td.s span.b {{ color: #808080; }}                          /* seq-name, accession_numbers */
   </style>
  </head>
  <body>

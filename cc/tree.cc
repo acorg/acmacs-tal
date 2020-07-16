@@ -580,6 +580,7 @@ void acmacs::tal::v3::Node::populate(const acmacs::seqdb::ref& a_ref, const acma
     continent = ref.entry->continent;
     country = ref.entry->country;
     hi_names = ref.seq().hi_names;
+    gisaid = ref.seq().gisaid;
 
 } // acmacs::tal::v3::Node::populate
 

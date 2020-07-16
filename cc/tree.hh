@@ -112,6 +112,7 @@ namespace acmacs::tal::inline v3
         enum class leaf_position { first, middle, last, single };
         leaf_position leaf_pos{leaf_position::middle};
         node_id_t node_id; // includes vertical leaf number for leaves
+        seqdb::SeqdbSeq::gisaid_data_t gisaid;   // from seqdb
 
         // all nodes
         ladderize_helper_t ladderize_helper_;
