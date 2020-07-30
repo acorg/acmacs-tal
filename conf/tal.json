@@ -2,7 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
-        {"?N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"?hide": true, "tree-edge-line-color": "red"}}
+        {"? N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"?hide": true, "tree-edge-line-color": "red"}}
     ],
 
     "? for all antigenic maps": "",
@@ -38,9 +38,11 @@
          "report-time-series-output": "",
          "whocc": false,
          "ladderize-method": "number-of-leaves",
-         "tree-draw-aa-transitions": true,
-         "virus-type/lineage": "XXX"
-        }
+         "tree-draw-aa-transitions": true
+        },
+        {"N": "if", "condition": {"empty": "{virus-type/lineage}"}, "then": [
+            {"N": "set", "virus-type/lineage": "XXX"}
+        ]}
     ],
     "? end overwrite in local settings": "----------------------------------------------------------------------",
 
