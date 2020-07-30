@@ -149,8 +149,14 @@ namespace acmacs::tal::inline v3
 
         size_t number_leaves_in_subtree() const
         {
-            if (!is_leaf())
-                return last_next_leaf->node_id.vertical - first_prev_leaf->node_id.vertical + 1;
+            if (!is_leaf()) {
+                if (!first_prev_leaf || !last_next_leaf) {
+                    AD_WARNING("first_prev_leaf or last_next_leaf is null, all subtree is hidden?", subtree.size(), fmt::ptr(subtree[0].first_prev_leaf));
+                    return 0;
+                }
+                else
+                    return last_next_leaf->node_id.vertical - first_prev_leaf->node_id.vertical + 1;
+            }
             else
                 return 0;
         }

@@ -2,7 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
-        {"N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"hide": true, "tree-edge-line-color": "red"}}
+        {"?N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"?hide": true, "tree-edge-line-color": "red"}}
     ],
 
     "? for all antigenic maps": "",
