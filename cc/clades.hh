@@ -111,6 +111,19 @@ namespace acmacs::tal::inline v3
 } // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------
+
+template <> struct fmt::formatter<acmacs::tal::Clades::slot_no_t> : fmt::formatter<acmacs::fmt_helper::default_formatter> {
+    template <typename FormatCtx> auto format(const acmacs::tal::Clades::slot_no_t& value, FormatCtx& ctx)
+    {
+        if (value == acmacs::tal::Clades::NoSlot)
+            format_to(ctx.out(), "none");
+        else
+            format_to(ctx.out(), "{}", *value);
+        return ctx.out();
+    }
+};
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

@@ -949,13 +949,17 @@ template <typename AA_AT> static inline void clade_set_by(std::string_view clade
     tree.add_clade(clade_name, display_name);
     size_t num = 0;
     acmacs::tal::tree::iterate_leaf(tree, [&aa_at_pos, clade_name, &num](acmacs::tal::Node& node) {
-        if (acmacs::seqdb::matches(node.aa_sequence, std::forward<AA_AT>(aa_at_pos))) {
+        const acmacs::seqdb::sequence_aligned_ref_t* sequence{nullptr};
+        if constexpr (std::is_same_v<std::decay_t<AA_AT>, acmacs::seqdb::amino_acid_at_pos1_eq_list_t>)
+            sequence = &node.aa_sequence;
+        else
+            sequence = &node.nuc_sequence;
+        if (acmacs::seqdb::matches(*sequence, std::forward<AA_AT>(aa_at_pos))) {
             node.clades.add(clade_name);
             ++num;
         }
     });
     AD_LOG(acmacs::log::clades, "\"{}\": {} leaves", clade_name, num);
-
 }
 
 void acmacs::tal::v3::Tree::clade_set_by_aa_at_pos(std::string_view clade_name, const acmacs::seqdb::amino_acid_at_pos1_eq_list_t& aa_at_pos, std::string_view display_name)

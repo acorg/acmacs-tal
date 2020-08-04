@@ -1,4 +1,4 @@
-# Time-stamp: <2020-06-15 15:31:57 eu>
+# Time-stamp: <2020-08-04 14:53:23 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -260,8 +260,8 @@ If multiple criteria specified within single "select" object, they all used (con
   {"N": "dash-bar-clades",
    "?width-to-height-ratio": 0.009,
    "clades": [
-     {"name": "2DEL2017", "color": "#A0A0A0"},
-     {"name": "3DEL2017", "color": "#606060"}
+     {"name": "2DEL2017", "color": "#A0A0A0" "label": {<[[Label parameters]]>}},
+     {"name": "3DEL2017", "color": "#606060" "label": {<[[Label parameters]]>}}
    ],
    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
    "?debug-outline": "lightblue"}
