@@ -147,7 +147,8 @@
         ]},
 
         {"?N": "---------- BVic ----------"},
-        {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": [
+        {"?N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": []},
+        {"N": "if", "condition": {"equal": ["{virus-type/lineage}", "B/Vic"]}, "then": [
             {"N": "dash-bar-clades",
              "width-to-height-ratio": 0.009,
              "clades": [
@@ -192,9 +193,9 @@
              {"name": "3C.2A4", "show": false},
              {"?N": "---------- BVic ----------"},
              {"name": "V1B", "show": false},
-             {"name": "V1A", "section_inclusion_tolerance": 20},
-             {"name": "2DEL2017", "show": false, "section_inclusion_tolerance": 15},
-             {"name": "3DEL2017", "show": false},
+             {"name": "V1A", "show": false, "section_inclusion_tolerance": 20},
+             {"name": "2DEL2017", "show": true, "section_inclusion_tolerance": 15},
+             {"name": "3DEL2017", "show": true},
              {"name": "6DEL2019", "show": false},
              {"?N": "---------- BYam ----------"},
              {"name": "Y2"},
