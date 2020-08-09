@@ -416,7 +416,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             update = Tree::Select::update;
     }
     if (report)
-        AD_INFO("{} selected nodes {}\n", selected.size(), criteria, report_nodes("  ", selected));
+        AD_INFO("{} selected nodes {} {}\n", selected.size(), criteria, report_nodes("  ", selected));
     return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
