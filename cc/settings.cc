@@ -245,7 +245,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 node->edge_line_width_scale = line_width_scale;
         }
         else if (key == "report"sv) {
-            AD_INFO("{} selected nodes {}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
+            AD_INFO("{} selected nodes {} {}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
         }
     };
 
