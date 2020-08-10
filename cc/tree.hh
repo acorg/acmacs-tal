@@ -151,7 +151,7 @@ namespace acmacs::tal::inline v3
         {
             if (!is_leaf()) {
                 if (!first_prev_leaf || !last_next_leaf) {
-                    AD_WARNING("first_prev_leaf or last_next_leaf is null, all subtree is hidden?", subtree.size(), fmt::ptr(subtree[0].first_prev_leaf));
+                    // AD_WARNING("first_prev_leaf or last_next_leaf is null, all subtree is hidden?", subtree.size(), fmt::ptr(subtree[0].first_prev_leaf));
                     return 0;
                 }
                 else
