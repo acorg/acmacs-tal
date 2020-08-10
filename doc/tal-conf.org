@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-04 14:53:23 eu>
+# Time-stamp: <2020-08-10 11:22:49 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -125,7 +125,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
 
-{"N": "aa-transitions", "report": false, "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+{"N": "aa-transitions", "report": false, "method": "derek", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
 "show-same-left-right-for-pos": 193}
 
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
@@ -176,6 +176,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC json
   {"N": "draw-aa-transitions", 
+   "method": "derek", -- "derek", "eu_20200514"
    "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
    "text_line_interleave": 0.3,
    "show": true,

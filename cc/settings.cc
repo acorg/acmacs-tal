@@ -245,7 +245,7 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 node->edge_line_width_scale = line_width_scale;
         }
         else if (key == "report"sv) {
-            AD_INFO("{} selected nodes {} {}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
+            AD_INFO("{} selected nodes {}\n{}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
         }
     };
 
@@ -1063,8 +1063,19 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 {
     using namespace std::string_view_literals;
 
-    if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree)
-        draw_tree->parameters().aa_transitions.calculate = true;
+    if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree) {
+        auto& aa_transitions = draw_tree->parameters().aa_transitions;
+        aa_transitions.calculate = true;
+        if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
+            const auto method = method_v.to<std::string_view>();
+            if (method.empty() || method == "derek"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::derek;
+            else if (method == "eu_20200514"sv || method == "eu-20200514"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200514;
+            else
+                throw error{"\"draw-aa-transitions\": invalid \"method\" (\"derek\" or \"eu_20200514\" expected)"};
+        }
+    }
 
     auto& element = add_element<DrawAATransitions>();
     auto& param = element.parameters();
