@@ -53,7 +53,7 @@ namespace acmacs::tal::inline v3
     class ColoringByContinent : public Coloring
     {
       public:
-        ColoringByContinent() : colors_{continent_colors_dark()} {}
+        ColoringByContinent() : colors_{continent_colors()} {}
         Color color(const Node& node) const override;
         std::string report() const override;
         std::string_view legend_type() const override { return "world-map"; }
