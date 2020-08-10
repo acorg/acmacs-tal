@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-10 11:22:49 eu>
+# Time-stamp: <2020-08-10 12:54:54 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -181,7 +181,7 @@ If multiple criteria specified within single "select" object, they all used (con
    "text_line_interleave": 0.3,
    "show": true,
    "?only-for": [<pos>], -- draw only for the specified pos, if list is absent or empty, draw for all pos
-   "all": {"node_id": "", "label": {<[[Label parameters]]>}},
+   "all_nodes": {"node_id": "", "label": {<[[Label parameters]]>}},
    "per_node": [
    ],
   },
