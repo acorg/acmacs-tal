@@ -264,11 +264,12 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
         const auto map_size = viewport.size.height / static_cast<double>(rows_) - gap * static_cast<double>(rows_ - 1) / static_cast<double>(rows_);
         const auto* hz_sections = tal().draw().layout().find<HzSections>();
         for (size_t section_no{0}; section_no < hz_sections->sections().size(); ++section_no) {
-            AD_INFO("drawing section {}", section_no);
+            fmt::print(stderr, "\n\n");
+            AD_INFO("========================================================\n>>> SECTION {} {}\n\n", section_no, static_cast<char>(section_no + 'A'));
             current_section_no_ = section_no;
             const auto left = static_cast<double>(section_no % columns_) * (map_size + gap);
             const auto top = static_cast<double>(section_no / columns_) * (map_size + gap);
-            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, false), section_no);
+            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, true), section_no);
             current_section_no_ = std::nullopt;
         }
     }
@@ -284,7 +285,7 @@ void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface,
     maps_settings_.apply("antigenic-map"sv);
 
     chart_draw_.calculate_viewport();
-    acmacs::draw::DrawElementsToSurface painter(surface.subsurface({0.0, 0.0}, Scaled{1.0}, chart_draw_.viewport("AntigenicMaps::draw_map"sv), false));
+    acmacs::draw::DrawElementsToSurface painter(surface.subsurface({0.0, 0.0}, Scaled{1.0}, chart_draw_.viewport("AntigenicMaps::draw_map"sv), true));
     chart_draw_.draw(painter);
 
 } // acmacs::tal::v3::AntigenicMaps::draw_map
