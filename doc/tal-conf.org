@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-20 17:18:55 eu>
+# Time-stamp: <2020-08-20 18:15:45 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -357,7 +357,7 @@ Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (h
   "label": {
     "text": "",
     "rotation_degrees": 0, "color": "black",
-    "scale": 0.5, "?scale?": "scale is a fraction of the slot width in clades"
+    "scale": 0.7, "?scale?": "scale is a fraction of the slot width in clades"
     "vertical_position": "middle|top|bottom",
     "horizontal_position": "left|middle|right",
     "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",

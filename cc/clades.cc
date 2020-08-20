@@ -92,7 +92,6 @@ void acmacs::tal::v3::Clades::make_sections()
         if (clade_param.any_shown()) {
             auto& clade = clades_.emplace_back(tree_clade.name);
             for (const auto [section_no, tree_section] : acmacs::enumerate(tree_clade.sections)) {
-                const bool shown{clade_param.shown(section_no)};
                 if (clade_param.shown(section_no)) {
                     auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
                     section.slot_no = section_data(clade_param.slot_no, section_no);
@@ -287,7 +286,27 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                     vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
                     break;
             }
-            const auto text_pos_x = time_series_to_the_left_ ? (pos_x + section.label.offset[0]) : (pos_x - text_size.width - section.label.offset[0]);
+
+            const auto text_pos_x_calc = [&, this]() {
+                if (time_series_to_the_left_) {
+                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                        return pos_x + text_size.height + section.label.offset[0];
+                    // else if (section.label.rotation == Rotation90DegreesClockwise)
+                    //     return pos_x + section.label.offset[0];
+                    else
+                        return pos_x + section.label.offset[0];
+                }
+                else {
+                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                        return pos_x - section.label.offset[0];
+                    else if (section.label.rotation == Rotation90DegreesClockwise)
+                        return pos_x - text_size.height - section.label.offset[0];
+                    else
+                        return pos_x - text_size.width - section.label.offset[0];
+                }
+            };
+
+            const auto text_pos_x = text_pos_x_calc(); // time_series_to_the_left_ ? (pos_x + section.label.offset[0]) : (pos_x - text_size.width - section.label.offset[0]);
             surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
 
         }
