@@ -276,7 +276,13 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
             double vertical_pos{0};
             switch (section.label.vpos) {
                 case parameters::vertical_position::top:
-                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1] + text_size.height;
+                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1];
+                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                        vertical_pos += text_size.width;
+                    else if (section.label.rotation == Rotation90DegreesClockwise)
+                        vertical_pos -= text_size.height / 2.0;
+                    else
+                        vertical_pos += text_size.height;
                     break;
                 case parameters::vertical_position::middle:
                     vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1];
@@ -289,6 +295,8 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                     break;
                 case parameters::vertical_position::bottom:
                     vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
+                    if (section.label.rotation == Rotation90DegreesClockwise)
+                        vertical_pos -= text_size.width;
                     break;
             }
 
