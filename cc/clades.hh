@@ -68,16 +68,29 @@ namespace acmacs::tal::inline v3
         struct CladeParameters
         {
             std::string name;
-            std::string display_name;
-            bool hidden{false};
+            std::vector<std::string> display_name;
+            std::vector<bool> hidden{false};
             unsigned short section_inclusion_tolerance{10};
             unsigned short section_exclusion_tolerance{5};
-            slot_no_t slot_no{NoSlot};
-            parameters::Label label;
+            std::vector<slot_no_t> slot_no{NoSlot};
+            std::vector<parameters::Label> label;
             arrow_t arrow;
             parameters::Line horizontal_line{GREY, Pixels{0.5}, surface::Dash::NoDash};
             double tree_top_gap{0.01}, tree_bottom_gap{0.01}; // fraction of the tree area height
             bool time_series_top_separator{true}, time_series_bottom_separator{true};
+
+            bool shown(size_t section_no) const
+            {
+                if (hidden.size() > section_no)
+                    return !hidden[section_no];
+                else
+                    return !hidden.back();
+            }
+
+            bool any_shown() const
+            {
+                return !hidden.empty() && std::any_of(hidden.begin(), hidden.end(), [](const auto& en) { return !en; });
+            }
         };
 
         struct Parameters

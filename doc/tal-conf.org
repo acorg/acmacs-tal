@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-10 12:54:54 eu>
+# Time-stamp: <2020-08-20 17:18:55 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -228,13 +228,14 @@ If multiple criteria specified within single "select" object, they all used (con
 **** Clade parameters
 
 #+BEGIN_SRC json
-  {"name": "183P-1", "display_name": "183P-1",
-   "shown": true, "show": true, "hidden": false,
-   "slot": 1,
-   "top-gap": 0.01, "bottom-gap": 0.01, -- fraction of the tree area height
+  {"name": "183P-1", 
+   "display_name": "183P-1", # "display_name": ["183P-1", "183P-11"], per section display_name
+   "show": true, # "show": [true, false] per section show
+   "slot": 1, # "slot": [1, 2] per section slots
+   "top-gap": 0.01, "bottom-gap": 0.01, # fraction of the tree area height
    "time_series_top_separator": true, "time_series_bottom_separator": true,
    "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
-   "label": {<[[Label parameters]]>},
+   "label": {<[[Label parameters]]>}, # "label": [{}, {}] per section label parameters
    "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
    "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",
   }

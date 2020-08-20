@@ -748,18 +748,66 @@ void acmacs::tal::v3::Settings::read_dash_parameters(parameters::Dash& param)
 void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::v3::value& source, Clades::CladeParameters& clade_parameters)
 {
     using namespace std::string_view_literals;
-    rjson::v3::copy_if_not_null(source["display_name"sv], clade_parameters.display_name);
-    if (const auto& shown = source["shown"sv]; !shown.is_null())
-        clade_parameters.hidden = !shown.template to<bool>();
-    else if (const auto& show = source["show"sv]; !show.is_null())
-        clade_parameters.hidden = !show.template to<bool>();
-    else
-        rjson::v3::copy_if_not_null(source["hidden"sv], clade_parameters.hidden);
+
+    const auto& display_name = source["display_name"sv];
+    display_name.visit([&clade_parameters, &display_name]<typename Arg>(const Arg& arg) {
+        if constexpr (std::is_same_v<Arg, rjson::v3::detail::string>) {
+            clade_parameters.display_name.emplace_back(arg.template to<std::string_view>());
+        }
+        else if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+            for (const auto& dn : arg)
+                clade_parameters.display_name.emplace_back(dn.template to<std::string_view>());
+        }
+        else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+            throw error{fmt::format("clade \"display_name\": invalid value ({}), array of strings or string expected", display_name)};
+    });
+
+    source["show"sv].visit([&clade_parameters]<typename Arg>(const Arg& arg) {
+        if constexpr (std::is_same_v<Arg, rjson::v3::detail::boolean>) {
+            clade_parameters.hidden.clear();
+            clade_parameters.hidden.push_back(!arg);
+        }
+        else if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+            clade_parameters.hidden.clear();
+            for (const auto& show : arg)
+                clade_parameters.hidden.push_back(!show);
+        }
+        else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+            throw error{"clade \"show\": invalid value, array of bools or bool expected"};
+    });
+    // AD_DEBUG("read_clade_parameters \"{}\" hidden {}", clade_parameters.name, clade_parameters.hidden);
+
+    source["slot"sv].visit([&clade_parameters]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, rjson::v3::detail::number>) {
+                clade_parameters.slot_no.clear();
+                clade_parameters.slot_no.push_back(arg.template to<Clades::slot_no_t>());
+            }
+            else if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+                clade_parameters.slot_no.clear();
+                for (const auto& slot : arg)
+                    clade_parameters.slot_no.push_back(slot.template to<Clades::slot_no_t>());
+            }
+            else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+                throw error{"clade \"slot\": invalid value, array of ints or int expected"};
+    });
+
+    const auto& label_v = source["label"sv];
+    label_v.visit([&clade_parameters, this, &label_v]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
+                clade_parameters.label.clear();
+                read_label_parameters(label_v, clade_parameters.label.emplace_back());
+            }
+            else if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+                clade_parameters.label.clear();
+                for (const auto& label : arg)
+                    read_label_parameters(label, clade_parameters.label.emplace_back());
+            }
+            else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+                throw error{"clade \"label\": invalid value, array or object expected"};
+    });
+
     rjson::v3::copy_if_not_null(source["section_inclusion_tolerance"sv], clade_parameters.section_inclusion_tolerance);
     rjson::v3::copy_if_not_null(source["section_exclusion_tolerance"sv], clade_parameters.section_exclusion_tolerance);
-    rjson::v3::copy_if_not_null(source["slot"sv], clade_parameters.slot_no);
-
-    read_label_parameters(source["label"sv], clade_parameters.label);
 
     rjson::v3::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
     rjson::v3::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);

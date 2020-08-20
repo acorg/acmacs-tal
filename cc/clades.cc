@@ -76,22 +76,32 @@ void acmacs::tal::v3::Clades::make_clades()
 
 void acmacs::tal::v3::Clades::make_sections()
 {
+    const auto section_data = []<typename Elt>(const std::vector<Elt>& data, size_t section_no) -> const Elt& {
+        if (data.size() > section_no)
+            return data[section_no];
+        else
+            return data.back();
+    };
+
     tal().tree().make_clade_sections();
     const auto& tree_clades = tal().tree().clades();
     for (const auto& tree_clade : tree_clades) {
         AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
         AD_LOG(acmacs::log::clades, "    from clade params: slot:{} display_name:{} hidden:{}", clade_param.slot_no, clade_param.display_name, clade_param.hidden);
-        if (!clade_param.hidden) {
+        if (clade_param.any_shown()) {
             auto& clade = clades_.emplace_back(tree_clade.name);
-            for (const auto& tree_section : tree_clade.sections) {
-                auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
-                section.slot_no = clade_param.slot_no;
-                section.label = clade_param.label;
-                section.arrow = clade_param.arrow;
-                section.horizontal_line = clade_param.horizontal_line;
-                if (!clade_param.display_name.empty())
-                    section.display_name = clade_param.display_name;
+            for (const auto [section_no, tree_section] : acmacs::enumerate(tree_clade.sections)) {
+                const bool shown{clade_param.shown(section_no)};
+                if (clade_param.shown(section_no)) {
+                    auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
+                    section.slot_no = section_data(clade_param.slot_no, section_no);
+                    section.label = section_data(clade_param.label, section_no);
+                    section.arrow = clade_param.arrow;
+                    section.horizontal_line = clade_param.horizontal_line;
+                    if (!clade_param.display_name.empty())
+                        section.display_name = section_data(clade_param.display_name, section_no);
+                }
             }
 
             // merge sections
@@ -108,7 +118,8 @@ void acmacs::tal::v3::Clades::make_sections()
 
             // remove small sections
             const auto is_section_small = [tol = clade_param.section_exclusion_tolerance](const auto& sec) { return sec.size() <= tol; };
-            if (const size_t num_small_sections = static_cast<size_t>(std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small)); num_small_sections < clade.sections.size())
+            if (const size_t num_small_sections = static_cast<size_t>(std::count_if(std::begin(clade.sections), std::end(clade.sections), is_section_small));
+                num_small_sections < clade.sections.size())
                 clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), is_section_small), std::end(clade.sections));
 
             if (clade.sections.empty())
@@ -204,10 +215,10 @@ void acmacs::tal::v3::Clades::report_clades()
         for (const auto& clade : clades_) {
             const auto& clade_param = parameters_for_clade(clade.name);
             fmt::print("Clade {} ({})    {{\"name\": \"{}\", \"display_name\": \"{}\", \"section_inclusion_tolerance\": {}, \"section_exclusion_tolerance\": {}, \"show\": {}}}\n", clade.name,
-                       clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, !clade_param.hidden);
+                       clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, clade_param.any_shown());
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  {} [{}] slot:{} {:.0} {} .. {:.0} {}\n", section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
+                fmt::print("  ({}) \"{}\" [{}] slot:{} {:.0} \"{}\" .. {:.0} \"{}\"\n", section_no, section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
                            section.last->seq_id);
                 if (section_no < (clade.sections.size() - 1))
                     fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id.vertical - section.last->node_id.vertical - 1);
