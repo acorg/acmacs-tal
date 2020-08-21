@@ -35,6 +35,7 @@
     "init": [
         {"N": "set",
          "report-cumulative-output": "",
+         "report-cumulative-max": 100,
          "report-time-series-output": "",
          "whocc": false,
          "ladderize-method": "number-of-leaves",
@@ -119,7 +120,7 @@
             {"N": "seqdb", "filename": "{seqdb-filename}"},
             {"N": "populate-with-nuc-duplicates"}
         ]},
-        {"N": "report-cumulative", "output": "{report-cumulative-output}", "all": true},
+        {"N": "report-cumulative", "output": "{report-cumulative-output}", "max": "{report-cumulative-max}"},
         {"N": "ladderize", "method": "{ladderize-method}"},
 
         {"?N": ""}

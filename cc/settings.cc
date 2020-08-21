@@ -157,7 +157,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
             if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty())
-                acmacs::file::write(output_filename, tree().report_cumulative());
+                acmacs::file::write(output_filename, tree().report_cumulative(getenv_or("max"sv, 0ul))); // 0 - report all
         }
         else if (name == "report-aa-at"sv) {
             report_aa_at();

@@ -215,7 +215,7 @@ namespace acmacs::tal::inline v3
         void match_seqdb(std::string_view seqdb_filename);
         void populate_with_nuc_duplicates();
 
-        std::string report_cumulative() const;
+        std::string report_cumulative(size_t max) const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
         void branches_by_edge();

@@ -94,7 +94,7 @@ acmacs::tal::v3::EdgeLength acmacs::tal::v3::Tree::max_cumulative_shown() const
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::Tree::report_cumulative() const
+std::string acmacs::tal::v3::Tree::report_cumulative(size_t max) const
 {
     cumulative_calculate();
 
@@ -102,9 +102,12 @@ std::string acmacs::tal::v3::Tree::report_cumulative() const
     tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.push_back(&node); });
     std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1->cumulative_edge_length > en2->cumulative_edge_length; });
 
-    std::string result{"All nodes sorted by cumulative\n Cumulative       Edge       Seq id\n"};
-    for (const auto* node : nodes)
+    auto result{fmt::format("Nodes {} sorted by cumulative\n Cumulative       Edge       Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"})};
+    for (const auto [no, node] : acmacs::enumerate(nodes)) {
         result.append(fmt::format("{:.10f}  {:.10f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id));
+        if (max > 0 && no >= max)
+            break;
+    }
     return result;
 
 } // acmacs::tal::v3::Tree::report_cumulative

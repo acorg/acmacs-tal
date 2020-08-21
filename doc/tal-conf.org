@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-20 18:15:45 eu>
+# Time-stamp: <2020-08-21 15:02:36 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -22,6 +22,7 @@ Use .tal suffix
 
 -D report-cumulative-output=-  write cumulative report to stdout
 -D report-cumulative-output=filename  write cumulative report to filename
+-D report-cumulative-output=- -D report-cumulative-max=100 write cumulative report for 100 (default) longest brachnes to stdout
 
 -D report-time-series-output=-  write time-series report to stdout
 -D report-time-series-output=filename  write time-series report to filename
@@ -136,7 +137,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 ** Report
 
-{"N": "report-cumulative", "output": "{report-cumulative-output}", "all": false}
+{"N": "report-cumulative", "output": "{report-cumulative-output}", "max": "{report-cumulative-max}"} -- report-cumulative-max=100, 0 - report all
 {"N": "report-branches-by-edge"}
 {"N": "report-branches-by-cumulative-edge"}
 {"N": "report-aa-at", "pos": [145, 156, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
