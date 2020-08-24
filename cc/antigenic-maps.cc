@@ -216,7 +216,7 @@ void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
 void acmacs::tal::v3::AntigenicMaps::columns_rows()
 {
     if (const auto* hz_sections = tal().draw().layout().find<HzSections>(); hz_sections && !hz_sections->sections().empty()) {
-        const auto num_sections = hz_sections->sections().size();
+        const auto num_sections = hz_sections->number_of_shown();
         if (parameters().columns == 0)
             columns_ = num_sections / 3 + (num_sections % 3 ? 1 : 0);
         else
@@ -262,15 +262,18 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
         const auto& viewport = surface.viewport();
         const auto gap = surface.convert(Pixels{parameters().gap_between_maps}).value();
         const auto map_size = viewport.size.height / static_cast<double>(rows_) - gap * static_cast<double>(rows_ - 1) / static_cast<double>(rows_);
-        const auto* hz_sections = tal().draw().layout().find<HzSections>();
-        for (size_t section_no{0}; section_no < hz_sections->sections().size(); ++section_no) {
-            fmt::print(stderr, "\n\n");
-            AD_INFO("========================================================\n>>> SECTION {} {}\n\n", section_no, static_cast<char>(section_no + 'A'));
-            current_section_no_ = section_no;
-            const auto left = static_cast<double>(section_no % columns_) * (map_size + gap);
-            const auto top = static_cast<double>(section_no / columns_) * (map_size + gap);
-            draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, true), section_no);
-            current_section_no_ = std::nullopt;
+        const auto& hz_sections = tal().draw().layout().find<HzSections>()->sections();
+        for (size_t section_no{0}, map_no{0}; section_no < hz_sections.size(); ++section_no) {
+            if (hz_sections[section_no].shown) {
+                fmt::print(stderr, "\n\n");
+                AD_INFO("========================================================\n>>> SECTION {} {}\n\n", section_no, static_cast<char>(map_no + 'A'));
+                current_section_no_ = section_no;
+                const auto left = static_cast<double>(map_no % columns_) * (map_size + gap);
+                const auto top = static_cast<double>(map_no / columns_) * (map_size + gap);
+                draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, true), section_no);
+                current_section_no_ = std::nullopt;
+                ++map_no;
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <numeric>
+
 #include "acmacs-tal/layout.hh"
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/aa-transition.hh"
@@ -61,6 +63,7 @@ namespace acmacs::tal::inline v3
         void add_section(HzSection&& section) { sections_.push_back(std::move(section)); }
 
         constexpr const auto& sections() const { return sections_; }
+        size_t number_of_shown() const { return std::accumulate(std::begin(sections_), std::end(sections_), 0ul, [](size_t sum, const auto& section) { return sum + (section.shown ? 1 : 0); }); }
 
       private:
         Parameters parameters_;
