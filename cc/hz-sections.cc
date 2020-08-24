@@ -51,8 +51,8 @@ void acmacs::tal::v3::HzSections::update_from_parameters()
             section.first = tree.find_node_by_seq_id(section_data.first);
         else if (!section.first)
             section.first = tree.first_prev_leaf;
-        while (section.first->leaf_pos != Tree::leaf_position::first && section.first->first_prev_leaf)
-            section.first = section.first->first_prev_leaf;
+        // while (section.first->leaf_pos != Tree::leaf_position::first && section.first->first_prev_leaf)
+        //     section.first = section.first->first_prev_leaf;
 
         if (!section_data.last.empty())
             section.last = tree.find_node_by_seq_id(section_data.last);
@@ -60,8 +60,8 @@ void acmacs::tal::v3::HzSections::update_from_parameters()
             section.last = tree.last_next_leaf;
         if (section.last->leaf_pos == Tree::leaf_position::first && section.last->first_prev_leaf)
             section.last = section.last->first_prev_leaf;
-        while (section.last->leaf_pos != Tree::leaf_position::last && section.last->last_next_leaf)
-            section.last = section.last->last_next_leaf;
+        // while (section.last->leaf_pos != Tree::leaf_position::last && section.last->last_next_leaf)
+        //     section.last = section.last->last_next_leaf;
 
         section.shown = section_data.shown;
         if (section_data.label)
