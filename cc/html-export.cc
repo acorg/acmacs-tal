@@ -165,6 +165,12 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
         fmt::format_to(text, "{prefix}{edge}\\                   <leaves: {leaves}>{aa_transitions}\n", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
                        fmt::arg("edge", std::string(edge, '=')), fmt::arg("leaves", node.number_leaves_in_subtree()),
                        fmt::arg("aa_transitions", aa_transitions.empty() ? std::string{} : fmt::format("  [{}]", aa_transitions)));
+        if (!prefix.empty()) {
+            if (prefix.back().back() == '\\')
+                prefix.back().back() = ' ';
+            else if (prefix.back().back() == '+')
+                prefix.back().back() = '|';
+        }
         prefix.push_back(std::string(edge, ' ') + "+");
         for (auto subnode = std::begin(node.subtree); subnode != std::end(node.subtree); ++subnode) {
             if (subnode->children_are_shown()) {
@@ -173,25 +179,13 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
                     prefix.back().back() = '\\';
                 add_nodes_text(text, *subnode, edge_step, prefix, sub_last);
             }
-
-            for (auto& pref : prefix) {
-                switch (pref.back()) {
-                    case '\\':
-                        pref.back() = ' ';
-                        break;
-                    case '+':
-                        pref.back() = '|';
-                        break;
-                }
-            }
         }
         prefix.pop_back();
+        if (!prefix.empty() && prefix.back().back() == '|')
+            prefix.back().back() = '+';
     }
 
 } // add_nodes_text
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:
