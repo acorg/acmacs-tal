@@ -18,6 +18,7 @@ namespace acmacs::tal::inline v3
     {
         HzSection(std::string_view a_id) : id{hz_section_id_t{a_id}} {}
         HzSection(std::string_view a_id, const Node* a_first, const Node* a_last, std::string_view a_label) : id{hz_section_id_t{a_id}}, first{a_first}, last{a_last}, label{a_label} {}
+
         hz_section_id_t id;
         const Node* first{nullptr};
         const Node* last{nullptr};
@@ -25,6 +26,9 @@ namespace acmacs::tal::inline v3
         std::string label;
         std::string prefix; // A, B, C, etc.
         AA_Transitions aa_transitions{};
+        std::optional<std::string> label_aa_transitions;
+
+        std::string aa_transitions_format() const;
     };
 
     class HzSections : public LayoutElement
@@ -44,7 +48,8 @@ namespace acmacs::tal::inline v3
             seq_id_t first;
             seq_id_t last;
             bool shown{true};
-            std::string label;
+            std::optional<std::string> label;
+            std::optional<std::string> label_aa_transitions;
         };
 
         struct Parameters

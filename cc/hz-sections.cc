@@ -9,6 +9,17 @@
 
 // ----------------------------------------------------------------------
 
+std::string acmacs::tal::v3::HzSection::aa_transitions_format() const
+{
+    if (label_aa_transitions)
+        return *label_aa_transitions;
+    else
+        return fmt::format("{}", aa_transitions);
+
+} // acmacs::tal::v3::HzSection::aa_transitions_format
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
 {
     if (stage == 2 && prepared_ < stage) {
@@ -53,8 +64,9 @@ void acmacs::tal::v3::HzSections::update_from_parameters()
             section.last = section.last->last_next_leaf;
 
         section.shown = section_data.shown;
-        if (!section_data.label.empty())
-            section.label = section_data.label;
+        if (section_data.label)
+            section.label = *section_data.label;
+        section.label_aa_transitions = section_data.label_aa_transitions;
     }
 
 } // acmacs::tal::v3::HzSections::update_from_parameters
@@ -149,7 +161,7 @@ void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) co
 
 void acmacs::tal::v3::HzSections::report() const
 {
-    size_t longest_id{0}, longest_first{0}, longest_last{0}, longest_label{0}, longest_substs{0};
+    size_t longest_id{0}, longest_first{0}, longest_last{0}, longest_label{0}, longest_label_aa{0}, longest_substs{0};
     for (const auto& section : sections_) {
         longest_id = std::max(longest_id, section.id.size());
         if (section.first)
@@ -157,42 +169,24 @@ void acmacs::tal::v3::HzSections::report() const
         if (section.last)
             longest_last = std::max(longest_last, section.last->seq_id.size());
         longest_label = std::max(longest_label, section.label.size());
+        longest_label_aa = std::max(longest_label_aa, section.label_aa_transitions ? section.label_aa_transitions->size() : section.aa_transitions.display_most_important(0).size());
         longest_substs = std::max(longest_substs, section.aa_transitions.display_most_important(0).size());
     }
 
-    // const auto print_section = [longest_id, longest_first, longest_last](bool print, const auto& section) {
-    //     if (print) {
-    //         fmt::print(stderr, "    {:1s}. {:{}s}  {:5d} {:{}s}   {:5d} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2,
-    //                    section.first ? section.first->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 2,
-    //                    section.last ? section.last->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 2,
-    //                    section.aa_transitions, section.label);
-    //         return 0;
-    //     }
-    //     else
-    //         return 1;
-    // };
-
-    // fmt::print(stderr, "HZ sections ({})\n", sections_.size());
-    // const auto hidden_sections = std::accumulate(std::begin(sections_), std::end(sections_), 0, [print_section](auto sum, const auto& section) { return sum + print_section(section.shown, section); });
-    // if (hidden_sections) {
-    //     AD_DEBUG("hidden hz_sections ({})", hidden_sections);
-    //     std::for_each(std::begin(sections_), std::end(sections_), [print_section](const auto& section) { print_section(!section.shown, section); });
-    // }
-
-    const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_substs](const auto& section) {
-        fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"subst\": {:{}s}}},\n",
+    const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs](const auto& section) {
+        fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
                    section.prefix,
                    fmt::format("\"{}\",", section.id), longest_id + 3, section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
                    fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3, section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
                    fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
                    fmt::format("{},", section.shown),
                    fmt::format("\"{}\",", section.label), longest_label + 3,
+                   fmt::format("\"{}\",", section.aa_transitions_format()), longest_label_aa + 3,
                    fmt::format("\"{}\"", section.aa_transitions), longest_substs + 2
                    );
     };
 
     AD_INFO("HZ sections");
-    // fmt::print(stderr, "\nHZ sections\n");
     fmt::print(stderr, "[\n");
     std::for_each(std::begin(sections_), std::end(sections_), print_section_entry);
     fmt::print(stderr, "]\n\n");

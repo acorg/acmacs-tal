@@ -880,6 +880,7 @@ void acmacs::tal::v3::Settings::hz_sections()
             rjson::v3::copy_if_not_null(for_section["first"sv], section.first);
             rjson::v3::copy_if_not_null(for_section["last"sv], section.last);
             rjson::v3::copy_if_not_null(for_section["label"sv], section.label);
+            rjson::v3::copy_if_not_null(for_section["aa_transitions"sv], section.label_aa_transitions);
         }
         else if (for_section["?id"sv].is_null() && for_section["? id"sv].is_null())
             AD_WARNING("settings hz-section without \"id\" ignored: {}", for_section);
