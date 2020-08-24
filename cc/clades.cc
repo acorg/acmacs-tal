@@ -76,11 +76,13 @@ void acmacs::tal::v3::Clades::make_clades()
 
 void acmacs::tal::v3::Clades::make_sections()
 {
-    const auto section_data = []<typename Elt>(const std::vector<Elt>& data, size_t section_no) -> const Elt& {
-        if (data.size() > section_no)
-            return data[section_no];
-        else
-            return data.back();
+    const auto section_data_assign = []<typename Elt>(const std::vector<Elt>& data, size_t section_no, Elt& target) {
+        if (!data.empty()) {
+            if (data.size() > section_no)
+                target = data[section_no];
+            else
+                target = data.back();
+        }
     };
 
     tal().tree().make_clade_sections();
@@ -94,12 +96,11 @@ void acmacs::tal::v3::Clades::make_sections()
             for (const auto [section_no, tree_section] : acmacs::enumerate(tree_clade.sections)) {
                 if (clade_param.shown(section_no)) {
                     auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
-                    section.slot_no = section_data(clade_param.slot_no, section_no);
-                    section.label = section_data(clade_param.label, section_no);
+                    section_data_assign(clade_param.slot_no, section_no, section.slot_no);
+                    section_data_assign(clade_param.label, section_no, section.label);
                     section.arrow = clade_param.arrow;
                     section.horizontal_line = clade_param.horizontal_line;
-                    if (!clade_param.display_name.empty())
-                        section.display_name = section_data(clade_param.display_name, section_no);
+                    section_data_assign(clade_param.display_name, section_no, section.display_name);
                 }
             }
 
