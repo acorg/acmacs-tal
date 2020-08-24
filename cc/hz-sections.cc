@@ -91,8 +91,15 @@ void acmacs::tal::v3::HzSections::sort()
 
 void acmacs::tal::v3::HzSections::set_prefix()
 {
-    for (auto [no, section] : acmacs::enumerate(sections_))
-        section.prefix.assign(1, 'A' + static_cast<char>(no));
+    char no{0};
+    for (auto& section : sections_) {
+        if (section.shown) {
+            section.prefix.assign(1, 'A' + no);
+            ++no;
+        }
+        else
+            section.prefix.clear();
+    }
 
 } // acmacs::tal::v3::HzSections::set_prefix
 
@@ -120,7 +127,7 @@ void acmacs::tal::v3::HzSections::add_separators_to_time_series()
                 const auto warn_if_present = section.id.size() < 3 || section.id[section.id.size() - 2] != '-';
                 time_series->add_horizontal_line_above(section.first, parameters().line, warn_if_present);
                 if (section.last->last_next_leaf) {
-                    // AD_DEBUG("add_horizontal_line_above: {} --> {}", section.last->seq_id, section.last->last_next_leaf->seq_id);
+                    // AD_DEBUG("add_horizontal_line_above: \"{}\" {} --> {}", section.label, section.last->seq_id, section.last->last_next_leaf->seq_id);
                     time_series->add_horizontal_line_above(section.last->last_next_leaf, parameters().line, warn_if_present);
                 }
             }
@@ -142,34 +149,53 @@ void acmacs::tal::v3::HzSections::draw(acmacs::surface::Surface& /*surface*/) co
 
 void acmacs::tal::v3::HzSections::report() const
 {
-    size_t longest_id{0}, longest_first{0}, longest_last{0};
+    size_t longest_id{0}, longest_first{0}, longest_last{0}, longest_label{0}, longest_substs{0};
     for (const auto& section : sections_) {
         longest_id = std::max(longest_id, section.id.size());
         if (section.first)
             longest_first = std::max(longest_first, section.first->seq_id.size());
         if (section.last)
             longest_last = std::max(longest_last, section.last->seq_id.size());
+        longest_label = std::max(longest_label, section.label.size());
+        longest_substs = std::max(longest_substs, section.aa_transitions.display_most_important(0).size());
     }
 
-    fmt::print(stderr, "HZ sections ({})\n", sections_.size());
+    // const auto print_section = [longest_id, longest_first, longest_last](bool print, const auto& section) {
+    //     if (print) {
+    //         fmt::print(stderr, "    {:1s}. {:{}s}  {:5d} {:{}s}   {:5d} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2,
+    //                    section.first ? section.first->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 2,
+    //                    section.last ? section.last->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 2,
+    //                    section.aa_transitions, section.label);
+    //         return 0;
+    //     }
+    //     else
+    //         return 1;
+    // };
 
-    const auto print_section = [longest_id,longest_first,longest_last](bool print, const auto& section) {
-        if (print) {
-            fmt::print(stderr, "    {:1s}. {:{}s}  {:5d} {:{}s}   {:5d} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2,
-                       section.first ? section.first->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 2,
-                       section.last ? section.last->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 2,
-                       section.aa_transitions, section.label);
-            return 0;
-        }
-        else
-            return 1;
+    // fmt::print(stderr, "HZ sections ({})\n", sections_.size());
+    // const auto hidden_sections = std::accumulate(std::begin(sections_), std::end(sections_), 0, [print_section](auto sum, const auto& section) { return sum + print_section(section.shown, section); });
+    // if (hidden_sections) {
+    //     AD_DEBUG("hidden hz_sections ({})", hidden_sections);
+    //     std::for_each(std::begin(sections_), std::end(sections_), [print_section](const auto& section) { print_section(!section.shown, section); });
+    // }
+
+    const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_substs](const auto& section) {
+        fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"subst\": {:{}s}}},\n",
+                   section.prefix,
+                   fmt::format("\"{}\",", section.id), longest_id + 3, section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
+                   fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3, section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
+                   fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
+                   fmt::format("{},", section.shown),
+                   fmt::format("\"{}\",", section.label), longest_label + 3,
+                   fmt::format("\"{}\"", section.aa_transitions), longest_substs + 2
+                   );
     };
 
-    const auto hidden_sections = std::accumulate(std::begin(sections_), std::end(sections_), 0, [print_section](auto sum, const auto& section) { return sum + print_section(section.shown, section); });
-    if (hidden_sections) {
-        AD_DEBUG("hidden hz_sections ({})", hidden_sections);
-        std::for_each(std::begin(sections_), std::end(sections_), [print_section](const auto& section) { print_section(!section.shown, section); });
-    }
+    AD_INFO("HZ sections");
+    // fmt::print(stderr, "\nHZ sections\n");
+    fmt::print(stderr, "[\n");
+    std::for_each(std::begin(sections_), std::end(sections_), print_section_entry);
+    fmt::print(stderr, "]\n\n");
 
 } // acmacs::tal::v3::HzSections::report
 
@@ -195,17 +221,20 @@ void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) c
             const auto& viewport = surface.viewport();
             const auto* time_series = tal().draw().layout().find<TimeSeries>();
             for (const auto& section : hz_sections->sections()) {
-                const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
-                const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
-                const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
-                surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
-                if (time_series) {
-                    tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
-                    tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
+                if (section.shown) {
+                    const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
+                    const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
+                    const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
+                    surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
+                    if (time_series) {
+                        tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
+                        tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
+                    }
+                    const auto prefix_size = surface.text_size(section.prefix, parameters().label_size);
+                    surface.rectangle_filled({viewport.right() - prefix_size.width * 0.7, pos_y_top + prefix_size.height * 0.5}, {prefix_size.width * 1.4, prefix_size.height * 2.0},
+                                             parameters().line.color, Pixels{0}, WHITE);
+                    surface.text({viewport.right() - prefix_size.width * 0.5, pos_y_top + prefix_size.height * 2.0}, section.prefix, parameters().label_color, parameters().label_size);
                 }
-                const auto prefix_size = surface.text_size(section.prefix, parameters().label_size);
-                surface.rectangle_filled({viewport.right() - prefix_size.width * 0.7, pos_y_top + prefix_size.height * 0.5}, {prefix_size.width * 1.4, prefix_size.height * 2.0}, parameters().line.color, Pixels{0}, WHITE);
-                surface.text({viewport.right() - prefix_size.width * 0.5, pos_y_top + prefix_size.height * 2.0}, section.prefix, parameters().label_color, parameters().label_size);
             }
         }
     }
