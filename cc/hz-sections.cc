@@ -1,3 +1,6 @@
+#include <numeric>
+#include <algorithm>
+
 #include "acmacs-tal/hz-sections.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/time-series.hh"
@@ -150,19 +153,22 @@ void acmacs::tal::v3::HzSections::report() const
 
     fmt::print(stderr, "HZ sections ({})\n", sections_.size());
 
-    bool hidden_present{false};
-    for (const auto& section : sections_) {
-        if (section.shown)
-            fmt::print(stderr, "    {:1s}. {:{}s} {:{}s} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
-        else
-            hidden_present = true;
-    }
-    if (hidden_present) {
-        AD_DEBUG("hidden hz_sections");
-        for (const auto& section : sections_) {
-            if (!section.shown)
-                fmt::print(stderr, "    {:1s}. {:{}s} {:{}s} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2, section.first ? section.first->seq_id : seq_id_t{}, longest_first, section.last ? section.last->seq_id : seq_id_t{}, longest_last, section.aa_transitions, section.label);
+    const auto print_section = [longest_id,longest_first,longest_last](bool print, const auto& section) {
+        if (print) {
+            fmt::print(stderr, "    {:1s}. {:{}s}  {:5d} {:{}s}   {:5d} {:{}s} {} label:\"{}\"\n", section.prefix, fmt::format("\"{}\"", section.id), longest_id + 2,
+                       section.first ? section.first->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 2,
+                       section.last ? section.last->node_id.vertical : node_id_t::NotSet, fmt::format("\"{}\"", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 2,
+                       section.aa_transitions, section.label);
+            return 0;
         }
+        else
+            return 1;
+    };
+
+    const auto hidden_sections = std::accumulate(std::begin(sections_), std::end(sections_), 0, [print_section](auto sum, const auto& section) { return sum + print_section(section.shown, section); });
+    if (hidden_sections) {
+        AD_DEBUG("hidden hz_sections ({})", hidden_sections);
+        std::for_each(std::begin(sections_), std::end(sections_), [print_section](const auto& section) { print_section(!section.shown, section); });
     }
 
 } // acmacs::tal::v3::HzSections::report
