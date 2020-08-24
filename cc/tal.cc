@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include "acmacs-base/string-compare.hh"
 #include "acmacs-base/argv.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
@@ -114,7 +115,7 @@ int main(int argc, const char* argv[])
 
             if (opt.open || opt.ql) {
                 for (const auto& output : *opt.outputs) {
-                    if (output.substr(output.size() - 4) == ".pdf")
+                    if (acmacs::string::endswith(output, ".pdf"sv) || acmacs::string::endswith(output, ".html"sv) || acmacs::string::endswith(output, ".txt"sv) || acmacs::string::endswith(output, ".text"sv))
                         acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
                 }
             }
