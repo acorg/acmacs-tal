@@ -76,7 +76,7 @@ void acmacs::tal::v3::Settings::update_env()
         AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
         setenv_toplevel("virus-type", virus_type);
         setenv_toplevel("lineage", lineage);
-        if (lineage.empty())
+        if (virus_type != "B" || lineage.empty())
             setenv_toplevel("virus-type/lineage", virus_type);
         else
             setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
