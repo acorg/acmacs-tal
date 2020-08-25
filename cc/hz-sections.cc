@@ -108,12 +108,16 @@ void acmacs::tal::v3::HzSections::detect_intersect()
     const auto last = [](const auto& section) { return static_cast<ssize_t>(section.last ? section.last->node_id.vertical : node_id_t::NotSet); };
 
     for (auto sect = std::begin(sections_); sect != std::end(sections_); ++sect) {
-        const auto sect_first = first(*sect), sect_last = last(*sect);
-        for (auto other = std::next(sect); other != std::end(sections_); ++other) {
-            const auto other_first = first(*other), other_last = last(*other);
-            if (sect_first <= other_last && other_first <= sect_last) {
-                AD_WARNING("HZ Sections \"{}\" and \"{}\" intersect", sect->id, other->id);
-                sect->intersect = other->intersect = true;
+        if (sect->shown) {
+            const auto sect_first = first(*sect), sect_last = last(*sect);
+            for (auto other = std::next(sect); other != std::end(sections_); ++other) {
+                if (other->shown) {
+                    const auto other_first = first(*other), other_last = last(*other);
+                    if (sect_first <= other_last && other_first <= sect_last) {
+                        AD_WARNING("HZ Sections \"{}\" and \"{}\" intersect", sect->id, other->id);
+                        sect->intersect = other->intersect = true;
+                    }
+                }
             }
         }
     }
