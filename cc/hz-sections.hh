@@ -23,6 +23,7 @@ namespace acmacs::tal::inline v3
         const Node* first{nullptr};
         const Node* last{nullptr};
         bool shown{true};
+        bool intersect{false};  // to report hz section intersection
         std::string label;
         std::string prefix; // A, B, C, etc.
         AA_Transitions aa_transitions{};
@@ -77,6 +78,7 @@ namespace acmacs::tal::inline v3
         void update_from_parameters();
         void set_aa_transitions();
         void sort();
+        void detect_intersect();
         void set_prefix();
         void add_gaps_to_tree();
         void add_separators_to_time_series();

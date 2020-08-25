@@ -26,6 +26,7 @@ void acmacs::tal::v3::HzSections::prepare(preparation_stage_t stage)
         width_to_height_ratio() = 0.0;
         update_from_parameters();
         sort();
+        detect_intersect();
         set_prefix();
         set_aa_transitions();
         add_gaps_to_tree();
@@ -101,6 +102,26 @@ void acmacs::tal::v3::HzSections::sort()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::HzSections::detect_intersect()
+{
+    const auto first = [](const auto& section) { return static_cast<ssize_t>(section.first ? section.first->node_id.vertical : node_id_t::value_type{0}); };
+    const auto last = [](const auto& section) { return static_cast<ssize_t>(section.last ? section.last->node_id.vertical : node_id_t::NotSet); };
+
+    for (auto sect = std::begin(sections_); sect != std::end(sections_); ++sect) {
+        const auto sect_first = first(*sect), sect_last = last(*sect);
+        for (auto other = std::next(sect); other != std::end(sections_); ++other) {
+            const auto other_first = first(*other), other_last = last(*other);
+            if (sect_first <= other_last && other_first <= sect_last) {
+                AD_WARNING("HZ Sections \"{}\" and \"{}\" intersect", sect->id, other->id);
+                sect->intersect = other->intersect = true;
+            }
+        }
+    }
+
+} // acmacs::tal::v3::HzSections::detect_intersect
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::HzSections::set_prefix()
 {
     char no{0};
@@ -172,27 +193,16 @@ void acmacs::tal::v3::HzSections::report() const
         longest_label_aa = std::max(longest_label_aa, section.label_aa_transitions ? section.label_aa_transitions->size() : section.aa_transitions.display_most_important(0).size());
         longest_substs = std::max(longest_substs, section.aa_transitions.display_most_important(0).size());
     }
+    const auto intersect_present = std::any_of(std::begin(sections_), std::end(sections_), [](const auto& section) { return section.intersect; });
 
-    // const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs](const auto& section) {
-    //     fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
-    //                section.prefix,
-    //                fmt::format("\"{}\",", section.id), longest_id + 3, section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
-    //                fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3, section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
-    //                fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
-    //                fmt::format("{},", section.shown),
-    //                fmt::format("\"{}\",", section.label), longest_label + 3,
-    //                fmt::format("\"{}\",", section.aa_transitions_format()), longest_label_aa + 3,
-    //                fmt::format("\"{}\"", section.aa_transitions), longest_substs + 2
-    //                );
-    // };
-
-    const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs](const auto& section) {
-        fmt::print(stderr, "    {{\"show\": {:6s} \"id\": {:{}s} \"L\": \"{:1s}\", \"V\": [{:5d}, {:5d}], \"first\": {:{}s} \"last\": {:{}s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
+    const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs, intersect_present](const auto& section) {
+        fmt::print(stderr, "    {{\"show\": {:6s} \"id\": {:{}s} \"L\": \"{:1s}\", \"V\": [{:5d}, {:5d}], {}\"first\": {:{}s} \"last\": {:{}s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
                    fmt::format("{},", section.shown),
                    fmt::format("\"{}\",", section.id), longest_id + 3,
                    section.prefix,
                    section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
                    section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
+                   section.intersect ? "\"INTRSCT\":1, " : (intersect_present ? "             " : ""),
                    fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3,
                    fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
                    fmt::format("\"{}\",", section.label), longest_label + 3,
