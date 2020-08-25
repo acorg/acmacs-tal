@@ -85,7 +85,7 @@ void acmacs::tal::v3::Settings::update_env()
     setenv_toplevel("chart-present", tal_.chart_present());
     if (tal_.chart_present()) {
         auto info{tal_.chart().info()};
-        setenv_toplevel("chart-assay", info->assay().hi_or_neut());
+        setenv_toplevel("chart-assay", info->assay().HI_or_Neut());
         setenv_toplevel("chart-lab", info->lab());
         setenv_toplevel("chart-rbc", info->rbc_species());
         setenv_toplevel("chart-date", info->date(chart::Info::Compute::Yes));
