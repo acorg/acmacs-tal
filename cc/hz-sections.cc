@@ -173,13 +173,28 @@ void acmacs::tal::v3::HzSections::report() const
         longest_substs = std::max(longest_substs, section.aa_transitions.display_most_important(0).size());
     }
 
+    // const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs](const auto& section) {
+    //     fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
+    //                section.prefix,
+    //                fmt::format("\"{}\",", section.id), longest_id + 3, section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
+    //                fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3, section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
+    //                fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
+    //                fmt::format("{},", section.shown),
+    //                fmt::format("\"{}\",", section.label), longest_label + 3,
+    //                fmt::format("\"{}\",", section.aa_transitions_format()), longest_label_aa + 3,
+    //                fmt::format("\"{}\"", section.aa_transitions), longest_substs + 2
+    //                );
+    // };
+
     const auto print_section_entry = [longest_id, longest_first, longest_last, longest_label, longest_label_aa, longest_substs](const auto& section) {
-        fmt::print(stderr, "    {{\"L\": \"{:1s}\", \"id\": {:{}s} \"F\": {:5d}, \"first\": {:{}s} \"L\": {:5d}, \"last\": {:{}s} \"show\": {:6s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
-                   section.prefix,
-                   fmt::format("\"{}\",", section.id), longest_id + 3, section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
-                   fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3, section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
-                   fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
+        fmt::print(stderr, "    {{\"show\": {:6s} \"id\": {:{}s} \"L\": \"{:1s}\", \"V\": [{:5d}, {:5d}], \"first\": {:{}s} \"last\": {:{}s} \"label\": {:{}s} \"aa_transitions\": {:{}s} \"All transitions\": {:{}s}}},\n",
                    fmt::format("{},", section.shown),
+                   fmt::format("\"{}\",", section.id), longest_id + 3,
+                   section.prefix,
+                   section.first ? section.first->node_id.vertical : node_id_t::value_type{0},
+                   section.last ? section.last->node_id.vertical : node_id_t::value_type{0},
+                   fmt::format("\"{}\",", section.first ? section.first->seq_id : seq_id_t{}), longest_first + 3,
+                   fmt::format("\"{}\",", section.last ? section.last->seq_id : seq_id_t{}), longest_last + 3,
                    fmt::format("\"{}\",", section.label), longest_label + 3,
                    fmt::format("\"{}\",", section.aa_transitions_format()), longest_label_aa + 3,
                    fmt::format("\"{}\"", section.aa_transitions), longest_substs + 2
