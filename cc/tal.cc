@@ -68,27 +68,21 @@ int main(int argc, const char* argv[])
         acmacs::log::enable(opt.verbose);
         acmacs::log::enable("hz-sections"sv);
 
-        // const report_time report{do_report_time(acmacs::log::is_enabled(acmacs::log::timer))};
-
         acmacs::tal::Tal tal;
-        // Timeit time_loading_tree(">>>> Loading tree: ", report);
         tal.import_tree(opt.tree_file);
-        // time_loading_tree.report();
-        // Timeit time_loading_chart(">>>> Loading chart: ", report);
         tal.import_chart(opt.chart_file);
-        // time_loading_chart.report();
 
-        // Timeit time_loading_settings(">>>> Loading settings: ", report);
         acmacs::tal::Settings settings{tal};
         settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
         settings.load(opt.settings_files);
         settings.set_defines(opt.defines);
-        // time_loading_settings.report();
 
         if (opt.interactive)
             signal(SIGHUP, signal_handler);
 
         for (;;) {
+            tal.import_tree(opt.tree_file);
+
             settings.apply("tal-default"sv);
 
             if (opt.chart_file) {
@@ -115,7 +109,8 @@ int main(int argc, const char* argv[])
 
             if (opt.open || opt.ql) {
                 for (const auto& output : *opt.outputs) {
-                    if (acmacs::string::endswith(output, ".pdf"sv) || acmacs::string::endswith(output, ".html"sv) || acmacs::string::endswith(output, ".txt"sv) || acmacs::string::endswith(output, ".text"sv))
+                    if (acmacs::string::endswith(output, ".pdf"sv) || acmacs::string::endswith(output, ".html"sv) || acmacs::string::endswith(output, ".txt"sv) ||
+                        acmacs::string::endswith(output, ".text"sv))
                         acmacs::open_or_quicklook(opt.open, opt.ql, output, 2);
                 }
             }
