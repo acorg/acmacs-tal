@@ -137,7 +137,7 @@ int main(int argc, const char* argv[])
 
             acmacs::run_and_detach({"tink"}, 0);
 
-            fmt::print(stderr, "{sep}\n{date}\n{sep}\n", fmt::arg("sep", "================================================================================"),
+            fmt::print(stderr, "\n> {sep}\n> {date}\n> {sep}\n\n", fmt::arg("sep", "======================================================================================================================================================"),
                        fmt::arg("date", date::current_date_time()));
             tal.reset();
             try {
