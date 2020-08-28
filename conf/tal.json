@@ -21,14 +21,12 @@
 
     "antigenic-map-reset": [
         {"N": "border", "color": "black", "line_width": 0.5},
-        {"N": "antigens", "select": "test",      "size": 3.0},
-        {"N": "antigens", "select": "reference", "size": 5.0},
-        {"N": "sera",     "select": "all",       "size": 5.0},
+        {"N": "antigens", "select": "test",      "size": 3.0, "order": "lower"},
+        {"N": "antigens", "select": "reference", "size": 5.0, "order": "lower"},
+        {"N": "sera",     "select": "all",       "size": 5.0, "order": "lower"},
         {"N": "/all-color", "color": "grey88"},
-        {"N": "antigens", "select": "reference", "order": "lower"},
-        {"N": "sera",     "select": "all",       "order": "lower"},
         "/no-labels",
-        {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "order": "raise"},
+        {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "?order": "raise"},
         {"N": "serum-circles-remove"}
     ],
 
