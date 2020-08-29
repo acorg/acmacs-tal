@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-21 15:02:36 eu>
+# Time-stamp: <2020-08-29 10:56:16 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -29,6 +29,8 @@ Use .tal suffix
 
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
 
+-D canvas-height=1000
+
 * Settings features
 
 {"N": "if", "condition": {"and": ["{whocc}", {"not": "tree-has-sequences"}, {"or": ["{xxx}", {"not": "{yyy}"}]}, {"not-empty": "{virus-type}"}]}, "then": [{"N": ...}], "else": [{"N": ...}]}
@@ -36,6 +38,8 @@ Use .tal suffix
 * Select nodes and operate on selection
 
 ** general
+
+{"N": "canvas", "height": 1000}
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "<operation>"}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"<operation>": true}}

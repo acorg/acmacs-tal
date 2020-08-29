@@ -118,6 +118,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             else
                 AD_WARNING("\"aa-transitions\" requested but no darw_tree found");
         }
+        else if (name == "canvas"sv)
+            canvas();
         else if (name == "clades-reset"sv)
             tree().clades_reset();
         else if (name == "clade"sv) // acmacs-whocc-data/conf/clades.json
@@ -181,6 +183,18 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
     }
 
 } // acmacs::tal::v3::Settings::apply_built_in
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::canvas()
+{
+    using namespace std::string_view_literals;
+    if (const auto& height_v = getenv("height"sv); !height_v.is_null()) {
+        draw().canvas_height(height_v.to<double>());
+        AD_INFO("pdf canvas height: {}", draw().canvas_height());
+    }
+
+} // acmacs::tal::v3::Settings::canvas
 
 // ----------------------------------------------------------------------
 

@@ -37,6 +37,7 @@ namespace acmacs::tal::inline v3
         template <typename ElementType, typename ... Args> ElementType& add_element(Args&& ... args, add_unique uniq = add_unique::no);
         void init_element(LayoutElement& element);
 
+        void canvas();
         void apply_nodes() const;
         void update_env();
         void clade() const;

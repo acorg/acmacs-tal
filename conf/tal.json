@@ -2,6 +2,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
+        {"N": "canvas", "height": "{canvas-height}"},
         {"? N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"?hide": true, "tree-edge-line-color": "red"}}
     ],
 
@@ -32,6 +33,7 @@
 
     "init": [
         {"N": "set",
+         "canvas-height": 1000,
          "report-cumulative-output": "",
          "report-cumulative-max": 100,
          "report-time-series-output": "",
