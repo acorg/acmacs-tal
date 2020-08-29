@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-29 10:56:16 eu>
+# Time-stamp: <2020-08-29 11:25:04 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -257,7 +257,7 @@ If multiple criteria specified within single "select" object, they all used (con
    ]
   }
 
-  {"N": "hz-section-marker", "width-to-height-ratio": 0.1, "line": {"color": "black", "line_width": 1}}
+  {"N": "hz-section-marker", "width-to-height-ratio": 0.1, "line": {"color": "black", "line_width": 1}, "label-size": 5, "label-color": "black"}
 #+END_SRC
 
 

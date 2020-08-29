@@ -88,7 +88,7 @@
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "{report-time-series-output}"},
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
-        {"N": "hz-section-marker", "width-to-height-ratio": 0.005},
+        {"N": "hz-section-marker", "width-to-height-ratio": 0.005, "label-size": 2.5},
         {"N": "gap", "pixels": 20, "width-to-height-ratio": 0.0, "?debug-outline": "red"},
         {"N": "antigenic-maps"},
         {"N": "title", "text": "{virus-type/lineage} {chart-assay} {chart-lab}", "color": "black", "size": 0.015}

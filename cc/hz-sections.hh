@@ -109,7 +109,7 @@ namespace acmacs::tal::inline v3
         struct Parameters
         {
             parameters::Line line{BLACK, Pixels{1.0}, surface::Dash::NoDash};
-            Pixels label_size{11};
+            double label_size{2.5}; // fraction of marker width
             Color label_color{BLACK};
         };
 

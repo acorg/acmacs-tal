@@ -912,6 +912,8 @@ void acmacs::tal::v3::Settings::hz_section_marker()
     auto& param = element.parameters();
 
     read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
+    rjson::v3::copy_if_not_null(substitute_to_value(getenv("label-size"sv)), param.label_size);
+    rjson::v3::copy_if_not_null(substitute_to_value(getenv("label-color"sv)), param.label_color);
 
 } // acmacs::tal::v3::Settings::hz_section_marker
 
