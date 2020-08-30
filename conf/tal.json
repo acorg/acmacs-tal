@@ -1,5 +1,28 @@
 {   "_": "-*- js-indent-level: 4 -*-",
 
+    "init": [
+        {"N": "set",
+         "canvas-height": 1000,
+         "report-cumulative-output": "",
+         "report-cumulative-max": 100,
+         "report-time-series-output": "",
+         "whocc": false,
+         "ladderize-method": "number-of-leaves",
+         "tree-draw-aa-transitions": true,
+
+         "hz-section-marker-label-size": 2.5,
+         "hz-section-marker-line-width": 1.0,
+
+         "gap-between-antigenic-maps": 20,
+         "reference-antigen-size": 5,
+         "test-antigen-size": 3,
+         "serum-size": 5
+        },
+        {"N": "if", "condition": {"empty": "{virus-type/lineage}"}, "then": [
+            {"N": "set", "virus-type/lineage": "XXX"}
+        ]}
+    ],
+
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
         {"N": "canvas", "height": "{canvas-height}"},
@@ -22,29 +45,15 @@
 
     "antigenic-map-reset": [
         {"N": "border", "color": "black", "line_width": 0.5},
-        {"N": "antigens", "select": "test",      "size": 3.0, "order": "lower"},
-        {"N": "antigens", "select": "reference", "size": 5.0, "order": "lower"},
-        {"N": "sera",     "select": "all",       "size": 5.0, "order": "lower"},
+        {"N": "antigens", "select": "test",      "size": "{test-antigen-size}",      "order": "lower"},
+        {"N": "antigens", "select": "reference", "size": "{reference-antigen-size}", "order": "lower"},
+        {"N": "sera",     "select": "all",       "size": "{serum-size}",             "order": "lower"},
         {"N": "/all-color", "color": "grey88"},
         "/no-labels",
         {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "?order": "raise"},
         {"N": "serum-circles-remove"}
     ],
 
-    "init": [
-        {"N": "set",
-         "canvas-height": 1000,
-         "report-cumulative-output": "",
-         "report-cumulative-max": 100,
-         "report-time-series-output": "",
-         "whocc": false,
-         "ladderize-method": "number-of-leaves",
-         "tree-draw-aa-transitions": true
-        },
-        {"N": "if", "condition": {"empty": "{virus-type/lineage}"}, "then": [
-            {"N": "set", "virus-type/lineage": "XXX"}
-        ]}
-    ],
     "? end overwrite in local settings": "----------------------------------------------------------------------",
 
     "tal-default": [
@@ -88,9 +97,9 @@
         {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "{report-time-series-output}"},
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
-        {"N": "hz-section-marker", "width-to-height-ratio": 0.005, "label-size": 2.5},
-        {"N": "gap", "pixels": 20, "width-to-height-ratio": 0.0, "?debug-outline": "red"},
-        {"N": "antigenic-maps"},
+        {"N": "hz-section-marker", "width-to-height-ratio": 0.005, "label-size": "{hz-section-marker-label-size}", "line": {"color": "black", "line_width": "{hz-section-marker-line-width}"}},
+        {"N": "gap", "pixels": "{gap-between-antigenic-maps}", "width-to-height-ratio": 0.0, "?debug-outline": "red"},
+        {"N": "antigenic-maps", "gap-between-maps": "{gap-between-antigenic-maps}"},
         {"N": "title", "text": "{virus-type/lineage} {chart-assay} {chart-lab}", "color": "black", "size": 0.015}
     ],
 

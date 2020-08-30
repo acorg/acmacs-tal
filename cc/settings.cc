@@ -1064,10 +1064,10 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& sou
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::v3::copy_if_not_null(source["color"sv], line_parameters.color);
-        rjson::v3::copy_if_not_null(source["line_width"sv], line_parameters.line_width);
+        rjson::v3::copy_if_not_null(substitute_to_value(source["color"sv]), line_parameters.color);
+        rjson::v3::copy_if_not_null(substitute_to_value(source["line_width"sv]), line_parameters.line_width);
 
-        if (const auto& dash_val = source["dash"sv]; !dash_val.is_null()) {
+        if (const auto& dash_val = substitute_to_value(source["dash"sv]); !dash_val.is_null()) {
             const auto dash = dash_val.to<std::string_view>();
             if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash"sv)
                 line_parameters.dash = surface::Dash::NoDash;
