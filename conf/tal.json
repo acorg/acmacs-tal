@@ -14,6 +14,7 @@
          "hz-section-marker-line-width": 1.0,
 
          "gap-between-antigenic-maps": 20,
+         "antigenic-map-border-width": 0.5,
          "reference-antigen-size": 5,
          "test-antigen-size": 3,
          "serum-size": 5
@@ -44,7 +45,7 @@
     ],
 
     "antigenic-map-reset": [
-        {"N": "border", "color": "black", "line_width": 0.5},
+        {"N": "border", "color": "black", "line_width": "{antigenic-map-border-width}"},
         {"N": "antigens", "select": "test",      "size": "{test-antigen-size}",      "order": "lower"},
         {"N": "antigens", "select": "reference", "size": "{reference-antigen-size}", "order": "lower"},
         {"N": "sera",     "select": "all",       "size": "{serum-size}",             "order": "lower"},
