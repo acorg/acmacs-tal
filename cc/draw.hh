@@ -26,7 +26,7 @@ namespace acmacs::tal::inline v3
         constexpr const DrawOutline& outline() const { return outline_; }
 
         constexpr auto canvas_height() const { return height_; }
-        constexpr void canvas_height(double height) { height_ = height; }
+        void canvas_height(double height);
 
       private:
         double height_{1000.0};
