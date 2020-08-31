@@ -27,6 +27,7 @@ namespace acmacs::tal::inline v3
 
         struct clade_section_t
         {
+            bool shown{true};
             const Node* first{nullptr};
             const Node* last{nullptr};
             std::string display_name;

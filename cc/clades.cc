@@ -90,18 +90,14 @@ void acmacs::tal::v3::Clades::make_sections()
     for (const auto& tree_clade : tree_clades) {
         AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
-        AD_LOG(acmacs::log::clades, "    from clade params: slot:{} display_name:{} hidden:{}", clade_param.slot_no, clade_param.display_name, clade_param.hidden);
+        AD_LOG(acmacs::log::clades, "    from clade params: slot:{} display_name:{} hidden:{} sections:{}", clade_param.slot_no, clade_param.display_name, clade_param.hidden,
+               tree_clade.sections.size());
         if (clade_param.any_shown()) {
             auto& clade = clades_.emplace_back(tree_clade.name);
             for (const auto [section_no, tree_section] : acmacs::enumerate(tree_clade.sections)) {
-                if (clade_param.shown(section_no)) {
-                    auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
-                    section_data_assign(clade_param.slot_no, section_no, section.slot_no);
-                    section_data_assign(clade_param.label, section_no, section.label);
-                    section.arrow = clade_param.arrow;
-                    section.horizontal_line = clade_param.horizontal_line;
-                    section_data_assign(clade_param.display_name, section_no, section.display_name);
-                }
+                auto& section = clade.sections.emplace_back(tree_section.first, tree_section.last, tree_clade.display_name);
+                section.arrow = clade_param.arrow;
+                section.horizontal_line = clade_param.horizontal_line;
             }
 
             // merge sections
@@ -122,7 +118,18 @@ void acmacs::tal::v3::Clades::make_sections()
                 num_small_sections < clade.sections.size())
                 clade.sections.erase(std::remove_if(std::begin(clade.sections), std::end(clade.sections), is_section_small), std::end(clade.sections));
 
-            if (clade.sections.empty())
+            AD_LOG(acmacs::log::clades, "    resulting number of sections: {}", clade.sections.size());
+            if (!clade.sections.empty()) {
+                // set parameters that depend on section_no (now section_no is correct upon erasing small sections)
+                for (const auto no_section : acmacs::enumerate(clade.sections)) {
+                    no_section.second.shown = clade_param.shown(no_section.first);
+                    section_data_assign(clade_param.slot_no, no_section.first, no_section.second.slot_no);
+                    section_data_assign(clade_param.label, no_section.first, no_section.second.label);
+                    section_data_assign(clade_param.display_name, no_section.first, no_section.second.display_name);
+                    AD_LOG(acmacs::log::clades, "        section {} label \"{}\" shown:{}", no_section.first, no_section.second.display_name, no_section.second.shown);
+                }
+            }
+            else
                 clades_.erase(std::prev(clades_.end()));
         }
     }
@@ -255,74 +262,75 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
 
     for (const auto& clade : clades_) {
         for (const auto& section : clade.sections) {
-            const auto pos_x = time_series_to_the_left_ ? (viewport.left() + parameters_.slot.width * static_cast<double>(*section.slot_no + 1))
-                                                        : (viewport.right() - parameters_.slot.width * static_cast<double>(*section.slot_no + 1));
-            const auto pos_y_top = pos_y_above(*section.first, vertical_step);
-            const auto pos_y_bottom = pos_y_below(*section.last, vertical_step);
+            if (section.shown) {
+                const auto pos_x = time_series_to_the_left_ ? (viewport.left() + parameters_.slot.width * static_cast<double>(*section.slot_no + 1))
+                                                            : (viewport.right() - parameters_.slot.width * static_cast<double>(*section.slot_no + 1));
+                const auto pos_y_top = pos_y_above(*section.first, vertical_step);
+                const auto pos_y_bottom = pos_y_below(*section.last, vertical_step);
 
-            // AD_DEBUG("{} {} slot:{}   {:.0} .. {:.0}", clade.name, section.display_name, section.slot_no, section.first->node_id, section.last->node_id);
+                // AD_DEBUG("{} {} slot:{}   {:.0} .. {:.0}", clade.name, section.display_name, section.slot_no, section.first->node_id, section.last->node_id);
 
-            // arrow
-            surface.double_arrow({pos_x, pos_y_top}, {pos_x, pos_y_bottom}, section.arrow.color, section.arrow.line_width, section.arrow.arrow_width);
+                // arrow
+                surface.double_arrow({pos_x, pos_y_top}, {pos_x, pos_y_bottom}, section.arrow.color, section.arrow.line_width, section.arrow.arrow_width);
 
-            // horizontal lines
-            const auto left = time_series_to_the_left_ ? viewport.left() : pos_x;
-            const auto right = time_series_to_the_left_ ? pos_x : viewport.right();
-            surface.line({left, pos_y_top}, {right, pos_y_top}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
-            surface.line({left, pos_y_bottom}, {right, pos_y_bottom}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
+                // horizontal lines
+                const auto left = time_series_to_the_left_ ? viewport.left() : pos_x;
+                const auto right = time_series_to_the_left_ ? pos_x : viewport.right();
+                surface.line({left, pos_y_top}, {right, pos_y_top}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
+                surface.line({left, pos_y_bottom}, {right, pos_y_bottom}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
 
-            // label
-            const Scaled label_size{parameters_.slot.width * section.label.scale};
-            const auto text_size = surface.text_size(section.display_name, label_size, section.label.text_style);
-            double vertical_pos{0};
-            switch (section.label.vpos) {
-                case parameters::vertical_position::top:
-                    vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1];
-                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                        vertical_pos += text_size.width;
-                    else if (section.label.rotation == Rotation90DegreesClockwise)
-                        vertical_pos -= text_size.height / 2.0;
-                    else
-                        vertical_pos += text_size.height;
-                    break;
-                case parameters::vertical_position::middle:
-                    vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1];
-                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                        vertical_pos += text_size.width / 2.0;
-                    else if (section.label.rotation == Rotation90DegreesClockwise)
-                        vertical_pos -= text_size.width / 2.0;
-                    else
-                        vertical_pos += text_size.height / 2.0;
-                    break;
-                case parameters::vertical_position::bottom:
-                    vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
-                    if (section.label.rotation == Rotation90DegreesClockwise)
-                        vertical_pos -= text_size.width;
-                    break;
+                // label
+                const Scaled label_size{parameters_.slot.width * section.label.scale};
+                const auto text_size = surface.text_size(section.display_name, label_size, section.label.text_style);
+                double vertical_pos{0};
+                switch (section.label.vpos) {
+                    case parameters::vertical_position::top:
+                        vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1];
+                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                            vertical_pos += text_size.width;
+                        else if (section.label.rotation == Rotation90DegreesClockwise)
+                            vertical_pos -= text_size.height / 2.0;
+                        else
+                            vertical_pos += text_size.height;
+                        break;
+                    case parameters::vertical_position::middle:
+                        vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1];
+                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                            vertical_pos += text_size.width / 2.0;
+                        else if (section.label.rotation == Rotation90DegreesClockwise)
+                            vertical_pos -= text_size.width / 2.0;
+                        else
+                            vertical_pos += text_size.height / 2.0;
+                        break;
+                    case parameters::vertical_position::bottom:
+                        vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
+                        if (section.label.rotation == Rotation90DegreesClockwise)
+                            vertical_pos -= text_size.width;
+                        break;
+                }
+
+                const auto text_pos_x_calc = [&, this]() {
+                    if (time_series_to_the_left_) {
+                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                            return pos_x + text_size.height + section.label.offset[0];
+                        // else if (section.label.rotation == Rotation90DegreesClockwise)
+                        //     return pos_x + section.label.offset[0];
+                        else
+                            return pos_x + section.label.offset[0];
+                    }
+                    else {
+                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                            return pos_x - section.label.offset[0];
+                        else if (section.label.rotation == Rotation90DegreesClockwise)
+                            return pos_x - text_size.height - section.label.offset[0];
+                        else
+                            return pos_x - text_size.width - section.label.offset[0];
+                    }
+                };
+                const auto text_pos_x = text_pos_x_calc();
+
+                surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
             }
-
-            const auto text_pos_x_calc = [&, this]() {
-                if (time_series_to_the_left_) {
-                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                        return pos_x + text_size.height + section.label.offset[0];
-                    // else if (section.label.rotation == Rotation90DegreesClockwise)
-                    //     return pos_x + section.label.offset[0];
-                    else
-                        return pos_x + section.label.offset[0];
-                }
-                else {
-                    if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                        return pos_x - section.label.offset[0];
-                    else if (section.label.rotation == Rotation90DegreesClockwise)
-                        return pos_x - text_size.height - section.label.offset[0];
-                    else
-                        return pos_x - text_size.width - section.label.offset[0];
-                }
-            };
-            const auto text_pos_x = text_pos_x_calc();
-
-
-            surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
         }
     }
 
