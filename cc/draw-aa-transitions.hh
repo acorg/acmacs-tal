@@ -26,12 +26,13 @@ namespace acmacs::tal::inline v3
         struct Transition
         {
             const Node* node;
+            bool show{true};
             parameters::Label label;
             std::vector<Size> name_sizes;
             PointCoordinates at_edge_line{PointCoordinates::zero2D};
             Viewport box;
 
-            Transition(const Node* a_node, const parameters::Label& a_label) : node(a_node), label(a_label) {}
+            Transition(const Node* a_node, bool a_show, const parameters::Label& a_label) : node{a_node}, show{a_show}, label(a_label) {}
         };
 
         // ----------------------------------------------------------------------
@@ -39,6 +40,7 @@ namespace acmacs::tal::inline v3
         struct TransitionParameters
         {
             std::string node_id;
+            bool show{true};
             parameters::Label label{BLACK, 0.01, parameters::vertical_position::top, parameters::horizontal_position::middle, {-0.04, 0.02}, {}, NoRotation, parameters::LabelTether{true, {BLACK, Pixels{0.3}}}, TextStyle{"monospace"}};
         };
 

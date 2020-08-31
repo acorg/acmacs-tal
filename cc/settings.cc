@@ -1166,6 +1166,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     const auto read_node_parameters = [this](const rjson::v3::value& source, DrawAATransitions::TransitionParameters& parameters, ignore_name ign) {
         if (ign == ignore_name::no)
             rjson::v3::copy_if_not_null(source["node_id"sv], parameters.node_id);
+        rjson::v3::copy_if_not_null(source["show"sv], parameters.show);
         read_label_parameters(source["label"sv], parameters.label);
     };
 

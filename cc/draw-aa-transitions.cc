@@ -23,7 +23,7 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
         tree::iterate_pre(tal().tree(), [this, aa_transitions_valid, minimum_number_leaves_in_subtree](const Node& node) {
             if (!node.hidden && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) {
                 const auto node_id = fmt::format("{}", node.node_id);
-                transitions_.emplace_back(&node, parameters_for_node(node_id).label);
+                transitions_.emplace_back(&node, parameters_for_node(node_id).show, parameters_for_node(node_id).label);
             }
         });
         std::sort(std::begin(transitions_), std::end(transitions_), [](const auto& e1, const auto& e2) { return e1.node->node_id < e2.node->node_id; });
@@ -138,13 +138,16 @@ void acmacs::tal::v3::DrawAATransitions::calculate_boxes(acmacs::surface::Surfac
 
 void acmacs::tal::v3::DrawAATransitions::report() const
 {
+    using namespace std::string_literals;
     AD_INFO("vvvvvvvvvvvvvvvvvvvv AA transitions ({}) vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv", transitions_.size());
-    size_t max_id{0}, max_name{0}, max_first{0};
+    size_t max_id{0}, max_name{0}, max_first{0}, max_last{0};
     for (const auto& transition : transitions_) {
         max_id = std::max(max_id, fmt::format("{}", transition.node->node_id).size());
         max_name = std::max(max_name, transition.node->aa_transitions_.display().size());
         if (transition.node->first_prev_leaf)
             max_first = std::max(max_first, transition.node->first_prev_leaf->seq_id.size());
+        if (transition.node->last_next_leaf)
+            max_last = std::max(max_last, transition.node->last_next_leaf->seq_id.size());
     }
 
     fmt::print("[\n");
@@ -154,12 +157,17 @@ void acmacs::tal::v3::DrawAATransitions::report() const
         const auto name = fmt::format("\"{}\",", transition.node->aa_transitions_.display());
         if (comma)
             fmt::print(",\n");
-        fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"label\": {{\"offset\": [{:6.3f}, {:6.3f}], \"?box\": {:.3f}}}, \"?first\": {:<{}s} \"?last\": \"{}\"}}", node_id, max_id + 2, name,
-                   max_name + 3, transition.label.offset[0], transition.label.offset[1], transition.box.size, fmt::format("\"{}\",", transition.node->first_prev_leaf->seq_id), max_first + 3,
-                   transition.node->last_next_leaf->seq_id);
-        // AD_DEBUG_IF(debug_from(transition.node->node_for_left_aa_transitions_ && transition.node->aa_transitions_.has_same_left_right()), "same-left-right {} (cumul:{}) -> {} (cumul:{})",
-        // transition.node->node_id, transition.node->cumulative_edge_length, transition.node->node_for_left_aa_transitions_->node_id,
-        // transition.node->node_for_left_aa_transitions_->cumulative_edge_length);
+        fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"show\": {} \"label\": {{\"offset\": [{:6.3f}, {:6.3f}], \"?box\": {:.3f}}}, "
+                   "\"?first\": {:<{}s} \"?last\": {:<{}s} \"?before first\": {:<{}s} \"?after last\": {}}}",
+                   //
+                   node_id, max_id + 2,                                                                                                       // node_id
+                   name, max_name + 3,                                                                                                        // name
+                   transition.show ? "true, " : "false,",                                                                                     // show
+                   transition.label.offset[0], transition.label.offset[1], transition.box.size,                                               // label
+                   fmt::format("\"{}\",", transition.node->first_prev_leaf->seq_id), max_first + 3,                                           // first
+                   transition.node->last_next_leaf ? fmt::format("\"{}\",", transition.node->last_next_leaf->seq_id) : "null"s, max_last + 3, // last
+                   transition.node->first_prev_leaf->first_prev_leaf ? fmt::format("\"{}\",", transition.node->first_prev_leaf->first_prev_leaf->seq_id) : "null,", max_first + 3,
+                   transition.node->last_next_leaf && transition.node->last_next_leaf->last_next_leaf ? fmt::format("\"{}\"", transition.node->last_next_leaf->last_next_leaf->seq_id) : "null"s);
         comma = true;
     }
     fmt::print("\n]\n");
@@ -177,7 +185,7 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
     const auto text_line_interleave = parameters().text_line_interleave;
 
     for (const auto& transition : transitions_) {
-        if (const auto names = transition.node->aa_transitions_.names(parameters().only_for_pos); !names.empty()) { // prevent from crashing during debugging aa transitions
+        if (const auto names = transition.node->aa_transitions_.names(parameters().only_for_pos); !names.empty() && transition.show) { // ignore empty name: prevent from crashing during debugging aa transitions
             const Scaled text_size{transition.label.scale};
 
             // const PointCoordinates box_top_left{transition.at_edge_line.x() + transition.label.offset[0], transition.at_edge_line.y() + transition.label.offset[1]};
