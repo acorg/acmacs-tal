@@ -917,7 +917,7 @@ void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
                 aa_at_pos.resize(*node.aa_sequence.size());
             for (seqdb::pos0_t pos{0}; pos < node.aa_sequence.size(); ++pos) {
                 const auto aa = node.aa_sequence.at(pos);
-                if (!aa_at_pos[*pos].empty() && aa_at_pos[*pos].back().aa != aa && aa_at_pos[*pos].back().size() < tolerance)
+                if (aa_at_pos[*pos].size() > 1 && aa_at_pos[*pos].back().aa != aa && aa_at_pos[*pos].back().size() < tolerance)
                     aa_at_pos[*pos].pop_back();
                 if (!aa_at_pos[*pos].empty() && aa_at_pos[*pos].back().aa == aa)
                     aa_at_pos[*pos].back().last = node.node_id.vertical;
