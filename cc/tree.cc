@@ -897,6 +897,51 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
+{
+    struct chunk_t
+    {
+        // constexpr chunk_t() = default;
+        constexpr chunk_t(char aaa, node_id_t::value_type vert) : aa{aaa}, first{vert}, last{vert} {}
+        constexpr size_t size() const { return last - first + 1ul; }
+        char aa;
+        node_id_t::value_type first;
+        node_id_t::value_type last;
+    };
+
+    std::vector<std::vector<chunk_t>> aa_at_pos;
+
+    tree::iterate_leaf(*this, [&aa_at_pos, tolerance](const Node& node) {
+        if (!node.hidden) {
+            if (aa_at_pos.size() < *node.aa_sequence.size())
+                aa_at_pos.resize(*node.aa_sequence.size());
+            for (seqdb::pos0_t pos{0}; pos < node.aa_sequence.size(); ++pos) {
+                const auto aa = node.aa_sequence.at(pos);
+                if (!aa_at_pos[*pos].empty() && aa_at_pos[*pos].back().aa != aa && aa_at_pos[*pos].back().size() < tolerance)
+                    aa_at_pos[*pos].pop_back();
+                if (!aa_at_pos[*pos].empty() && aa_at_pos[*pos].back().aa == aa)
+                    aa_at_pos[*pos].back().last = node.node_id.vertical;
+                else
+                    aa_at_pos[*pos].emplace_back(aa, node.node_id.vertical);
+            }
+        }
+    });
+
+    AD_INFO("aa-at-pos-report");
+    for (const auto [pos, chunks] : acmacs::enumerate(aa_at_pos)) {
+        // if (chunks.size() > 1) {
+            fmt::print("{:3d}  ({:3d})\n", pos + 1, chunks.size());
+            for (const auto& chunk : chunks) {
+                if ((chunk.last - chunk.first) >= tolerance)
+                    fmt::print("   {} {:5d}  {:5d} .. {:5d}\n", chunk.aa, chunk.size(), chunk.first, chunk.last);
+            }
+        // }
+    }
+
+} // acmacs::tal::v3::Tree::aa_at_pos_report
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::clades_reset()
 {
     AD_LOG(acmacs::log::clades, "reset");

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-08-29 11:25:04 eu>
+# Time-stamp: <2020-09-07 18:46:20 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -130,9 +130,6 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "ladderize", "method": "number-of-leaves", "?method": "max-edge-length"}
 {"N": "re-root", "new-root": <seq-id>}
 
-{"N": "aa-transitions", "report": false, "method": "derek", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
-"show-same-left-right-for-pos": 193}
-
 {"N": "nodes", "select": <select>, "apply": <node-apply>} -- See [[Node modifications][Node modifications]]
 
 {"N": "clades-reset"}
@@ -178,6 +175,14 @@ If multiple criteria specified within single "select" object, they all used (con
   },
 #+END_SRC
 
+*** AA subst labels
+
+#+BEGIN_SRC bash
+{"N": "aa-transitions", "report": false, 
+ "method": "derek", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+"show-same-left-right-for-pos": 193}
+#+END_SRC
+
 
 #+BEGIN_SRC json
   {"N": "draw-aa-transitions", 
@@ -190,6 +195,10 @@ If multiple criteria specified within single "select" object, they all used (con
    "per_node": [
    ],
   },
+#+END_SRC
+
+#+BEGIN_SRC bash
+  {"N": "aa-at-pos-report", "tolerance": 0}
 #+END_SRC
 
 
