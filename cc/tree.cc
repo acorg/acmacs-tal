@@ -929,13 +929,12 @@ void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
 
     AD_INFO("aa-at-pos-report");
     for (const auto [pos, chunks] : acmacs::enumerate(aa_at_pos)) {
-        // if (chunks.size() > 1) {
+        if (chunks.size() > 1) {
             fmt::print("{:3d}  ({:3d})\n", pos + 1, chunks.size());
             for (const auto& chunk : chunks) {
-                if ((chunk.last - chunk.first) >= tolerance)
-                    fmt::print("   {} {:5d}  {:5d} .. {:5d}\n", chunk.aa, chunk.size(), chunk.first, chunk.last);
+                fmt::print("   {} {:5d}  {:5d} .. {:5d}\n", chunk.aa, chunk.size(), chunk.first, chunk.last);
             }
-        // }
+        }
     }
 
 } // acmacs::tal::v3::Tree::aa_at_pos_report
