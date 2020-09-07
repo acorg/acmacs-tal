@@ -373,7 +373,14 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             tree().select_all(selected, update);
         }
         else if (key == "aa"sv) {
-            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(substitute_to_value(val)));
+            std::visit(
+                [this, &selected, &update]<typename Res>(const Res& res) {
+                    if constexpr (std::is_same_v<Res, const rjson::v3::value*> || std::is_same_v<Res, no_substitution_request>)
+                        tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(*res));
+                    else
+                        tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(res));
+                },
+                substitute(val));
         }
         else if (key == "country"sv) {
             tree().select_by_country(selected, update, substitute_to_value(val).to<std::string_view>());
@@ -968,7 +975,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("Invalid label offset, two numbers expected: {}", source);
         }
-        rjson::v3::copy_if_not_null(substitute_to_value(source["text"sv]), param.text);
+        if (const auto& text_v = source["text"sv]; !text_v.is_null())
+            param.text = substitute_to_string(text_v);
         if (const auto& rotation_degrees_v = substitute_to_value(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
             param.rotation = RotationDegrees(rotation_degrees_v.to<double>());
 
