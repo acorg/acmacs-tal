@@ -945,10 +945,11 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::v3::copy_if_not_null(substitute_to_value(source["color"sv]), param.color);
+        if (const auto& color_v = source["color"sv]; !color_v.is_null())
+            param.color = substitute_to_string(color_v);
         rjson::v3::copy_if_not_null(substitute_to_value(source["scale"sv]), param.scale);
-        if (const auto& position_v = substitute_to_value(source["vertical_position"sv]); !position_v.is_null()) {
-            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
+        if (const auto& position_v = source["vertical_position"sv]; !position_v.is_null()) {
+            if (const auto position = substitute_to_string(position_v); position == "middle"sv)
                 param.vpos = parameters::vertical_position::middle;
             else if (position == "top"sv)
                 param.vpos = parameters::vertical_position::top;
@@ -957,8 +958,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
-        if (const auto& position_v = substitute_to_value(source["horizontal_position"sv]); !position_v.is_null()) {
-            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
+        if (const auto& position_v = source["horizontal_position"sv]; !position_v.is_null()) {
+            if (const auto position = substitute_to_string(position_v); position == "middle"sv)
                 param.hpos = parameters::horizontal_position::middle;
             else if (position == "left"sv)
                 param.hpos = parameters::horizontal_position::left;
@@ -1005,7 +1006,8 @@ void acmacs::tal::v3::Settings::add_dash_bar()
     for (const rjson::v3::value& entry : getenv("nodes"sv).array()) {
         auto& for_nodes = param.for_nodes.emplace_back();
         for_nodes.nodes = select_nodes(entry["select"sv]);
-        rjson::v3::copy_if_not_null(substitute_to_value(entry["color"sv]), for_nodes.color);
+        if (const auto& color_v = entry["color"sv]; !color_v.is_null())
+            for_nodes.color = substitute_to_string(color_v);
     }
 
     for (const rjson::v3::value& label_data : getenv("labels"sv).array())
