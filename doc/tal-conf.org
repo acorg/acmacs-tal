@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-08 15:07:55 eu>
+# Time-stamp: <2020-09-08 19:03:12 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -30,6 +30,8 @@ Use .tal suffix
 -D ladderize-method=max-edge-length  (number-of-leaves is default)
 
 -D canvas-height=1000
+
+-D report-aa-at-pos-counter - report percentage of AAs at each position (tolerance: 0.01, i.e. do not repot AAs occuring <1% in the tree)
 
 * Settings features
 

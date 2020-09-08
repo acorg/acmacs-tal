@@ -7,6 +7,7 @@
          "report-cumulative-max": 100,
          "report-time-series-output": "",
          "whocc": false,
+         "report-aa-at-pos-counter": false,
          "ladderize-method": "number-of-leaves",
          "tree-draw-aa-transitions": true,
 
@@ -121,6 +122,8 @@
         {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
             "clades-whocc"
         ]},
+
+        {"N": "if", "condition": "{report-aa-at-pos-counter}", "then": [{"N": "aa-at-pos-counter-report", "tolerance": 0.01}]},
 
         "tal"
     ],
