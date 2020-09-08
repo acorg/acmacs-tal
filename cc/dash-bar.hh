@@ -14,6 +14,8 @@ namespace acmacs::tal::inline v3
 
         // void prepare(preparation_stage_t stage) override;
 
+        virtual void draw_label(acmacs::surface::Surface& surface, std::string_view text, Color color, const parameters::Label& label_param) const;
+
         // ----------------------------------------------------------------------
 
         struct Parameters
