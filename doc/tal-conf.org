@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-08 10:02:37 eu>
+# Time-stamp: <2020-09-08 10:41:19 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -187,7 +187,6 @@ If multiple criteria specified within single "select" object, they all used (con
 #+BEGIN_SRC json
   {"N": "draw-aa-transitions", "report": false, "debug": false,
    "method": "derek-20200907", #  "derek-20200907", "derek-2016", "eu-20200514"
-   "?pos": 193,
    "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
    "text_line_interleave": 0.3,
    "show": true,
