@@ -1148,14 +1148,20 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree) {
         auto& aa_transitions = draw_tree->parameters().aa_transitions;
         aa_transitions.calculate = true;
+        getenv_copy_if_present("report"sv, aa_transitions.report);
+        getenv_copy_if_present("debug"sv, aa_transitions.report);
+        if (const auto& pos = getenv("pos"sv); !pos.is_null())
+            aa_transitions.report_pos = pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
             const auto method = method_v.to<std::string_view>();
-            if (method.empty() || method == "derek"sv)
-                aa_transitions.method = draw_tree::AATransitionsParameters::method::derek;
+            if (method.empty() || method == "derek_20200907"sv || method == "derek-20200907"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_20200907;
+            else if (method == "derek_2016"sv || method == "derek-2016"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_2016;
             else if (method == "eu_20200514"sv || method == "eu-20200514"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200514;
             else
-                throw error{"\"draw-aa-transitions\": invalid \"method\" (\"derek\" or \"eu_20200514\" expected)"};
+                throw error{"\"draw-aa-transitions\": invalid \"method\" (\"derek-2016\", \"derek-20200907\", \"eu-20200514\" expected)"};
         }
     }
 
