@@ -245,7 +245,10 @@ void acmacs::tal::v3::update_aa_transitions_derek_20200907(Tree& tree, const dra
             if (common_aa_at == CommonAA::NoCommon) {
                 CounterChar counter;
                 for (auto& child : node.subtree) {
-                    if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
+                    if (child.hidden) {
+                        // ignore hidden
+                    }
+                    else if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
                         child.aa_transitions_.add(pos, aa);
                         counter.count(aa);
                     }
