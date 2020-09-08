@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-08 13:20:41 eu>
+# Time-stamp: <2020-09-08 15:07:55 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -285,6 +285,9 @@ If multiple criteria specified within single "select" object, they all used (con
 #+END_SRC
 
 *** dash-bar-aa-at - Show colored dashes for AAs at position
+
+Just one entry for "labels": [{"offset": [0.0, 0.008], "scale": 0.008, "vertical_position": "bottom", "horizontal_position": "middle"}]
+is enough, other will be auto-added to place labels below the first one.
 
 #+BEGIN_SRC json
   {"N": "dash-bar-aa-at",
