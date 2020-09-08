@@ -102,6 +102,7 @@ namespace acmacs::tal::inline v3
         {
             seqdb::pos1_t pos{193};
             std::vector<Color> colors_by_frequency;
+            std::vector<parameters::Label> labels_by_frequency;
         };
 
         constexpr Parameters& parameters() { return parameters_; }

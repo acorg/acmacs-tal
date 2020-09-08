@@ -147,35 +147,40 @@ void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
         }
     });
 
-    // for (const auto& label : parameters().labels) {
-    //     const Scaled label_size{viewport.size.height * label.scale};
-    //     const auto text_size = surface.text_size(label.text, label_size, label.text_style);
-    //     double pos_y{0};
-    //     switch (label.vpos) {
-    //         case parameters::vertical_position::top:
-    //             pos_y = viewport.top() + label.offset[1] + text_size.height;
-    //             break;
-    //         case parameters::vertical_position::middle:
-    //             pos_y = viewport.center().y() + label.offset[1] + text_size.height / 2.0;
-    //             break;
-    //         case parameters::vertical_position::bottom:
-    //             pos_y = viewport.bottom() + label.offset[1];
-    //             break;
-    //     }
-    //     double pos_x{0};
-    //     switch (label.hpos) {
-    //         case parameters::horizontal_position::left:
-    //             pos_x = viewport.left() + label.offset[0] - text_size.width;
-    //             break;
-    //         case parameters::horizontal_position::middle:
-    //             pos_x = viewport.center().x() + label.offset[0] - text_size.width / 2.0;
-    //             break;
-    //         case parameters::horizontal_position::right:
-    //             pos_x = viewport.right() + label.offset[0];
-    //             break;
-    //     }
-    //     surface.text({pos_x, pos_y}, label.text, label.color, label_size, label.text_style, label.rotation);
-    // }
+    if (!parameters().labels_by_frequency.empty()) {
+        for (const auto [ind, aa] : acmacs::enumerate(aa_by_fequency)) {
+            const auto text = fmt::format("{}{}", parameters().pos, aa);
+            AD_DEBUG("DashBarAAAt label {}", text);
+            const auto& label = parameters().labels_by_frequency[ind < parameters().labels_by_frequency.size() ? ind : 0];
+            const Scaled label_size{viewport.size.height * label.scale};
+            const auto text_size = surface.text_size(text, label_size, label.text_style);
+            double pos_y{0};
+            switch (label.vpos) {
+                case parameters::vertical_position::top:
+                    pos_y = viewport.top() + label.offset[1] + text_size.height;
+                    break;
+                case parameters::vertical_position::middle:
+                    pos_y = viewport.center().y() + label.offset[1] + text_size.height / 2.0;
+                    break;
+                case parameters::vertical_position::bottom:
+                    pos_y = viewport.bottom() + label.offset[1];
+                    break;
+            }
+            double pos_x{0};
+            switch (label.hpos) {
+                case parameters::horizontal_position::left:
+                    pos_x = viewport.left() + label.offset[0] - text_size.width;
+                    break;
+                case parameters::horizontal_position::middle:
+                    pos_x = viewport.center().x() + label.offset[0] - text_size.width / 2.0;
+                    break;
+                case parameters::horizontal_position::right:
+                    pos_x = viewport.right() + label.offset[0];
+                    break;
+            }
+            surface.text({pos_x, pos_y}, text, colors.get(aa), label_size, label.text_style, label.rotation);
+        }
+    }
 
 } // acmacs::tal::v3::DashBarAAAt::draw
 

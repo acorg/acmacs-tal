@@ -1057,6 +1057,11 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
 
     read_dash_parameters(param.dash);
 
+    if (const auto& labels = substitute_to_value(getenv("labels"sv)); labels.is_array()) {
+        for (const rjson::v3::value& label_data : labels.array())
+            read_label_parameters(label_data, param.labels_by_frequency.emplace_back());
+    }
+
     // for (const rjson::v3::value& for_clade : getenv("clades"sv).array()) {
     //     auto& clade = param.clades.emplace_back();
     //     rjson::v3::copy_if_not_null(for_clade["name"sv], clade.name);

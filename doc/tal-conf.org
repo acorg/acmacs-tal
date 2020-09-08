@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-08 12:21:04 eu>
+# Time-stamp: <2020-09-08 12:51:07 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -290,8 +290,10 @@ If multiple criteria specified within single "select" object, they all used (con
   {"N": "dash-bar-aa-at",
    # "?width-to-height-ratio": 0.009,
    "pos": 193,
-   "colors": [<most-frequent>, <second>],
-   "colors": {"A": "red", "T": "blue"},
+   # "colors": [<most-frequent>, <second>],
+   # "colors": {"A": "red", "T": "blue"},
+   # "labels": [<most-frequent>, <second>],
+   # "labels": {"A": "red", "T": "blue"},
    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
    "?debug-outline": "lightblue"}
 #+END_SRC
