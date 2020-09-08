@@ -20,8 +20,9 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
 
         const auto total_leaves = static_cast<double>(tal().tree().number_leaves_in_subtree());
         const auto minimum_number_leaves_in_subtree = static_cast<size_t>(parameters().minimum_number_leaves_in_subtree < 1 ? total_leaves * parameters().minimum_number_leaves_in_subtree : parameters().minimum_number_leaves_in_subtree);
-        tree::iterate_pre(tal().tree(), [this, aa_transitions_valid, minimum_number_leaves_in_subtree](const Node& node) {
-            if (!node.hidden && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) {
+        const auto& tree = tal().tree();
+        tree::iterate_pre(tree, [this, &tree, aa_transitions_valid, minimum_number_leaves_in_subtree](const Node& node) {
+            if (!node.hidden && &node != &tree && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) { // &node != &tree to avoid showing root aa transion found due to presense of multiple root sequences
                 const auto node_id = fmt::format("{}", node.node_id);
                 transitions_.emplace_back(&node, parameters_for_node(node_id).show, parameters_for_node(node_id).label);
             }

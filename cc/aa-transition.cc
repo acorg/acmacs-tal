@@ -271,6 +271,9 @@ void acmacs::tal::v3::update_aa_transitions_derek_20200907(Tree& tree, const dra
         node.aa_transitions_.remove_left_right_same(parameters);
     });
 
+    if (!tree.aa_transitions_.empty())
+        AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
+
 } // acmacs::tal::v3::update_aa_transitions_derek_20200907
 
 // ----------------------------------------------------------------------
