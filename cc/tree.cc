@@ -941,6 +941,44 @@ void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance) const
+{
+    using CounterAA = acmacs::CounterCharSome<'A', 'Z'>;
+    std::vector<CounterAA> counter_aa_at_pos;
+
+    tree::iterate_leaf(*this, [&counter_aa_at_pos](const Node& node) {
+        if (!node.hidden) {
+            if (counter_aa_at_pos.size() < *node.aa_sequence.size())
+                counter_aa_at_pos.resize(*node.aa_sequence.size());
+            for (seqdb::pos0_t pos{0}; pos < node.aa_sequence.size(); ++pos)
+                counter_aa_at_pos[*pos].count(node.aa_sequence.at(pos));
+        }
+    });
+
+    AD_INFO("aa-at-pos-counter-report");
+    for (const auto [pos, counter] : acmacs::enumerate(counter_aa_at_pos)) {
+        const auto total = static_cast<double>(counter.total());
+        std::vector<std::pair<char, double>> aa_precent;
+        for (const auto& [aa, count] : counter.pairs(CounterAA::sorted::yes)) {
+            if (const auto percent = static_cast<double>(count) / total; percent >= tolerance)
+                aa_precent.emplace_back(aa, percent);
+        }
+        if (aa_precent.size() > 1) {
+            fmt::print("{:3d}  {}:{:.0f}%  {}:{:.0f}%", pos + 1, aa_precent[0].first, aa_precent[0].second * 100.0, aa_precent[1].first, aa_precent[1].second * 100.0);
+            for (auto it = std::next(aa_precent.begin(), 2); it != aa_precent.end(); ++it)
+                fmt::print("  {}:{:.0f}%", it->first, it->second * 100.0);
+            fmt::print("\n");
+        }
+
+        // if (counter.size() > 1) {
+        //     fmt::print("{:3d} {}\n", pos + 1, counter.report_sorted_max_first("  {value}:{counter_percent:.0f}%({counter})"));
+        // }
+    }
+
+} // acmacs::tal::v3::Tree::aa_at_pos_counter_report
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Tree::clades_reset()
 {
     AD_LOG(acmacs::log::clades, "reset");

@@ -107,6 +107,9 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             tree().set_first_last_next_node_id();
             tree().aa_at_pos_report(getenv_or("tolerance"sv, 0ul));
         }
+        else if (name == "aa-at-pos-counter-report"sv) {
+            tree().aa_at_pos_counter_report(getenv_or("tolerance"sv, 0.0));
+        }
         else if (name == "aa-transitions"sv) {
             if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree) {
                 auto& param = draw_tree->parameters().aa_transitions;

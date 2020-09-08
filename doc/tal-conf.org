@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-07 18:46:20 eu>
+# Time-stamp: <2020-09-08 09:22:40 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -199,6 +199,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC bash
   {"N": "aa-at-pos-report", "tolerance": 0}
+  {"N": "aa-at-pos-counter-report", "tolerance": 0} # tolerance: 0.01 - exclude if less that 1%
 #+END_SRC
 
 
