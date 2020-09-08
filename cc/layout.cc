@@ -93,6 +93,7 @@ template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal
 // template const acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::DashBarAAAt* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarAAAt>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id) const;
@@ -116,6 +117,7 @@ template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::
 // template acmacs::tal::v3::LegendContinentMap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::LegendContinentMap>(const LayoutElementId& id);
 template acmacs::tal::v3::Gap* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Gap>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBar* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBar>(const LayoutElementId& id);
+template acmacs::tal::v3::DashBarAAAt* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarAAAt>(const LayoutElementId& id);
 template acmacs::tal::v3::DashBarClades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DashBarClades>(const LayoutElementId& id);
 template acmacs::tal::v3::HzSections* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSections>(const LayoutElementId& id);
 template acmacs::tal::v3::HzSectionMarker* acmacs::tal::v3::Layout::find<acmacs::tal::v3::HzSectionMarker>(const LayoutElementId& id);

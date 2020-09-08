@@ -135,6 +135,8 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             add_clades();
         else if (name == "dash-bar"sv)
             add_dash_bar();
+        else if (name == "dash-bar-aa-at"sv)
+            add_dash_bar_aa_at();
         else if (name == "dash-bar-clades"sv)
             add_dash_bar_clades();
         else if (name == "draw-aa-transitions"sv)
@@ -1041,6 +1043,28 @@ void acmacs::tal::v3::Settings::add_dash_bar_clades()
     }
 
 } // acmacs::tal::v3::Settings::add_dash_bar_clades
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
+{
+    using namespace std::string_view_literals;
+
+    auto& element = add_element<DashBarAAAt>();
+    auto& param = element.parameters();
+
+    rjson::v3::copy_if_not_null(substitute_to_value(getenv("pos"sv)), param.pos);
+
+    read_dash_parameters(param.dash);
+
+    // for (const rjson::v3::value& for_clade : getenv("clades"sv).array()) {
+    //     auto& clade = param.clades.emplace_back();
+    //     rjson::v3::copy_if_not_null(for_clade["name"sv], clade.name);
+    //     rjson::v3::copy_if_not_null(for_clade["color"sv], clade.color);
+    //     read_label_parameters(for_clade["label"sv], clade.label);
+    // }
+
+} // acmacs::tal::v3::Settings::add_dash_bar_aa_at
 
 // ----------------------------------------------------------------------
 

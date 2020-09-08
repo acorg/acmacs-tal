@@ -1,3 +1,5 @@
+#include "acmacs-base/flat-map.hh"
+#include "acmacs-base/color-distinct.hh"
 #include "acmacs-tal/dash-bar.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/draw-tree.hh"
@@ -112,6 +114,70 @@ void acmacs::tal::v3::DashBarClades::draw(acmacs::surface::Surface& surface) con
     }
 
 } // acmacs::tal::v3::DashBarClades::draw
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
+{
+    const auto* draw_tree = tal().draw().layout().find_draw_tree();
+    const auto& viewport = surface.viewport();
+    const auto vertical_step = draw_tree->vertical_step();
+    const auto dash_width = parameters().dash.width;
+    const auto dash_line_width = parameters().dash.line_width;
+    const auto dash_pos_x = viewport.left() + viewport.size.width * (1.0 - dash_width) * 0.5;
+
+    acmacs::CounterCharSome<'A', 'Z'> counter_aa;
+    tree::iterate_leaf(tal().tree(), [&counter_aa, pos = parameters().pos](const Node& leaf) {
+        if (!leaf.hidden)
+            counter_aa.count(leaf.aa_sequence.at(pos));
+    });
+
+    acmacs::small_map_with_unique_keys_t<char, Color> colors;
+    const auto& aa_by_fequency = counter_aa.sorted();
+    for (const auto [ind, aa] : acmacs::enumerate(aa_by_fequency))
+        colors.emplace_not_replace(aa, acmacs::color::distinct(ind));
+    colors.emplace_or_replace('X', GREY);
+    colors.emplace_or_replace(' ', TRANSPARENT);
+
+    tree::iterate_leaf(tal().tree(), [&surface, &colors, pos = parameters().pos, dash_pos_x, dash_width, viewport_width = viewport.size.width, vertical_step, dash_line_width](const Node& leaf) {
+        if (!leaf.hidden) {
+            const double vpos = vertical_step * leaf.cumulative_vertical_offset_;
+            // AD_DEBUG("at pos '{}'", leaf.aa_sequence.at(pos));
+            surface.line({dash_pos_x, vpos}, {dash_pos_x + viewport_width * dash_width, vpos}, colors.get(leaf.aa_sequence.at(pos)), dash_line_width, surface::LineCap::Round);
+        }
+    });
+
+    // for (const auto& label : parameters().labels) {
+    //     const Scaled label_size{viewport.size.height * label.scale};
+    //     const auto text_size = surface.text_size(label.text, label_size, label.text_style);
+    //     double pos_y{0};
+    //     switch (label.vpos) {
+    //         case parameters::vertical_position::top:
+    //             pos_y = viewport.top() + label.offset[1] + text_size.height;
+    //             break;
+    //         case parameters::vertical_position::middle:
+    //             pos_y = viewport.center().y() + label.offset[1] + text_size.height / 2.0;
+    //             break;
+    //         case parameters::vertical_position::bottom:
+    //             pos_y = viewport.bottom() + label.offset[1];
+    //             break;
+    //     }
+    //     double pos_x{0};
+    //     switch (label.hpos) {
+    //         case parameters::horizontal_position::left:
+    //             pos_x = viewport.left() + label.offset[0] - text_size.width;
+    //             break;
+    //         case parameters::horizontal_position::middle:
+    //             pos_x = viewport.center().x() + label.offset[0] - text_size.width / 2.0;
+    //             break;
+    //         case parameters::horizontal_position::right:
+    //             pos_x = viewport.right() + label.offset[0];
+    //             break;
+    //     }
+    //     surface.text({pos_x, pos_y}, label.text, label.color, label_size, label.text_style, label.rotation);
+    // }
+
+} // acmacs::tal::v3::DashBarAAAt::draw
 
 // ----------------------------------------------------------------------
 /// Local Variables:

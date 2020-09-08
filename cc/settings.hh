@@ -50,6 +50,7 @@ namespace acmacs::tal::inline v3
         void add_clades();
         void add_dash_bar();
         void add_dash_bar_clades();
+        void add_dash_bar_aa_at();
         void add_title();
         void hz_sections();
         void hz_section_marker();

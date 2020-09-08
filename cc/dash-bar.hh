@@ -86,6 +86,31 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
     };
 
+    // ----------------------------------------------------------------------
+
+    class DashBarAAAt : public DashBarBase
+    {
+      public:
+        DashBarAAAt(Tal& tal) : DashBarBase(tal) {}
+
+        // void prepare(preparation_stage_t stage) override;
+        void draw(acmacs::surface::Surface& surface) const override;
+
+        // ----------------------------------------------------------------------
+
+        struct Parameters : public DashBarBase::Parameters
+        {
+            seqdb::pos1_t pos{193};
+            std::vector<Color> colors_by_frequency;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
+    };
+
 } // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------

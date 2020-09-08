@@ -25,6 +25,7 @@ namespace acmacs::tal::inline v3
     // class LegendContinentMap;
     class Gap;
     class DashBar;
+    class DashBarAAAt;
     class DashBarClades;
     class HzSections;
     class HzSectionMarker;
@@ -73,6 +74,7 @@ namespace acmacs::tal::inline v3
     // extern template const LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id) const;
     extern template const Gap* Layout::find<Gap>(const LayoutElementId& id) const;
     extern template const DashBar* Layout::find<DashBar>(const LayoutElementId& id) const;
+    extern template const DashBarAAAt* Layout::find<DashBarAAAt>(const LayoutElementId& id) const;
     extern template const DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id) const;
     extern template const HzSections* Layout::find<HzSections>(const LayoutElementId& id) const;
     extern template const HzSectionMarker* Layout::find<HzSectionMarker>(const LayoutElementId& id) const;
@@ -87,6 +89,7 @@ namespace acmacs::tal::inline v3
     // extern template LegendContinentMap* Layout::find<LegendContinentMap>(const LayoutElementId& id);
     extern template Gap* Layout::find<Gap>(const LayoutElementId& id);
     extern template DashBar* Layout::find<DashBar>(const LayoutElementId& id);
+    extern template DashBarAAAt* Layout::find<DashBarAAAt>(const LayoutElementId& id);
     extern template DashBarClades* Layout::find<DashBarClades>(const LayoutElementId& id);
     extern template HzSections* Layout::find<HzSections>(const LayoutElementId& id);
     extern template HzSectionMarker* Layout::find<HzSectionMarker>(const LayoutElementId& id);
