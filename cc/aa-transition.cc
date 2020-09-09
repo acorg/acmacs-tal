@@ -232,7 +232,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
             const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
             if (!node.common_aa_.is_common(pos, parameters.non_common_tolerance)) {
                 AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
-                            node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
+                            node.common_aa_.size() > *pos ? node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})") : std::string{});
                 for (auto& child : node.subtree) {
                     if (!child.is_leaf()) {
                         if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon)

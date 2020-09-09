@@ -137,7 +137,7 @@ std::string acmacs::tal::v3::text_export(const Tree& tree)
 
 // ----------------------------------------------------------------------
 
-void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node, double edge_step, prefix_t& prefix, bool last)
+void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node, double edge_step, prefix_t& prefix, bool /*last*/)
 {
     const auto format_accession_numbers = [](const auto& aNode) {
         std::string result;

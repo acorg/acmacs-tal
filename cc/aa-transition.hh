@@ -26,6 +26,9 @@ namespace acmacs::tal::inline v3
 
         constexpr static inline bool is_common(char aa) { return aa != NoCommon; }
 
+        bool empty() const { return at_pos_.empty(); }
+        size_t size() const { return at_pos_.size(); }
+
         char at(seqdb::pos0_t pos) const
         {
             if (at_pos_.size() <= *pos || at_pos_[*pos].size() != 1)
