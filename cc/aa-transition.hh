@@ -70,33 +70,6 @@ namespace acmacs::tal::inline v3
         }
     };
 
-    // class CommonAA : public seqdb::sequence_aligned_t
-    // {
-    //   public:
-    //     constexpr static const char NoCommon{'.'};
-    //     constexpr static const char Any{'X'};
-    //     // CommonAA() = default;
-
-    //     // char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
-    //     constexpr static inline bool is_common(char aa) { return aa != NoCommon && aa != Any; }
-    //     /*constexpr*/ bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
-    //     // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
-    //     ssize_t num_common() const
-    //     {
-    //         return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NoCommon; });
-    //     }
-
-    //     void update(acmacs::seqdb::sequence_aligned_ref_t seq);
-    //     void update(const CommonAA& subtree);
-
-    //     std::string report() const;
-    //     std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
-
-    //   private:
-    //     void update(seqdb::pos0_t pos, char aa);
-    //     void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
-    // };
-
     // ======================================================================
 
     class AA_Transition

@@ -19,10 +19,6 @@ namespace acmacs::tal::inline v3
     static void update_aa_transitions_derek_2016(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 
     // ----------------------------------------------------------------------
-    // AA subst calculation derek-20200907
-    static void update_aa_transitions_derek_20200907(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
-
-    // ----------------------------------------------------------------------
     // AA subst calculation eu-20200909
     static void update_aa_transitions_eu_20200909(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 }
@@ -50,9 +46,6 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
           break;
       case draw_tree::AATransitionsParameters::method::derek_2016:
           update_aa_transitions_derek_2016(tree, parameters);
-          break;
-      case draw_tree::AATransitionsParameters::method::derek_20200907:
-          update_aa_transitions_derek_20200907(tree, parameters);
           break;
     }
 
@@ -227,75 +220,18 @@ void acmacs::tal::v3::update_aa_transitions_derek_2016(Tree& tree, const draw_tr
 } // acmacs::tal::v3::update_aa_transitions_derek_2016
 
 // ======================================================================
-// Derek's method 20200907
-
-void acmacs::tal::v3::update_aa_transitions_derek_20200907(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
-{
-    AD_DEBUG_IF(debug_from(parameters.debug), "update_aa_transitions_derek_20200907");
-
-    const auto longest_sequence = update_common_aa(tree);
-    const auto& root_sequence = tree.find_first_leaf().aa_sequence;
-
-    const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
-        if (node.is_leaf())
-            return node.aa_sequence.at(pos);
-        else
-            return node.common_aa_.at(pos);
-    };
-
-    tree::iterate_post(tree, [aa_at, longest_sequence, &root_sequence, &parameters](Node& node) {
-        for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
-            const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
-            const auto common_aa_at = node.common_aa_.at(pos);
-            AD_DEBUG_IF(dbg, "update_aa_transitions_derek_20200907 counting {} node:{:4.3s} leaves:{:4d} common-aa:{} is_no_common:{}", pos, node.node_id, node.number_leaves_in_subtree(),
-                        common_aa_at, common_aa_at == CommonAA::NoCommon);
-            if (common_aa_at == CommonAA::NoCommon) {
-                CounterChar counter;
-                for (auto& child : node.subtree) {
-                    if (child.hidden) {
-                        // ignore hidden
-                    }
-                    else if (const auto aa = aa_at(child, pos); CommonAA::is_common(aa)) {
-                        child.aa_transitions_.add(pos, aa);
-                        counter.count(aa);
-                    }
-                    else if (const auto found = child.aa_transitions_.find(pos); found) {
-                        counter.count(found->right);
-                    }
-                }
-                AD_DEBUG_IF(dbg, "  update_aa_transitions_derek_20200907 counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
-                if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
-                    node.remove_aa_transition(pos, max_aa);
-                    node.aa_transitions_.add(pos, max_aa);
-                }
-            }
-            // else {
-            //     if (node.aa_transitions_.has(pos))
-            //         AD_WARNING("update_aa_transitions_before_20200513 (the only common) has for pos {}", pos);
-            // }
-        }
-        node.aa_transitions_.set_left(root_sequence);
-        node.aa_transitions_.remove_left_right_same(parameters);
-    });
-
-    if (!tree.aa_transitions_.empty())
-        AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
-
-} // acmacs::tal::v3::update_aa_transitions_derek_20200907
-
-// ======================================================================
 // Eu 2020-09-09
 
 void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200909");
 
-    const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
-        if (node.is_leaf())
-            return node.aa_sequence.at(pos);
-        else
-            return node.common_aa_.at(pos);
-    };
+    // const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
+    //     if (node.is_leaf())
+    //         return node.aa_sequence.at(pos);
+    //     else
+    //         return node.common_aa_.at(pos);
+    // };
 
     const auto longest_sequence = update_common_aa(tree);
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;

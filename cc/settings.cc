@@ -1186,8 +1186,6 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
             const auto method = method_v.to<std::string_view>();
             if (method.empty() || method == "eu_20200909"sv || method == "eu-20200909"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200909;
-            else if (method == "derek_20200907"sv || method == "derek-20200907"sv)
-                aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_20200907;
             else if (method == "derek_2016"sv || method == "derek-2016"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_2016;
             else if (method == "eu_20200514"sv || method == "eu-20200514"sv)
