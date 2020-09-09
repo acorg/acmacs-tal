@@ -142,6 +142,7 @@ namespace acmacs::tal::inline v3
             return !hidden && (subtree.empty() || std::any_of(std::begin(subtree), std::end(subtree), [](const auto& node) { return node.children_are_shown(); }));
         }
         void remove_aa_transition(seqdb::pos0_t pos, char right);
+        void replace_aa_transition(seqdb::pos0_t pos, char right);
         std::vector<const Node*> shown_children() const;
 
         void hide();

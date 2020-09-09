@@ -26,6 +26,15 @@ const acmacs::tal::v3::Node& acmacs::tal::v3::Node::find_first_leaf() const
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::Node::replace_aa_transition(seqdb::pos0_t pos, char right)
+{
+    remove_aa_transition(pos, right);
+    aa_transitions_.add(pos, right);
+
+} // acmacs::tal::v3::Node::replace_aa_transition
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::Node::remove_aa_transition(seqdb::pos0_t pos, char right)
 {
     auto remove = [pos,right](Node& node) -> bool {

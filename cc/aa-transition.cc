@@ -172,10 +172,8 @@ void acmacs::tal::v3::update_aa_transitions_derek_2016(Tree& tree, const draw_tr
                     }
                 }
                 AD_DEBUG_IF(dbg, "  update_aa_transitions_derek_2016 counting {} node:{:4.3s} leaves:{:4d} counter: {}", pos, node.node_id, node.number_leaves_in_subtree(), counter);
-                if (const auto [max_aa, max_count] = counter.max(); max_count > 1) {
-                    node.remove_aa_transition(pos, max_aa);
-                    node.aa_transitions_.add(pos, max_aa);
-                }
+                if (const auto [max_aa, max_count] = counter.max(); max_count > 1)
+                    node.replace_aa_transition(pos, max_aa);
             }
             // else {
             //     if (node.aa_transitions_.has(pos))
@@ -226,36 +224,37 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
 {
     AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200909");
 
-    // const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
-    //     if (node.is_leaf())
-    //         return node.aa_sequence.at(pos);
-    //     else
-    //         return node.common_aa_.at(pos);
-    // };
-
     const auto longest_sequence = update_common_aa(tree);
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
 
     tree::iterate_post(tree, [longest_sequence, &parameters](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
             const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
-            // const auto common_aa_at = node.common_aa_.at(pos, parameters.non_common_tolerance);
-            // AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} common:{} {}", pos, node.node_id, node.number_leaves_in_subtree(),
-            //             common_aa_at, node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
             if (!node.common_aa_.is_common(pos, parameters.non_common_tolerance)) {
                 AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                             node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
                 for (auto& child : node.subtree) {
                     if (!child.is_leaf()) {
-                        if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon) {
-                            child.remove_aa_transition(pos, aa);
-                            child.aa_transitions_.add(pos, aa);
-                        }
+                        if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon)
+                            child.replace_aa_transition(pos, aa);
                     }
                 }
             }
+            else {
+                if (node.number_leaves_in_subtree() > 100)
+                    AD_DEBUG_IF(dbg, "eu-20200909 common {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
+                                node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
+            }
         }
     });
+
+    // add to top children of the tree differences between them and root, even if that subtree has common aa (with tolerance)
+    for (auto& top_child : tree.subtree) {
+        for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
+            if (const auto aa = top_child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
+                top_child.replace_aa_transition(pos, aa);
+        }
+    }
 
     tree::iterate_post(tree, [&root_sequence, &parameters](Node& node) {
         node.aa_transitions_.set_left(root_sequence);
@@ -322,7 +321,7 @@ std::string acmacs::tal::v3::CommonAA::report() const
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report) const
+std::string acmacs::tal::v3::CommonAA::report(const CommonAA& /*parent*/, std::optional<seqdb::pos1_t> /*pos_to_report*/) const
 {
     throw std::runtime_error{"CommonAA::report(parent) not implemented"};
 
