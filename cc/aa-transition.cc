@@ -21,6 +21,10 @@ namespace acmacs::tal::inline v3
     // ----------------------------------------------------------------------
     // AA subst calculation derek-20200907
     static void update_aa_transitions_derek_20200907(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
+
+    // ----------------------------------------------------------------------
+    // AA subst calculation eu-20200909
+    static void update_aa_transitions_eu_20200909(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
 }
 
 // ----------------------------------------------------------------------
@@ -40,6 +44,9 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
     switch (parameters.method) {
       case draw_tree::AATransitionsParameters::method::eu_20200514:
           update_aa_transitions_eu_20200514(tree, parameters);
+          break;
+      case draw_tree::AATransitionsParameters::method::eu_20200909:
+          update_aa_transitions_eu_20200909(tree, parameters);
           break;
       case draw_tree::AATransitionsParameters::method::derek_2016:
           update_aa_transitions_derek_2016(tree, parameters);
@@ -101,8 +108,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200514(Tree& tree, const draw_t
 
 } // acmacs::tal::v3::update_aa_transitions_eu_20200514
 
-// ======================================================================
-// derek's method before 2016
+// ----------------------------------------------------------------------
 
 acmacs::seqdb::pos0_t acmacs::tal::v3::update_common_aa(Node& root)
 {
@@ -138,7 +144,8 @@ void acmacs::tal::v3::report_common_aa(const Node& root, std::optional<seqdb::po
 
 } // acmacs::tal::v3::report_common_aa
 
-// ----------------------------------------------------------------------
+// ======================================================================
+// derek's method 2016
 
 void acmacs::tal::v3::update_aa_transitions_derek_2016(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
@@ -276,6 +283,54 @@ void acmacs::tal::v3::update_aa_transitions_derek_20200907(Tree& tree, const dra
 
 } // acmacs::tal::v3::update_aa_transitions_derek_20200907
 
+// ======================================================================
+// Eu 2020-09-09
+
+void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
+{
+    AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200909");
+
+    const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
+        if (node.is_leaf())
+            return node.aa_sequence.at(pos);
+        else
+            return node.common_aa_.at(pos);
+    };
+
+    const auto longest_sequence = update_common_aa(tree);
+    const auto& root_sequence = tree.find_first_leaf().aa_sequence;
+
+    tree::iterate_post(tree, [longest_sequence, &parameters](Node& node) {
+        for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
+            const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
+            // const auto common_aa_at = node.common_aa_.at(pos, parameters.non_common_tolerance);
+            // AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} common:{} {}", pos, node.node_id, node.number_leaves_in_subtree(),
+            //             common_aa_at, node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
+            if (!node.common_aa_.is_common(pos, parameters.non_common_tolerance)) {
+                AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
+                            node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
+                for (auto& child : node.subtree) {
+                    if (!child.is_leaf()) {
+                        if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon) {
+                            child.remove_aa_transition(pos, aa);
+                            child.aa_transitions_.add(pos, aa);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    tree::iterate_post(tree, [&root_sequence, &parameters](Node& node) {
+        node.aa_transitions_.set_left(root_sequence);
+        node.aa_transitions_.remove_left_right_same(parameters);
+    });
+
+    if (!tree.aa_transitions_.empty())
+        AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
+
+} // acmacs::tal::v3::update_aa_transitions_eu_20200909
+
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::report_aa_transitions(const Node& root, const draw_tree::AATransitionsParameters& parameters)
@@ -292,31 +347,16 @@ void acmacs::tal::v3::report_aa_transitions(const Node& root, const draw_tree::A
 
 } // acmacs::tal::v3::report_aa_transitions
 
-// ----------------------------------------------------------------------
-
-void acmacs::tal::v3::CommonAA::update(seqdb::pos0_t pos, char aa)
-{
-    if (aa != Any) {
-        if (at(pos) == Any)
-            set(pos, aa);
-        else if (at(pos) != aa)
-            set_to_no_common(pos);
-    }
-
-} // acmacs::tal::v3::CommonAA::update
-
-// ----------------------------------------------------------------------
+// ======================================================================
+// CommonAA
+// ======================================================================
 
 void acmacs::tal::v3::CommonAA::update(acmacs::seqdb::sequence_aligned_ref_t seq)
 {
-    if (empty()) {
-        get().assign(*seq);
-    }
-    else {
-        if (seq.size() < size())
-            resize(seq.size());
-        for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
-            update(pos, seq.at(pos));
+    resize(*seq.size());
+    for (seqdb::pos0_t pos{0}; pos < seq.size(); ++pos) {
+        if (const auto aa = seq.at(pos); aa != Any)
+            at_pos_[*pos].count(aa);
     }
 
 } // acmacs::tal::v3::CommonAA::update
@@ -325,14 +365,13 @@ void acmacs::tal::v3::CommonAA::update(acmacs::seqdb::sequence_aligned_ref_t seq
 
 void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
 {
-    if (empty()) {
-        *this = subtree;
+    if (at_pos_.empty()) {
+        at_pos_ = subtree.at_pos_;
     }
     else {
-        if (subtree.size() < size())
-            resize(subtree.size());
-        for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
-            update(pos, subtree.at(pos));
+        resize(subtree.at_pos_.size());
+        for (size_t pos{0}; pos < at_pos_.size(); ++pos)
+            at_pos_[pos].update(subtree.at_pos_[pos]);
     }
 
 } // acmacs::tal::v3::CommonAA::update
@@ -341,12 +380,7 @@ void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
 
 std::string acmacs::tal::v3::CommonAA::report() const
 {
-    fmt::memory_buffer out;
-    for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
-        if (is_common(pos))
-            fmt::format_to(out, " {}{}", pos, at(pos));
-    }
-    return fmt::format("common:{} {}", num_common(), fmt::to_string(out));
+    throw std::runtime_error{"CommonAA::report() not implemented"};
 
 } // acmacs::tal::v3::CommonAA::report
 
@@ -354,22 +388,90 @@ std::string acmacs::tal::v3::CommonAA::report() const
 
 std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report) const
 {
-    fmt::memory_buffer out;
-    size_t num_common = 0;
-    for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
-        if (is_common(pos) && !parent.is_common(pos) && (!pos_to_report || pos_to_report == pos)) {
-            fmt::format_to(out, " {}{}", pos, at(pos));
-            ++num_common;
-        }
-    }
-    if (num_common == 0)
-        return std::string{};
-    else
-        return fmt::format("common:{} {}", num_common, fmt::to_string(out));
+    throw std::runtime_error{"CommonAA::report(parent) not implemented"};
 
 } // acmacs::tal::v3::CommonAA::report
 
-// ----------------------------------------------------------------------
+// ======================================================================
+// CommonAA
+// ======================================================================
+
+// void acmacs::tal::v3::CommonAA::update(seqdb::pos0_t pos, char aa)
+// {
+//     if (aa != Any) {
+//         if (at(pos) == Any)
+//             set(pos, aa);
+//         else if (at(pos) != aa)
+//             set_to_no_common(pos);
+//     }
+
+// } // acmacs::tal::v3::CommonAA::update
+
+// // ----------------------------------------------------------------------
+
+// void acmacs::tal::v3::CommonAA::update(acmacs::seqdb::sequence_aligned_ref_t seq)
+// {
+//     if (empty()) {
+//         get().assign(*seq);
+//     }
+//     else {
+//         if (seq.size() < size())
+//             resize(seq.size());
+//         for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
+//             update(pos, seq.at(pos));
+//     }
+
+// } // acmacs::tal::v3::CommonAA::update
+
+// // ----------------------------------------------------------------------
+
+// void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
+// {
+//     if (empty()) {
+//         *this = subtree;
+//     }
+//     else {
+//         if (subtree.size() < size())
+//             resize(subtree.size());
+//         for (seqdb::pos0_t pos{0}; pos < size(); ++pos)
+//             update(pos, subtree.at(pos));
+//     }
+
+// } // acmacs::tal::v3::CommonAA::update
+
+// // ----------------------------------------------------------------------
+
+// std::string acmacs::tal::v3::CommonAA::report() const
+// {
+//     fmt::memory_buffer out;
+//     for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
+//         if (is_common(pos))
+//             fmt::format_to(out, " {}{}", pos, at(pos));
+//     }
+//     return fmt::format("common:{} {}", num_common(), fmt::to_string(out));
+
+// } // acmacs::tal::v3::CommonAA::report
+
+// // ----------------------------------------------------------------------
+
+// std::string acmacs::tal::v3::CommonAA::report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report) const
+// {
+//     fmt::memory_buffer out;
+//     size_t num_common = 0;
+//     for (seqdb::pos0_t pos{0}; pos < size(); ++pos) {
+//         if (is_common(pos) && !parent.is_common(pos) && (!pos_to_report || pos_to_report == pos)) {
+//             fmt::format_to(out, " {}{}", pos, at(pos));
+//             ++num_common;
+//         }
+//     }
+//     if (num_common == 0)
+//         return std::string{};
+//     else
+//         return fmt::format("common:{} {}", num_common, fmt::to_string(out));
+
+// } // acmacs::tal::v3::CommonAA::report
+
+// ======================================================================
 
 void acmacs::tal::v3::AA_Transitions::remove_left_right_same(const draw_tree::AATransitionsParameters& parameters)
 {

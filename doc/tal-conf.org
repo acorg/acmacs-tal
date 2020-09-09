@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-08 19:03:12 eu>
+# Time-stamp: <2020-09-09 11:52:28 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -181,15 +181,16 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC bash
 {"N": "aa-transitions", "report": false, 
- "method": "derek-20200907", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+ "method": "eu-20200909", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
 "show-same-left-right-for-pos": 193}
 #+END_SRC
 
 
 #+BEGIN_SRC json
   {"N": "draw-aa-transitions", "report": false, "debug": false, "?debug-pos": 278,
-   "method": "derek-20200907", #  "derek-20200907", "derek-2016", "eu-20200514"
+   "method": "eu-20200909", #  "derek-20200907", "derek-2016", "eu-20200514", "eu-20200909"
    "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
+   "non_common_tolerance": 0.99, -- if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
    "text_line_interleave": 0.3,
    "show": true,
    "?only-for": [<pos>], -- draw only for the specified pos, if list is absent or empty, draw for all pos

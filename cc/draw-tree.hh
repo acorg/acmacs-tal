@@ -14,22 +14,24 @@ namespace acmacs::tal::inline v3
     {
         struct AATransitionsParameters
         {
-            enum class method { derek_2016, derek_20200907, eu_20200514 };
+            enum class method { derek_2016, derek_20200907, eu_20200514, eu_20200909 };
 
-            enum method method{method::derek_20200907};
+            enum method method { method::eu_20200909 };
             bool calculate{false};
             bool report{false};
             bool debug{false};
             std::optional<seqdb::pos1_t> report_pos;
             size_t report_number_leaves_threshold{20};
             std::optional<seqdb::pos1_t> show_same_left_right_for_pos;
+            // if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
+            double non_common_tolerance{0.99};
         };
 
         struct Parameters
         {
             AATransitionsParameters aa_transitions;
         };
-    }
+    } // namespace draw_tree
 
     // ----------------------------------------------------------------------
 
@@ -91,8 +93,7 @@ namespace acmacs::tal::inline v3
         Parameters parameters_;
     };
 
-
-}
+} // namespace acmacs::tal::inline v3
 
 // ----------------------------------------------------------------------
 /// Local Variables:

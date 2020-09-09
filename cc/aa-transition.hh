@@ -1,6 +1,7 @@
 #pragma once
 
 #include "acmacs-base/named-type.hh"
+#include "acmacs-base/counter.hh"
 #include "seqdb-3/sequence.hh"
 
 // ----------------------------------------------------------------------
@@ -17,30 +18,84 @@ namespace acmacs::tal::inline v3
 
     // ======================================================================
 
-    class CommonAA : public seqdb::sequence_aligned_t
+    class CommonAA
     {
       public:
         constexpr static const char NoCommon{'.'};
         constexpr static const char Any{'X'};
-        // CommonAA() = default;
 
-        // char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
-        constexpr static inline bool is_common(char aa) { return aa != NoCommon && aa != Any; }
-        /*constexpr*/ bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
-        // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
-        ssize_t num_common() const
+        constexpr static inline bool is_common(char aa) { return aa != NoCommon; }
+
+        char at(seqdb::pos0_t pos) const
         {
-            return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NoCommon; });
+            if (at_pos_.size() <= *pos || at_pos_[*pos].size() != 1)
+                return NoCommon;
+            else
+                return at_pos_[*pos].max().first;
         }
 
-        void update(seqdb::pos0_t pos, char aa);
+        char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance in draw-tree.hh
+        {
+            if (at_pos_.size() <= *pos)
+                return NoCommon;
+            else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance)
+                return max.first;
+            else
+                return NoCommon;
+        }
+
+        bool is_common(seqdb::pos0_t pos, double tolerance) const { return at(pos, tolerance) != NoCommon; }
+
+        constexpr const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
+
+        ssize_t num_common() const
+        {
+            return std::count_if(at_pos_.begin(), at_pos_.end(), [](const auto& counter) { return counter.size() < 2; });
+        }
+
         void update(acmacs::seqdb::sequence_aligned_ref_t seq);
         void update(const CommonAA& subtree);
-        /*constexpr*/ void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
 
         std::string report() const;
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
+
+      private:
+        using counter_t = CounterCharSome<'A', 'Z' + 1>;
+        std::vector<counter_t> at_pos_;
+
+        void resize(size_t size)
+        {
+            if (at_pos_.size() < size)
+                at_pos_.resize(size);
+        }
     };
+
+    // class CommonAA : public seqdb::sequence_aligned_t
+    // {
+    //   public:
+    //     constexpr static const char NoCommon{'.'};
+    //     constexpr static const char Any{'X'};
+    //     // CommonAA() = default;
+
+    //     // char at(seqdb::pos0_t pos) const { return *pos < size() ? get()[*pos] : NoCommon; }
+    //     constexpr static inline bool is_common(char aa) { return aa != NoCommon && aa != Any; }
+    //     /*constexpr*/ bool is_common(seqdb::pos0_t pos) const { return is_common(at(pos)); }
+    //     // bool is_no_common(seqdb::pos0_t pos) const { return at(pos) == NoCommon; }
+    //     ssize_t num_common() const
+    //     {
+    //         return std::count_if(get().begin(), get().end(), [](char aa) { return aa != NoCommon; });
+    //     }
+
+    //     void update(acmacs::seqdb::sequence_aligned_ref_t seq);
+    //     void update(const CommonAA& subtree);
+
+    //     std::string report() const;
+    //     std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
+
+    //   private:
+    //     void update(seqdb::pos0_t pos, char aa);
+    //     void set_to_no_common(seqdb::pos0_t pos) { set(pos, NoCommon); }
+    // };
 
     // ======================================================================
 
@@ -82,10 +137,19 @@ namespace acmacs::tal::inline v3
         bool empty() const { return data_.empty(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
         void add(seqdb::pos0_t pos, char left, char right) { data_.emplace_back(pos, left, right); }
-        bool remove(seqdb::pos0_t pos) { return remove_if([pos](const auto& en) { return en.pos == pos; }); }
-        bool remove(seqdb::pos0_t pos, char right) { return remove_if([pos,right](const auto& en) { return en.pos == pos && en.right == right; }); }
+        bool remove(seqdb::pos0_t pos)
+        {
+            return remove_if([pos](const auto& en) { return en.pos == pos; });
+        }
+        bool remove(seqdb::pos0_t pos, char right)
+        {
+            return remove_if([pos, right](const auto& en) { return en.pos == pos && en.right == right; });
+        }
         void remove_left_right_same(const draw_tree::AATransitionsParameters& parameters);
-        void remove_empty_right() { remove_if([](const auto& en) { return en.empty_right(); }); }
+        void remove_empty_right()
+        {
+            remove_if([](const auto& en) { return en.empty_right(); });
+        }
 
         const AA_Transition* find(seqdb::pos0_t pos) const
         {
@@ -95,7 +159,10 @@ namespace acmacs::tal::inline v3
                 return nullptr;
         }
 
-        bool has_data() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.has_data(); }); }
+        bool has_data() const
+        {
+            return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.has_data(); });
+        }
         bool has_data_for(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const
         {
             return std::any_of(std::begin(data_), std::end(data_), [&selected_pos](const auto& en) -> bool { return en.has_data() && en.pos_is_in(selected_pos); });
@@ -105,7 +172,10 @@ namespace acmacs::tal::inline v3
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
         std::string display_most_important(size_t num) const;
         bool has(seqdb::pos1_t pos) const;
-        bool has_same_left_right() const { return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); }); }
+        bool has_same_left_right() const
+        {
+            return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); });
+        }
         std::vector<std::string> names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const; // for all pos if selected_pos is empty
 
         bool contains(std::string_view label) const
@@ -133,7 +203,7 @@ namespace acmacs::tal::inline v3
     void update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters);
     void report_aa_transitions(const Node& root, const draw_tree::AATransitionsParameters& parameters);
 
-} // namespace acmacs::tal::inlinev3
+} // namespace acmacs::tal::inline v3
 
 // ----------------------------------------------------------------------
 

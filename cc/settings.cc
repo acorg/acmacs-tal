@@ -1178,12 +1178,15 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         auto& aa_transitions = draw_tree->parameters().aa_transitions;
         aa_transitions.calculate = true;
         getenv_copy_if_present("report"sv, aa_transitions.report);
-        getenv_copy_if_present("debug"sv, aa_transitions.report);
+        getenv_copy_if_present("debug"sv, aa_transitions.debug);
+        getenv_copy_if_present("non_common_tolerance"sv, aa_transitions.non_common_tolerance);
         if (const auto& debug_pos = getenv("debug-pos"sv); !debug_pos.is_null())
             aa_transitions.report_pos = debug_pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
             const auto method = method_v.to<std::string_view>();
-            if (method.empty() || method == "derek_20200907"sv || method == "derek-20200907"sv)
+            if (method.empty() || method == "eu_20200909"sv || method == "eu-20200909"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200909;
+            else if (method == "derek_20200907"sv || method == "derek-20200907"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_20200907;
             else if (method == "derek_2016"sv || method == "derek-2016"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_2016;
