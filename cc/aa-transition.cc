@@ -238,7 +238,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
         // common. See H3 and M346L labelling in the 3a clade.
         const auto number_of_children_with_the_same_common_aa =
             std::count_if(std::begin(node.subtree), std::end(node.subtree), [aa, pos, tolerance](const Node& child) { return child.common_aa_.at(pos, tolerance) == aa; });
-        return number_of_children_with_the_same_common_aa > 0 && number_of_children_with_the_same_common_aa <= 2;
+        return number_of_children_with_the_same_common_aa > 0 && number_of_children_with_the_same_common_aa <= 1 && node.subtree.size() > static_cast<size_t>(number_of_children_with_the_same_common_aa);
     };
 
     tree::iterate_post(tree, [longest_sequence, is_not_common_with_tolerance, &parameters](Node& node) {
