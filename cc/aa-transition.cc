@@ -235,15 +235,18 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
                             node.common_aa_.size() > *pos ? node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})") : std::string{});
                 for (auto& child : node.subtree) {
                     if (!child.is_leaf()) {
-                        if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon)
+                        if (const auto aa = child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon) {
                             child.replace_aa_transition(pos, aa);
+                            // AD_DEBUG("replace_aa_transition {} {} {} --> {}", child.node_id, pos, aa, child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
+                        }
                     }
                 }
             }
             else {
-                if (node.number_leaves_in_subtree() > 100)
+                if (node.number_leaves_in_subtree() > 100) {
                     AD_DEBUG_IF(dbg, "eu-20200909 common {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                                 node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
+                }
             }
         }
     });
@@ -258,6 +261,8 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
 
     tree::iterate_post(tree, [&root_sequence, &parameters](Node& node) {
         node.aa_transitions_.set_left(root_sequence);
+        if (!node.aa_transitions_.empty())
+            AD_DEBUG("set_left {} {}", node.node_id, node.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
         node.aa_transitions_.remove_left_right_same(parameters);
     });
 
