@@ -49,7 +49,7 @@ namespace acmacs::tal::inline v3
 
         bool is_common(seqdb::pos0_t pos, double tolerance) const { return at(pos, tolerance) != NoCommon; }
 
-        constexpr const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
+        const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
 
         ssize_t num_common() const
         {
@@ -111,6 +111,7 @@ namespace acmacs::tal::inline v3
         }
 
         bool empty() const { return data_.empty(); }
+        auto size() const { return data_.size(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
         void add(seqdb::pos0_t pos, char left, char right) { data_.emplace_back(pos, left, right); }
         bool remove(seqdb::pos0_t pos)
