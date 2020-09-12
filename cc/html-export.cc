@@ -155,19 +155,20 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
     };
 
     if (node.is_leaf()) {
-        fmt::format_to(text, "{prefix}{edge} \"{seq_id}\" {accession_numbers} edge: {edge_val}  cumul: {cumul_val}  v:{vert}\n", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
-                       fmt::arg("edge", std::string(static_cast<size_t>(node.edge_length.as_number() * edge_step), '-')), fmt::arg("seq_id", node.seq_id),
-                       fmt::arg("accession_numbers", format_accession_numbers(node)), fmt::arg("edge_val", node.edge_length.as_number()),
-                       fmt::arg("cumul_val", node.cumulative_edge_length.as_number()),
-                       fmt::arg("vert", node.node_id.vertical)
-                       );
+        fmt::format_to(text, "{prefix}{edge} \"{seq_id}\" {accession_numbers} edge: {edge_val}  cumul: {cumul_val}  v:{vert}\n",
+                       fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)), fmt::arg("edge", std::string(static_cast<size_t>(node.edge_length.as_number() * edge_step), '-')),
+                       fmt::arg("seq_id", node.seq_id), fmt::arg("accession_numbers", format_accession_numbers(node)), fmt::arg("edge_val", node.edge_length.as_number()),
+                       fmt::arg("cumul_val", node.cumulative_edge_length.as_number()), fmt::arg("vert", node.node_id.vertical));
     }
     else {
         const auto edge = static_cast<size_t>(node.edge_length.as_number() * edge_step);
         const auto aa_transitions = node.aa_transitions_.display();
-        fmt::format_to(text, "{prefix}{edge}\\ >>>> leaves: {leaves}{aa_transitions}\n", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
-                       fmt::arg("edge", std::string(edge, '=')), fmt::arg("leaves", node.number_leaves_in_subtree()),
+        fmt::format_to(text, "{prefix}{edge}\\ >>>> leaves: {leaves}{aa_transitions}",                        //
+                       fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),                              //
+                       fmt::arg("edge", std::string(edge, '=')),                                                                   //
+                       fmt::arg("leaves", node.number_leaves_in_subtree()),                                                        //
                        fmt::arg("aa_transitions", aa_transitions.empty() ? std::string{} : fmt::format("  [{}]", aa_transitions)));
+        fmt::format_to(text, " node_id: {}\n", node.node_id);
         if (!prefix.empty()) {
             if (prefix.back().back() == '\\')
                 prefix.back().back() = ' ';
