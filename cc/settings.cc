@@ -1180,7 +1180,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         getenv_copy_if_present("report"sv, aa_transitions.report);
         getenv_copy_if_present("debug"sv, aa_transitions.debug);
         getenv_copy_if_present("non_common_tolerance"sv, aa_transitions.non_common_tolerance);
-        if (const auto& debug_pos = getenv("debug-pos"sv); !debug_pos.is_null())
+        if (const auto& debug_pos = getenv("debug-pos"sv); debug_pos.is_number())
             aa_transitions.report_pos = debug_pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
             const auto method = method_v.to<std::string_view>();

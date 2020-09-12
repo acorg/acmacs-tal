@@ -36,7 +36,7 @@ void acmacs::tal::v3::DashBarBase::draw_label(acmacs::surface::Surface& surface,
             pos_x = viewport.right() + label_param.offset[0];
             break;
     }
-    AD_DEBUG("draw_label \"{}\" {} {} {}", text, PointCoordinates{pos_x, pos_y}, color, label_size);
+    // AD_DEBUG("draw_label \"{}\" {} {} {}", text, PointCoordinates{pos_x, pos_y}, color, label_size);
     surface.text({pos_x, pos_y}, text, color, label_size, label_param.text_style, label_param.rotation);
 
 } // acmacs::tal::v3::DashBar::draw_label
