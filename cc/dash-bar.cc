@@ -163,7 +163,7 @@ void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
     const auto dash_line_width = parameters().dash.line_width;
     const auto dash_pos_x = viewport.left() + viewport.size.width * (1.0 - dash_width) * 0.5;
 
-    acmacs::CounterCharSome<'A', 'Z'> counter_aa;
+    acmacs::CounterCharSome<' ', '`'> counter_aa;
     tree::iterate_leaf(tal().tree(), [&counter_aa, pos = parameters().pos](const Node& leaf) {
         if (!leaf.hidden)
             counter_aa.count(leaf.aa_sequence.at(pos));

@@ -952,7 +952,7 @@ void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
 
 void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance) const
 {
-    using CounterAA = acmacs::CounterCharSome<'A', 'Z'>;
+    using CounterAA = acmacs::CounterCharSome<' ', '`'>;
     std::vector<CounterAA> counter_aa_at_pos;
 
     tree::iterate_leaf(*this, [&counter_aa_at_pos](const Node& node) {

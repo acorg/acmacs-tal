@@ -63,7 +63,7 @@ namespace acmacs::tal::inline v3
         std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
 
       private:
-        using counter_t = CounterCharSome<'A', 'Z' + 1>;
+        using counter_t = CounterCharSome<' ', '`'>;
         std::vector<counter_t> at_pos_;
 
         void resize(size_t size)
