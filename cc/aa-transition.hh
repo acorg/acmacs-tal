@@ -136,6 +136,14 @@ namespace acmacs::tal::inline v3
                 return nullptr;
         }
 
+        AA_Transition* find(seqdb::pos0_t pos)
+        {
+            if (const auto found = std::find_if(std::begin(data_), std::end(data_), [pos](const auto& en) { return en.pos == pos; }); found != std::end(data_))
+                return &*found;
+            else
+                return nullptr;
+        }
+
         bool has_data() const
         {
             return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.has_data(); });

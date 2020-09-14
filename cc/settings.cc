@@ -1184,8 +1184,12 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
             aa_transitions.report_pos = debug_pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
             const auto method = method_v.to<std::string_view>();
-            if (method.empty() || method == "eu_20200909"sv || method == "eu-20200909"sv)
+            if (method.empty())
+                ; // default is in draw-tree.hh
+            if (method == "eu_20200909"sv || method == "eu-20200909"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200909;
+            else if (method == "eu_20200915"sv || method == "eu-20200915"sv)
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200915;
             else if (method == "derek_2016"sv || method == "derek-2016"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_2016;
             else if (method == "eu_20200514"sv || method == "eu-20200514"sv)
