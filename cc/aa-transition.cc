@@ -357,11 +357,14 @@ void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t l
 
 void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
+    const auto leaves_ratio_threshold = 0.005;
+
     AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200915");
 
     const auto longest_sequence = update_common_aa(tree);
     set_aa_transitions_eu_20200915(tree, longest_sequence, parameters);
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
+    // const auto total_leaves = tree.number_leaves_in_subtree();
 
     for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
 
@@ -376,7 +379,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
             const AA_Transitions& transitions;
             size_t flips{0};
             size_t leaves{0};
-            size_t min_flip_distance{999999};
+            acmacs::Counter<ssize_t> flip_distances;
 
             flips_leaves_t(const AA_Transitions& tr) : transitions{tr} {}
 
@@ -384,37 +387,51 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
             {
                 ++flips;
                 leaves += number_of_leaves;
-                min_flip_distance = std::min(min_flip_distance, static_cast<size_t>(distance));
+                flip_distances.count(distance);
             }
         };
 
-        std::vector<flips_leaves_t> transitions_stack;
-        tree::iterate_pre_post(
-            tree,
-            // pre
-            [&root_sequence, &transitions_stack, pos, &parameters](Node& node) {
-                if (AA_Transition* this_transition = node.aa_transitions_.find(pos); this_transition) {
-                    const auto prev = std::find_if(transitions_stack.rbegin(), transitions_stack.rend(), [pos](const auto& en) { return en.transitions.find(pos) != nullptr; });
-                    if (prev != transitions_stack.rend()) {
-                        const auto& prev_trans = *prev->transitions.find(pos);
-                        this_transition->left = prev_trans.right;
-                        if (this_transition->right == prev_trans.left) {
-                            prev->add(node.number_leaves_in_subtree(), prev - transitions_stack.rbegin());
+        for (bool repeat{true}; repeat;) {
+            repeat = false;
+            std::vector<flips_leaves_t> transitions_stack;
+            tree::iterate_pre_post(
+                tree,
+                // pre
+                [&root_sequence, &transitions_stack, pos, &parameters](Node& node) {
+                    if (AA_Transition* this_transition = node.aa_transitions_.find(pos); this_transition) {
+                        const auto prev = std::find_if(transitions_stack.rbegin(), transitions_stack.rend(), [pos](const auto& en) { return en.transitions.find(pos) != nullptr; });
+                        if (prev != transitions_stack.rend()) {
+                            const auto& prev_trans = *prev->transitions.find(pos);
+                            this_transition->left = prev_trans.right;
+                            if (this_transition->right == prev_trans.left) {
+                                prev->add(node.number_leaves_in_subtree(), prev - transitions_stack.rbegin());
+                            }
+                        }
+                        else
+                            this_transition->left = root_sequence.at(pos);
+                        if (this_transition->left != this_transition->right)
+                            AD_DEBUG("transition {:3d} {:5.3} {}", pos, node.node_id, *this_transition);
+                    }
+                    node.aa_transitions_.remove_left_right_same(parameters);
+                    transitions_stack.emplace_back(node.aa_transitions_);
+                },
+                // post
+                [&transitions_stack, &repeat, pos, leaves_ratio_threshold](Node& node) {
+                    if (const auto& fl = transitions_stack.back(); fl.flips) {
+                        const auto& min_flip_distance = fl.flip_distances.min_value();
+                        const auto node_leaves = node.number_leaves_in_subtree();
+                        const auto leaves_ratio = static_cast<double>(fl.leaves) / static_cast<double>(node_leaves);
+                        AD_DEBUG("flips_in_children {:3d} {:5.3} leaves:{:5d} children:{:3d}    flips:{:3d}  leaves:{:5d} ({:4.1f}%)  min_flip_distance:{} num:{}", pos, node.node_id, node_leaves,
+                                 node.subtree.size(), fl.flips, fl.leaves, leaves_ratio * 100.0, min_flip_distance.first, min_flip_distance.second);
+                        if (min_flip_distance.first < 3 && leaves_ratio > leaves_ratio_threshold) {
+                            AD_DEBUG("   remove");
+                            node.aa_transitions_.remove(pos);
+                            repeat = true;
                         }
                     }
-                    else
-                        this_transition->left = root_sequence.at(pos);
-                }
-                node.aa_transitions_.remove_left_right_same(parameters);
-                transitions_stack.emplace_back(node.aa_transitions_);
-            },
-            // post
-            [&transitions_stack, pos](const Node& node) {
-                if (const auto& fl = transitions_stack.back(); fl.flips)
-                    AD_DEBUG("flips_in_children {:4.3} leaves:{:5d} pos:{:3d}  flips:{:3d}  leaves:{:5d}   min_flip_distance:{:2d}", node.node_id, node.number_leaves_in_subtree(), pos, fl.flips,
-                             fl.leaves, fl.min_flip_distance);
-                transitions_stack.pop_back();
-            });
+                    transitions_stack.pop_back();
+                });
+        }
     }
 
     if (!tree.aa_transitions_.empty())
