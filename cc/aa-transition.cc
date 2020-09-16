@@ -397,22 +397,21 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
             tree::iterate_pre_post(
                 tree,
                 // pre
-                [&root_sequence, &transitions_stack, pos, &parameters](Node& node) {
+                [&root_sequence, &transitions_stack, pos](Node& node) {
                     if (AA_Transition* this_transition = node.aa_transitions_.find(pos); this_transition) {
                         const auto prev = std::find_if(transitions_stack.rbegin(), transitions_stack.rend(), [pos](const auto& en) { return en.transitions.find(pos) != nullptr; });
                         if (prev != transitions_stack.rend()) {
                             const auto& prev_trans = *prev->transitions.find(pos);
                             this_transition->left = prev_trans.right;
-                            if (this_transition->right == prev_trans.left) {
+                            if (this_transition->left != this_transition->right && this_transition->right == prev_trans.left) {
                                 prev->add(node.number_leaves_in_subtree(), prev - transitions_stack.rbegin());
                             }
                         }
                         else
                             this_transition->left = root_sequence.at(pos);
-                        if (this_transition->left != this_transition->right)
-                            AD_DEBUG("transition {:3d} {:5.3} {}", pos, node.node_id, *this_transition);
+                        // if (this_transition->left != this_transition->right)
+                        //     AD_DEBUG("transition {:3d} {:5.3} {}", pos, node.node_id, *this_transition);
                     }
-                    node.aa_transitions_.remove_left_right_same(parameters);
                     transitions_stack.emplace_back(node.aa_transitions_);
                 },
                 // post
@@ -433,6 +432,8 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
                 });
         }
     }
+
+    tree::iterate_pre(tree, [&parameters](Node& node) { node.aa_transitions_.remove_left_right_same(parameters); });
 
     if (!tree.aa_transitions_.empty())
         AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
