@@ -1204,6 +1204,21 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 
     getenv_copy_if_present("show"sv, param.show);
     getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
+    getenv("minimum_number_leaves_in_subtree_per_pos"sv).visit([this, &param]<typename Arg>(const Arg& arg) {
+        if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
+            for (const auto& [key, val] : arg) {
+                if (const auto pos = acmacs::string::from_chars<size_t>(key); pos < 5000) {
+                    if (param.minimum_number_leaves_in_subtree_per_pos.size() < pos)
+                        param.minimum_number_leaves_in_subtree_per_pos.resize(pos, -1.0);
+                    param.minimum_number_leaves_in_subtree_per_pos[pos - 1] = val.template to<double>();
+                }
+                else
+                    throw error{fmt::format("\"minimum_number_leaves_in_subtree_per_pos\" invalid: {}", getenv("minimum_number_leaves_in_subtree_per_pos"sv))};
+            }
+        }
+        else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+            throw error{fmt::format("\"minimum_number_leaves_in_subtree_per_pos\" must be an object: {}", getenv("minimum_number_leaves_in_subtree_per_pos"sv))};
+    });
     getenv_copy_if_present("text_line_interleave"sv, param.text_line_interleave);
 
     getenv("only-for"sv).visit([&param, this]<typename Val>(const Val& value) { // draw only for the specified pos, if list is absent or empty, draw for all pos

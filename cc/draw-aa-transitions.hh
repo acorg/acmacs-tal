@@ -47,7 +47,8 @@ namespace acmacs::tal::inline v3
         struct Parameters
         {
             bool show{true};
-            double minimum_number_leaves_in_subtree{0.01}; // if < 1 - relative to total, if > 1 - absolute value
+            double minimum_number_leaves_in_subtree{0.0067}; // if < 1 - relative to total, if > 1 - absolute value
+            std::vector<double> minimum_number_leaves_in_subtree_per_pos; // negative value means use minimum_number_leaves_in_subtree
             double text_line_interleave{0.3}; // fraction of the text height
             std::vector<acmacs::seqdb::pos1_t> only_for_pos;
             TransitionParameters all_nodes;

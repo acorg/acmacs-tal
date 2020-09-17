@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-14 18:40:19 eu>
+# Time-stamp: <2020-09-17 17:14:13 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -190,6 +190,7 @@ If multiple criteria specified within single "select" object, they all used (con
   {"N": "draw-aa-transitions", "report": false, "debug": false, "?debug-pos": 278,
    "method": "eu-20200909", #  "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"
    "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
+   "minimum_number_leaves_in_subtree_per_pos": {"94": 0.0037}, -- default and per pos
    "non_common_tolerance": 0.95, -- if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
    "text_line_interleave": 0.3,
    "show": true,

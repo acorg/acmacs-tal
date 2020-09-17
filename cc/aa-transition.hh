@@ -153,6 +153,13 @@ namespace acmacs::tal::inline v3
             return std::any_of(std::begin(data_), std::end(data_), [&selected_pos](const auto& en) -> bool { return en.has_data() && en.pos_is_in(selected_pos); });
         }
 
+        std::vector<seqdb::pos0_t> all_pos0() const
+        {
+            std::vector<seqdb::pos0_t> all_pos(data_.size(), seqdb::pos0_t{99999});
+            std::transform(std::begin(data_), std::end(data_), std::begin(all_pos), [](const auto& trans) { return trans.pos; });
+            return all_pos;
+        }
+
         enum class show_empty_left { no, yes };
         std::string display(std::optional<seqdb::pos1_t> pos1 = std::nullopt, show_empty_left sel = show_empty_left::no) const;
         std::string display_most_important(size_t num) const;

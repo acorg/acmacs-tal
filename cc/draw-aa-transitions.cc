@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "acmacs-base/enumerate.hh"
 #include "acmacs-tal/draw-aa-transitions.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -19,10 +21,21 @@ void acmacs::tal::v3::DrawAATransitions::prepare(preparation_stage_t stage)
         };
 
         const auto total_leaves = static_cast<double>(tal().tree().number_leaves_in_subtree());
-        const auto minimum_number_leaves_in_subtree = static_cast<size_t>(parameters().minimum_number_leaves_in_subtree < 1 ? total_leaves * parameters().minimum_number_leaves_in_subtree : parameters().minimum_number_leaves_in_subtree);
+        const auto minimum_number_leaves = [total_leaves](double value) -> size_t {
+            return static_cast<size_t>(value < 1 ? total_leaves * value : value);
+        };
+        const auto minimum_number_leaves_in_subtree = [this, minimum_number_leaves](const std::vector<seqdb::pos0_t>& poss) -> size_t {
+            auto min_leaves = minimum_number_leaves(parameters().minimum_number_leaves_in_subtree);
+            for (const auto pos0 : poss) {
+                if (parameters().minimum_number_leaves_in_subtree_per_pos.size() > *pos0 && parameters().minimum_number_leaves_in_subtree_per_pos[*pos0] >= 0)
+                    min_leaves = std::min(min_leaves, minimum_number_leaves(parameters().minimum_number_leaves_in_subtree_per_pos[*pos0]));
+            }
+            return min_leaves;
+        };
+        // const auto minimum_number_leaves_in_subtree = static_cast<size_t>(parameters().minimum_number_leaves_in_subtree < 1 ? total_leaves * parameters().minimum_number_leaves_in_subtree : parameters().minimum_number_leaves_in_subtree);
         const auto& tree = tal().tree();
         tree::iterate_pre(tree, [this, &tree, aa_transitions_valid, minimum_number_leaves_in_subtree](const Node& node) {
-            if (!node.hidden && &node != &tree && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree && aa_transitions_valid(node.aa_transitions_)) { // &node != &tree to avoid showing root aa transion found due to presense of multiple root sequences
+            if (!node.hidden && &node != &tree && aa_transitions_valid(node.aa_transitions_) && node.number_leaves_in_subtree() >= minimum_number_leaves_in_subtree(node.aa_transitions_.all_pos0())) { // &node != &tree to avoid showing root aa transion found due to presense of multiple root sequences
                 const auto node_id = fmt::format("{}", node.node_id);
                 // AD_DEBUG("{:5.3} show:{} aa:\"{}\" label:\"{}\" ", node.node_id, parameters_for_node(node_id).show, node.aa_transitions_, parameters_for_node(node_id).label.text);
                 transitions_.emplace_back(&node, parameters_for_node(node_id).show, parameters_for_node(node_id).label);
