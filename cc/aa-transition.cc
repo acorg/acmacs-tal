@@ -1,4 +1,5 @@
 #include "acmacs-base/string-join.hh"
+#include "acmacs-base/string-split.hh"
 #include "acmacs-tal/aa-transition.hh"
 #include "acmacs-tal/draw-tree.hh"
 #include "acmacs-tal/tree-iterate.hh"
@@ -749,12 +750,19 @@ bool acmacs::tal::v3::AA_Transitions::has(seqdb::pos1_t pos) const
 
 // ----------------------------------------------------------------------
 
-std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const
+std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos, std::string_view overwrite) const
 {
     std::vector<std::string> result;
-    for (const auto& en : data_) {
-        if (!en.empty_left() && (selected_pos.empty() || en.pos_is_in(selected_pos)))
-            result.push_back(en.display());
+    if (overwrite.empty()) {
+        for (const auto& en : data_) {
+            if (!en.empty_left() && (selected_pos.empty() || en.pos_is_in(selected_pos)))
+                result.push_back(en.display());
+        }
+    }
+    else {
+        const auto res = acmacs::string::split(overwrite, " ", acmacs::string::Split::StripRemoveEmpty);
+        result.resize(res.size());
+        std::transform(std::begin(res), std::end(res), std::begin(result), [](std::string_view src) { return std::string{src}; });
     }
     return result;
 

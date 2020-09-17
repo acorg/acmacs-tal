@@ -161,7 +161,7 @@ namespace acmacs::tal::inline v3
         {
             return std::any_of(std::begin(data_), std::end(data_), [](const auto& en) -> bool { return en.left_right_same(); });
         }
-        std::vector<std::string> names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos) const; // for all pos if selected_pos is empty
+        std::vector<std::string> names(const std::vector<acmacs::seqdb::pos1_t>& selected_pos, std::string_view overwrite) const; // for all pos if selected_pos is empty
 
         bool contains(std::string_view label) const
         {
