@@ -188,7 +188,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         return true;
     }
     catch (std::exception& err) {
-        throw error{fmt::format("cannot apply \"{}\": {}", name, err)};
+        throw error{fmt::format("cannot apply built in \"{}\": {}", name, err)};
     }
 
 } // acmacs::tal::v3::Settings::apply_built_in
