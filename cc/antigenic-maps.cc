@@ -174,6 +174,7 @@ std::string acmacs::tal::v3::MapTitle::update_line_before_drawing(std::string_vi
         chart_draw.chart(0).chart_metadata(store);
         const auto& section = antigenic_maps_.current_section();
         // AD_DEBUG("hz section {} {}", section.id, section.aa_transitions);
+        // AD_DEBUG("section line \"{}\"", line);
         store.push_back(fmt::arg("section_prefix", section.prefix));
         store.push_back(fmt::arg("section_label", section.label));
         store.push_back(fmt::arg("section_aa_transitions", section.aa_transitions_format()));
