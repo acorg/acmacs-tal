@@ -343,6 +343,11 @@ void acmacs::tal::v3::Tree::select_all(NodeSet& nodes, Select update)
     select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return node.is_leaf() && !node.hidden; });
 }
 
+void acmacs::tal::v3::Tree::select_all_and_intermediate(NodeSet& nodes, Select update)
+{
+    select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return !node.hidden; });
+}
+
 void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end)
 {
     select_update(nodes, update, Descent::yes, *this, [start,end](const Node& node) { return node.is_leaf() && !node.hidden && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });

@@ -381,6 +381,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
         if (key == "all"sv) {
             tree().select_all(selected, update);
         }
+        else if (key == "all-and-intermediate"sv) {
+            tree().select_all_and_intermediate(selected, update);
+        }
         else if (key == "aa"sv) {
             std::visit(
                 [this, &selected, &update]<typename Res>(const Res& res) {

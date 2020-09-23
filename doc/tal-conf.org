@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-17 17:14:13 eu>
+# Time-stamp: <2020-09-23 10:01:37 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -56,7 +56,8 @@ object.
 
 If multiple criteria specified within single "select" object, they all used (conjunction)
 
-{"all": true}
+{"all": true} -- all leaf nodes
+{"all-and-intermediate": true} -- all nodes overall
 {"aa": ["192Q", "!123E"]}
 {"cumulative >=": 0.01, "report": true}
 {"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >= 
@@ -106,6 +107,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-color": "black"}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-color": "red"}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-width": 2.0}} -- relative to the inferred line width for all edge lines
+{"N": "nodes", "select": {"all-and-intermediate": true}, "apply": {"tree-edge-line-width": 45}} -- information meeting
 
 *** Time series dash
 

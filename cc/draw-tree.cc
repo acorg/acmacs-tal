@@ -86,7 +86,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
 
                     surface.line({horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.front()->cumulative_vertical_offset_ - vertical_additon},
                                  {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.back()->cumulative_vertical_offset_ + vertical_additon}, BLACK,
-                                 line_width);
+                                 line_width * node.edge_line_width_scale);
 
                     surface.text(
                         {horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *node_id_text_size, vertical_step() * node.cumulative_vertical_offset_ - *line_width},

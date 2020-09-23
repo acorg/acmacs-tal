@@ -231,6 +231,7 @@ namespace acmacs::tal::inline v3
         EdgeLength max_cumulative_shown() const;
 
         void select_all(NodeSet& nodes, Select update);
+        void select_all_and_intermediate(NodeSet& nodes, Select update);
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_country(NodeSet& nodes, Select update, std::string_view country);
