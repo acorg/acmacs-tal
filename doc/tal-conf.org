@@ -1,4 +1,4 @@
-# Time-stamp: <2020-09-23 10:01:37 eu>
+# Time-stamp: <2020-09-23 10:12:46 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -374,7 +374,7 @@ is enough, other will be auto-added to place labels below the first one.
 Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (hi or neut) {chart-lab} {chart-rbc} {chart-date}
 
 #+BEGIN_SRC json
-  {"N": "title", "text": "<text with substituions>", "offset": [0, -0.005], "color": "black", "size": 0.015} -- size relative to image height
+  {"N": "title", "text": "<text with substituions>", "offset": [0, -0.005], "color": "black", "size": 0.015, "show": true} -- size relative to image height
 #+END_SRC
 
 *** Legend

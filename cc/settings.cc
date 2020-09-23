@@ -1083,6 +1083,7 @@ void acmacs::tal::v3::Settings::add_title()
     auto& element = add_element<Title>();
     auto& param = element.parameters();
 
+    rjson::v3::copy_if_not_null(getenv("show"sv), param.show);
     param.text = getenv_to_string("text"sv, toplevel_only::no, if_no_substitution_found::leave_as_is);
     extract_coordinates(getenv("offset"sv), param.offset);
     rjson::v3::copy_if_not_null(getenv("color"sv), param.color);

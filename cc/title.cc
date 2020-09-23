@@ -7,9 +7,11 @@
 void acmacs::tal::v3::Title::prepare(preparation_stage_t stage)
 {
     if (stage == 2 && prepared_ < stage) {
-        // AD_DEBUG("Title::prepare \"{}\"", parameters().text);
-        parameters().text = tal().settings().substitute_to_string(parameters().text);
-        // AD_DEBUG("     --> \"{}\"", parameters().text);
+        if (parameters().show) {
+            // AD_DEBUG("Title::prepare \"{}\"", parameters().text);
+            parameters().text = tal().settings().substitute_to_string(parameters().text);
+            // AD_DEBUG("     --> \"{}\"", parameters().text);
+        }
     }
     LayoutElement::prepare(stage);
 
@@ -19,8 +21,10 @@ void acmacs::tal::v3::Title::prepare(preparation_stage_t stage)
 
 void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface) const
 {
-    const TextStyle text_style{};
-    surface.text(parameters().offset, parameters().text, parameters().color, parameters().size, text_style, NoRotation);
+    if (parameters().show) {
+        const TextStyle text_style{};
+        surface.text(parameters().offset, parameters().text, parameters().color, parameters().size, text_style, NoRotation);
+    }
 
 } // acmacs::tal::v3::Title::draw
 

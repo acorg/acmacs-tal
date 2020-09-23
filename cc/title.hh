@@ -23,6 +23,7 @@ namespace acmacs::tal::inline v3
         struct Parameters : parameters::Text
         {
             Parameters() : parameters::Text{{}, PointCoordinates{0.0, -0.005}, std::nullopt, BLACK, Scaled{0.015}} {}
+            bool show{true};
         };
 
         constexpr Parameters& parameters() { return parameters_; }
