@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "acmacs-base/settings.hh"
+#include "acmacs-base/settings-v2.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/clades.hh"
 
@@ -17,7 +17,7 @@ namespace acmacs::tal::inline v3
         struct WorldMapDot;
     };
 
-    class Settings : public acmacs::settings::Settings
+    class Settings : public acmacs::settings::v2::Settings
     {
       public:
         Settings(Tal& tal) : tal_{tal} { tal_.settings_ = this; update_env(); }

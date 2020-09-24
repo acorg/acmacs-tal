@@ -184,7 +184,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "tree"sv)
             add_tree();
         else
-            return acmacs::settings::Settings::apply_built_in(name);
+            return acmacs::settings::v2::Settings::apply_built_in(name);
         return true;
     }
     catch (std::exception& err) {
@@ -307,7 +307,7 @@ void acmacs::tal::v3::Settings::ladderize()
     else if (method == "max-edge-length"sv)
         tree().ladderize(Tree::Ladderize::MaxEdgeLength);
     else
-        throw acmacs::settings::error{fmt::format("unsupported ladderize method: {}", method)};
+        throw acmacs::settings::v2::error{fmt::format("unsupported ladderize method: {}", method)};
 
 } // acmacs::tal::v3::Settings::ladderize
 
@@ -414,13 +414,13 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
         }
         else if (key == "matches-chart-antigen"sv) {
             if (!tal_.chart_present())
-                throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
+                throw acmacs::settings::v2::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             tree().select_matches_chart_antigens(selected, update);
         }
         else if (key == "matches-chart-serum"sv) {
             if (!tal_.chart_present())
-                throw acmacs::settings::error{"cannot select node that matches chart antigen: no chart given"};
+                throw acmacs::settings::v2::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
             if (const auto match_type = substitute_to_value(val).to<std::string_view>(); match_type == "reassortant"sv)
@@ -444,7 +444,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             select_vaccine(selected, update, substitute_to_value(val));
         }
         else
-            throw acmacs::settings::error{fmt::format("unrecognized select node criterium: {}", key)};
+            throw acmacs::settings::v2::error{fmt::format("unrecognized select node criterium: {}", key)};
         if (key != "report"sv)
             update = Tree::Select::update;
     }
