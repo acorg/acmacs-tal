@@ -3,6 +3,7 @@
 #include "acmacs-map-draw/draw.hh"
 #include "acmacs-map-draw/mapi-settings.hh"
 #include "acmacs-tal/layout.hh"
+#include "acmacs-tal/error.hh"
 
 // ----------------------------------------------------------------------
 
@@ -39,15 +40,6 @@ namespace acmacs::tal::inline v3
 
     class MapTitle : public map_elements::v1::Title
     {
-      public:
-        MapTitle(AntigenicMaps& antigenic_maps) : map_elements::v1::Title(), antigenic_maps_{antigenic_maps} {}
-
-     protected:
-        std::string update_line_before_drawing(std::string_view line, const ChartDraw& aChartDraw) const override;
-
-      private:
-        AntigenicMaps& antigenic_maps_;
-
     }; // class MapTitle
 
     // ----------------------------------------------------------------------
@@ -73,23 +65,33 @@ namespace acmacs::tal::inline v3
 
         constexpr auto& maps_settings() { return maps_settings_; }
 
+        const HzSection& section(std::optional<size_t> section_no = std::nullopt) const;
         acmacs::chart::PointIndexList chart_antigens_in_tree() const;
         acmacs::chart::PointIndexList chart_antigens_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
-        acmacs::chart::PointIndexList chart_sera_in_section(std::optional<size_t> section_no) const; // current_section_no_ if nullopt
+        acmacs::chart::PointIndexList chart_sera_in_section(std::optional<size_t> section_no) const;     // current_section_no_ if nullopt
         void antigen_fill_time_series_color_scale(const acmacs::chart::PointIndexList& indexes);
 
-        const HzSection& current_section() const;
         void remove_serum_circles();
 
       private:
+        struct CurrentSection
+        {
+            size_t no{static_cast<size_t>(-1)};
+            const HzSection* section{nullptr};
+
+            constexpr void set(size_t s_no, const HzSection& sect) { no = s_no; section = &sect; }
+            void reset() { *this = CurrentSection{}; }
+            void validate() const { if (!section) throw error{"tal::AntigenicMaps: no current section"}; }
+        };
+
         Parameters parameters_;
         size_t columns_{0}, rows_{0};
         ChartDraw chart_draw_;
         mutable MapsSettings maps_settings_;
-        mutable std::optional<size_t> current_section_no_; // during drawing
+        mutable CurrentSection current_section_;
 
         void columns_rows();
-        void draw_map(acmacs::surface::Surface& surface, size_t section_no) const;
+        void draw_map(acmacs::surface::Surface& surface, const HzSection& section) const;
 
     }; // class AntigenicMaps
 

@@ -1,5 +1,4 @@
-{   "_": "-*- js-indent-level: 4 -*-",
-
+{
     "init": [
         {"N": "set",
          "canvas-height": 1000,
@@ -27,7 +26,7 @@
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
     "tal": [
-        {"N": "canvas", "height": "{canvas-height}"},
+        {"N": "canvas", "height": "$canvas-height"},
         {"? N": "nodes", "select": {"top-cumulative-gap": 2.0, "report": true}, "apply": {"?hide": true, "tree-edge-line-color": "red"}}
     ],
 
@@ -40,16 +39,16 @@
     "? for specific antigenic map": "",
     "antigenic-map": [
         "antigenic-map-reset",
-        {"N": "title", "remove-lines": true, "lines": ["{section_prefix}. {section_label} {section_aa_transitions}"]},
+        {"N": "title", "remove-lines": true, "lines": ["{section-prefix}. {section-label} {section-aa-transitions}"]},
         {"N": "antigens", "select": {"in-section": true, "report": true}, "fill": {"time-series-color-scale": true}, "outline": "black", "size": 5, "order": "raise"},
         {"?N": "sera", "select": {"in-section": true, "report": true}, "fill": "red", "outline": "black", "size": 15, "order": "raise"}
     ],
 
     "antigenic-map-reset": [
-        {"N": "border", "color": "black", "line_width": "{antigenic-map-border-width}"},
-        {"N": "antigens", "select": "test",      "size": "{test-antigen-size}",      "order": "lower"},
-        {"N": "antigens", "select": "reference", "size": "{reference-antigen-size}", "order": "lower"},
-        {"N": "sera",     "select": "all",       "size": "{serum-size}",             "order": "lower"},
+        {"N": "border", "color": "black", "line_width": "$antigenic-map-border-width"},
+        {"N": "antigens", "select": "test",      "size": "$test-antigen-size",      "order": "lower"},
+        {"N": "antigens", "select": "reference", "size": "$reference-antigen-size", "order": "lower"},
+        {"N": "sera",     "select": "all",       "size": "$serum-size",             "order": "lower"},
         {"N": "/all-color", "color": "grey88"},
         "/no-labels",
         {"N": "antigens", "select": {"in-tree": true, "report": false}, "fill": "gray63", "outline": "white", "outline_width": 0.5, "?order": "raise"},
@@ -72,7 +71,7 @@
     ],
 
     "layout": [
-        {"N": "if", "condition": "{chart-present}",
+        {"N": "if", "condition": "$chart-present",
          "then": [{"N": "layout-with-maps"}],
          "else": [{"N": "layout-tree-only"}]
         },
@@ -85,7 +84,7 @@
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
         "tal-dash-bar-clades",
-        {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}, "report": "{report-time-series-output}"},
+        {"N": "time-series", "color_by": "continent", "color-scale": {"show": false}, "report": "$report-time-series-output"},
         {"N": "clades"},
         {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015}
     ],
@@ -96,17 +95,17 @@
         {"N": "draw-on-tree"},
         "tal-dash-bar-clades",
         {"N": "clades"},
-        {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "{report-time-series-output}"},
+        {"N": "time-series", "color_by": "continent", "color-scale": {"show": true}, "report": "$report-time-series-output"},
         {"N": "gap", "width-to-height-ratio": 0.005, "?debug-outline": "red"},
         {"N": "dash-bar", "nodes": [{"select": {"matches-chart-antigen": true}, "color": "#808080"}]},
-        {"N": "hz-section-marker", "width-to-height-ratio": 0.005, "label-size": "{hz-section-marker-label-size}", "line": {"color": "black", "line_width": "{hz-section-marker-line-width}"}},
-        {"N": "gap", "pixels": "{gap-between-antigenic-maps}", "width-to-height-ratio": 0.0, "?debug-outline": "red"},
-        {"N": "antigenic-maps", "gap-between-maps": "{gap-between-antigenic-maps}"},
+        {"N": "hz-section-marker", "width-to-height-ratio": 0.005, "label-size": "$hz-section-marker-label-size", "line": {"color": "black", "line_width": "$hz-section-marker-line-width"}},
+        {"N": "gap", "pixels": "$gap-between-antigenic-maps", "width-to-height-ratio": 0.0, "?debug-outline": "red"},
+        {"N": "antigenic-maps", "gap-between-maps": "$gap-between-antigenic-maps"},
         {"N": "title", "text": "{virus-type/lineage} {chart-assay} {chart-lab}", "color": "black", "size": 0.015}
     ],
 
     "tal-modifications": [
-        {"N": "if", "condition": "{tree-draw-aa-transitions}", "then": [
+        {"N": "if", "condition": "$tree-draw-aa-transitions", "then": [
             {"N": "draw-aa-transitions",
              "minimum_number_leaves_in_subtree": 0.01,
              "text_line_interleave": 0.3,
@@ -114,34 +113,34 @@
             }
         ]},
 
-        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "{virus-type}"}]}, "then": [
             {"?N": "mark vaccine"},
             {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
         ]},
 
-        {"N": "if", "condition": {"and": ["{whocc}", {"not-empty": "{virus-type}"}]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "{virus-type}"}]}, "then": [
             "clades-whocc"
         ]},
 
-        {"N": "if", "condition": "{report-aa-at-pos-counter}", "then": [{"N": "aa-at-pos-counter-report", "tolerance": 0.01}]},
+        {"N": "if", "condition": "$report-aa-at-pos-counter", "then": [{"N": "aa-at-pos-counter-report", "tolerance": 0.01}]},
 
         "tal"
     ],
 
     "tal-pre": [
-        {"N": "if", "condition": {"and": ["{whocc}", {"not": "{tree-has-sequences}"}]}, "then": [
-            {"N": "seqdb", "filename": "{seqdb-filename}"},
+        {"N": "if", "condition": {"and": ["$whocc", {"not": "$tree-has-sequences"}]}, "then": [
+            {"N": "seqdb", "filename": "$seqdb-filename"},
             {"N": "populate-with-nuc-duplicates"}
         ]},
-        {"N": "report-cumulative", "output": "{report-cumulative-output}", "max": "{report-cumulative-max}"},
-        {"N": "ladderize", "method": "{ladderize-method}"},
+        {"N": "report-cumulative", "output": "$report-cumulative-output", "max": "$report-cumulative-max"},
+        {"N": "ladderize", "method": "$ladderize-method"},
 
         {"?N": ""}
     ],
 
     "tal-dash-bar-clades": [
         {"?N": "---------- H1 ----------"},
-        {"N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", {"equal": ["{virus-type/lineage}", "A(H1N1)/Pdm"]}]}, "then": [
             {"N": "dash-bar-clades",
              "width-to-height-ratio": 0.009,
              "clades": [
@@ -161,7 +160,7 @@
         ]},
 
         {"?N": "---------- BVic ----------"},
-        {"?N": "if", "condition": {"and": ["{whocc}", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": []},
+        {"?N": "if", "condition": {"and": ["$whocc", {"equal": ["{virus-type/lineage}", "B/Vic"]}]}, "then": []},
         {"N": "if", "condition": {"equal": ["{virus-type/lineage}", "B/Vic"]}, "then": [
             {"N": "dash-bar-clades",
              "width-to-height-ratio": 0.009,
@@ -176,7 +175,7 @@
     ],
 
     "dash-bar-found-in-chart": [
-        {"N": "if", "condition": {"and": ["{whocc}", "{chart-present}"]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", "$chart-present"]}, "then": [
         ]}
     ],
 

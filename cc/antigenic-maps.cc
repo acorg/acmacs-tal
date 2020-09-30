@@ -3,7 +3,6 @@
 #include "acmacs-tal/antigenic-maps.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/hz-sections.hh"
-#include "acmacs-tal/error.hh"
 #include "acmacs-tal/time-series.hh"
 
 // ----------------------------------------------------------------------
@@ -23,7 +22,7 @@ bool acmacs::tal::v3::MapsSettings::apply_built_in(std::string_view name)
         return acmacs::mapi::Settings::apply_built_in(name);
     }
     catch (std::exception& err) {
-        throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, getenv_toplevel())};
+        throw error{fmt::format("cannot apply \"{}\": {} while reading {}", name, err, format_toplevel())};
     }
 
 } // acmacs::tal::v3::MapsSettings::apply_built_in
@@ -40,7 +39,7 @@ void acmacs::tal::v3::MapsSettings::apply_antigenic_map_section()
     if (!to_apply.is_array())
         throw error{"no or invalid \"apply\" in \"antigenic-map-section\""};
     const auto last_seq_id = rjson::v3::read_string(getenv("last"sv), "");
-    if (const auto& current_section = antigenic_maps_.current_section();
+    if (const auto& current_section = antigenic_maps_.section();
         current_section.first && first_seq_id == current_section.first->seq_id && (last_seq_id.empty() || (current_section.last && last_seq_id == current_section.last->seq_id))) {
         apply("apply"sv);
     }
@@ -51,7 +50,7 @@ void acmacs::tal::v3::MapsSettings::apply_antigenic_map_section()
 
 map_elements::v1::Title& acmacs::tal::v3::MapsSettings::title()
 {
-    return chart_draw().map_elements().find_or_add<MapTitle>("title", antigenic_maps_);
+    return chart_draw().map_elements().find_or_add<MapTitle>("title");
 
 } // acmacs::tal::v3::MapsSettings::title
 
@@ -167,28 +166,6 @@ void acmacs::tal::v3::MapsSettings::select_sera_in_section(acmacs::chart::PointI
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::MapTitle::update_line_before_drawing(std::string_view line, const ChartDraw& chart_draw) const
-{
-    try {
-        fmt::dynamic_format_arg_store<fmt::format_context> store;
-        chart_draw.chart(0).chart_metadata(store);
-        const auto& section = antigenic_maps_.current_section();
-        // AD_DEBUG("hz section {} {}", section.id, section.aa_transitions);
-        // AD_DEBUG("section line \"{}\"", line);
-        store.push_back(fmt::arg("section_prefix", section.prefix));
-        store.push_back(fmt::arg("section_label", section.label));
-        store.push_back(fmt::arg("section_aa_transitions", section.aa_transitions_format()));
-        return acmacs::string::substitute_from_store(line, store, acmacs::string::if_no_substitution_found::leave_as_is);
-    }
-    catch (std::exception& err) {
-        AD_ERROR("fmt cannot substitute in \"{}\": {}", line, err);
-        throw;
-    }
-
-} // acmacs::tal::v3::MapTitle::update_line_before_drawing
-
-// ----------------------------------------------------------------------
-
 acmacs::tal::v3::AntigenicMaps::AntigenicMaps(Tal& tal)
     : LayoutElement(tal, 0.0), chart_draw_{tal.chartp(), 0}, maps_settings_{*this, chart_draw_}
 {
@@ -206,7 +183,7 @@ void acmacs::tal::v3::AntigenicMaps::prepare(preparation_stage_t stage)
         tal().draw().layout().prepare_element<HzSections>(stage);
         columns_rows();
         // acmacs::log::enable("settings"sv);
-        maps_settings_.apply_first({"/tal-mapi"sv, "mapi"sv, "mapi-default"sv}, acmacs::mapi::Settings::throw_if_nothing_applied::yes);
+        maps_settings_.apply_first({"/tal-mapi"sv, "mapi"sv, "mapi-default"sv}, acmacs::settings::v3::throw_if_nothing_applied::yes);
     }
     LayoutElement::prepare(stage);
 
@@ -238,14 +215,15 @@ void acmacs::tal::v3::AntigenicMaps::columns_rows()
 
 // ----------------------------------------------------------------------
 
-const acmacs::tal::v3::HzSection& acmacs::tal::v3::AntigenicMaps::current_section() const
+const acmacs::tal::v3::HzSection& acmacs::tal::v3::AntigenicMaps::section(std::optional<size_t> section_no) const
 {
-    auto* hz_sections = tal().draw().layout().find<HzSections>();
-    if (!current_section_no_.has_value() || *current_section_no_ >= hz_sections->sections().size())
-        throw std::runtime_error{"internal: acmacs::tal::v3::AntigenicMaps: no current section"};
-    return hz_sections->sections().at(*current_section_no_);
+    if (section_no.has_value())
+        return tal().draw().layout().find<HzSections>()->sections().at(*section_no);
 
-} // acmacs::tal::v3::AntigenicMaps::current_section
+    current_section_.validate();
+    return *current_section_.section;
+
+} // acmacs::tal::v3::AntigenicMaps::section
 
 // ----------------------------------------------------------------------
 
@@ -259,20 +237,21 @@ void acmacs::tal::v3::AntigenicMaps::remove_serum_circles()
 
 void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) const
 {
+    using namespace std::string_view_literals;
     if (columns_ && rows_) {
         const auto& viewport = surface.viewport();
         const auto gap = surface.convert(Pixels{parameters().gap_between_maps}).value();
         const auto map_size = viewport.size.height / static_cast<double>(rows_) - gap * static_cast<double>(rows_ - 1) / static_cast<double>(rows_);
         const auto& hz_sections = tal().draw().layout().find<HzSections>()->sections();
         for (size_t section_no{0}, map_no{0}; section_no < hz_sections.size(); ++section_no) {
-            if (hz_sections[section_no].shown) {
+            if (const auto& section = hz_sections[section_no]; section.shown) {
                 fmt::print(stderr, "\n\n");
                 AD_INFO("========================================================\n>>> SECTION {} {}\n\n", section_no, static_cast<char>(map_no + 'A'));
-                current_section_no_ = section_no;
+                current_section_.set(section_no, section);
                 const auto left = static_cast<double>(map_no % columns_) * (map_size + gap);
                 const auto top = static_cast<double>(map_no / columns_) * (map_size + gap);
-                draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, true), section_no);
-                current_section_no_ = std::nullopt;
+                draw_map(surface.subsurface({left, top}, Scaled{map_size}, Size{1.0, 1.0}, true), section);
+                current_section_.reset();
                 ++map_no;
             }
         }
@@ -282,9 +261,14 @@ void acmacs::tal::v3::AntigenicMaps::draw(acmacs::surface::Surface& surface) con
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, size_t /*section_no*/) const
+void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface, const HzSection& section) const
 {
     using namespace std::string_view_literals;
+
+    MapsSettings::environment_push subenv(maps_settings_);
+    maps_settings_.setenv("section-prefix"sv, section.prefix);
+    maps_settings_.setenv("section-label"sv, section.label);
+    maps_settings_.setenv("section-aa-transitions"sv, section.aa_transitions_format());
 
     maps_settings_.apply("antigenic-map"sv);
 
@@ -306,13 +290,8 @@ acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_
 
 acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_section(std::optional<size_t> section_no) const
 {
-    if (!section_no.has_value()) {
-        if (!current_section_no_.has_value())
-            throw error{"tal::AntigenicMaps::chart_antigens_in_section: no current section"};
-        section_no = current_section_no_;
-    }
-    const auto& section = tal().draw().layout().find<HzSections>()->sections().at(*section_no);
-    return tal().tree().chart_antigens_in_section(section.first, section.last);
+    const auto& sect = section(section_no);
+    return tal().tree().chart_antigens_in_section(sect.first, sect.last);
 
 } // acmacs::tal::v3::AntigenicMaps::chart_antigens_in_section
 
@@ -320,13 +299,8 @@ acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_antigens_in_
 
 acmacs::chart::PointIndexList acmacs::tal::v3::AntigenicMaps::chart_sera_in_section(std::optional<size_t> section_no) const
 {
-    if (!section_no.has_value()) {
-        if (!current_section_no_.has_value())
-            throw error{"tal::AntigenicMaps::chart_sera_in_section: no current section"};
-        section_no = current_section_no_;
-    }
-    const auto& section = tal().draw().layout().find<HzSections>()->sections().at(*section_no);
-    return tal().tree().chart_sera_in_section(section.first, section.last);
+    const auto& sect = section(section_no);
+    return tal().tree().chart_sera_in_section(sect.first, sect.last);
 
 } // acmacs::tal::v3::AntigenicMaps::chart_sera_in_section
 
