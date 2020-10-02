@@ -1251,7 +1251,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 
     if (const auto& all_nodes_val = getenv("all-nodes"sv); !all_nodes_val.is_null())
         read_node_parameters(all_nodes_val, param.all_nodes, ignore_name::yes);
-    for (const rjson::v3::value& for_node : getenv("per_node"sv).array()) {
+    for (const rjson::v3::value& for_node : getenv("per-node"sv).array()) {
         param.per_node.push_back(param.all_nodes);
         read_node_parameters(for_node, param.per_node.back(), ignore_name::no);
     }
