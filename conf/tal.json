@@ -107,9 +107,9 @@
     "tal-modifications": [
         {"N": "if", "condition": "$tree-draw-aa-transitions", "then": [
             {"N": "draw-aa-transitions",
-             "minimum_number_leaves_in_subtree": 0.01,
-             "text_line_interleave": 0.3,
-             "all_nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
+             "minimum-number-leaves-in-subtree": 0.01,
+             "text-line-interleave": 0.3,
+             "all-nodes": {"label": {"scale": 0.01, "offset": [-0.04, 0.02], "tether": {"show": true, "color": "black", "line_width": 0.3}, "text_style": {"font": "monospace"}}}
             }
         ]},
 
@@ -182,7 +182,7 @@
     "clades-whocc": [
         "clades-{virus-type}{lineage}",
         {"N": "clades",
-         "per_clade": [
+         "per-clade": [
              {"?N": "---------- H1 ----------"},
              {"name": "6B",       "show": false},
              {"name": "6B1",      "show": false},
@@ -205,19 +205,19 @@
              {"?N": "---------- H3 ----------"},
              {"name": "3C.3",              "show": false},
              {"name": "3C.2A",             "show": false},
-             {"name": "3C.2A1",            "show": false, "section_inclusion_tolerance": 40},
-             {"name": "3C.2A1A",           "show": false, "section_exclusion_tolerance": 20},
-             {"name": "3C.2A1B",           "show": false,  "section_inclusion_tolerance": 40},
+             {"name": "3C.2A1",            "show": false, "section-inclusion-tolerance": 40},
+             {"name": "3C.2A1A",           "show": false, "section-exclusion-tolerance": 20},
+             {"name": "3C.2A1B",           "show": false,  "section-inclusion-tolerance": 40},
              {"name": "3C.2A4",            "show": false},
-             {"name": "3C.2A1B+131K",      "show": true, "section_inclusion_tolerance": 12},
-             {"name": "3C.2A1B+131K+94N",  "show": true, "section_inclusion_tolerance": 12},
-             {"name": "3C.2A1B+135K",      "show": true, "section_inclusion_tolerance": 12},
-             {"name": "3C.2A1B+135K+137F", "show": true, "section_inclusion_tolerance": 12},
-             {"name": "3C.2A1B+135K+186D", "show": true, "section_inclusion_tolerance": 12},
+             {"name": "3C.2A1B+131K",      "show": true, "section-inclusion-tolerance": 12},
+             {"name": "3C.2A1B+131K+94N",  "show": true, "section-inclusion-tolerance": 12},
+             {"name": "3C.2A1B+135K",      "show": true, "section-inclusion-tolerance": 12},
+             {"name": "3C.2A1B+135K+137F", "show": true, "section-inclusion-tolerance": 12},
+             {"name": "3C.2A1B+135K+186D", "show": true, "section-inclusion-tolerance": 12},
              {"?N": "---------- BVic ----------"},
              {"name": "V1B", "show": false},
-             {"name": "V1A", "show": false, "section_inclusion_tolerance": 20},
-             {"name": "2DEL2017", "show": true, "section_inclusion_tolerance": 15},
+             {"name": "V1A", "show": false, "section-inclusion-tolerance": 20},
+             {"name": "2DEL2017", "show": true, "section-inclusion-tolerance": 15},
              {"name": "3DEL2017", "show": true},
              {"name": "6DEL2019", "show": false},
              {"?N": "---------- BYam ----------"},

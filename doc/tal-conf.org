@@ -191,13 +191,13 @@ If multiple criteria specified within single "select" object, they all used (con
 #+BEGIN_SRC json
   {"N": "draw-aa-transitions", "report": false, "debug": false, "?debug-pos": 278,
    "method": "eu-20200909", #  "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"
-   "minimum_number_leaves_in_subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
+   "minimum-number-leaves-in-subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
    "minimum_number_leaves_in_subtree_per_pos": {"94": 0.0037}, -- default and per pos
    "non_common_tolerance": 0.95, -- if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
-   "text_line_interleave": 0.3,
+   "text-line-interleave": 0.3,
    "show": true,
    "?only-for": [<pos>], -- draw only for the specified pos, if list is absent or empty, draw for all pos
-   "all_nodes": {"node_id": "", "label": {<[[Label parameters]]>}},
+   "all-nodes": {"node_id": "", "label": {<[[Label parameters]]>}},
    "per_node": [
    ],
   },
@@ -242,8 +242,8 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {"N": "clades", "report": true,
  "slot": {"width": 0.02}, "?slot?": "width relative to the clades area height",
- "all_clades": {<[[Clade parameters]]>},
- "per_clade": [{<[[Clade parameters]]>}, ...],
+ "all-clades": {<[[Clade parameters]]>},
+ "per-clade": [{<[[Clade parameters]]>}, ...],
  "?width-to-height-ratio": 0.3, "debug-outline": <[[Debug outline][debug-outline]]>},
 
 **** Clade parameters
@@ -255,7 +255,7 @@ If multiple criteria specified within single "select" object, they all used (con
    "slot": 1, # "slot": [1, 2] per section slots
    "top-gap": 0.01, "bottom-gap": 0.01, # fraction of the tree area height
    "time_series_top_separator": true, "time_series_bottom_separator": true,
-   "section_inclusion_tolerance": 10, "section_exclusion_tolerance": 5,
+   "section-inclusion-tolerance": 10, "section-exclusion-tolerance": 5,
    "label": {<[[Label parameters]]>}, # "label": [{}, {}] per section label parameters
    "arrow": {"color": "black", "line_width": 1, "arrow_width": 3.0}, "?arrow?": "line_width and arrow_width are in pixels",
    "horizontal_line": {"color": "grey", "line_width": 0.5}, "?horizontal_line?": "line_width in pixels",

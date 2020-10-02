@@ -845,8 +845,8 @@ void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::v3::value& so
                 throw error{"clade \"label\": invalid value, array or object expected"};
     });
 
-    rjson::v3::copy_if_not_null(source["section_inclusion_tolerance"sv], clade_parameters.section_inclusion_tolerance);
-    rjson::v3::copy_if_not_null(source["section_exclusion_tolerance"sv], clade_parameters.section_exclusion_tolerance);
+    rjson::v3::copy_if_not_null(source["section-inclusion-tolerance"sv], clade_parameters.section_inclusion_tolerance);
+    rjson::v3::copy_if_not_null(source["section-exclusion-tolerance"sv], clade_parameters.section_exclusion_tolerance);
 
     rjson::v3::copy_if_not_null(source.get("arrow"sv, "color"sv), clade_parameters.arrow.color);
     rjson::v3::copy_if_not_null(source.get("arrow"sv, "line_width"sv), clade_parameters.arrow.line_width);
@@ -866,7 +866,7 @@ void acmacs::tal::v3::Settings::read_clade_parameters(const rjson::v3::value& so
 void acmacs::tal::v3::Settings::read_per_clade(Clades::Parameters& parameters)
 {
     using namespace std::string_view_literals;
-    for (const rjson::v3::value& for_clade : getenv("per_clade"sv).array()) {
+    for (const rjson::v3::value& for_clade : getenv("per-clade"sv).array()) {
         if (const auto& name = for_clade["name"sv]; !name.is_null())
             read_clade_parameters(for_clade, parameters.find_or_add_pre_clade(name.to<std::string_view>()));
     }
@@ -892,7 +892,7 @@ void acmacs::tal::v3::Settings::add_clades()
 
     // ----------------------------------------------------------------------
 
-    if (const auto& all_clades_val = getenv("all_clades"sv); !all_clades_val.is_null())
+    if (const auto& all_clades_val = getenv("all-clades"sv); !all_clades_val.is_null())
         read_clade_parameters(all_clades_val, param.all_clades);
     read_per_clade(param);
 
@@ -1210,7 +1210,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     auto& param = element.parameters();
 
     getenv_copy_if_present("show"sv, param.show);
-    getenv_copy_if_present("minimum_number_leaves_in_subtree"sv, param.minimum_number_leaves_in_subtree);
+    getenv_copy_if_present("minimum-number-leaves-in-subtree"sv, param.minimum_number_leaves_in_subtree);
     getenv("minimum_number_leaves_in_subtree_per_pos"sv).visit([this, &param]<typename Arg>(const Arg& arg) {
         if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
             for (const auto& [key, val] : arg) {
@@ -1226,7 +1226,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
             throw error{fmt::format("\"minimum_number_leaves_in_subtree_per_pos\" must be an object: {}", getenv("minimum_number_leaves_in_subtree_per_pos"sv))};
     });
-    getenv_copy_if_present("text_line_interleave"sv, param.text_line_interleave);
+    getenv_copy_if_present("text-line-interleave"sv, param.text_line_interleave);
 
     getenv("only-for"sv).visit([&param, this]<typename Val>(const Val& value) { // draw only for the specified pos, if list is absent or empty, draw for all pos
         if constexpr (std::is_same_v<Val, rjson::v3::detail::array>) {
@@ -1249,7 +1249,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         read_label_parameters(source["label"sv], parameters.label);
     };
 
-    if (const auto& all_nodes_val = getenv("all_nodes"sv); !all_nodes_val.is_null())
+    if (const auto& all_nodes_val = getenv("all-nodes"sv); !all_nodes_val.is_null())
         read_node_parameters(all_nodes_val, param.all_nodes, ignore_name::yes);
     for (const rjson::v3::value& for_node : getenv("per_node"sv).array()) {
         param.per_node.push_back(param.all_nodes);
