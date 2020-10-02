@@ -38,7 +38,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
             AD_INFO("time series {} full range {} .. {}", id(), ts_stat.counter().begin()->first, ts_stat.counter().rbegin()->first);
         AD_INFO("time series {} suggested  {} .. {}", id(), first, after_last);
         AD_INFO("time series {} used       {} .. {}", id(), parameters().time_series.first, parameters().time_series.after_last);
-        tal().settings().setenv_toplevel("time-series-range", acmacs::time_series::range_name(parameters().time_series, series_, "-"));
+        tal().settings().setenv("time-series-range"sv, acmacs::time_series::range_name(parameters().time_series, series_, "-"));
     }
     else if (stage == 3 && prepared_ < stage) {
         tal().draw().layout().prepare_element<DrawTree>(stage);

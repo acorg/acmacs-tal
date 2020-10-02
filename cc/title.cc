@@ -9,7 +9,7 @@ void acmacs::tal::v3::Title::prepare(preparation_stage_t stage)
     if (stage == 2 && prepared_ < stage) {
         if (parameters().show) {
             // AD_DEBUG("Title::prepare \"{}\"", parameters().text);
-            parameters().text = tal().settings().substitute_to_string(parameters().text);
+            parameters().text = tal().settings().substitute(parameters().text);
             // AD_DEBUG("     --> \"{}\"", parameters().text);
         }
     }

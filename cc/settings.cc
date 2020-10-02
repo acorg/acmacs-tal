@@ -33,13 +33,24 @@ inline void extract_coordinates(const rjson::v3::value& source, acmacs::PointCoo
 
 // ======================================================================
 
+size_t acmacs::tal::v3::Settings::uniq_id = 0;
+
 template <typename ElementType, typename... Args> ElementType& acmacs::tal::v3::Settings::add_element(Args&&... args, add_unique uniq)
 {
     using namespace std::string_view_literals;
-    static size_t uniq_id{0};   // thread unsafe!
 
-    const auto id = getenv_to_string("id"sv);
-    const LayoutElementId element_id{(id.empty() && uniq == add_unique::yes) ? fmt::format("-unique-{}", ++uniq_id) : id};
+    const auto get_element_id = [this, uniq]() -> LayoutElementId {
+        if (const auto& id = getenv("id"sv); id.is_null()) {
+            if (uniq == add_unique::yes)
+                return LayoutElementId{fmt::format("-unique-{}", ++uniq_id)};
+            else
+                return {};
+        }
+        else
+            return LayoutElementId{id.to<std::string_view>()};
+    };
+
+    const LayoutElementId element_id = get_element_id();
     if (auto* found = draw().layout().find<ElementType>(element_id); found) {
         init_element(*found);
         return *found;
@@ -70,25 +81,26 @@ void acmacs::tal::v3::Settings::init_element(LayoutElement& element)
 
 void acmacs::tal::v3::Settings::update_env()
 {
+    using namespace std::string_view_literals;
     const auto virus_type = tal_.tree().virus_type();
     if (!virus_type.empty()) {  // might be updated later upon seqdb matching
         const auto lineage = tal_.tree().lineage();
         AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
-        setenv_toplevel("virus-type", virus_type);
-        setenv_toplevel("lineage", lineage);
+        setenv("virus-type"sv, virus_type);
+        setenv("lineage"sv, lineage);
         if (virus_type != "B" || lineage.empty())
-            setenv_toplevel("virus-type/lineage", virus_type);
+            setenv("virus-type/lineage"sv, virus_type);
         else
-            setenv_toplevel("virus-type/lineage", fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
+            setenv("virus-type/lineage"sv, fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
     }
-    setenv_toplevel("tree-has-sequences", tal_.tree().has_sequences());
-    setenv_toplevel("chart-present", tal_.chart_present());
+    setenv("tree-has-sequences"sv, tal_.tree().has_sequences());
+    setenv("chart-present"sv, tal_.chart_present());
     if (tal_.chart_present()) {
         auto info{tal_.chart().info()};
-        setenv_toplevel("chart-assay", info->assay().HI_or_Neut());
-        setenv_toplevel("chart-lab", info->lab());
-        setenv_toplevel("chart-rbc", info->rbc_species());
-        setenv_toplevel("chart-date", info->date(chart::Info::Compute::Yes));
+        setenv("chart-assay"sv, info->assay().HI_or_Neut());
+        setenv("chart-lab"sv, info->lab());
+        setenv("chart-rbc"sv, info->rbc_species());
+        setenv("chart-date"sv, info->date(chart::Info::Compute::Yes));
     }
 
 } // acmacs::tal::v3::Settings::update_env
@@ -184,7 +196,7 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
         else if (name == "tree"sv)
             add_tree();
         else
-            return acmacs::settings::v2::Settings::apply_built_in(name);
+            return acmacs::settings::v3::Data::apply_built_in(name);
         return true;
     }
     catch (std::exception& err) {
@@ -307,7 +319,7 @@ void acmacs::tal::v3::Settings::ladderize()
     else if (method == "max-edge-length"sv)
         tree().ladderize(Tree::Ladderize::MaxEdgeLength);
     else
-        throw acmacs::settings::v2::error{fmt::format("unsupported ladderize method: {}", method)};
+        throw acmacs::settings::v3::error{fmt::format("unsupported ladderize method: {}", method)};
 
 } // acmacs::tal::v3::Settings::ladderize
 
@@ -377,7 +389,8 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
     NodeSet selected;
     bool report = false;
     auto update = Tree::Select::init;
-    for (const auto& [key, val] : criteria.object()) {
+    for (const auto& [key, val_raw] : criteria.object()) {
+        const auto& val = substitute(val_raw);
         if (key == "all"sv) {
             tree().select_all(selected, update);
         }
@@ -385,45 +398,38 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             tree().select_all_and_intermediate(selected, update);
         }
         else if (key == "aa"sv) {
-            std::visit(
-                [this, &selected, &update]<typename Res>(const Res& res) {
-                    if constexpr (std::is_same_v<Res, const rjson::v3::value*> || std::is_same_v<Res, no_substitution_request>)
-                        tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(*res));
-                    else
-                        tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(res));
-                },
-                substitute(val));
+            tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(val));
         }
         else if (key == "country"sv) {
-            tree().select_by_country(selected, update, substitute_to_value(val).to<std::string_view>());
+            tree().select_by_country(selected, update, val.to<std::string_view>());
         }
         else if (key == "cumulative >="sv) {
-            tree().select_if_cumulative_more_than(selected, update, substitute_to_value(val).to<double>());
+            tree().select_if_cumulative_more_than(selected, update, val.to<double>());
         }
         else if (key == "date"sv) {
             tree().select_by_date(selected, update, val[0].to<std::string_view>(), val[1].to<std::string_view>());
         }
         else if (key == "edge >="sv) {
-            tree().select_if_edge_more_than(selected, update, substitute_to_value(val).to<double>());
+            tree().select_if_edge_more_than(selected, update, val.to<double>());
         }
         else if (key == "edge >= mean_edge of"sv) {
-            tree().select_if_edge_more_than_mean_edge_of(selected, update, substitute_to_value(val).to<double>());
+            tree().select_if_edge_more_than_mean_edge_of(selected, update, val.to<double>());
         }
         else if (key == "location"sv) {
-            tree().select_by_location(selected, update, substitute_to_value(val).to<std::string_view>());
+            tree().select_by_location(selected, update, val.to<std::string_view>());
         }
         else if (key == "matches-chart-antigen"sv) {
             if (!tal_.chart_present())
-                throw acmacs::settings::v2::error{"cannot select node that matches chart antigen: no chart given"};
+                throw acmacs::settings::v3::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             tree().select_matches_chart_antigens(selected, update);
         }
         else if (key == "matches-chart-serum"sv) {
             if (!tal_.chart_present())
-                throw acmacs::settings::v2::error{"cannot select node that matches chart antigen: no chart given"};
+                throw acmacs::settings::v3::error{"cannot select node that matches chart antigen: no chart given"};
             tree().match(tal_.chart());
             Tree::serum_match_t mt{Tree::serum_match_t::name};
-            if (const auto match_type = substitute_to_value(val).to<std::string_view>(); match_type == "reassortant"sv)
+            if (const auto match_type = val.to<std::string_view>(); match_type == "reassortant"sv)
                 mt = Tree::serum_match_t::reassortant;
             else if (match_type == "passage"sv)
                 mt = Tree::serum_match_t::passage_type;
@@ -432,19 +438,19 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             tree().select_matches_chart_sera(selected, update, mt);
         }
         else if (key == "seq_id"sv) {
-            tree().select_by_seq_id(selected, update, substitute_to_value(val).to<std::string_view>());
+            tree().select_by_seq_id(selected, update, val.to<std::string_view>());
         }
         else if (key == "report"sv) {
-            report = substitute_to_value(val).to<bool>();
+            report = val.to<bool>();
         }
         else if (key == "top-cumulative-gap"sv) {
-            tree().select_by_top_cumulative_gap(selected, update, substitute_to_value(val).to<double>());
+            tree().select_by_top_cumulative_gap(selected, update, val.to<double>());
         }
         else if (key == "vaccine"sv) {
-            select_vaccine(selected, update, substitute_to_value(val));
+            select_vaccine(selected, update, val);
         }
         else
-            throw acmacs::settings::v2::error{fmt::format("unrecognized select node criterium: {}", key)};
+            throw acmacs::settings::v3::error{fmt::format("unrecognized select node criterium: {}", key)};
         if (key != "report"sv)
             update = Tree::Select::update;
     }
@@ -501,18 +507,18 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
     using namespace std::string_view_literals;
 
     const auto color_by_pos_aa_colors = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
-        const auto& pos_v = substitute_to_value(fields["pos"sv]);
+        const auto& pos_v = substitute(fields["pos"sv]);
         if (pos_v.is_null())
             throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos-aa-colors\""};
         return std::make_unique<ColoringByPosAAColors>(acmacs::seqdb::pos1_t{pos_v.to<acmacs::seqdb::pos1_t>()});
     };
 
     const auto color_by_pos_aa_frequency = [this](const rjson::v3::value& fields) -> std::unique_ptr<Coloring> {
-        const auto& pos_v = substitute_to_value(fields["pos"sv]);
+        const auto& pos_v = substitute(fields["pos"sv]);
         if (pos_v.is_null())
             throw error{"\"pos\" is not in \"color-by\" with \"N\": \"pos-aa-frequency\""};
         auto coloring_by_pos = std::make_unique<ColoringByPosAAFrequency>(acmacs::seqdb::pos1_t{pos_v.to<acmacs::seqdb::pos1_t>()});
-        if (const auto& colors_v = substitute_to_value(fields.get("colors"sv)); !colors_v.is_null()) {
+        if (const auto& colors_v = substitute(fields.get("colors"sv)); !colors_v.is_null()) {
             if (colors_v.is_array()) {
                 for (const auto& en : colors_v.array())
                     coloring_by_pos->add_color(en.to<Color>());
@@ -547,7 +553,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         }
     };
 
-    const auto& cb_val = getenv("color-by"sv, "color_by"sv);
+    const auto& cb_val = getenv("color-by"sv);
     auto coloring = cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
         if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
             return color_by(arg.template to<std::string_view>(), rjson::v3::detail::object{});
@@ -880,8 +886,8 @@ void acmacs::tal::v3::Settings::add_clades()
 
     getenv_copy_if_present("report"sv, param.report);
 
-    if (const auto& slot_val = substitute_to_value(getenv("slot"sv)); !slot_val.is_null()) {
-        rjson::v3::copy_if_not_null(substitute_to_value(slot_val["width"sv]), param.slot.width);
+    if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
+        rjson::v3::copy_if_not_null(substitute(slot_val["width"sv]), param.slot.width);
     }
 
     // ----------------------------------------------------------------------
@@ -902,7 +908,7 @@ void acmacs::tal::v3::Settings::hz_sections()
     auto& param = element.parameters();
 
     getenv_copy_if_present("report"sv, param.report);
-    read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
+    read_line_parameters(getenv("line"sv), param.line);
     rjson::v3::copy_if_not_null(getenv("top-gap"sv), param.tree_top_gap);
     rjson::v3::copy_if_not_null(getenv("bottom-gap"sv), param.tree_bottom_gap);
 
@@ -930,9 +936,9 @@ void acmacs::tal::v3::Settings::hz_section_marker()
     auto& element = add_element<HzSectionMarker>();
     auto& param = element.parameters();
 
-    read_line_parameters(substitute_to_value(getenv("line"sv)), param.line);
-    rjson::v3::copy_if_not_null(substitute_to_value(getenv("label-size"sv)), param.label_size);
-    rjson::v3::copy_if_not_null(substitute_to_value(getenv("label-color"sv)), param.label_color);
+    read_line_parameters(getenv("line"sv), param.line);
+    rjson::v3::copy_if_not_null(getenv("label-size"sv), param.label_size);
+    rjson::v3::copy_if_not_null(getenv("label-color"sv), param.label_color);
 
 } // acmacs::tal::v3::Settings::hz_section_marker
 
@@ -957,11 +963,10 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        if (const auto& color_v = source["color"sv]; !color_v.is_null())
-            param.color = substitute_to_string(color_v);
-        rjson::v3::copy_if_not_null(substitute_to_value(source["scale"sv]), param.scale);
-        if (const auto& position_v = source["vertical_position"sv]; !position_v.is_null()) {
-            if (const auto position = substitute_to_string(position_v); position == "middle"sv)
+        rjson::v3::copy_if_not_null(substitute(source["color"sv]), param.color);
+        rjson::v3::copy_if_not_null(substitute(source["scale"sv]), param.scale);
+        if (const auto& position_v = substitute(source["vertical_position"sv]); !position_v.is_null()) {
+            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.vpos = parameters::vertical_position::middle;
             else if (position == "top"sv)
                 param.vpos = parameters::vertical_position::top;
@@ -970,8 +975,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
-        if (const auto& position_v = source["horizontal_position"sv]; !position_v.is_null()) {
-            if (const auto position = substitute_to_string(position_v); position == "middle"sv)
+        if (const auto& position_v = substitute(source["horizontal_position"sv]); !position_v.is_null()) {
+            if (const auto position = position_v.to<std::string_view>(); position == "middle"sv)
                 param.hpos = parameters::horizontal_position::middle;
             else if (position == "left"sv)
                 param.hpos = parameters::horizontal_position::left;
@@ -980,7 +985,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("unrecognized clade label position: \"{}\"", position);
         }
-        if (const auto& offset_v = source["offset"sv]; !offset_v.is_null()) {
+        if (const auto& offset_v = substitute(source["offset"sv]); !offset_v.is_null()) {
             if (offset_v.size() == param.offset.size()) {
                 for (size_t index = 0; index < param.offset.size(); ++index)
                     param.offset[index] = offset_v[index].to<double>();
@@ -988,9 +993,8 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
             else
                 AD_WARNING("Invalid label offset, two numbers expected: {}", source);
         }
-        if (const auto& text_v = source["text"sv]; !text_v.is_null())
-            param.text = substitute_to_string(text_v);
-        if (const auto& rotation_degrees_v = substitute_to_value(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
+        rjson::v3::copy_if_not_null(substitute(source["text"sv]), param.text);
+        if (const auto& rotation_degrees_v = substitute(source["rotation_degrees"sv]); !rotation_degrees_v.is_null())
             param.rotation = RotationDegrees(rotation_degrees_v.to<double>());
 
         rjson::v3::copy_if_not_null(source.get("tether"sv, "show"sv), param.tether.show);
@@ -1018,8 +1022,7 @@ void acmacs::tal::v3::Settings::add_dash_bar()
     for (const rjson::v3::value& entry : getenv("nodes"sv).array()) {
         auto& for_nodes = param.for_nodes.emplace_back();
         for_nodes.nodes = select_nodes(entry["select"sv]);
-        if (const auto& color_v = entry["color"sv]; !color_v.is_null())
-            for_nodes.color = substitute_to_string(color_v);
+        rjson::v3::copy_if_not_null(substitute(entry["color"sv]), for_nodes.color);
     }
 
     for (const rjson::v3::value& label_data : getenv("labels"sv).array())
@@ -1056,11 +1059,11 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
     auto& element = add_element<DashBarAAAt>();
     auto& param = element.parameters();
 
-    rjson::v3::copy_if_not_null(substitute_to_value(getenv("pos"sv)), param.pos);
+    rjson::v3::copy_if_not_null(getenv("pos"sv), param.pos);
 
     read_dash_parameters(param.dash);
 
-    if (const auto& labels = substitute_to_value(getenv("labels"sv)); labels.is_array()) {
+    if (const auto& labels = getenv("labels"sv); labels.is_array()) {
         for (const rjson::v3::value& label_data : labels.array())
             read_label_parameters(label_data, param.labels_by_frequency.emplace_back());
     }
@@ -1084,7 +1087,7 @@ void acmacs::tal::v3::Settings::add_title()
     auto& param = element.parameters();
 
     rjson::v3::copy_if_not_null(getenv("show"sv), param.show);
-    param.text = getenv_to_string("text"sv, toplevel_only::no, if_no_substitution_found::leave_as_is);
+    rjson::v3::copy_if_not_null(getenv("text"sv), param.text);
     extract_coordinates(getenv("offset"sv), param.offset);
     rjson::v3::copy_if_not_null(getenv("color"sv), param.color);
     rjson::v3::copy_if_not_null(getenv("size"sv), param.size);
@@ -1114,10 +1117,10 @@ void acmacs::tal::v3::Settings::read_line_parameters(const rjson::v3::value& sou
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
-        rjson::v3::copy_if_not_null(substitute_to_value(source["color"sv]), line_parameters.color);
-        rjson::v3::copy_if_not_null(substitute_to_value(source["line_width"sv]), line_parameters.line_width);
+        rjson::v3::copy_if_not_null(substitute(source["color"sv]), line_parameters.color);
+        rjson::v3::copy_if_not_null(substitute(source["line_width"sv]), line_parameters.line_width);
 
-        if (const auto& dash_val = substitute_to_value(source["dash"sv]); !dash_val.is_null()) {
+        if (const auto& dash_val = substitute(source["dash"sv]); !dash_val.is_null()) {
             const auto dash = dash_val.to<std::string_view>();
             if (dash.empty() || dash == "no" || dash == "no-dash" || dash == "no_dash"sv)
                 line_parameters.dash = surface::Dash::NoDash;
@@ -1228,7 +1231,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
     getenv("only-for"sv).visit([&param, this]<typename Val>(const Val& value) { // draw only for the specified pos, if list is absent or empty, draw for all pos
         if constexpr (std::is_same_v<Val, rjson::v3::detail::array>) {
             for (const auto& pos_v : value)
-                param.only_for_pos.emplace_back(substitute_to_value(pos_v).template to<size_t>());
+                param.only_for_pos.emplace_back(substitute(pos_v).template to<size_t>());
         }
         else if constexpr (std::is_same_v<Val, rjson::v3::detail::number>)
             param.only_for_pos.emplace_back(value.template to<size_t>());
@@ -1286,8 +1289,9 @@ void acmacs::tal::v3::Settings::report_aa_at() const
     };
 
     std::vector<acmacs::seqdb::pos1_t> pos_to_report;
+    const auto& pos = getenv("pos"sv);
     try {
-        substitute_to_value(getenv("pos")).visit([&pos_to_report, extract]<typename Val>(const Val& value) {
+        pos.visit([&pos_to_report, extract]<typename Val>(const Val& value) {
             if constexpr (std::is_same_v<Val, rjson::v3::detail::string> || std::is_same_v<Val, rjson::v3::detail::number>) {
                 pos_to_report.emplace_back(extract(value));
             }
@@ -1300,11 +1304,10 @@ void acmacs::tal::v3::Settings::report_aa_at() const
         });
     }
     catch (std::exception&) {
-        const auto& pos = getenv("pos");
-        throw error{AD_FORMAT("unsupported value for report_pos_at \"pos\": {} substituted: {}", pos, substitute_to_value(pos))};
+        throw error{AD_FORMAT("unsupported value for report_pos_at \"pos\": {}", pos)};
     }
 
-    const auto output = tree().report_aa_at(pos_to_report, substitute_to_value(getenv("names"sv)).to<bool>());
+    const auto output = tree().report_aa_at(pos_to_report, getenv("names"sv).to<bool>());
     if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty() && output_filename != "-"sv)
         acmacs::file::write(output_filename, output);
     else
