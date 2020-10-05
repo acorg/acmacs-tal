@@ -16,7 +16,7 @@ namespace acmacs::tal::inline v3
         {
             enum class method { derek_2016, eu_20200514, eu_20200909, eu_20200915 };
 
-            enum method method { method::eu_20200909 };
+            enum method method { method::eu_20200915 };
             bool calculate{false};
             bool report{false};
             bool debug{false};
