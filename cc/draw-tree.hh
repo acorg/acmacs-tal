@@ -24,7 +24,16 @@ namespace acmacs::tal::inline v3
             size_t report_number_leaves_threshold{20};
             std::optional<seqdb::pos1_t> show_same_left_right_for_pos;
             // if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
-            double non_common_tolerance{0.95};
+            double non_common_tolerance{0.6};
+            std::vector<double> non_common_tolerance_per_pos; // negative value means use non_common_tolerance
+
+            double non_common_tolerance_for(seqdb::pos0_t pos) const
+            {
+                if (non_common_tolerance_per_pos.size() <= *pos || non_common_tolerance_per_pos[*pos] < 0.0)
+                    return non_common_tolerance;
+                else
+                    return non_common_tolerance_per_pos[*pos];
+            }
         };
 
         struct Parameters

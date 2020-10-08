@@ -233,7 +233,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
     const auto longest_sequence = update_common_aa(tree);
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
 
-    const auto is_not_common_with_tolerance = [tolerance = parameters.non_common_tolerance](const Node& node, seqdb::pos0_t pos) -> bool {
+    const auto is_not_common_with_tolerance = [](const Node& node, seqdb::pos0_t pos, double tolerance) -> bool {
         const auto aa = node.common_aa_.at(pos, tolerance);
         if (aa == CommonAA::NoCommon)
             return true;
@@ -251,13 +251,14 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
     tree::iterate_post(tree, [longest_sequence, is_not_common_with_tolerance, &parameters](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
             const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
-            if (is_not_common_with_tolerance(node, pos)) {
+            const auto non_common_tolerance = parameters.non_common_tolerance_for(pos);
+            if (is_not_common_with_tolerance(node, pos, non_common_tolerance)) {
                 AD_DEBUG_IF(dbg, "eu-20200909 {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                             node.common_aa_.size() > *pos ? node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})") : std::string{});
                 for (auto& child : node.subtree) {
                     if (!child.is_leaf()) {
-                        if (!is_not_common_with_tolerance(child, pos)) {
-                            child.replace_aa_transition(pos, child.common_aa_.at(pos, parameters.non_common_tolerance));
+                        if (!is_not_common_with_tolerance(child, pos, non_common_tolerance)) {
+                            child.replace_aa_transition(pos, child.common_aa_.at(pos, non_common_tolerance));
                             // AD_DEBUG("replace_aa_transition {} {} {} --> {}", child.node_id, pos, aa, child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
                         }
                     }
@@ -284,7 +285,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
     // add to top children of the tree differences between them and root, even if that subtree has common aa (with tolerance)
     for (auto& top_child : tree.subtree) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
-            if (const auto aa = top_child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
+            if (const auto aa = top_child.common_aa_.at(pos, parameters.non_common_tolerance_for(pos)); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
                 top_child.replace_aa_transition(pos, aa);
         }
     }
@@ -308,7 +309,7 @@ void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t l
 {
     // const auto total_leaves = tree.number_leaves_in_subtree();
 
-    const auto is_not_common_with_tolerance = [tolerance = parameters.non_common_tolerance](const Node& node, seqdb::pos0_t pos, acmacs::debug /*dbg*/) -> bool {
+    const auto is_not_common_with_tolerance = [](const Node& node, seqdb::pos0_t pos, double tolerance, acmacs::debug /*dbg*/) -> bool {
         const auto aa = node.common_aa_.at(pos, tolerance);
         if (aa == CommonAA::NoCommon)
             return true;
@@ -327,21 +328,23 @@ void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t l
     tree::iterate_post(tree, [longest_sequence, is_not_common_with_tolerance, &parameters](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
             const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
-            if (is_not_common_with_tolerance(node, pos, dbg)) {
+            const auto non_common_tolerance = parameters.non_common_tolerance_for(pos);
+            if (is_not_common_with_tolerance(node, pos, non_common_tolerance, dbg)) {
                 AD_DEBUG_IF(dbg, "eu-20200915 {} node:{:5.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                             node.common_aa_.size() > *pos ? node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})") : std::string{});
                 for (auto& child : node.subtree) {
                     if (!child.is_leaf()) {
-                        if (!is_not_common_with_tolerance(child, pos, dbg)) {
-                            child.aa_transitions_.add(pos, child.common_aa_.at(pos, parameters.non_common_tolerance));
-                            AD_DEBUG_IF(dbg, "eu-20200915        add {} node:{:5.3s} common:{} leaves:{:4d}", pos, child.node_id, child.common_aa_.at(pos, parameters.non_common_tolerance),
+                        if (!is_not_common_with_tolerance(child, pos, non_common_tolerance, dbg)) {
+                            const auto aa = child.common_aa_.at(pos, non_common_tolerance);
+                            child.aa_transitions_.add(pos, aa);
+                            AD_DEBUG_IF(dbg, "eu-20200915        add {}{} node:{:5.3s} common:{} leaves:{:4d}", pos, aa, child.node_id, child.common_aa_.at(pos, non_common_tolerance),
                                         child.number_leaves_in_subtree());
                         }
                     }
                 }
             }
             else {
-                const auto node_aa = node.common_aa_.at(pos, parameters.non_common_tolerance);
+                const auto node_aa = node.common_aa_.at(pos, non_common_tolerance);
                 AD_DEBUG_IF(dbg, "eu-20200915 common {} node:{:5.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                             node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
                 for (auto& child : node.subtree) {
@@ -349,11 +352,11 @@ void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t l
                         // AD_DEBUG_IF(dbg, "eu-20200915    {:5.3s} {} {}{}", child.node_id, child.seq_id, pos, child.aa_sequence.at(pos));
                     }
                     else if (!child.common_aa_.empty()) {
-                        const auto child_aa = child.common_aa_.at(pos, parameters.non_common_tolerance);
+                        const auto child_aa = child.common_aa_.at(pos, non_common_tolerance);
                         const auto counter = child.common_aa_.counter(pos);
                         AD_DEBUG_IF(dbg, "eu-20200915    {:5.3s} leaves:{:4d} {}", child.node_id, child.number_leaves_in_subtree(),
                                     counter.report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
-                        if (child_aa != node_aa && !is_not_common_with_tolerance(child, pos, dbg)) {
+                        if (child_aa != node_aa && !is_not_common_with_tolerance(child, pos, non_common_tolerance, dbg)) {
                             child.replace_aa_transition(pos, child_aa);
                             AD_DEBUG_IF(dbg, "eu-20200915          {:5.3s} {:3d}{}  {}", child.node_id, pos, child_aa,
                                         child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
@@ -372,19 +375,20 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
 {
     const auto leaves_ratio_threshold = 0.005;
 
-    AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200915");
-
     const auto longest_sequence = update_common_aa(tree);
+    AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200915 set aa transitions =============================================================");
     set_aa_transitions_eu_20200915(tree, longest_sequence, parameters);
+    AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200915 ================================================================================");
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
     // const auto total_leaves = tree.number_leaves_in_subtree();
 
     for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
         const auto dbg = debug_from(parameters.debug && parameters.report_pos && pos == *parameters.report_pos);
+        const auto non_common_tolerance = parameters.non_common_tolerance_for(pos);
 
         // add to top children of the tree differences between them and root, even if that subtree has common aa (with tolerance)
         for (auto& top_child : tree.subtree) {
-            if (const auto aa = top_child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
+            if (const auto aa = top_child.common_aa_.at(pos, non_common_tolerance); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
                 top_child.replace_aa_transition(pos, aa);
         }
 
@@ -423,8 +427,14 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
                         }
                         else
                             this_transition->left = root_sequence.at(pos);
-                        if (this_transition->left != this_transition->right)
-                            AD_DEBUG_IF(dbg, "eu-20200915 {:3d} {:5.3} transition {}", pos, node.node_id, *this_transition);
+                        if (this_transition->left != this_transition->right) {
+                            AD_DEBUG_IF(dbg, "eu-20200915 {}{:3d}{} {:5.3} leaves:{:5d} transition {}", this_transition->left, pos, this_transition->right, node.node_id,
+                                        node.number_leaves_in_subtree(), *this_transition);
+                        }
+                        // else {
+                        //     AD_DEBUG_IF(dbg, "eu-20200915 same-left-right {}{:3d}{} {:5.3} leaves:{:5d} transition {}", this_transition->left, pos, this_transition->right, node.node_id,
+                        //                 node.number_leaves_in_subtree(), *this_transition);
+                        // }
                     }
                     transitions_stack.emplace_back(node.aa_transitions_);
                 },
@@ -434,12 +444,15 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
                         const auto& min_flip_distance = fl.flip_distances.min_value();
                         const auto node_leaves = node.number_leaves_in_subtree();
                         const auto leaves_ratio = static_cast<double>(fl.leaves) / static_cast<double>(node_leaves);
-                        AD_DEBUG_IF(dbg, "flips_in_children {:3d} {:5.3} leaves:{:5d} children:{:3d}    flips:{:3d}  leaves:{:5d} ({:4.1f}%)  min_flip_distance:{} num:{}", pos, node.node_id, node_leaves,
-                                 node.subtree.size(), fl.flips, fl.leaves, leaves_ratio * 100.0, min_flip_distance.first, min_flip_distance.second);
                         if (min_flip_distance.first < 3 && leaves_ratio > leaves_ratio_threshold) {
-                            AD_DEBUG_IF(dbg, "   remove");
+                            AD_DEBUG_IF(dbg, "eu-20200915 remove flips_in_children {:3d} {:5.3} leaves:{:5d} children:{:3d}    flips:{:3d}  leaves:{:5d} ({:4.1f}%)  min_flip_distance:{} num:{}", pos,
+                                        node.node_id, node_leaves, node.subtree.size(), fl.flips, fl.leaves, leaves_ratio * 100.0, min_flip_distance.first, min_flip_distance.second);
                             node.aa_transitions_.remove(pos);
                             repeat = true;
+                        }
+                        else {
+                            AD_DEBUG_IF(dbg, "eu-20200915 keep flips_in_children {:3d} {:5.3} leaves:{:5d} children:{:3d}    flips:{:3d}  leaves:{:5d} ({:4.1f}%)  min_flip_distance:{} num:{}", pos,
+                                        node.node_id, node_leaves, node.subtree.size(), fl.flips, fl.leaves, leaves_ratio * 100.0, min_flip_distance.first, min_flip_distance.second);
                         }
                     }
                     transitions_stack.pop_back();
@@ -453,81 +466,6 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
         AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
 
 } // acmacs::tal::v3::update_aa_transitions_eu_20200915
-
-// void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
-// {
-//     AD_DEBUG_IF(debug_from(parameters.debug), "eu-20200915");
-
-//     const auto longest_sequence = update_common_aa(tree);
-//     set_aa_transitions_eu_20200915(tree, longest_sequence, parameters);
-
-//     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
-
-//     // add to top children of the tree differences between them and root, even if that subtree has common aa (with tolerance)
-//     for (auto& top_child : tree.subtree) {
-//         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
-//             if (const auto aa = top_child.common_aa_.at(pos, parameters.non_common_tolerance); aa != CommonAA::NoCommon && aa != root_sequence.at(pos))
-//                 top_child.replace_aa_transition(pos, aa);
-//         }
-//     }
-
-//     struct flips_leaves_t
-//     {
-//         size_t flips{0};
-//         size_t leaves{0};
-//         size_t min_flip_distance{999999};
-
-//         void add(size_t number_of_leaves, ssize_t distance)
-//         {
-//             ++flips;
-//             leaves += number_of_leaves;
-//             min_flip_distance = std::min(min_flip_distance, static_cast<size_t>(distance));
-//         }
-//     };
-
-//     struct StackEntry
-//     {
-//         StackEntry(const AA_Transitions& tr, seqdb::pos0_t longest) : transitions{tr}, flips_leaves_in_children(*longest) {}
-//         const AA_Transitions& transitions;
-//         std::vector<flips_leaves_t> flips_leaves_in_children;
-//     };
-
-//     std::vector<StackEntry> transitions_stack;
-//     tree::iterate_pre_post(
-//         tree,
-//         // pre
-//         [&root_sequence, &transitions_stack, longest_sequence, &parameters](Node& node) {
-//             for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
-//                 if (AA_Transition* this_transition = node.aa_transitions_.find(pos); this_transition) {
-//                     const auto prev = std::find_if(transitions_stack.rbegin(), transitions_stack.rend(), [pos](const auto& en) { return en.transitions.find(pos) != nullptr; });
-//                     if (prev != transitions_stack.rend()) {
-//                         const auto& prev_trans = *prev->transitions.find(pos);
-//                         this_transition->left = prev_trans.right;
-//                         if (this_transition->right == prev_trans.left) {
-//                             // AD_DEBUG("flip pos:{} leaves:{}", pos, node.number_leaves_in_subtree());
-//                             prev->flips_leaves_in_children[*pos].add(node.number_leaves_in_subtree(), prev - transitions_stack.rbegin());
-//                         }
-//                     }
-//                     else
-//                         this_transition->left = root_sequence.at(pos);
-//                 }
-//             }
-//             node.aa_transitions_.remove_left_right_same(parameters);
-//             transitions_stack.emplace_back(node.aa_transitions_, longest_sequence);
-//         },
-//         // post
-//         [&transitions_stack, longest_sequence](const Node& node) {
-//             for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
-//                 if (const auto& fl = transitions_stack.back().flips_leaves_in_children[*pos]; fl.flips)
-//                     AD_DEBUG("flips_in_children {:4.3} leaves:{:5d} pos:{:3d}  flips:{:3d}  leaves:{:5d}   min_flip_distance:{:2d}", node.node_id, node.number_leaves_in_subtree(), pos, fl.flips, fl.leaves, fl.min_flip_distance);
-//             }
-//             transitions_stack.pop_back();
-//         });
-
-//     if (!tree.aa_transitions_.empty())
-//         AD_WARNING("Root AA transions: {} (hide some roots to show this transion(s) in the first branch)", tree.aa_transitions_);
-
-// } // acmacs::tal::v3::update_aa_transitions_eu_20200915
 
 // ----------------------------------------------------------------------
 

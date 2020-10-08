@@ -1186,7 +1186,24 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         aa_transitions.calculate = true;
         getenv_copy_if_present("report"sv, aa_transitions.report);
         getenv_copy_if_present("debug"sv, aa_transitions.debug);
-        getenv_copy_if_present("non_common_tolerance"sv, aa_transitions.non_common_tolerance);
+        getenv_copy_if_present("non-common-tolerance"sv, aa_transitions.non_common_tolerance);
+
+        getenv("non-common-tolerance-per-pos"sv).visit([this, &aa_transitions]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
+                for (const auto& [key, val] : arg) {
+                    if (const auto pos = acmacs::string::from_chars<size_t>(key); pos < 5000) {
+                        if (aa_transitions.non_common_tolerance_per_pos.size() < pos)
+                            aa_transitions.non_common_tolerance_per_pos.resize(pos, -1.0);
+                        aa_transitions.non_common_tolerance_per_pos[pos - 1] = val.template to<double>();
+                    }
+                    else
+                        throw error{fmt::format("\"non-common-tolerance-per-pos\" invalid: {}", getenv("non-common-tolerance-per-pos"sv))};
+                }
+            }
+            else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+                throw error{fmt::format("\"non-common-tolerance-per-pos\" must be an object: {}", getenv("non-common-tolerance-per-pos"sv))};
+        });
+
         if (const auto& debug_pos = getenv("debug-pos"sv); debug_pos.is_number())
             aa_transitions.report_pos = debug_pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {

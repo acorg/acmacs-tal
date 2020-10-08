@@ -37,7 +37,7 @@ namespace acmacs::tal::inline v3
                 return at_pos_[*pos].max().first;
         }
 
-        char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance in draw-tree.hh
+        char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
             if (at_pos_.size() <= *pos)
                 return NoCommon;
