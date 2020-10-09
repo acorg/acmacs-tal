@@ -1,13 +1,13 @@
 #pragma once
 
-#include "acmacs-base/debug.hh"
+#include "acmacs-map-draw/log.hh"
 
 // ----------------------------------------------------------------------
 
 namespace acmacs::log
 {
     enum {
-        clades = 16,
+        clades = 20,
         coloring,
         tree,
         hz_sections,
