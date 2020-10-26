@@ -27,7 +27,7 @@ namespace acmacs::tal::inline v3::parameters
     struct LabelTether
     {
         bool show{false};
-        parameters::Line line;
+        parameters::Line line{};
     };
 
     struct Label
@@ -37,10 +37,10 @@ namespace acmacs::tal::inline v3::parameters
         vertical_position vpos{vertical_position::middle};
         horizontal_position hpos{horizontal_position::left};
         std::array<double, 2> offset{0.004, 0.0}; // relative to the area height
-        std::string text;
+        std::string text{};
         Rotation rotation{NoRotation};
-        LabelTether tether;
-        TextStyle text_style;
+        LabelTether tether{};
+        TextStyle text_style{};
     };
 
     struct Dash
