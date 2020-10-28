@@ -6,7 +6,7 @@
 #include <optional>
 #include <algorithm>
 
-#include "acmacs-base/debug.hh"
+#include "acmacs-base/log.hh"
 #include "acmacs-base/named-type.hh"
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/date.hh"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "acmacs-base/debug.hh"
+#include "acmacs-base/log.hh"
 #include "acmacs-draw/surface.hh"
 #include "acmacs-tal/coloring.hh"
 #include "acmacs-tal/parameters.hh"

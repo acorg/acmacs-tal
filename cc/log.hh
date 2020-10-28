@@ -4,17 +4,15 @@
 
 // ----------------------------------------------------------------------
 
-namespace acmacs::log
+namespace acmacs::log::inline v1
 {
-    enum {
-        clades = 20,
-        coloring,
-        tree,
-        hz_sections,
-        time_series
-    };
+    constexpr log_key_t clades{"clades"};
+    constexpr log_key_t coloring{"coloring"};
+    constexpr log_key_t tree{"tree"};
+    constexpr log_key_t hz_sections{"hz-sections"};
+    constexpr log_key_t time_series{"time-series"};
 
-}
+} // namespace acmacs::log::inline v1
 
 // ----------------------------------------------------------------------
 /// Local Variables:
