@@ -86,21 +86,21 @@ void acmacs::tal::v3::Settings::update_env()
     if (!virus_type.empty()) {  // might be updated later upon seqdb matching
         const auto lineage = tal_.tree().lineage();
         AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
-        setenv("virus-type"sv, virus_type);
-        setenv("lineage"sv, lineage);
+        setenv("virus-type"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        setenv("lineage"sv, lineage, acmacs::settings::v3::replace::yes_or_set_at_bottom);
         if (virus_type != "B" || lineage.empty())
-            setenv("virus-type/lineage"sv, virus_type);
+            setenv("virus-type/lineage"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
         else
-            setenv("virus-type/lineage"sv, fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))));
+            setenv("virus-type/lineage"sv, fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))), acmacs::settings::v3::replace::yes_or_set_at_bottom);
     }
-    setenv("tree-has-sequences"sv, tal_.tree().has_sequences());
-    setenv("chart-present"sv, tal_.chart_present());
+    setenv("tree-has-sequences"sv, tal_.tree().has_sequences(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+    setenv("chart-present"sv, tal_.chart_present(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
     if (tal_.chart_present()) {
         auto info{tal_.chart().info()};
-        setenv("chart-assay"sv, info->assay().HI_or_Neut());
-        setenv("chart-lab"sv, info->lab());
-        setenv("chart-rbc"sv, info->rbc_species());
-        setenv("chart-date"sv, info->date(chart::Info::Compute::Yes));
+        setenv("chart-assay"sv, info->assay().HI_or_Neut(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        setenv("chart-lab"sv, info->lab(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        setenv("chart-rbc"sv, info->rbc_species(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        setenv("chart-date"sv, info->date(chart::Info::Compute::Yes), acmacs::settings::v3::replace::yes_or_set_at_bottom);
     }
 
 } // acmacs::tal::v3::Settings::update_env

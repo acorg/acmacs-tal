@@ -18,10 +18,7 @@
          "reference-antigen-size": 5,
          "test-antigen-size": 3,
          "serum-size": 5
-        },
-        {"N": "if", "condition": {"empty": "{virus-type/lineage}"}, "then": [
-            {"N": "set", "virus-type/lineage": "XXX"}
-        ]}
+        }
     ],
 
     "? overwrite in local settings": "----------------------------------------------------------------------",
@@ -113,12 +110,12 @@
             }
         ]},
 
-        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "{virus-type}"}]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "$virus-type"}]}, "then": [
             {"?N": "mark vaccine"},
             {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
         ]},
 
-        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "{virus-type}"}]}, "then": [
+        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "$virus-type"}]}, "then": [
             "clades-whocc"
         ]},
 
