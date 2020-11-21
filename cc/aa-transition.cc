@@ -506,7 +506,8 @@ void acmacs::tal::v3::CommonAA::update(const CommonAA& subtree)
     }
     else {
         resize(subtree.at_pos_.size());
-        for (size_t pos{0}; pos < at_pos_.size(); ++pos)
+        // AD_DEBUG("CommonAA::update size:{} subtree.at_pos_.size:{}", size(), subtree.at_pos_.size());
+        for (size_t pos{0}; pos < std::min(at_pos_.size(), subtree.at_pos_.size()); ++pos)
             at_pos_[pos].update(subtree.at_pos_[pos]);
     }
 
