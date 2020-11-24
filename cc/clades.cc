@@ -90,7 +90,7 @@ void acmacs::tal::v3::Clades::make_sections()
     for (const auto& tree_clade : tree_clades) {
         AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
-        AD_LOG(acmacs::log::clades, "    from clade params: slot:{} display_name:{} hidden:{} sections:{}", clade_param.slot_no, clade_param.display_name, clade_param.hidden,
+        AD_LOG(acmacs::log::clades, "    from clade params: slot:{} display_name:{} hidden:{} sections:{}", clade_param.slot_no, clade_param.display_name, clade_param.hidden.front(),
                tree_clade.sections.size());
         if (clade_param.any_shown()) {
             auto& clade = clades_.emplace_back(tree_clade.name);
