@@ -130,9 +130,7 @@
             {"N": "populate-with-nuc-duplicates"}
         ]},
         {"N": "report-cumulative", "output": "$report-cumulative-output", "max": "$report-cumulative-max"},
-        {"N": "ladderize", "method": "$ladderize-method"},
-
-        {"?N": ""}
+        {"N": "ladderize", "method": "$ladderize-method"}
     ],
 
     "tal-dash-bar-clades": [

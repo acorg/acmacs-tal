@@ -1,4 +1,4 @@
-# Time-stamp: <2020-10-08 12:40:30 eu>
+# Time-stamp: <2020-11-21 09:15:06 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -138,7 +138,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {"N": "clades-reset"}
 {"N": "clade", "name": "3C.2A1B", "display_name": "2A1B", "aa": ["92R", "121K", "158N", "159Y", "171K", "311Q", "406V", "484E"], "report": false}
--- "inclusion_tolerance": "{clade_section_inclusion_tolerance}", "exclusion_tolerance": "{clade_section_exclusion_tolerance}"}
+-- "inclusion_tolerance": "$clade_section_inclusion_tolerance", "exclusion_tolerance": "$clade_section_exclusion_tolerance"}
 
 ** Report
 
@@ -183,7 +183,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC bash
 {"N": "aa-transitions", "report": false, 
- "method": "eu-20200909", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+ "method": "eu-20200915", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
 "show-same-left-right-for-pos": 193}
 #+END_SRC
 
