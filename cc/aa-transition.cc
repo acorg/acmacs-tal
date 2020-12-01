@@ -265,7 +265,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
                 }
             }
             else {
-                if (node.number_leaves_in_subtree() > 1000 && dbg == acmacs::debug::yes) {
+                if (node.number_leaves_in_subtree() > 1000 && dbg) {
                     AD_DEBUG_IF(dbg, "eu-20200909 common {} node:{:4.3s} leaves:{:4d} {}", pos, node.node_id, node.number_leaves_in_subtree(),
                                 node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
                     for (const auto& child : node.subtree) {
@@ -309,7 +309,7 @@ void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t l
 {
     // const auto total_leaves = tree.number_leaves_in_subtree();
 
-    const auto is_not_common_with_tolerance = [](const Node& node, seqdb::pos0_t pos, double tolerance, acmacs::debug /*dbg*/) -> bool {
+    const auto is_not_common_with_tolerance = [](const Node& node, seqdb::pos0_t pos, double tolerance, auto /*dbg*/) -> bool {
         const auto aa = node.common_aa_.at(pos, tolerance);
         if (aa == CommonAA::NoCommon)
             return true;
