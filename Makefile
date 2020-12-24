@@ -33,9 +33,7 @@ LDLIBS = $(ACMACSD_LIBS) $(CAIRO_LIBS) $(XZ_LIBS)
 # ----------------------------------------------------------------------
 
 install: $(TARGETS)
-	$(call symbolic_link_wildcard,$(abspath conf)/*.json,$(AD_CONF))
-	$(call symbolic_link,$(DIST)/tal,$(AD_BIN))
-	$(call symbolic_link_wildcard,$(abspath doc)/*.org,$(AD_DOC))
+	$(call install_all,$(AD_PACKAGE_NAME))
 
 test: install $(DIST)/tal
 	test/test
