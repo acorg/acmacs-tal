@@ -127,7 +127,7 @@ int main(int argc, const char* argv[])
                 }
             }
 
-            acmacs::run_and_detach({"tink"}, 0);
+            acmacs::run_and_detach("tink");
 
             fmt::print(stderr, "\n> {sep}\n> {date}\n> {sep}\n\n", fmt::arg("sep", "======================================================================================================================================================"),
                        fmt::arg("date", date::current_date_time()));
@@ -137,7 +137,7 @@ int main(int argc, const char* argv[])
             }
             catch (std::exception& err) {
                 AD_ERROR("{}", err);
-                acmacs::run_and_detach({"submarine"}, 0);
+                acmacs::run_and_detach("submarine");
             }
         }
 
