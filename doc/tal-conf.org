@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-21 09:15:06 eu>
+# Time-stamp: <2021-01-07 14:47:31 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -297,22 +297,20 @@ Just one entry for "labels": [{"offset": [0.0, 0.008], "scale": 0.008, "vertical
 is enough, other will be auto-added to place labels below the first one.
 
 #+BEGIN_SRC json
-  {"N": "dash-bar-aa-at",
-   # "?width-to-height-ratio": 0.009,
+  {"N": "dash-bar-aa-at", "?id": "bar-", "?width-to-height-ratio": 0.009,
    "pos": 193,
-   # "colors": [<most-frequent>, <second>],
-   # "colors": {"A": "red", "T": "blue"},
-   "labels": [<most-frequent>, <second>],
-   # "labels": {"A": "red", "T": "blue"},
-   "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
+   "?colors": "[<most-frequent>, <second>]", "?colors": {"A": "red", "T": "blue"},
+   "?labels": "[<most-frequent>, <second>]",  "?labels": {"A": "red", "T": "blue"},
+   "?dash": {"width": 1.0, "line_width_pixels": 0.5, "?": "width is a fraction of area width"},
    "?debug-outline": "lightblue"}
 #+END_SRC
 
 *** dash-bar - Show colored dashes for selected nodes
 
+**** template
+
 #+BEGIN_SRC json
-  {"N": "dash-bar",
-   "?width-to-height-ratio": 0.009,
+  {"N": "dash-bar", "?id": "bar-", "?width-to-height-ratio": 0.009,
    "nodes": [
      {"select": {<[[Select Nodes]]>}, "color": "#A0A0A0"},
    ],
@@ -322,6 +320,21 @@ is enough, other will be auto-added to place labels below the first one.
    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
    "?debug-outline": "lightblue"}
 #+END_SRC
+
+**** example
+
+#+BEGIN_SRC bash
+  {"N": "dash-bar", "id": "bar 94N 171N", "?width-to-height-ratio": 0.009,
+   "nodes": [
+       {"select": {"aa": ["171N", "94N"]}, "color": "#A3A60C"},
+   ],
+   "labels": [
+       {"text": "171N", "color": "#A3A60C", "vertical_position": "bottom", "horizontal_position": "middle", "offset": [0.00, 0.007], "scale": 0.007},
+       {"text": "94N", "color": "#A3A60C", "vertical_position": "bottom", "horizontal_position": "middle", "offset": [0.00, 0.014], "scale": 0.007},
+   ],
+  }
+#+END_SRC
+
 
 *** Antigenic maps
 

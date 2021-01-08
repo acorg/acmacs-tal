@@ -119,11 +119,9 @@ int main(int argc, const char* argv[])
             FD_ZERO(&set);
             FD_SET(0, &set);
             if (select(FD_SETSIZE, &set, nullptr, nullptr, nullptr) > 0) {
-                // fmt::print(stderr, " (reading)\n");
                 std::string input(20, ' ');
                 if (const auto bytes = ::read(0, input.data(), input.size()); bytes > 0) {
                     input.resize(static_cast<size_t>(bytes));
-                    // fmt::print(stderr, " (read {} bytes)\n", bytes);
                 }
             }
 
@@ -146,7 +144,7 @@ int main(int argc, const char* argv[])
         return 0;
     }
     catch (std::exception& err) {
-        fmt::print(stderr, "ERROR {}\n", err);
+        AD_ERROR("{}", err);
         return 1;
     }
 }
