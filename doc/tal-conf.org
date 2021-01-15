@@ -1,4 +1,4 @@
-# Time-stamp: <2021-01-07 14:47:31 eu>
+# Time-stamp: <2021-01-14 16:49:19 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -59,6 +59,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"all": true} -- all leaf nodes
 {"all-and-intermediate": true} -- all nodes overall
 {"aa": ["192Q", "!123E"]}
+{"nuc": ["354A", "547C"]}
 {"cumulative >=": 0.01, "report": true}
 {"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >= 
 {"edge >=": 0.01, "report": true}
@@ -284,8 +285,8 @@ If multiple criteria specified within single "select" object, they all used (con
   {"N": "dash-bar-clades",
    "?width-to-height-ratio": 0.009,
    "clades": [
-     {"name": "2DEL2017", "color": "#A0A0A0" "label": {<[[Label parameters]]>}},
-     {"name": "3DEL2017", "color": "#606060" "label": {<[[Label parameters]]>}}
+     {"name": "2DEL2017", "color": "#A0A0A0", "label": {"text": "", "?": "<[[Label parameters]]>"}},
+     {"name": "3DEL2017", "color": "#606060", "label": {"text": "", "?": "<[[Label parameters]]>"}},
    ],
    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
    "?debug-outline": "lightblue"}
@@ -312,10 +313,10 @@ is enough, other will be auto-added to place labels below the first one.
 #+BEGIN_SRC json
   {"N": "dash-bar", "?id": "bar-", "?width-to-height-ratio": 0.009,
    "nodes": [
-     {"select": {<[[Select Nodes]]>}, "color": "#A0A0A0"},
+     {"select": {"?": "<[[Select Nodes]]>"}, "color": "#A0A0A0"},
    ],
    "labels": [
-     {<[[Label parameters]]>}
+     {"text": "", "color": "pink", "vertical_position": "middle", "horizontal_position": "left", "offset": [-0.002, 0.0], "scale": 0.01, "?": "<[[Label parameters]]>"},
    ],
    "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
    "?debug-outline": "lightblue"}
@@ -409,7 +410,7 @@ Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (h
   "label": {
     "text": "",
     "rotation_degrees": 0, "color": "black",
-    "scale": 0.7, "?scale?": "scale is a fraction of the slot width in clades"
+    "scale": 0.01, "?scale?": "scale is a fraction of the slot width in clades"
     "vertical_position": "middle|top|bottom",
     "horizontal_position": "left|middle|right",
     "offset": [0.002, 0.0], "?offset?": "offset is a fraction of the area height",

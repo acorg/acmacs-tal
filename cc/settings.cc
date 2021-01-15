@@ -400,6 +400,9 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
         else if (key == "aa"sv) {
             tree().select_by_aa(selected, update, acmacs::seqdb::extract_aa_at_pos1_eq_list(val));
         }
+        else if (key == "nuc"sv) {
+            tree().select_by_nuc(selected, update, acmacs::seqdb::extract_nuc_at_pos1_eq_list(val));
+        }
         else if (key == "country"sv) {
             tree().select_by_country(selected, update, val.to<std::string_view>());
         }
@@ -449,7 +452,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
         else if (key == "vaccine"sv) {
             select_vaccine(selected, update, val);
         }
-        else
+        else if (key.empty() || key[0] != '?')
             throw acmacs::settings::v3::error{fmt::format("unrecognized select node criterium: {}", key)};
         if (key != "report"sv)
             update = Tree::Select::update;
