@@ -37,14 +37,21 @@ namespace acmacs::tal::inline v3
                 return at_pos_[*pos].max().first;
         }
 
-        char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
+        char at(seqdb::pos0_t pos, double tolerance, bool dbg = false) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
-            if (at_pos_.size() <= *pos)
+            AD_DEBUG_IF(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
+            if (at_pos_.size() <= *pos) {
+                AD_DEBUG_IF(dbg, "                    common:- <- at_pos_.size():{} <= pos", at_pos_.size());
                 return NoCommon;
-            else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance)
+            }
+            else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance) {
+                AD_DEBUG_IF(dbg, "                    common:{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} > tolerance", max.first, max, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
                 return max.first;
-            else
+            }
+            else {
+                AD_DEBUG_IF(dbg, "                    common:- <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} <= tolerance", max, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
                 return NoCommon;
+            }
         }
 
         bool is_common(seqdb::pos0_t pos, double tolerance) const { return at(pos, tolerance) != NoCommon; }
