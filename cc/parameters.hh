@@ -41,6 +41,7 @@ namespace acmacs::tal::inline v3::parameters
         Rotation rotation{NoRotation};
         LabelTether tether{};
         TextStyle text_style{};
+        bool show{true};
     };
 
     struct Dash

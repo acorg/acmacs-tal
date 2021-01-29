@@ -1,4 +1,4 @@
-# Time-stamp: <2021-01-14 16:49:19 eu>
+# Time-stamp: <2021-01-29 09:21:25 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -408,6 +408,7 @@ Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (h
 
 #+BEGIN_SRC json
   "label": {
+    "show": true,
     "text": "",
     "rotation_degrees": 0, "color": "black",
     "scale": 0.01, "?scale?": "scale is a fraction of the slot width in clades"

@@ -966,6 +966,7 @@ void acmacs::tal::v3::Settings::read_label_parameters(const rjson::v3::value& so
     using namespace std::string_view_literals;
 
     if (!source.is_null()) {
+        param.show = rjson::v3::get_or(substitute(source["show"sv]), true);
         rjson::v3::copy_if_not_null(substitute(source["color"sv]), param.color);
         rjson::v3::copy_if_not_null(substitute(source["scale"sv]), param.scale);
         if (const auto& position_v = substitute(source["vertical_position"sv]); !position_v.is_null()) {

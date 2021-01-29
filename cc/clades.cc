@@ -280,56 +280,58 @@ void acmacs::tal::v3::Clades::draw(acmacs::surface::Surface& surface) const
                 surface.line({left, pos_y_bottom}, {right, pos_y_bottom}, section.horizontal_line.color, section.horizontal_line.line_width, section.horizontal_line.dash);
 
                 // label
-                const Scaled label_size{parameters_.slot.width * section.label.scale};
-                const auto text_size = surface.text_size(section.display_name, label_size, section.label.text_style);
-                double vertical_pos{0};
-                switch (section.label.vpos) {
-                    case parameters::vertical_position::top:
-                        vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1];
-                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                            vertical_pos += text_size.width;
-                        else if (section.label.rotation == Rotation90DegreesClockwise)
-                            vertical_pos -= text_size.height / 2.0;
-                        else
-                            vertical_pos += text_size.height;
-                        break;
-                    case parameters::vertical_position::middle:
-                        vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1];
-                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                            vertical_pos += text_size.width / 2.0;
-                        else if (section.label.rotation == Rotation90DegreesClockwise)
-                            vertical_pos -= text_size.width / 2.0;
-                        else
-                            vertical_pos += text_size.height / 2.0;
-                        break;
-                    case parameters::vertical_position::bottom:
-                        vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
-                        if (section.label.rotation == Rotation90DegreesClockwise)
-                            vertical_pos -= text_size.width;
-                        break;
+                if (section.label.show) {
+                    const Scaled label_size{parameters_.slot.width * section.label.scale};
+                    const auto text_size = surface.text_size(section.display_name, label_size, section.label.text_style);
+                    double vertical_pos{0};
+                    switch (section.label.vpos) {
+                        case parameters::vertical_position::top:
+                            vertical_pos = vertical_step * section.first->cumulative_vertical_offset_ + section.label.offset[1];
+                            if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                                vertical_pos += text_size.width;
+                            else if (section.label.rotation == Rotation90DegreesClockwise)
+                                vertical_pos -= text_size.height / 2.0;
+                            else
+                                vertical_pos += text_size.height;
+                            break;
+                        case parameters::vertical_position::middle:
+                            vertical_pos = vertical_step * (section.first->cumulative_vertical_offset_ + section.last->cumulative_vertical_offset_) / 2.0 + section.label.offset[1];
+                            if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                                vertical_pos += text_size.width / 2.0;
+                            else if (section.label.rotation == Rotation90DegreesClockwise)
+                                vertical_pos -= text_size.width / 2.0;
+                            else
+                                vertical_pos += text_size.height / 2.0;
+                            break;
+                        case parameters::vertical_position::bottom:
+                            vertical_pos = vertical_step * section.last->cumulative_vertical_offset_ + section.label.offset[1];
+                            if (section.label.rotation == Rotation90DegreesClockwise)
+                                vertical_pos -= text_size.width;
+                            break;
+                    }
+
+                    const auto text_pos_x_calc = [&, this]() {
+                        if (time_series_to_the_left_) {
+                            if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                                return pos_x + text_size.height + section.label.offset[0];
+                            // else if (section.label.rotation == Rotation90DegreesClockwise)
+                            //     return pos_x + section.label.offset[0];
+                            else
+                                return pos_x + section.label.offset[0];
+                        }
+                        else {
+                            if (section.label.rotation == Rotation90DegreesAnticlockwise)
+                                return pos_x - section.label.offset[0];
+                            else if (section.label.rotation == Rotation90DegreesClockwise)
+                                return pos_x - text_size.height - section.label.offset[0];
+                            else
+                                return pos_x - text_size.width - section.label.offset[0];
+                        }
+                    };
+                    const auto text_pos_x = text_pos_x_calc();
+
+                    surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
                 }
-
-                const auto text_pos_x_calc = [&, this]() {
-                    if (time_series_to_the_left_) {
-                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                            return pos_x + text_size.height + section.label.offset[0];
-                        // else if (section.label.rotation == Rotation90DegreesClockwise)
-                        //     return pos_x + section.label.offset[0];
-                        else
-                            return pos_x + section.label.offset[0];
-                    }
-                    else {
-                        if (section.label.rotation == Rotation90DegreesAnticlockwise)
-                            return pos_x - section.label.offset[0];
-                        else if (section.label.rotation == Rotation90DegreesClockwise)
-                            return pos_x - text_size.height - section.label.offset[0];
-                        else
-                            return pos_x - text_size.width - section.label.offset[0];
-                    }
-                };
-                const auto text_pos_x = text_pos_x_calc();
-
-                surface.text({text_pos_x, vertical_pos}, section.display_name, section.label.color, label_size, section.label.text_style, section.label.rotation);
             }
         }
     }
