@@ -1210,6 +1210,8 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
 
         if (const auto& debug_pos = getenv("debug-pos"sv); debug_pos.is_number())
             aa_transitions.report_pos = debug_pos.to<seqdb::pos1_t>();
+        if (const auto& same_pos = getenv("show-same-left-right-for-pos"sv); !same_pos.is_null())
+            aa_transitions.show_same_left_right_for_pos = same_pos.to<seqdb::pos1_t>();
         if (const auto& method_v = getenv("method"sv); !method_v.is_null()) {
             const auto method = method_v.to<std::string_view>();
             if (method.empty()) {

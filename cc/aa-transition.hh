@@ -129,7 +129,7 @@ namespace acmacs::tal::inline v3
         {
             return remove_if([pos, right](const auto& en) { return en.pos == pos && en.right == right; });
         }
-        void remove_left_right_same(const draw_tree::AATransitionsParameters& parameters);
+        void remove_left_right_same(const draw_tree::AATransitionsParameters& parameters, const Node& node);
         void remove_empty_right()
         {
             remove_if([](const auto& en) { return en.empty_right(); });

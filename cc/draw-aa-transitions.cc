@@ -237,7 +237,7 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
                     AD_WARNING("DrawAATransitions::draw_transitions: name is empty in {}", names);
             }
 
-            if (transition.node->aa_transitions_.has_same_left_right()) {
+            if (transition.node->aa_transitions_.has_same_left_right() && transition.node->node_for_left_aa_transitions_) {
                 const auto node_left = [horizontal_step = draw_tree.horizontal_step(), vertical_step = draw_tree.vertical_step()](const Node& node) -> PointCoordinates {
                     return {horizontal_step * (node.cumulative_edge_length.as_number() - node.edge_length.as_number()), vertical_step * node.cumulative_vertical_offset_};
                 };
