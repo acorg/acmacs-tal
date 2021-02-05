@@ -471,8 +471,8 @@ void acmacs::tal::v3::set_aa_transitions_eu_20210205(Tree& tree, seqdb::pos0_t l
                         if (const auto [common_child, msg_child] = is_common_with_tolerance_for_child(child, pos, non_common_tolerance, dbg); common_child) {
                             const auto aa = child.common_aa_.at(pos, non_common_tolerance);
                             child.aa_transitions_.add(pos, aa);
-                            AD_DEBUG_IF(dbg, "                <child> add {}{} node:{:5.3s} leaves:{:4d} --> {}", pos, aa, child.node_id, child.number_leaves_in_subtree(),
-                                        child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
+                            AD_DEBUG_IF(dbg, "                <child> add {}{} node:{:5.3s} leaves:{:4d}", pos, aa, child.node_id,
+                                        child.number_leaves_in_subtree()); //, child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
                             AD_DEBUG_IF(dbg, "                    [is_common_with_tolerance_for_child]: {}", msg_child);
                         }
                         else {
@@ -496,8 +496,8 @@ void acmacs::tal::v3::set_aa_transitions_eu_20210205(Tree& tree, seqdb::pos0_t l
                                     counter.report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
                         if (const auto [common_child, msg_child] = is_common_with_tolerance_for_child(child, pos, non_common_tolerance, dbg); /* child_aa != node_aa && */ common_child) {
                             child.replace_aa_transition(pos, child_aa);
-                            AD_DEBUG_IF(dbg, "                <child> <replaced> {:5.3s} {:3d}{} --> {}", child.node_id, pos, child_aa,
-                                        child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
+                            AD_DEBUG_IF(dbg, "                <child> <replaced> {:5.3s} {:3d}{}", child.node_id, pos,
+                                        child_aa); //, child.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
                             AD_DEBUG_IF(dbg, "                    [is_common_with_tolerance_for_child]: {}", msg);
                         }
                     }
@@ -505,6 +505,20 @@ void acmacs::tal::v3::set_aa_transitions_eu_20210205(Tree& tree, seqdb::pos0_t l
             }
         }
     });
+
+    if (parameters.debug && parameters.report_pos) {
+        AD_DEBUG("eu-20200915 added aa transitions =============================================================");
+        size_t offset = 0;
+        tree::iterate_pre_post(
+            tree,
+            [&parameters, &offset](const Node& node) mutable {
+                ++offset;
+                if (const auto* aatr = node.aa_transitions_.find(*parameters.report_pos); aatr) {
+                    AD_DEBUG("  {:{}s}{:5.3} {}", "", offset * 2, node.node_id, aatr->display());
+                }
+            },
+            [&offset](const Node& node) { --offset; });
+    }
 
 } // acmacs::tal::v3::set_aa_transitions_eu_20210205
 
