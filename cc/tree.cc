@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <regex>
 #include <set>
+#include <stack>
 
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
@@ -617,27 +618,31 @@ void acmacs::tal::v3::Tree::populate_with_nuc_duplicates()
 
     const auto& seqdb = acmacs::seqdb::get();
     seqdb.find_slaves();
-    Node* parent{nullptr};
-    const auto pre = [&parent](Node& node) { parent = &node; };
-    const auto leaf = [&parent, &seqdb, already_in_tree](const Node& node) {
+    std::stack<Node*> parents;
+    const auto pre_populate = [&parents](Node& node) { parents.push(&node); };
+    const auto post_populate = [&parents](Node&) { parents.pop(); };
+    const auto leaf_populate = [&parents, &seqdb, already_in_tree](const Node& node) {
         if (!node.ref.empty()) {
-            for (const auto& slave : node.ref.seq().slaves())
+            // AD_DEBUG("[populate_with_nuc_duplicates] {}", node.ref.seq_id());
+            for (const auto& slave : node.ref.seq().slaves()) {
                 if (const auto seq_id = slave.seq_id(); !already_in_tree(seq_id)) {
-                    parent->to_populate.emplace_back(seq_id, node.edge_length).populate(slave, seqdb);
+                    // AD_DEBUG("[populate_with_nuc_duplicates]     {}", seq_id);
+                    parents.top()->to_populate.emplace_back(seq_id, node.edge_length).populate(slave, seqdb);
                 }
+            }
         }
     };
-    tree::iterate_leaf_pre(*this, leaf, pre);
+    tree::iterate_leaf_pre_post(*this, leaf_populate, pre_populate, post_populate);
 
     size_t added_leaves{0};
-    const auto post = [&added_leaves](Node& node) {
+    const auto post_add_nuc_duplicate = [&added_leaves](Node& node) {
         if (!node.to_populate.empty()) {
             added_leaves += node.to_populate.size();
             std::move(std::begin(node.to_populate), std::end(node.to_populate), std::back_inserter(node.subtree));
             node.to_populate.clear();
         }
     };
-    tree::iterate_post(*this, post);
+    tree::iterate_post(*this, post_add_nuc_duplicate);
 
     AD_INFO("populate_with_nuc_duplicates:\n  initial: {:5d}\n  added:   {:5d}\n  total:   {:5d}", all_seq_ids.size(), added_leaves, all_seq_ids.size() + added_leaves);
 
