@@ -570,7 +570,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
                 tree,
                 // pre
                 [&root_sequence, &transitions_stack, pos, dbg](Node& node) {
-                    AD_DEBUG_IF(node.node_id.vertical == 4756 && pos >= seqdb::pos1_t{159} && pos <= seqdb::pos1_t{161}, "** pre   {:5.3} {} [{}]", node.node_id, node.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes), pos);
+                    // AD_DEBUG_IF(node.node_id.vertical == 4756 && pos >= seqdb::pos1_t{159} && pos <= seqdb::pos1_t{161}, "** pre   {:5.3} {} [{}]", node.node_id, node.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes), pos);
                     if (AA_Transition* this_transition = node.aa_transitions_.find(pos); this_transition) {
                         const auto prev = std::find_if(transitions_stack.rbegin(), transitions_stack.rend(), [pos](const auto& en) { return en.transitions.find(pos) != nullptr; });
                         if (prev != transitions_stack.rend()) {
@@ -611,7 +611,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200915(Tree& tree, const draw_t
                                         node.node_id, node_leaves, node.subtree.size(), fl.flips, fl.leaves, leaves_ratio * 100.0, min_flip_distance.first, min_flip_distance.second);
                         }
                     }
-                    AD_DEBUG_IF(node.node_id.vertical == 4756 && pos >= seqdb::pos1_t{159} && pos <= seqdb::pos1_t{161}, "** post2 {:5.3} {} [{}]", node.node_id, node.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes), pos);
+                    // AD_DEBUG_IF(node.node_id.vertical == 4756 && pos >= seqdb::pos1_t{159} && pos <= seqdb::pos1_t{161}, "** post2 {:5.3} {} [{}]", node.node_id, node.aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes), pos);
                     transitions_stack.pop_back();
                 });
         }
