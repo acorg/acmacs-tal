@@ -119,7 +119,16 @@ namespace acmacs::tal::inline v3
 
         // leaf node only
         mutable std::optional<size_t> antigen_index_in_chart_;
-        mutable std::vector<std::tuple<size_t, bool, bool>> serum_index_in_chart_; // serum_no, reassortant matches, passage_type matches
+
+        struct serum_from_chart_t
+        {
+            size_t serum_no;
+            bool reassortant_matches;
+            bool passage_type_matches;
+        };
+
+        mutable std::vector<serum_from_chart_t> serum_index_in_chart_;
+
         Subtree to_populate; // populate_with_nuc_duplicates()
 
         // -------------------- AA transitions (branch node only) --------------------
@@ -294,6 +303,13 @@ namespace acmacs::tal::inline v3
 
         using clades_t = std::vector<clade_t>;
 
+        struct nodes_of_sera_t
+        {
+            std::vector<const Node*> nodes;
+        };
+
+        using serum_to_node_t = std::vector<nodes_of_sera_t>;
+
         // constexpr clades_t& clades() { return clades_; }
         constexpr const clades_t& clades() const { return clades_; }
 
@@ -336,6 +352,7 @@ namespace acmacs::tal::inline v3
         std::string lineage_;
         clades_t clades_;
         mutable bool chart_matched_{false};
+        mutable serum_to_node_t serum_to_node_; // nodes matched for each serum index from the chart
         bool structure_modified_{true};
 
     }; // class Tree

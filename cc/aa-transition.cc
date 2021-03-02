@@ -306,7 +306,7 @@ void acmacs::tal::v3::update_aa_transitions_eu_20200909(Tree& tree, const draw_t
 // ======================================================================
 //  Eu 2020-09-15
 
-void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t longest_sequence, const draw_tree::AATransitionsParameters& parameters)
+[[maybe_unused]] void acmacs::tal::v3::set_aa_transitions_eu_20200915(Tree& tree, seqdb::pos0_t longest_sequence, const draw_tree::AATransitionsParameters& parameters)
 {
     // const auto total_leaves = tree.number_leaves_in_subtree();
 
@@ -482,7 +482,7 @@ void acmacs::tal::v3::set_aa_transitions_eu_20210205(Tree& tree, seqdb::pos0_t l
                 }
             }
             else {
-                const auto node_aa = node.common_aa_.at(pos, non_common_tolerance);
+                [[maybe_unused]] const auto node_aa = node.common_aa_.at(pos, non_common_tolerance);
                 AD_DEBUG_IF(dbg, "            <common> {}", node.common_aa_.counter(pos).report_sorted_max_first(" {value}:{counter_percent:.1f}%({counter})"));
                 AD_DEBUG_IF(dbg, "                [is_common_with_tolerance]: {}", msg);
                 for (auto& child : node.subtree) {
@@ -517,7 +517,7 @@ void acmacs::tal::v3::set_aa_transitions_eu_20210205(Tree& tree, seqdb::pos0_t l
                     AD_DEBUG("  {:{}s}{:5.3} {}", "", offset * 2, node.node_id, aatr->display());
                 }
             },
-            [&offset](const Node& node) { --offset; });
+            [&offset](const Node& /*node*/) { --offset; });
     }
 
 } // acmacs::tal::v3::set_aa_transitions_eu_20210205
@@ -767,7 +767,7 @@ std::string acmacs::tal::v3::CommonAA::report(const CommonAA& /*parent*/, std::o
 
 // ======================================================================
 
-void acmacs::tal::v3::AA_Transitions::remove_left_right_same(const draw_tree::AATransitionsParameters& parameters, const Node& node)
+void acmacs::tal::v3::AA_Transitions::remove_left_right_same(const draw_tree::AATransitionsParameters& parameters, [[maybe_unused]] const Node& node)
 {
     // AD_DEBUG_IF(!data_.empty(), "remove_left_right_same {}", display());
     remove_if([&parameters /*, &node */](const auto& en) {

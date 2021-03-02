@@ -6,6 +6,7 @@
 #include "acmacs-base/statistics.hh"
 #include "acmacs-base/timeit.hh"
 #include "acmacs-base/counter.hh"
+#include "acmacs-base/range-v3.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-virus/virus-name-v1.hh"
 #include "acmacs-chart-2/chart.hh"
@@ -403,16 +404,16 @@ void acmacs::tal::v3::Tree::select_matches_chart_sera(NodeSet& nodes, Select upd
     const auto serum_matches = [match_type](const Node& node) -> bool {
         if (!node.is_leaf())
             return false;
-        for (const auto& [serum_index, reassortant_matches, passage_type_matches] : node.serum_index_in_chart_) {
+        for (const auto& serum_data : node.serum_index_in_chart_) {
             switch (match_type) {
               case serum_match_t::name:
                   return true;
               case serum_match_t::reassortant:
-                  if (reassortant_matches)
+                  if (serum_data.reassortant_matches)
                       return true;
                   break;
               case serum_match_t::passage_type:
-                  if (reassortant_matches && passage_type_matches)
+                  if (serum_data.reassortant_matches && serum_data.passage_type_matches)
                       return true;
                   break;
             }
@@ -453,18 +454,18 @@ acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_tree(serum_ma
 {
     acmacs::chart::PointIndexList indexes;
     tree::iterate_leaf(*this, [&indexes, match_type](const Node& node) {
-        for (const auto& [serum_index, reassortant_matches, passage_type_matches] : node.serum_index_in_chart_) {
+        for (const auto& serum_data : node.serum_index_in_chart_) {
             switch (match_type) {
               case serum_match_t::name:
-                  indexes.insert(serum_index);
+                  indexes.insert(serum_data.serum_no);
                   break;
               case serum_match_t::reassortant:
-                  if (reassortant_matches)
-                      indexes.insert(serum_index);
+                  if (serum_data.reassortant_matches)
+                      indexes.insert(serum_data.serum_no);
                   break;
               case serum_match_t::passage_type:
-                  if (reassortant_matches && passage_type_matches)
-                      indexes.insert(serum_index);
+                  if (serum_data.reassortant_matches && serum_data.passage_type_matches)
+                      indexes.insert(serum_data.serum_no);
                   break;
             }
         }
@@ -477,12 +478,17 @@ acmacs::chart::PointIndexList acmacs::tal::v3::Tree::chart_sera_in_section(const
 {
     acmacs::chart::PointIndexList indexes;
     bool use{first == nullptr};
-    tree::iterate_leaf(*this, [&indexes, &use, first, last](const Node& node) {
+    tree::iterate_leaf(*this, [&indexes, &use, first, last, this](const Node& node) {
         if (!use && &node == first)
             use = true;
         if (use) {
-            for (const auto& en : node.serum_index_in_chart_)
-                indexes.insert(std::get<size_t>(en));
+            for (const auto& en : node.serum_index_in_chart_) {
+                // to avoid serum circles for the same serum in different sections, we choose serum for this section if a node from this section is a best match for serum (by passage type)
+                if (serum_to_node_[en.serum_no].nodes.front() == &node) {
+                    // AD_DEBUG("chart_sera_in_section {} reass:{} pass:{}", en.serum_no, en.reassortant_matches, en.passage_type_matches);
+                    indexes.insert(en.serum_no);
+                }
+            }
         }
         if (use && &node == last)
             use = false;
@@ -1145,7 +1151,8 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
             antigen_names[antigens->at(ag_no)->full_name()] = ag_no;
         for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
             serum_names[sera->at(sr_no)->name()].push_back(sr_no);
-        tree::iterate_leaf(*this, [&antigen_names,&serum_names,&sera](const Node& node) {
+        serum_to_node_.resize(sera->size());
+        tree::iterate_leaf(*this, [&antigen_names, &serum_names, &sera, this](const Node& node) {
             for (const auto& hi_name : node.hi_names) {
                 if (const auto found = antigen_names.find(hi_name); found != std::end(antigen_names)) {
                     node.antigen_index_in_chart_ = found->second;
@@ -1154,10 +1161,26 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
             }
             const auto parsed_seq_id = acmacs::virus::name::parse(node.seq_id);
             if (const auto found = serum_names.find(parsed_seq_id.name()); found != std::end(serum_names)) {
-                for (auto serum_index : found->second)
-                    node.serum_index_in_chart_.emplace_back(serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant, sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg());
+                for (auto serum_index : found->second) {
+                    node.serum_index_in_chart_.push_back(
+                        {serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant, sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg()});
+                    serum_to_node_[serum_index].nodes.push_back(&node);
+                }
             }
         });
+        for (const auto sr_no : range_from_0_to(sera->size())) {
+            if (auto& nodes = serum_to_node_[sr_no].nodes; !nodes.empty()) {
+                // sort node pointers to have one with the best serum match first (the one matching reassortant and passage type)
+                ranges::sort(nodes, [sr_no](const auto& n1, const auto& n2) {
+                    const auto pred = [sr_no](const auto& en) { return en.serum_no == sr_no; };
+                    const auto rank = [](const auto& sr_data) { return (sr_data.reassortant_matches ? 2 : 0) + (sr_data.passage_type_matches ? 1 : 0); };
+                    const auto sr_en_1 = ranges::find_if(n1->serum_index_in_chart_, pred);
+                    const auto sr_en_2 = ranges::find_if(n2->serum_index_in_chart_, pred);
+                    return rank(*sr_en_1) > rank(*sr_en_2);
+                });
+                // AD_DEBUG("serum nodes {:3d} {:2d} {}", sr_no, serum_to_node_[sr_no].nodes.size(), nodes.front()->seq_id);
+            }
+        }
         chart_matched_ = true;
     }
 
