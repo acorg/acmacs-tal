@@ -1162,8 +1162,8 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
             const auto parsed_seq_id = acmacs::virus::name::parse(node.seq_id);
             if (const auto found = serum_names.find(parsed_seq_id.name()); found != std::end(serum_names)) {
                 for (auto serum_index : found->second) {
-                    node.serum_index_in_chart_.push_back(
-                        {serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant, sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg()});
+                    node.serum_index_in_chart_.push_back({serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant,
+                                                          sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg(), sera->at(serum_index)->passage() == parsed_seq_id.passage});
                     serum_to_node_[serum_index].nodes.push_back(&node);
                 }
             }
@@ -1173,7 +1173,7 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
                 // sort node pointers to have one with the best serum match first (the one matching reassortant and passage type)
                 ranges::sort(nodes, [sr_no](const auto& n1, const auto& n2) {
                     const auto pred = [sr_no](const auto& en) { return en.serum_no == sr_no; };
-                    const auto rank = [](const auto& sr_data) { return (sr_data.reassortant_matches ? 2 : 0) + (sr_data.passage_type_matches ? 1 : 0); };
+                    const auto rank = [](const auto& sr_data) { return (sr_data.reassortant_matches ? 4 : 0) + (sr_data.passage_type_matches ? 2 : 0) + (sr_data.passage_matches ? 1 : 0); };
                     const auto sr_en_1 = ranges::find_if(n1->serum_index_in_chart_, pred);
                     const auto sr_en_2 = ranges::find_if(n2->serum_index_in_chart_, pred);
                     return rank(*sr_en_1) > rank(*sr_en_2);
