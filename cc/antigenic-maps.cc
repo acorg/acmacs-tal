@@ -1,5 +1,4 @@
 #include "acmacs-base/rjson-v3-helper.hh"
-#include "acmacs-base/string-substitute.hh"
 #include "acmacs-tal/antigenic-maps.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/hz-sections.hh"
