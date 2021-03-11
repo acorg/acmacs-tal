@@ -1148,7 +1148,7 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
         std::map<std::string, size_t, std::less<>> antigen_names;
         std::map<acmacs::virus::name_t, std::vector<size_t>, std::less<>> serum_names;
         for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
-            antigen_names[antigens->at(ag_no)->format("{name_full}")] = ag_no;
+            antigen_names[antigens->at(ag_no)->name_full()] = ag_no;
         for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
             serum_names[sera->at(sr_no)->name()].push_back(sr_no);
         serum_to_node_.resize(sera->size());
