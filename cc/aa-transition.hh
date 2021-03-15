@@ -39,17 +39,17 @@ namespace acmacs::tal::inline v3
 
         char at(seqdb::pos0_t pos, double tolerance, bool dbg = false) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
-            // AD_DEBUG_IF(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
+            // AD_DEBUG(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
             if (at_pos_.size() <= *pos) {
-                AD_DEBUG_IF(dbg, "                    common:- @{} <- at_pos_.size():{} <= pos", pos, at_pos_.size());
+                AD_DEBUG(dbg, "                    common:- @{} <- at_pos_.size():{} <= pos", pos, at_pos_.size());
                 return NoCommon;
             }
             else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance) {
-                AD_DEBUG_IF(dbg && at_pos_[*pos].total() > 100, "                    common:{} @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} > tolerance", max.first, pos, max, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
+                AD_DEBUG(dbg && at_pos_[*pos].total() > 100, "                    common:{} @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} > tolerance", max.first, pos, max, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
                 return max.first;
             }
             else {
-                AD_DEBUG_IF(dbg && at_pos_[*pos].total() > 100, "                    common:- @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} <= tolerance", max, pos, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
+                AD_DEBUG(dbg && at_pos_[*pos].total() > 100, "                    common:- @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} <= tolerance", max, pos, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
                 return NoCommon;
             }
         }

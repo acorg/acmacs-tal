@@ -30,10 +30,10 @@ const acmacs::tal::v3::Node& acmacs::tal::v3::Node::find_first_leaf() const
 
 void acmacs::tal::v3::Node::replace_aa_transition(seqdb::pos0_t pos, char right)
 {
-    // AD_DEBUG_IF(pos == seqdb::pos1_t{160}, "replace_aa_transition {:5.3} {}{} (was: {})", node_id, pos, right, aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
+    // AD_DEBUG(pos == seqdb::pos1_t{160}, "replace_aa_transition {:5.3} {}{} (was: {})", node_id, pos, right, aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
     remove_aa_transition(pos, right);
     aa_transitions_.add(pos, right);
-    // AD_DEBUG_IF(pos == seqdb::pos1_t{160}, "    --> {}", aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
+    // AD_DEBUG(pos == seqdb::pos1_t{160}, "    --> {}", aa_transitions_.display(std::nullopt, AA_Transitions::show_empty_left::yes));
 
 } // acmacs::tal::v3::Node::replace_aa_transition
 
