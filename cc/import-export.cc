@@ -39,7 +39,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
+void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree, const ExportOptions& options)
 {
     fs::path filepath{filename};
     auto ext = filepath.extension();
@@ -48,7 +48,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
     std::string exported;
     if (ext == ".newick") {
         try {
-            exported = newick_export(tree);
+            exported = newick_export(tree, options);
         }
         catch (NewickExportError& err) {
             throw ExportError{fmt::format("cannot export to newick: {}", err)};
@@ -88,7 +88,7 @@ void acmacs::tal::v3::export_tree(std::string_view filename, const Tree& tree)
     }
     else
         throw ExportError{fmt::format("cannot infer export method from filename: {}", filename)};
-    if (filename[0] == '/')
+    if (filename == "/")
         filename = std::string_view{"-"};
     acmacs::file::write(filename, exported, filename.back() == 'z' ? acmacs::file::force_compression::yes : acmacs::file::force_compression::no);
 

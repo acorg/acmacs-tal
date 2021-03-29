@@ -26,6 +26,7 @@ struct Options : public argv
     option<str_array> defines{*this, 'D', "--define", desc{"see $ACMACSD_ROOT/share/doc/tal-conf.org"}};
     option<str>       chart_file{*this, "chart", desc{"path to a chart for the signature page"}};
     option<size_t>    first_last_leaves{*this, "first-last-leaves", desc{"min num of leaves per node to print"}};
+    option<bool> export_aa_transion_labels{*this, "export-aa-transion-labels", desc{"for exporting into newick"}};
 
     option<bool>      interactive{*this, 'i', "interactive"};
     option<bool>      open{*this, "open"};
@@ -61,7 +62,7 @@ int main(int argc, const char* argv[])
         acmacs::log::enable(acmacs::log::hz_sections);
 
         acmacs::tal::Tal tal;
-        tal.import_tree(opt.tree_file);
+        // tal.import_tree(opt.tree_file);
         tal.import_chart(opt.chart_file);
 
         acmacs::tal::Settings settings{tal};
@@ -75,7 +76,10 @@ int main(int argc, const char* argv[])
         for (;;) {
             tal.import_tree(opt.tree_file);
 
+            AD_DEBUG("applying \"tal-default\"...");
+            const Timeit time_tal_default("applying \"tal-default\"");
             settings.apply("tal-default"sv);
+            time_tal_default.report();
 
             if (opt.chart_file) {
                 acmacs::tal::AntigenicMaps* maps{tal.draw().layout().find<acmacs::tal::AntigenicMaps>()};
@@ -87,16 +91,18 @@ int main(int argc, const char* argv[])
                 maps_settings.set_defines(opt.defines);
             }
 
-            // Timeit time_preparing(">>>> preparing: ", report);
+            AD_DEBUG("preparing...");
+            const Timeit time_preparing("preparing");
             tal.prepare();
-            // time_preparing.report();
+            time_preparing.report();
 
             if (opt.first_last_leaves.has_value())
                 tal.tree().report_first_last_leaves(opt.first_last_leaves);
 
             // Timeit time_exporting(">>>> exporting: ", report);
+            acmacs::tal::ExportOptions export_options{.add_aa_substitution_labels = *opt.export_aa_transion_labels};
             for (const auto& output : *opt.outputs)
-                tal.export_tree(output);
+                tal.export_tree(output, export_options);
             // time_exporting.report();
 
             if (opt.open || opt.ql) {

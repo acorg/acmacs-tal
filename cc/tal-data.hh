@@ -2,6 +2,7 @@
 
 #include "acmacs-tal/tree.hh"
 #include "acmacs-tal/draw.hh"
+#include "acmacs-tal/import-export.hh"
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ namespace acmacs::tal::inline v3
 
         void import_tree(std::string_view filename);
         void import_chart(std::string_view filename);
-        void export_tree(std::string_view filename);
+        void export_tree(std::string_view filename, const ExportOptions& options);
 
         void reset();
         void prepare();

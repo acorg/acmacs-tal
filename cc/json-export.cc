@@ -1,5 +1,6 @@
 #include "acmacs-base/to-json.hh"
 #include "acmacs-base/date.hh"
+#include "acmacs-base/timeit.hh"
 #include "acmacs-tal/json-export.hh"
 #include "acmacs-tal/tree.hh"
 
@@ -9,6 +10,7 @@ static to_json::object export_node(const acmacs::tal::v3::Node& node);
 
 std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
 {
+    // Timeit ti{"exporting tree to json"};
     tree.cumulative_calculate();
     auto json = to_json::object(to_json::key_val("_", fmt::format("-*- js-indent-level: {} -*-", indent)),
                                 to_json::key_val("  version", "phylogenetic-tree-v3"),

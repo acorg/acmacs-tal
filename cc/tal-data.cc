@@ -1,13 +1,14 @@
 #include "acmacs-base/filesystem.hh"
 #include "acmacs-chart-2/factory-import.hh"
+#include "acmacs-base/timeit.hh"
 #include "acmacs-tal/tal-data.hh"
-#include "acmacs-tal/import-export.hh"
 #include "acmacs-tal/aa-transition.hh"
 
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::Tal::import_tree(std::string_view filename)
 {
+    // const Timeit ti{"importing tree"};
     if (!filename.empty()) {
         tree_.erase();
         acmacs::tal::import_tree(filename, tree_);
@@ -44,7 +45,7 @@ void acmacs::tal::v3::Tal::prepare()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tal::export_tree(std::string_view filename)
+void acmacs::tal::v3::Tal::export_tree(std::string_view filename, const ExportOptions& options)
 {
     const fs::path filepath{filename};
     const auto ext = filepath.extension();
@@ -52,7 +53,7 @@ void acmacs::tal::v3::Tal::export_tree(std::string_view filename)
         draw().export_pdf(filename);
     }
     else {
-        acmacs::tal::export_tree(filename, tree_);
+        acmacs::tal::export_tree(filename, tree_, options);
     }
 
 } // acmacs::tal::v3::Tal::export_tree

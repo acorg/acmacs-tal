@@ -2,6 +2,7 @@
 #include <stack>
 
 #include "acmacs-base/read-file.hh"
+#include "acmacs-base/string.hh"
 #include "acmacs-tal/newick.hh"
 #include "acmacs-tal/tree.hh"
 
@@ -126,6 +127,7 @@ void acmacs::tal::v3::newick_import(std::string_view filename, Tree& tree)
 {
     tree.data_buffer(acmacs::file::read(filename));
     Tokenizer tokenizer{tree.data_buffer()};
+    size_t leaves { 0 };
     try {
         std::stack<Node*> node_stack;
         for (auto token = tokenizer.next(); token.type != Tokenizer::EndTree; token = tokenizer.next()) {
@@ -139,6 +141,7 @@ void acmacs::tal::v3::newick_import(std::string_view filename, Tree& tree)
                 case Tokenizer::Leaf:
                     // AD_DEBUG("Leaf {} :{} -- {}", token.name, token.edge_length, tokenizer.rest().substr(0, 20));
                     node_stack.top()->add_leaf(seq_id_t{token.name}, EdgeLength{token.edge_length});
+                    ++leaves;
                     break;
                 case Tokenizer::EndSubtree:
                     node_stack.top()->seq_id = seq_id_t{token.name};
@@ -155,16 +158,20 @@ void acmacs::tal::v3::newick_import(std::string_view filename, Tree& tree)
     catch (TokenizerError& err) {
         throw NewickImportError{fmt::format("newick import error: {}", err)};
     }
+    AD_DEBUG("{} leaves read from newick tree", leaves);
 
 } // acmacs::tal::v3::newick_import
 
 // ----------------------------------------------------------------------
 
-static std::string export_node(const acmacs::tal::v3::Node& node);
-
-std::string acmacs::tal::v3::newick_export(const Tree& tree)
+namespace acmacs::tal::inline v3
 {
-    std::string result = export_node(tree);
+    static std::string export_node(const acmacs::tal::v3::Node& node, const ExportOptions& options);
+}
+
+std::string acmacs::tal::v3::newick_export(const Tree& tree, const ExportOptions& options)
+{
+    std::string result = export_node(tree, options);
     result.append(1, ';');
     return result;
 
@@ -172,7 +179,7 @@ std::string acmacs::tal::v3::newick_export(const Tree& tree)
 
 // ----------------------------------------------------------------------
 
-std::string export_node(const acmacs::tal::v3::Node& node)
+std::string acmacs::tal::v3::export_node(const acmacs::tal::v3::Node& node, const ExportOptions& options)
 {
     std::string result;
     if (!node.hidden) {
@@ -184,9 +191,14 @@ std::string export_node(const acmacs::tal::v3::Node& node)
             for (const auto& sub_node : node.subtree) {
                 if (result.back() != '(')
                     result.append(1, ',');
-                result.append(export_node(sub_node));
+                result.append(export_node(sub_node, options));
             }
             result.append(1, ')');
+            if (options.add_aa_substitution_labels && !node.aa_transitions_.empty()) {
+                auto label = node.aa_transitions_.display();
+                ::string::replace_in_place(label, ' ', '_');
+                result.append(label);
+            }
         }
         if (!node.edge_length.is_zero()) {
             result.append(1, ':');
@@ -195,7 +207,7 @@ std::string export_node(const acmacs::tal::v3::Node& node)
     }
     return result;
 
-} // export_node
+} // acmacs::tal::v3::export_node
 
 // ----------------------------------------------------------------------
 
