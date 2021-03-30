@@ -871,7 +871,7 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
     std::vector<Node> nodes;
     for (size_t item_no = 0; item_no < (new_root.size() - 1); ++item_no) {
         const auto& source = *new_root[item_no];
-        nodes.push_back(Node());
+        nodes.emplace_back();
         std::copy_if(source.subtree.begin(), source.subtree.end(), std::back_inserter(nodes.back().subtree), [&](const Node& to_copy) -> bool { return &to_copy != new_root[item_no + 1]; });
         nodes.back().edge_length = new_root[item_no + 1]->edge_length;
     }
@@ -879,10 +879,10 @@ void acmacs::tal::v3::Tree::re_root(const NodePath& new_root)
     std::vector<Node> new_subtree(new_root->back()->subtree.begin(), new_root->back()->subtree.end());
     Subtree* append_to = &new_subtree;
     for (auto child = nodes.rbegin(); child != nodes.rend(); ++child) {
-        append_to->push_back(*child);
+        append_to->push_back(std::move(*child));
         append_to = &append_to->back().subtree;
     }
-    subtree = new_subtree;
+    subtree = std::move(new_subtree);
     edge_length = EdgeLength{0.0};
 
     if (cumulative_edge_length != EdgeLengthNotSet)
@@ -1225,6 +1225,47 @@ double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
     return height;
 
 } // acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets
+
+// ----------------------------------------------------------------------
+
+acmacs::seqdb::pos0_t acmacs::tal::v3::Tree::longest_aa_sequence() const
+{
+    // const Timeit ti{"longest_aa_sequence"};
+    seqdb::pos0_t longest{0};
+    tree::iterate_leaf(*this, [&longest](const Node& leaf) { longest = std::max(longest, leaf.aa_sequence.size()); });
+    return longest;
+
+} // acmacs::tal::v3::Tree::longest_sequence
+
+// ----------------------------------------------------------------------
+
+acmacs::seqdb::pos0_t acmacs::tal::v3::Tree::longest_nuc_sequence() const
+{
+    // const Timeit ti{"longest_nuc_sequence"};
+    seqdb::pos0_t longest{0};
+    tree::iterate_leaf(*this, [&longest](const Node& leaf) { longest = std::max(longest, leaf.nuc_sequence.size()); });
+    return longest;
+
+} // acmacs::tal::v3::Tree::longest_sequence
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::resize_common_aa(size_t longest_sequence)
+{
+    AD_DEBUG("resize_common_aa to {}", longest_sequence);
+    const Timeit ti{fmt::format("resize_common_aa to {}", longest_sequence)};
+
+    if (longest_sequence > AACounter::number_of_positions)
+        throw std::runtime_error{fmt::format("Tree::resize_common_aa {}: change number_of_positions in aa-counter.hh:15", longest_sequence)};
+
+    size_t nodes{0};
+    tree::iterate_pre(*this, [&nodes](Node& node) {
+        node.common_aa_.create();
+        ++nodes;
+    });
+    AD_DEBUG("{} nodes resized", nodes);
+
+} // acmacs::tal::v3::Tree::resize_common_aa
 
 // ----------------------------------------------------------------------
 /// Local Variables:

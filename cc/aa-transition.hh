@@ -1,8 +1,9 @@
 #pragma once
 
 #include "acmacs-base/named-type.hh"
-#include "acmacs-base/counter.hh"
+// #include "acmacs-base/counter.hh"
 #include "seqdb-3/sequence.hh"
+#include "acmacs-tal/aa-counter.hh"
 
 // ----------------------------------------------------------------------
 
@@ -18,67 +19,181 @@ namespace acmacs::tal::inline v3
 
     // ======================================================================
 
+    // constexpr const char NoCommon{'.'};
+    constexpr const char NoCommon = AACounter::nothing;
+    constexpr const char Any{'X'};
+    constexpr inline bool is_common(char aa) { return aa != NoCommon; }
+
     class CommonAA
     {
       public:
-        constexpr static const char NoCommon{'.'};
-        constexpr static const char Any{'X'};
-
-        constexpr static inline bool is_common(char aa) { return aa != NoCommon; }
-
-        bool empty() const { return at_pos_.empty(); }
-        size_t size() const { return at_pos_.size(); }
+        bool empty(seqdb::pos0_t pos) const { return at_pos_.empty(*pos); }
 
         char at(seqdb::pos0_t pos) const
         {
-            if (at_pos_.size() <= *pos || at_pos_[*pos].size() != 1)
-                return NoCommon;
-            else
-                return at_pos_[*pos].max().first;
+            return at_pos_.max(*pos);
         }
 
-        char at(seqdb::pos0_t pos, double tolerance, bool dbg = false) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
+        template <bool dbg = false> char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
             // AD_DEBUG(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
-            if (at_pos_.size() <= *pos) {
-                AD_DEBUG(dbg, "                    common:- @{} <- at_pos_.size():{} <= pos", pos, at_pos_.size());
-                return NoCommon;
-            }
-            else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance) {
-                AD_DEBUG(dbg && at_pos_[*pos].total() > 100, "                    common:{} @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} > tolerance", max.first, pos, max, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
-                return max.first;
+            const auto total = at_pos_.total(*pos);
+            if (const auto& max = at_pos_.max_count(*pos); (static_cast<double>(max.count) / static_cast<double>(total)) > tolerance) {
+                if constexpr (dbg)
+                    AD_DEBUG(total > 100, "                    common:{} @{} <- at_pos_[pos].max():{} total:{} max.second/total: {} > tolerance", max.aa, pos, max.count, total,
+                             static_cast<double>(max.count) / static_cast<double>(total));
+                return max.aa;
             }
             else {
-                AD_DEBUG(dbg && at_pos_[*pos].total() > 100, "                    common:- @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} <= tolerance", max, pos, at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
+                if constexpr (dbg)
+                    AD_DEBUG(total > 100, "                    common:- @{} <- at_pos_[pos].max():{} total:{} max.second/total: {} <= tolerance", pos, max.count, total,
+                             static_cast<double>(max.count) / static_cast<double>(total));
                 return NoCommon;
             }
         }
 
         bool is_common(seqdb::pos0_t pos, double tolerance) const { return at(pos, tolerance) != NoCommon; }
 
-        const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
+        std::string report_sorted_max_first(seqdb::pos0_t pos, std::string_view format) const { return at_pos_.report_sorted_max_first(*pos, format); }
 
-        ssize_t num_common() const
+        // const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
+
+        // ssize_t num_common() const
+        // {
+        //     return std::count_if(at_pos_.begin(), at_pos_.end(), [](const auto& counter) { return counter.size() < 2; });
+        // }
+
+        void update(acmacs::seqdb::sequence_aligned_ref_t seq)
         {
-            return std::count_if(at_pos_.begin(), at_pos_.end(), [](const auto& counter) { return counter.size() < 2; });
+            for (AACounter::pos_t pos0{0}; pos0 < *seq.size(); ++pos0) {
+                if (const auto aa = seq[pos0]; aa != Any)
+                    at_pos_.count(pos0, aa);
+            }
         }
 
-        void update(acmacs::seqdb::sequence_aligned_ref_t seq);
-        void update(const CommonAA& subtree);
+        void update(const CommonAA& subtree)
+        {
+            at_pos_.add(subtree.at_pos_);
+        }
 
-        std::string report() const;
-        std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
+        // std::string report() const;
+        // std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
+
+        // void resize(size_t size)
+        // {
+        //     if (__builtin_expect(size <= AACounter::number_of_positions, 1)) // [[likely]]
+        //         ;
+        //     else // [[unlikely]]
+        //         throw std::runtime_error{fmt::format("CommonAA::resize {}: change number_of_positions in aa-counter.hh:15", size)};
+        // }
 
       private:
-        using counter_t = CounterCharSome<' ', '`'>;
-        std::vector<counter_t> at_pos_;
-
-        void resize(size_t size)
-        {
-            if (at_pos_.size() < size)
-                at_pos_.resize(size);
-        }
+        AACounter at_pos_;
     };
+
+    class CommonAA_Ptr
+    {
+      public:
+        CommonAA_Ptr() = default;
+        CommonAA_Ptr(const CommonAA_Ptr&) {} // not copied
+        CommonAA_Ptr(CommonAA_Ptr&&) = default;
+        CommonAA_Ptr& operator=(CommonAA_Ptr&&) = default;
+
+        void create() { data_ = std::make_unique<CommonAA>(); }
+
+        CommonAA* operator->() { return data_.get(); }
+        const CommonAA* operator->() const { return data_.get(); }
+        const CommonAA& operator*() const { return *data_; }
+
+      private:
+        std::unique_ptr<CommonAA> data_{nullptr};
+    };
+
+    // class CommonAA
+    // {
+    //   public:
+    //     // constexpr static const char NoCommon{'.'};
+    //     // constexpr static const char Any{'X'};
+
+    //     // constexpr static inline bool is_common(char aa) { return aa != NoCommon; }
+
+    //     // bool empty() const { return at_pos_.empty(); }
+    //     // size_t size() const { return at_pos_.size(); }
+
+    //     char at(seqdb::pos0_t pos) const
+    //     {
+    //         if (at_pos_.size() <= *pos || at_pos_[*pos].size() != 1)
+    //             return NoCommon;
+    //         else
+    //             return at_pos_[*pos].max().first;
+    //     }
+
+    //     template <bool dbg = false> char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
+    //     {
+    //         // AD_DEBUG(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
+    //         if (at_pos_.size() <= *pos) {
+    //             if constexpr (dbg)
+    //                 AD_DEBUG("                    common:- @{} <- at_pos_.size():{} <= pos", pos, at_pos_.size());
+    //             return NoCommon;
+    //         }
+    //         else if (const auto max = at_pos_[*pos].max(); (static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total())) > tolerance) {
+    //             if constexpr (dbg)
+    //                 AD_DEBUG(at_pos_[*pos].total() > 100, "                    common:{} @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} > tolerance", max.first, pos,
+    //                 max,
+    //                          at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
+    //             return max.first;
+    //         }
+    //         else {
+    //             if constexpr (dbg)
+    //                 AD_DEBUG(at_pos_[*pos].total() > 100, "                    common:- @{} <- at_pos_[pos].max():{} at_pos_[*pos].total():{} max.second/total: {} <= tolerance", max, pos,
+    //                          at_pos_[*pos].total(), static_cast<double>(max.second) / static_cast<double>(at_pos_[*pos].total()));
+    //             return NoCommon;
+    //         }
+    //     }
+
+    //     bool is_common(seqdb::pos0_t pos, double tolerance) const { return at(pos, tolerance) != NoCommon; }
+
+    //     const auto& counter(seqdb::pos0_t pos) const { return at_pos_[*pos]; }
+
+    //     ssize_t num_common() const
+    //     {
+    //         return std::count_if(at_pos_.begin(), at_pos_.end(), [](const auto& counter) { return counter.size() < 2; });
+    //     }
+
+    //     void update(acmacs::seqdb::sequence_aligned_ref_t seq)
+    //     {
+    //         for (size_t pos0{0}; pos0 < *seq.size(); ++pos0) {
+    //             if (const auto aa = seq[pos0]; aa != Any)
+    //                 at_pos_[pos0].count(aa);
+    //         }
+    //     }
+
+    //     void update(const CommonAA& subtree)
+    //     {
+    //         if (at_pos_.empty()) {
+    //             at_pos_ = subtree.at_pos_;
+    //         }
+    //         else {
+    //             for (size_t pos{0}; pos < at_pos_.size(); ++pos)
+    //                 at_pos_[pos].update(subtree.at_pos_[pos]);
+    //         }
+    //     }
+
+    //     // std::string report() const;
+    //     // std::string report(const CommonAA& parent, std::optional<seqdb::pos1_t> pos_to_report = std::nullopt) const;
+
+    //     void resize(size_t size)
+    //     {
+    //         // if (at_pos_.size() < size)
+    //         //     throw std::runtime_error{fmt::format("CommonAA<{}>::resize {}: change in aa_transition.hh:21", SIZE, size)};
+    //         // if (at_pos_.size() < size)
+    //         at_pos_.resize(size);
+    //     }
+
+    //   private:
+    //     // using counter_t = CounterCharSome<'-', '['>;
+    //     // std::vector<counter_t> at_pos_;
+    // };
 
     // ======================================================================
 

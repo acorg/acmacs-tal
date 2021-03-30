@@ -139,7 +139,7 @@ namespace acmacs::tal::inline v3
         const Node* closest_leaf{nullptr}; // child leaf with minimal cumulative_edge_length
 
         // before_20200513
-        CommonAA common_aa_;
+        CommonAA_Ptr common_aa_;
         const Node* node_for_left_aa_transitions_{nullptr};
 
         // -------------------- drawing support --------------------
@@ -337,6 +337,10 @@ namespace acmacs::tal::inline v3
 
         enum class leaves_only { no, yes };
         std::vector<const Node*> sorted_by_cumulative_edge(leaves_only lo) const; // bigger cumul length first
+
+        seqdb::pos0_t longest_aa_sequence() const;
+        seqdb::pos0_t longest_nuc_sequence() const;
+        void resize_common_aa(size_t longest_sequence);
 
       private:
         const clade_t* find_clade(std::string_view name) const;

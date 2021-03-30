@@ -1217,8 +1217,8 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
             if (method.empty()) {
                 // empty, default is in draw-tree.hh
             }
-            else if (method == "eu_20200909"sv || method == "eu-20200909"sv)
-                aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200909;
+            // else if (method == "eu_20200909"sv || method == "eu-20200909"sv)
+            //     aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200909;
             else if (method == "eu_20200915"sv || method == "eu-20200915"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200915;
             else if (method == "derek_2016"sv || method == "derek-2016"sv)

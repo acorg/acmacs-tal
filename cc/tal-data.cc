@@ -8,7 +8,7 @@
 
 void acmacs::tal::v3::Tal::import_tree(std::string_view filename)
 {
-    // const Timeit ti{"importing tree"};
+    const Timeit ti{"importing tree"};
     if (!filename.empty()) {
         tree_.erase();
         acmacs::tal::import_tree(filename, tree_);
