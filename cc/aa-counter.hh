@@ -14,7 +14,7 @@ namespace acmacs::tal::inline v3
     {
       public:
         constexpr static const size_t number_of_positions{1300};
-        constexpr static const size_t number_of_aa{16};
+        constexpr static const size_t number_of_aa{17};
         constexpr static const char nothing{'.'}; // dot is to ease reporting
 
         using count_t = uint32_t;
@@ -54,7 +54,7 @@ namespace acmacs::tal::inline v3
                     return;
                 }
             }
-            throw std::runtime_error{"AACounter::count: increase number_of_aa in aa-counter.hh:16"};
+            throw std::runtime_error{AD_FORMAT("AACounter::count: increase number_of_aa in aa-counter.hh:17")};
         }
 
         void add(pos_t pos, const AACounter& other)
