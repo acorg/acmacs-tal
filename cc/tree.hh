@@ -169,7 +169,7 @@ namespace acmacs::tal::inline v3
                     return last_next_leaf->node_id.vertical - first_prev_leaf->node_id.vertical + 1;
             }
             else
-                return 0;
+                return 1;
         }
 
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
