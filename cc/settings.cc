@@ -177,6 +177,10 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             tree().branches_by_cumulative_edge();
         else if (name == "report-branches-by-edge"sv)
             tree().branches_by_edge();
+        else if (name == "report-by-edge"sv) {
+            if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty())
+                acmacs::file::write(output_filename, tree().report_by_edge(getenv_or("max"sv, 0ul), getenv_or("max-names-per-row"sv, 20ul))); // 0 - report all
+        }
         else if (name == "report-cumulative"sv) {
             // tree().branches_by_edge();
             if (const auto output_filename = getenv_or("output"sv, ""sv); !output_filename.empty())
@@ -280,17 +284,17 @@ void acmacs::tal::v3::Settings::apply_nodes() const
                 node->edge_line_width_scale = line_width_scale;
         }
         else if (key == "report"sv) {
-            AD_INFO("{} selected nodes {}\n{}\n", selected.size(), getenv("select"sv), report_nodes("  ", selected));
+            AD_INFO("{} selected nodes {}\n{}", selected.size(), getenv("select"sv), report_nodes("  ", selected));
         }
     };
 
-    const auto apply_value = [apply_one](const rjson::v3::value& value_val) {
-        value_val.visit([apply_one, &value_val]<typename Arg>(const Arg& arg) {
+    const auto apply_value = [apply_one, this](const rjson::v3::value& value_val) {
+        substitute(value_val).visit([apply_one, &value_val, this]<typename Arg>(const Arg& arg) {
             if constexpr (std::is_same_v<Arg, rjson::v3::detail::string>)
                 apply_one(arg.template to<std::string_view>(), rjson::v3::detail::boolean{true});
             else if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
                 for (const auto& [key, val] : arg)
-                    apply_one(key, val);
+                    apply_one(key, substitute(val));
             }
             else
                 throw error{fmt::format("don't know how to apply for \"nodes\": {}", value_val)};
@@ -458,7 +462,7 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Settings::select_nodes(const rjson::v3
             update = Tree::Select::update;
     }
     if (report)
-        AD_INFO("{} selected nodes {} {}\n", selected.size(), criteria, report_nodes("  ", selected));
+        AD_INFO("{} selected nodes {}\n{}", selected.size(), criteria, report_nodes("  ", selected));
     return selected;
 
 } // acmacs::tal::v3::Settings::select_nodes
@@ -1385,7 +1389,7 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
           nodes.filter(selected_nodes);
           break;
     }
-    // AD_INFO("{} selected nodes {}\n", selected.size(), getenv("select"sv), report_nodes("  ", nodes));
+    // AD_INFO("{} selected nodes {}", selected.size(), getenv("select"sv), report_nodes("  ", nodes));
 
 } // acmacs::tal::v3::Settings::select_vaccine
 

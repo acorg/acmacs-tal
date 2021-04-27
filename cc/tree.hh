@@ -227,6 +227,7 @@ namespace acmacs::tal::inline v3
         void populate_with_nuc_duplicates();
 
         std::string report_cumulative(size_t max) const;
+        std::string report_by_edge(size_t max, size_t max_names_per_row) const;
         void cumulative_calculate(bool recalculate = false) const;
         // void cumulative_reset() const;
         void branches_by_edge();

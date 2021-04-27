@@ -115,15 +115,42 @@ std::string acmacs::tal::v3::Tree::report_cumulative(size_t max) const
     tree::iterate_leaf(*this, [&nodes](const Node& node) { nodes.push_back(&node); });
     std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1->cumulative_edge_length > en2->cumulative_edge_length; });
 
-    auto result{fmt::format("Nodes {} sorted by cumulative\n Cumulative       Edge       Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"})};
+    fmt::memory_buffer out;
+    fmt::format_to(out, "Nodes {} sorted by cumulative\nCumulative       Edge       Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
     for (const auto [no, node] : acmacs::enumerate(nodes)) {
-        result.append(fmt::format("{:.10f}  {:.10f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id));
+        fmt::format_to(out, "{:12.8f}  {:12.8f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id);
         if (max > 0 && no >= max)
             break;
     }
-    return result;
+    return fmt::to_string(out);
 
 } // acmacs::tal::v3::Tree::report_cumulative
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::Tree::report_by_edge(size_t max, size_t max_names_per_row) const
+{
+    cumulative_calculate();
+
+    std::vector<const Node*> nodes = sorted_by_edge();
+
+    fmt::memory_buffer out;
+    fmt::format_to(out, "Nodes {} sorted by edge length\nEdge          Cumulative           Node id     Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
+    for (const auto [no, node] : acmacs::enumerate(nodes)) {
+        fmt::format_to(out, "{:12.8f}  {:12.8f}  [{:5d}] {:5.4}", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->number_leaves_in_subtree(), node->node_id);
+        size_t no2{0};
+        tree::iterate_leaf_stop(*node, [&no2, max_names_per_row, &out](const auto& subnode) {
+            fmt::format_to(out, " {}", subnode.seq_id);
+            ++no2;
+            return no2 > max_names_per_row;
+        });
+        fmt::format_to(out, "\n");
+        if (max > 0 && no >= max)
+            break;
+    }
+    return fmt::to_string(out);
+
+} // acmacs::tal::v3::Tree::report_by_edge
 
 // ----------------------------------------------------------------------
 

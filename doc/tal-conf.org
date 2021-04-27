@@ -1,4 +1,4 @@
-# Time-stamp: <2021-02-04 09:58:09 eu>
+# Time-stamp: <2021-04-27 11:40:51 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -144,6 +144,7 @@ If multiple criteria specified within single "select" object, they all used (con
 ** Report
 
 {"N": "report-cumulative", "output": "{report-cumulative-output}", "max": "{report-cumulative-max}"} -- report-cumulative-max=100, 0 - report all
+{"N": "report-by-edge", "output": "", "max": 0, "max-names-per-row": 20} -- 0 - report all
 {"N": "report-branches-by-edge"}
 {"N": "report-branches-by-cumulative-edge"}
 {"N": "report-aa-at", "pos": [145, 156, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
