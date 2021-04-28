@@ -682,46 +682,46 @@ void acmacs::tal::v3::Settings::add_time_series()
     rjson::v3::copy_if_not_null(getenv("report"sv), param.report);
 
     if (const auto& slot_val = getenv("slot"sv); !slot_val.is_null()) {
-        rjson::v3::copy_if_not_null(slot_val["width"sv], param.slot.width);
+        rjson::v3::copy_if_not_null(substitute(slot_val["width"sv]), param.slot.width);
 
-        if (const auto& separator = slot_val["separator"sv]; !separator.is_null()) {
-            if (const auto& width_pixels = separator["width_pixels"sv]; !width_pixels.is_null()) {
+        if (const auto& separator = substitute(slot_val["separator"sv]); !separator.is_null()) {
+            if (const auto& width_pixels = substitute(separator["width_pixels"sv]); !width_pixels.is_null()) {
                 rjson::v3::copy_if_not_null(width_pixels, param.slot.separator[0].line_width);
                 for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
                     mp->line_width = param.slot.separator[0].line_width;
             }
-            if (const auto& color = separator["color"sv]; !color.is_null()) {
+            if (const auto& color = substitute(separator["color"sv]); !color.is_null()) {
                 rjson::v3::copy_if_not_null(color, param.slot.separator[0].color);
                 for (auto mp = std::next(std::begin(param.slot.separator)); mp != std::end(param.slot.separator); ++mp)
                     mp->color = param.slot.separator[0].color;
             }
-            for (const rjson::v3::value& for_month : separator["per_month"sv].array()) {
-                if (const auto& month = for_month["month"sv]; !month.is_null()) {
+            for (const rjson::v3::value& for_month : substitute(separator["per_month"sv]).array()) {
+                if (const auto& month = substitute(for_month["month"sv]); !month.is_null()) {
                     const auto month_no = month.to<size_t>() - 1;
-                    rjson::v3::copy_if_not_null(for_month["width_pixels"sv], param.slot.separator[month_no].line_width);
-                    rjson::v3::copy_if_not_null(for_month["color"], param.slot.separator[month_no].color);
+                    rjson::v3::copy_if_not_null(substitute(for_month["width_pixels"sv]), param.slot.separator[month_no].line_width);
+                    rjson::v3::copy_if_not_null(substitute(for_month["color"]), param.slot.separator[month_no].color);
                 }
             }
         }
 
-        if (const auto& background = slot_val["background"sv]; !background.is_null()) {
-            if (const auto& color = background["color"sv]; !color.is_null()) {
+        if (const auto& background = substitute(slot_val["background"sv]); !background.is_null()) {
+            if (const auto& color = substitute(background["color"sv]); !color.is_null()) {
                 rjson::v3::copy_if_not_null(color, param.slot.background[0]);
                 for (auto mp = std::next(std::begin(param.slot.background)); mp != std::end(param.slot.background); ++mp)
                     *mp = param.slot.background[0];
             }
-            for (const rjson::v3::value& for_month : background["per_month"sv].array()) {
-                if (const auto& month = for_month["month"sv]; !month.is_null()) {
+            for (const rjson::v3::value& for_month : substitute(background["per_month"sv]).array()) {
+                if (const auto& month = substitute(for_month["month"sv]); !month.is_null()) {
                     const auto month_no = month.to<size_t>() - 1;
-                    rjson::v3::copy_if_not_null(for_month["color"sv], param.slot.background[month_no]);
+                    rjson::v3::copy_if_not_null(substitute(for_month["color"sv]), param.slot.background[month_no]);
                 }
             }
         }
 
-        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "color"sv), param.slot.label.color);
-        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "scale"sv), param.slot.label.scale);
-        rjson::v3::copy_if_not_null(slot_val.get("label"sv, "offset"sv), param.slot.label.offset);
-        if (const auto& rot_v = slot_val.get("label"sv, "rotation"sv); !rot_v.is_null()) {
+        rjson::v3::copy_if_not_null(substitute(slot_val.get("label"sv, "color"sv)), param.slot.label.color);
+        rjson::v3::copy_if_not_null(substitute(slot_val.get("label"sv, "scale"sv)), param.slot.label.scale);
+        rjson::v3::copy_if_not_null(substitute(slot_val.get("label"sv, "offset"sv)), param.slot.label.offset);
+        if (const auto& rot_v = substitute(slot_val.get("label"sv, "rotation"sv)); !rot_v.is_null()) {
             if (const auto rot = rot_v.to<std::string_view>(); rot == "clockwise"sv)
                 param.slot.label.rotation = Rotation90DegreesClockwise;
             else if (rot == "anticlockwise"sv || rot == "counterclockwise"sv)
@@ -732,8 +732,8 @@ void acmacs::tal::v3::Settings::add_time_series()
     }
 
     if (const auto& color_scale_val = getenv("color-scale"sv); !color_scale_val.is_null()) {
-        rjson::v3::copy_if_not_null(color_scale_val["show"sv], param.color_scale.show);
-        if (const auto& type_val = color_scale_val["type"sv]; !type_val.is_null()) {
+        rjson::v3::copy_if_not_null(substitute(color_scale_val["show"sv]), param.color_scale.show);
+        if (const auto& type_val = substitute(color_scale_val["type"sv]); !type_val.is_null()) {
             if (const auto type = type_val.to<std::string_view>(); type == "bezier_gradient" || type == "bezier-gradient"sv)
                 param.color_scale.type = TimeSeries::color_scale_type::bezier_gradient;
             else
@@ -751,8 +751,8 @@ void acmacs::tal::v3::Settings::add_time_series()
                 }
                 break;
         }
-        rjson::v3::copy_if_not_null(color_scale_val["offset"sv], param.color_scale.offset);
-        rjson::v3::copy_if_not_null(color_scale_val["height"sv], param.color_scale.height);
+        rjson::v3::copy_if_not_null(substitute(color_scale_val["offset"sv]), param.color_scale.offset);
+        rjson::v3::copy_if_not_null(substitute(color_scale_val["height"sv]), param.color_scale.height);
     }
 
 } // acmacs::tal::v3::Settings::add_time_series
