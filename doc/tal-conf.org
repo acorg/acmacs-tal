@@ -1,4 +1,4 @@
-# Time-stamp: <2021-04-27 11:40:51 eu>
+# Time-stamp: <2021-04-27 17:29:24 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -216,29 +216,30 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Time series
 
 #+BEGIN_SRC json
-  {"N": "time-series", "color-by": <[[Color by][color-by]]>,
-   "?start": "2019-01", "?end": "2019-11", #-- "start is inclusive, end is exclusive",
+  {"N": "time-series", "color-by": "<[[Color by][color-by]]>",
+   "?start": "2019-01", "?end": "2019-11", "?": "start is inclusive, end is exclusive",
    "report": "{report-time-series-output}",
-   "interval": {"month": 1}, #-- month, week, year, day ("interval": "month" also supported)
-   "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}, # applicable to color-by-pos
+   "interval": {"month": 1}, "?": "month, week, year, day (\"interval\": \"month\" also supported)",
+   "legend": {"show": true, "scale": 0.012, "offset": 0.022, "gap_scale": 1.1, "count_scale": 0.3, "pos_color": "black", "count_color": "black"}, "?": "applicable to color-by-pos",
    "dash": {"width": 0.5, "line_width_pixels": 0.5}, "?": "dash width is fraction of slot_width",
    "slot": {"width": 0.01, "?": "fraction of the time series area height",
             "separator": {
                 "width_pixels": 0.5, "color": "black",
                 "per_month": [
-                    {"month": 1, "width_pixels": 1, "color": "red"} -- month: 1..12
+                    {"month": 1, "width_pixels": 1, "color": "red"}, "?": "month: 1..12",
                 ]
             },
             "background": {
                 "color": "transparent",
                 "per_month": [
-                    {"month": 1, "color": "#F0000000"} -- month: 1..12
+                    {"month": 1, "color": "#F0000000"}, "?": "month: 1..12"
                 ]
             },
             "label": {"rotation": "anticlockwise", "color": "black", "scale": 0.7, "offset": 0.002}, "?": "scale relative to slot_width, offset relative to the time series area height"
            },
    "color-scale": {"show": false, "colors": ["#440154", "#40ffff", "#fde725"], "offset": 0.008, "height": 0.01, "?type": "bezier-gradient"},
-   "width-to-height-ratio": 0.7, "debug-outline": <[[Debug outline][debug-outline]]>},
+   "width-to-height-ratio": 0.7, "?debug-outline": "<[[Debug outline][debug-outline]]>"
+  },
 #+END_SRC
 
 
