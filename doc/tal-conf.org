@@ -1,4 +1,4 @@
-# Time-stamp: <2021-04-27 17:29:24 eu>
+# Time-stamp: <2021-04-28 14:36:28 eu>
 
 bjorn {145, 155, 156, 158, 159, 189, 193}
 
@@ -63,7 +63,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"cumulative >=": 0.01, "report": true}
 {"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >= 
 {"edge >=": 0.01, "report": true}
-{"date": ["start >=", "end <", "report": true}
+{"date": ["start >=", "end <"], "report": true}
 {"seq_id": "regexp", "report": true}
 {"country": "BRUNEI", "report": true}
 {"continent": "NORTH-AMERICA", "report": true}
@@ -77,9 +77,9 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Hide
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "hide"}
-{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"hide": true}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"hide": true, "hide-if-too-many-leaves": false}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": ["hide"]}
-{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": [{"hide": true}]}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": [{"hide": true, "hide-if-too-many-leaves": false}]}
 
 **** samples
 

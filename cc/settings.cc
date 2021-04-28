@@ -229,10 +229,10 @@ void acmacs::tal::v3::Settings::apply_nodes() const
 
     const auto selected = select_nodes(getenv("select"sv));
 
-    const auto apply_one = [this, &selected](std::string_view key, const rjson::v3::value& value) {
+    const auto apply_one = [this, &selected](std::string_view key, const rjson::v3::value& value, const rjson::v3::value& apply_clause) {
         if (key == "hide"sv) {
             if (rjson::v3::read_bool(value, false))
-                tree().hide(selected, Tree::hide_if_too_many_leaves::no);
+                tree().hide(selected, rjson::v3::get_or(substitute(apply_clause["hide-if-too-many-leaves"sv]), false) ?  Tree::hide_if_too_many_leaves::yes : Tree::hide_if_too_many_leaves::no);
         }
         else if (key == "line"sv) {
             if (auto* draw_on_tree = draw().layout().find<DrawOnTree>(); draw_on_tree) {
@@ -286,15 +286,18 @@ void acmacs::tal::v3::Settings::apply_nodes() const
         else if (key == "report"sv) {
             AD_INFO("{} selected nodes {}\n{}", selected.size(), getenv("select"sv), report_nodes("  ", selected));
         }
+        else if (key == "hide-if-too-many-leaves"sv) {
+            // handled by "hide"
+        }
     };
 
     const auto apply_value = [apply_one, this](const rjson::v3::value& value_val) {
         substitute(value_val).visit([apply_one, &value_val, this]<typename Arg>(const Arg& arg) {
             if constexpr (std::is_same_v<Arg, rjson::v3::detail::string>)
-                apply_one(arg.template to<std::string_view>(), rjson::v3::detail::boolean{true});
+                apply_one(arg.template to<std::string_view>(), rjson::v3::detail::boolean{true}, value_val);
             else if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {
                 for (const auto& [key, val] : arg)
-                    apply_one(key, substitute(val));
+                    apply_one(key, substitute(val), value_val);
             }
             else
                 throw error{fmt::format("don't know how to apply for \"nodes\": {}", value_val)};
