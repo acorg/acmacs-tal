@@ -934,18 +934,44 @@ std::vector<std::string_view> acmacs::tal::v3::Tree::all_dates() const
 
 // ----------------------------------------------------------------------
 
-std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool /*names*/) const
+size_t acmacs::tal::v3::Tree::longest_seq_id() const
 {
+    size_t longest_seq_id{0};
+    tree::iterate_leaf(*this, [&longest_seq_id](const Node& node) { longest_seq_id = std::max(longest_seq_id, node.seq_id.size()); });
+    return longest_seq_id;
+
+} // acmacs::tal::v3::Tree::longest_seq_id
+
+// ----------------------------------------------------------------------
+
+std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool names) const
+{
+    const size_t seq_id_size = names ? longest_seq_id() : 0ul;
     std::vector<acmacs::CounterChar> counter(pos.size());
-    tree::iterate_leaf(*this, [&pos, &counter](const Node& leaf) {
-        for (auto it = pos.begin(); it != pos.end(); ++it)
-            counter[static_cast<size_t>(it - pos.begin())].count(acmacs::seqdb::at_pos(leaf.aa_sequence, *it));
-    });
-    std::string result;
-    for (auto it = pos.begin(); it != pos.end(); ++it) {
-        result += fmt::format("  {}\n{}\n", *it, counter[static_cast<size_t>(it - pos.begin())].report_sorted_max_first("    {first} {second:5d}\n"));
+    fmt::memory_buffer out;
+    if (names) {
+        fmt::format_to(out, "{:{}s}", "", seq_id_size);
+        for (const auto pp : pos)
+            fmt::format_to(out, " {:4d}", pp);
     }
-    return result;
+    tree::iterate_leaf(*this, [&pos, &counter, &out, names, seq_id_size](const Node& leaf) {
+        if (names)
+            fmt::format_to(out, "\n{:{}s}", leaf.seq_id, seq_id_size);
+        for (auto it = pos.begin(); it != pos.end(); ++it) {
+            const auto aa = acmacs::seqdb::at_pos(leaf.aa_sequence, *it);
+            if (aa != ' ')
+                counter[static_cast<size_t>(it - pos.begin())].count(aa);
+            // else
+            //     AD_WARNING("{}: space at {}, seq length: {}", leaf.seq_id, *it, leaf.aa_sequence.size());
+            if (names)
+                fmt::format_to(out, "   {} ", aa);
+        }
+    });
+    if (names)
+        fmt::format_to(out, "\n\n\n");
+    for (auto it = pos.begin(); it != pos.end(); ++it)
+        fmt::format_to(out, "  {}\n{}\n", *it, counter[static_cast<size_t>(it - pos.begin())].report_sorted_max_first("    {first} {second:5d}\n"));
+    return fmt::to_string(out);
 
 } // acmacs::tal::v3::Tree::report_aa_at
 

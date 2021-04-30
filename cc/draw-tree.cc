@@ -60,7 +60,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
 {
     const Scaled line_width{vertical_step() * 0.5};
     const Scaled text_size{vertical_step() * 0.8};
-    const Scaled node_id_text_size{3e-4};
+    const Scaled node_id_text_size{1e-4}; // const Scaled node_id_text_size{3e-4};
 
     tree::iterate_leaf_pre(
         tal().tree(),

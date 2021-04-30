@@ -110,21 +110,23 @@ void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& s
     const auto count_text_size{text_size * count_scale};
     const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W'), text_size);
     for (const auto& [aa, color_count] : colors()) {
-        switch (layout) {
-            case legend_layout::vertical:
-                text_origin.y(text_origin.y() + *text_size * (1.0 + interleave));
-                break;
-            case legend_layout::horizontal:
-                text_origin.x(text_origin.x() + *text_size * (1.0 + interleave));
-                break;
-        }
-        const auto aa_t{fmt::format("{}", aa)};
-        surface.text(text_origin, aa_t, color_count.color, text_size);
-        if (show_count) {
-            const auto count_x{text_origin.x() + aa_width * 1.1};
-            surface.text({count_x, text_origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), count_color,
-                         count_text_size);
-            surface.text({count_x, text_origin.y()}, fmt::format("{}", color_count.count), count_color, count_text_size);
+        if (aa != ' ') {        // ignore data for absent or short sequences, it is ugly and misleading in the legend
+            switch (layout) {
+                case legend_layout::vertical:
+                    text_origin.y(text_origin.y() + *text_size * (1.0 + interleave));
+                    break;
+                case legend_layout::horizontal:
+                    text_origin.x(text_origin.x() + *text_size * (1.0 + interleave));
+                    break;
+            }
+            const auto aa_t{fmt::format("{}", aa)};
+            surface.text(text_origin, aa_t, color_count.color, text_size);
+            if (show_count) {
+                const auto count_x{text_origin.x() + aa_width * 1.1};
+                surface.text({count_x, text_origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), count_color,
+                             count_text_size);
+                surface.text({count_x, text_origin.y()}, fmt::format("{}", color_count.count), count_color, count_text_size);
+            }
         }
     }
 

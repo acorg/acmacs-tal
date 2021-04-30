@@ -1,6 +1,6 @@
-# Time-stamp: <2021-04-28 14:36:28 eu>
+# Time-stamp: <2021-04-30 14:53:58 eu>
 
-bjorn {145, 155, 156, 158, 159, 189, 193}
+bjorn [145, 155, 156, 158, 159, 189, 193]
 
 * Sample settings
 
@@ -118,6 +118,10 @@ If multiple criteria specified within single "select" object, they all used (con
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"line": <[[Line with offset parameters]]>, "text": <[[Text parameters]]>}}
 
+*** Report AA at selected
+
+{"N": "report-aa-at", "pos": [145, 155, 156, 158, 159, 189, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
+
 *** Just report selected
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "report"}
@@ -147,7 +151,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"N": "report-by-edge", "output": "", "max": 0, "max-names-per-row": 20} -- 0 - report all
 {"N": "report-branches-by-edge"}
 {"N": "report-branches-by-cumulative-edge"}
-{"N": "report-aa-at", "pos": [145, 156, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
+{"N": "report-aa-at", "pos": [145, 155, 156, 158, 159, 189, 193], "names": false, "?output": "<filename>"} -- "pos": [145, 156, 193], "pos": 145, "pos": "145", "pos": ["145", "156"]
 
 ** Draw
 

@@ -343,6 +343,8 @@ namespace acmacs::tal::inline v3
         seqdb::pos0_t longest_nuc_sequence() const;
         void resize_common_aa(size_t longest_sequence);
 
+        size_t longest_seq_id() const;
+
       private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t* find_clade(std::string_view name);

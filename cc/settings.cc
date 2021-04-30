@@ -768,13 +768,13 @@ void acmacs::tal::v3::Settings::process_legend(TimeSeries& time_series)
 
     if (const auto& legend = getenv("legend"sv); !legend.is_null()) {
         auto& legend_param = time_series.parameters().legend;
-        rjson::v3::copy_if_not_null(legend["show"sv], legend_param.show);
-        rjson::v3::copy_if_not_null(legend["scale"sv], legend_param.scale);
-        rjson::v3::copy_if_not_null(legend["offset"sv], legend_param.offset);
-        rjson::v3::copy_if_not_null(legend["gap_scale"sv], legend_param.gap_scale);
-        rjson::v3::copy_if_not_null(legend["count_scale"sv], legend_param.count_scale);
-        rjson::v3::copy_if_not_null(legend["pos_color"sv], legend_param.pos_color);
-        rjson::v3::copy_if_not_null(legend["count_color"sv], legend_param.count_color);
+        rjson::v3::copy_if_not_null(substitute(legend["show"sv]), legend_param.show);
+        rjson::v3::copy_if_not_null(substitute(legend["scale"sv]), legend_param.scale);
+        rjson::v3::copy_if_not_null(substitute(legend["offset"sv]), legend_param.offset);
+        rjson::v3::copy_if_not_null(substitute(legend["gap_scale"sv]), legend_param.gap_scale);
+        rjson::v3::copy_if_not_null(substitute(legend["count_scale"sv]), legend_param.count_scale);
+        rjson::v3::copy_if_not_null(substitute(legend["pos_color"sv]), legend_param.pos_color);
+        rjson::v3::copy_if_not_null(substitute(legend["count_color"sv]), legend_param.count_color);
     }
 
 } // acmacs::tal::v3::Settings::process_legend
