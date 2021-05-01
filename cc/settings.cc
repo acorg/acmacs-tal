@@ -376,14 +376,14 @@ void acmacs::tal::v3::Settings::outline(DrawOutline& draw_outline)
 std::string acmacs::tal::v3::Settings::report_nodes(std::string_view indent, const NodeSet& nodes) const
 {
     fmt::memory_buffer output;
-    if (nodes.size() < 100) {
+    // if (nodes.size() < 100) {
         for (const auto* node : nodes) {
             if (node->is_leaf())
                 fmt::format_to(output, "{}{} {} [{}] edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->seq_id, node->date, node->edge_length.as_number(), node->cumulative_edge_length.as_number());
             else
                 fmt::format_to(output, "{}{} (children: {}) edge:{:.6f} cumul:{:.6f}\n", indent, node->node_id, node->subtree.size(), node->edge_length.as_number(), node->cumulative_edge_length.as_number());
         }
-    }
+    // }
     return fmt::to_string(output);
 
 } // acmacs::tal::v3::Settings::report_nodes
