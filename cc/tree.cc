@@ -950,7 +950,7 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
     std::vector<acmacs::CounterChar> counter(pos.size());
     fmt::memory_buffer out;
     if (names) {
-        fmt::format_to(out, "{:{}s}", "", seq_id_size);
+        fmt::format_to(out, "{:{}s} ", "", seq_id_size);
         for (const auto pp : pos)
             fmt::format_to(out, " {:4d}", pp);
     }
@@ -964,7 +964,7 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
             // else
             //     AD_WARNING("{}: space at {}, seq length: {}", leaf.seq_id, *it, leaf.aa_sequence.size());
             if (names)
-                fmt::format_to(out, "   {} ", aa);
+                fmt::format_to(out, "    {}", aa);
         }
     });
     if (names)
