@@ -58,6 +58,12 @@ void acmacs::tal::v3::reset_aa_transitions(Tree& tree)
 void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     switch (parameters.method) {
+        case draw_tree::AATransitionsParameters::method::eu_20210503:
+            // update_aa_transitions_eu_20210503(tree, parameters);
+            break;
+        case draw_tree::AATransitionsParameters::method::eu_20200915:
+            update_aa_transitions_eu_20200915(tree, parameters);
+            break;
         case draw_tree::AATransitionsParameters::method::eu_20200514:
             update_aa_transitions_eu_20200514(tree, parameters);
             break;
@@ -65,9 +71,6 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
         //     throw std::runtime_error{"aa subst method eu_20200909 commented out"};
         //     // update_aa_transitions_eu_20200909(tree, parameters);
         //     // break;
-        case draw_tree::AATransitionsParameters::method::eu_20200915:
-            update_aa_transitions_eu_20200915(tree, parameters);
-            break;
         case draw_tree::AATransitionsParameters::method::derek_2016:
             update_aa_transitions_derek_2016(tree, parameters);
             break;
