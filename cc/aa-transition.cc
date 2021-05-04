@@ -213,6 +213,25 @@ std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vecto
 } // acmacs::tal::v3::AA_Transitions::names
 
 // ----------------------------------------------------------------------
+
+void acmacs::tal::v3::detail::set_closest_leaf_for_intermediate(Tree& tree)
+{
+    tree.cumulative_calculate();
+
+    tree::iterate_post(tree, [](Node& branch) {
+        branch.closest_leaf = nullptr;
+        for (const auto& child : branch.subtree) {
+            if (const auto* leaf = child.is_leaf() ? &child : child.closest_leaf; leaf) {
+                if (branch.closest_leaf == nullptr || branch.closest_leaf->cumulative_edge_length > leaf->cumulative_edge_length)
+                    branch.closest_leaf = leaf;
+            }
+        }
+    });
+
+} // acmacs::tal::v3::detail::set_closest_leaf_for_intermediate
+
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

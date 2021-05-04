@@ -287,7 +287,8 @@ void acmacs::tal::v3::detail::set_aa_transitions_eu_20210205(Tree& tree, seqdb::
 void acmacs::tal::v3::detail::update_aa_transitions_eu_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     AD_DEBUG(parameters.debug, "update_aa_transitions_eu_20200514");
-    tree.cumulative_calculate();
+
+    set_closest_leaf_for_intermediate(tree);
 
     // see https://notebooks.antigenic-cartography.org/eu/results/2020-0513-tree-aa-subst-left/
     // for testing, methods description and known issues
@@ -301,14 +302,6 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200514(Tree& tree, cons
     // parent node, right part being AA at this node
 
     tree::iterate_post(tree, [&parameters](Node& branch) {
-        branch.closest_leaf = nullptr;
-        for (const auto& child : branch.subtree) {
-            if (const auto* leaf = child.is_leaf() ? &child : child.closest_leaf; leaf) {
-                if (branch.closest_leaf == nullptr || branch.closest_leaf->cumulative_edge_length > leaf->cumulative_edge_length)
-                    branch.closest_leaf = leaf;
-            }
-        }
-
         if (branch.closest_leaf) {
             for (auto& child : branch.subtree) {
                 if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
