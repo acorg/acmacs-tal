@@ -14,8 +14,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
     set_closest_leaf_for_intermediate(tree);
 
     // for each intermediate node find closest leaf node of its subtree, i.e. a leaf in the subtree that has minimum cumulative length
-
-    tree::iterate_post(tree, [&parameters](Node& branch) { // _post is necessary!
+    tree::iterate_pre(tree, [&parameters](Node& branch) {
         if (branch.closest_leaf) {
             for (auto& child : branch.subtree) {
                 if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
@@ -29,25 +28,48 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
                             AD_DEBUG(parameters.debug && parameters.report_pos && pos == *parameters.report_pos,
                                      "update_aa_transitions_eu_20210503 node:{:4.3s} {}{}{} leaves:{:5d} closest-cumul:{} closest:{}", child.node_id, left_aa, pos, right_aa,
                                      child.number_leaves_in_subtree(), child.closest_leaf->cumulative_edge_length, child.closest_leaf->seq_id);
-
-                            // check if a child of child has a flipping transition for this pos
-                            if (parameters.debug && parameters.report_pos && pos == *parameters.report_pos) {
-                                for (auto& enkel : child.subtree) {
-                                    if (auto* enkel_transition = enkel.aa_transitions_.find(pos); enkel_transition)
-                                        AD_WARNING("update_aa_transitions_eu_20210503:       sub-child {} of {} has transition {}", child.node_id, enkel.node_id, enkel_transition->display());
-                                }
-                            }
-
-                            // // check if child node (set earlier)
-                            // if (parameters.debug && parameters.report_pos && pos == *parameters.report_pos) {
-                            // }
                         }
                     }
                 }
             }
         }
-        else
-            AD_WARNING("update_aa_transitions_eu_20210503: closest leaf not found for the branch node {}", branch.node_id);
+    });
+
+    // for each intermediate node check if a child has an aa transition label for the same position
+    tree::iterate_pre(tree, [&parameters](Node& node) {
+        for (auto& aa_transition : node.aa_transitions_) {
+            bool update = false;
+            for (auto& child : node.subtree) {
+                if (auto* child_transition = child.aa_transitions_.find(aa_transition.pos); child_transition) {
+                    AD_DEBUG(parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos,
+                             "update_aa_transitions_eu_20210503: close aa transtions for {} in {} {} (parent) and {} {} (child)", aa_transition.pos, node.node_id, aa_transition.display(),
+                             child.node_id, child.aa_transitions_.display());
+                    update = true;
+                    break;
+                }
+            }
+            if (update) {
+                // remove transition from node, pretend node has the
+                // same left and right (equals left) for this pos,
+                // update transitions for all children
+                aa_transition.right = aa_transition.left; // mark for removal, cannot remove now due to iteration over transitions
+                for (auto& child : node.subtree) {
+                    if (!child.is_leaf()) {
+                        if (auto* child_transition = child.aa_transitions_.find(aa_transition.pos); child_transition) {
+                            if (child_transition->right == aa_transition.right)
+                                child.aa_transitions_.remove(aa_transition.pos);
+                            else
+                                child_transition->left = aa_transition.right;
+                        }
+                        else if (const auto child_right = child.closest_leaf->aa_sequence.at(aa_transition.pos); child_right != 'X' && child_right != aa_transition.right)
+                            child.aa_transitions_.add(aa_transition.pos, aa_transition.right, child_right);
+                        AD_DEBUG(parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos,
+                                 "update_aa_transitions_eu_20210503:      child ({}) updated: {}", child.node_id, child.aa_transitions_.display());
+                    }
+                }
+            }
+        }
+        node.aa_transitions_.remove_left_right_same(parameters, node);
     });
 }
 

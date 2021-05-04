@@ -308,6 +308,11 @@ namespace acmacs::tal::inline v3
 
         void clear() { data_.clear(); }
 
+        auto begin() const { return data_.begin(); }
+        auto end() const { return data_.end(); }
+        auto begin() { return data_.begin(); }
+        auto end() { return data_.end(); }
+
       private:
         std::vector<AA_Transition> data_;
 
