@@ -7,7 +7,7 @@ TARGETS = \
 SOURCES = \
   settings.cc tree.cc time-series.cc tal.cc clades.cc hz-sections.cc json-export.cc coloring.cc \
   json-import.cc import-export.cc \
-  draw-aa-transitions.cc aa-transition.cc aa-transition-20200915.cc \
+  draw-aa-transitions.cc aa-transition.cc aa-transition-20200915.cc aa-transition-20210503.cc \
   newick.cc draw-tree.cc \
   layout.cc html-export.cc draw.cc antigenic-maps.cc dash-bar.cc tal-data.cc legend.cc title.cc
 

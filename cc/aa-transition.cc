@@ -50,8 +50,7 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
 {
     switch (parameters.method) {
         case draw_tree::AATransitionsParameters::method::eu_20210503:
-            // detail::update_aa_transitions_eu_20210503(tree, parameters);
-            AD_WARNING("aa_transitions_eu_20210503 disabled");
+            detail::update_aa_transitions_eu_20210503(tree, parameters);
             break;
         case draw_tree::AATransitionsParameters::method::eu_20200915:
             detail::update_aa_transitions_eu_20200915(tree, parameters);
