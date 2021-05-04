@@ -168,7 +168,7 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
                        fmt::arg("edge", std::string(edge, '=')),                                                                   //
                        fmt::arg("leaves", node.number_leaves_in_subtree()),                                                        //
                        fmt::arg("aa_transitions", aa_transitions.empty() ? std::string{} : fmt::format("  [{}]", aa_transitions)));
-        fmt::format_to(text, " node_id: {}\n", node.node_id);
+        fmt::format_to(text, " node_id: {} edge: {}  cumul: {}\n", node.node_id, node.edge_length.as_number(), node.cumulative_edge_length.as_number());
         if (!prefix.empty()) {
             if (prefix.back().back() == '\\')
                 prefix.back().back() = ' ';
