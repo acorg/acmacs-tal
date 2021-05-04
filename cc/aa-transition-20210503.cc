@@ -42,7 +42,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
             for (auto& child : node.subtree) {
                 if (auto* child_transition = child.aa_transitions_.find(aa_transition.pos); child_transition) {
                     AD_DEBUG(parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos,
-                             "update_aa_transitions_eu_20210503: close aa transtions for {} in {} {} (parent) and {} {} (child)", aa_transition.pos, node.node_id, aa_transition.display(),
+                             "update_aa_transitions_eu_20210503: flipping aa transtions for {} in {} {} (parent) and {} {} (child)", aa_transition.pos, node.node_id, aa_transition.display(),
                              child.node_id, child.aa_transitions_.display());
                     update = true;
                     break;
