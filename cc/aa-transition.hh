@@ -321,6 +321,8 @@ namespace acmacs::tal::inline v3
     {
         void update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence);
         void update_aa_transitions_eu_20200915(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
+        void update_aa_transitions_eu_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
+        void update_aa_transitions_derek_2016(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
     }
 
 } // namespace acmacs::tal::inline v3
