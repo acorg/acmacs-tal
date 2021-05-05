@@ -65,26 +65,6 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
 
     // for each intermediate node check if a child has an aa transition label for the same position
 
-    // const auto process_children = [&parameters](const Node& parent, const AA_Transition& parent_transition, double number_of_leaves_ratio_threshold, const char* child_name) -> bool {
-    //     // returns if parent needs to be updated, i.e. its transition removed and transitions of its children updated
-    //     for (auto& child : parent.subtree) {
-    //         if (auto* child_transition = child.aa_transitions_.find(parent_transition.pos); child_transition) {
-    //             if (const auto parent_leaves = static_cast<double>(parent.number_leaves_in_subtree()), child_leaves = static_cast<double>(child.number_leaves_in_subtree()), ratio = child_leaves / parent_leaves;
-    //                 ratio > number_of_leaves_ratio_threshold) {
-    //                 AD_DEBUG(parameters.debug && parameters.report_pos && parent_transition.pos == *parameters.report_pos,
-    //                          "update_aa_transitions_eu_20210503: flipping aa transtions for {} in {} {} (parent, {} leaves) and {} {} ({}, {:.0f} leaves), ratio: {:.2f}", parent_transition.pos,
-    //                          parent.node_id, parent_transition.display(), parent_leaves, child.node_id, child.aa_transitions_.display(), child_name, child_leaves, ratio);
-    //                 return true;
-    //             }
-    //             else
-    //                 AD_DEBUG(parameters.debug && parameters.report_pos && parent_transition.pos == *parameters.report_pos,
-    //                          "update_aa_transitions_eu_20210503: IGNORED flipping aa transtions for {} in {} {} (parent, {} leaves) and {} {} ({}, {:.0f} leaves), ratio: {:.2f}", parent_transition.pos,
-    //                          parent.node_id, parent_transition.display(), parent_leaves, child.node_id, child.aa_transitions_.display(), child_name, child_leaves, ratio);
-    //         }
-    //     }
-    //     return false;
-    // };
-
     const auto update_children = [child_number_of_leaves_ratio_threshold](const Node& parent, const AA_Transition& parent_transition, bool dbg) {
         return detail::process_children(parent, parent_transition, child_number_of_leaves_ratio_threshold, dbg, "child");
     };
@@ -100,6 +80,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
     tree::iterate_pre(tree, [&parameters, update_children, update_enkels](Node& node) {
         for (auto& aa_transition : node.aa_transitions_) {
             const bool dbg = parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos;
+            AD_DEBUG(dbg, "update_aa_transitions_eu_20210503 {} {}", node.node_id, aa_transition.display());
             if (update_children(node, aa_transition, dbg) || update_enkels(node, aa_transition, dbg)) {
                 // remove transition from node, pretend node has the
                 // same left and right (equals left) for this pos,

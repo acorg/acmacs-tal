@@ -60,7 +60,6 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
 {
     const Scaled line_width{vertical_step() * 0.5};
     const Scaled text_size{vertical_step() * 0.8};
-    const Scaled node_id_text_size{1e-4}; // const Scaled node_id_text_size{3e-4};
 
     tree::iterate_leaf_pre(
         tal().tree(),
@@ -77,7 +76,7 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
             }
         },
         // pre
-        [&surface, this, line_width, vertical_additon = line_width.value() / 2.0, node_id_text_size](const Node& node) {
+        [&surface, this, line_width, vertical_additon = line_width.value() / 2.0](const Node& node) {
             if (!node.hidden) {
                 if (const auto shown_children = node.shown_children(); !shown_children.empty()) {
                     surface.line({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number(), vertical_step() * node.cumulative_vertical_offset_},
@@ -88,9 +87,9 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                                  {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.back()->cumulative_vertical_offset_ + vertical_additon}, BLACK,
                                  line_width * node.edge_line_width_scale);
 
-                    surface.text(
-                        {horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *node_id_text_size, vertical_step() * node.cumulative_vertical_offset_ - *line_width},
-                        fmt::format("{}", node.node_id), BLACK, node_id_text_size);
+                    surface.text({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *parameters_.node_id_text_size * 0.5,
+                                  vertical_step() * node.cumulative_vertical_offset_ - *line_width - *parameters_.node_id_text_size * 0.1},
+                                 fmt::format("{}", node.node_id), BLACK, parameters_.node_id_text_size);
                 }
                 else
                     AD_WARNING("node is not hidden but all ist children are hidden {} total children: {}", node.node_id, node.subtree.size());

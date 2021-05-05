@@ -169,6 +169,12 @@ bool acmacs::tal::v3::Settings::apply_built_in(std::string_view name)
             margins();
         else if (name == "nodes"sv)
             apply_nodes();
+        else if (name == "node-id-size"sv) {
+            if (DrawTree* draw_tree = draw().layout().find_draw_tree(throw_error::no); draw_tree)
+                draw_tree->parameters().node_id_text_size = Scaled{getenv_or("size"sv, 1e-4)};
+            else
+                AD_WARNING("\"node-id-size\" requested but no darw_tree found");
+        }
         else if (name == "populate-with-nuc-duplicates"sv)
             tree().populate_with_nuc_duplicates();
         else if (name == "re-root"sv)

@@ -1,4 +1,4 @@
-# Time-stamp: <2021-05-05 11:29:58 eu>
+# Time-stamp: <2021-05-05 14:43:55 eu>
 
 bjorn [145, 155, 156, 158, 159, 189, 193]
 
@@ -125,6 +125,10 @@ If multiple criteria specified within single "select" object, they all used (con
 *** Just report selected
 
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": "report"}
+
+*** node_id label size
+
+{"N": "node-id-size", "size": 0.004},
 
 * Settings
 

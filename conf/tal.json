@@ -102,6 +102,7 @@
     ],
 
     "tal-modifications": [
+        {"?N": "node-id-size", "size": 0.0001},
         {"N": "if", "condition": "$tree-draw-aa-transitions", "then": [
             {"N": "draw-aa-transitions",
              "minimum-number-leaves-in-subtree": 0.01,

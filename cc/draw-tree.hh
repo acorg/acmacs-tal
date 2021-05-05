@@ -39,6 +39,7 @@ namespace acmacs::tal::inline v3
         struct Parameters
         {
             AATransitionsParameters aa_transitions;
+            Scaled node_id_text_size{1e-4};
         };
     } // namespace draw_tree
 
