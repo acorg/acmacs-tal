@@ -284,7 +284,7 @@ namespace acmacs::tal::inline v3
         enum class report_size { brief, detailed };
         std::string report_aa_at(const std::vector<acmacs::seqdb::pos1_t>& pos, bool names) const;
         void aa_at_pos_report(size_t tolerance) const;
-        void aa_at_pos_counter_report(double tolerance) const;
+        void aa_at_pos_counter_report(double tolerance, bool positions_only) const;
 
         // ----------------------------------------------------------------------
 

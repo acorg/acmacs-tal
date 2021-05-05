@@ -7,6 +7,7 @@
 #include "acmacs-base/timeit.hh"
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/range-v3.hh"
+#include "acmacs-base/string-join.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-virus/virus-name-v1.hh"
 #include "acmacs-chart-2/chart.hh"
@@ -1021,7 +1022,7 @@ void acmacs::tal::v3::Tree::aa_at_pos_report(size_t tolerance) const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance) const
+void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance, bool positions_only) const
 {
     using CounterAA = acmacs::CounterCharSome<' ', '`'>;
     std::vector<CounterAA> counter_aa_at_pos;
@@ -1035,8 +1036,9 @@ void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance) const
         }
     });
 
-    AD_INFO("aa-at-pos-counter-report");
+    AD_INFO(!positions_only, "aa-at-pos-counter-report");
     const auto& root_seq = find_first_leaf().aa_sequence;
+    std::vector<size_t> pos1;
     for (const auto [pos, counter] : acmacs::enumerate(counter_aa_at_pos)) {
         const auto total = static_cast<double>(counter.total());
         std::vector<std::pair<char, double>> aa_precent;
@@ -1044,14 +1046,18 @@ void acmacs::tal::v3::Tree::aa_at_pos_counter_report(double tolerance) const
             if (const auto percent = static_cast<double>(count) / total; percent >= tolerance)
                 aa_precent.emplace_back(aa, percent);
         }
-        const auto root_aa = root_seq.at(seqdb::pos0_t{pos});
-        if (aa_precent.size() > 1 || root_aa != aa_precent.front().first) {
-            fmt::print("{:3d}", pos + 1);
-            for (auto it = aa_precent.begin(); it != aa_precent.end(); ++it)
-                fmt::print("  {}:{:.0f}%", it->first, it->second * 100.0);
-            fmt::print("  root:{}\n", root_aa);
+        if (const auto root_aa = root_seq.at(seqdb::pos0_t{pos}); aa_precent.size() > 1 || root_aa != aa_precent.front().first) {
+            pos1.push_back(pos + 1);
+            if (!positions_only) {
+                fmt::print("{:3d}", pos + 1);
+                for (auto it = aa_precent.begin(); it != aa_precent.end(); ++it)
+                    fmt::print("  {}:{:.0f}%", it->first, it->second * 100.0);
+                fmt::print("  root:{}\n", root_aa);
+            }
         }
     }
+    if (positions_only)
+        fmt::print("{}\n", acmacs::string::join(acmacs::string::join_space, pos1));
 
 } // acmacs::tal::v3::Tree::aa_at_pos_counter_report
 
