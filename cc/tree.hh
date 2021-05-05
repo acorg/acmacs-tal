@@ -136,7 +136,7 @@ namespace acmacs::tal::inline v3
         AA_Transitions aa_transitions_;
 
         // 20200514
-        const Node* closest_leaf{nullptr}; // child leaf with minimal cumulative_edge_length
+        std::vector<const Node*> closest_leaves{}; // child leaves with minimal cumulative_edge_length, multiple leaves necessary because closest one may have X at some positions
 
         // before_20200513
         CommonAA_Ptr common_aa_;

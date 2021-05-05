@@ -41,21 +41,34 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
 
     set_closest_leaf_for_intermediate(tree);
 
-    // for each intermediate node find closest leaf node of its subtree, i.e. a leaf in the subtree that has minimum cumulative length
-    tree::iterate_pre(tree, [&parameters](Node& branch) {
-        if (branch.closest_leaf) {
-            for (auto& child : branch.subtree) {
-                if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
-                    for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaf->aa_sequence.size(), child.closest_leaf->aa_sequence.size()); ++pos) {
-                        // transitions to/from X ignored
-                        // perhaps we need to look for a second closest leaf if found closest leaf has X at the pos
-                        if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos);
-                            left_aa != right_aa && left_aa != 'X' && right_aa != 'X') {
-                            child.aa_transitions_.add(pos, left_aa, right_aa);
+    const auto find_closest_with_aa_at = [](seqdb::pos0_t pos, const Node& node) -> std::pair<char, const Node*> {
+        auto aa{'X'};
+        for (const auto* bcl : node.closest_leaves) {
+            aa = bcl->aa_sequence.at(pos);
+            if (aa != 'X' && aa != ' ')
+                return {aa, bcl};
+        }
+        if (node.number_leaves_in_subtree() > node.closest_leaves.size() && *pos < static_cast<size_t>(static_cast<double>(*node.closest_leaves[0]->aa_sequence.size()) * 0.9)) // ignore last 10% of positions anyway
+            AD_WARNING("update_aa_transitions_eu_20210503: no closest leaf sequence with certain amino acid at {} found for node:{} (num-leaves:{}, closest-leaves:{}), increase "
+                       "max_number_of_closest_leaves_to_set in aa-transitions.cc:219",
+                       pos, node.node_id, node.number_leaves_in_subtree(), node.closest_leaves.size());
+        return {aa, nullptr};
+    };
 
+    // for each intermediate node find closest leaf node of its subtree, i.e. a leaf in the subtree that has minimum cumulative length
+    tree::iterate_pre(tree, [&parameters, &find_closest_with_aa_at](Node& branch) {
+        if (!branch.closest_leaves.empty()) {
+            for (auto& child : branch.subtree) {
+                if (!child.closest_leaves.empty() && branch.closest_leaves[0] != child.closest_leaves[0]) {
+                    for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaves[0]->aa_sequence.size(), child.closest_leaves[0]->aa_sequence.size()); ++pos) {
+                        const auto [left_aa, left_aa_node] = find_closest_with_aa_at(pos, branch);
+                        const auto [right_aa, right_aa_node] = find_closest_with_aa_at(pos, child);
+                        // transitions to/from X ignored, space in aa means sequence is too short
+                        if (left_aa != right_aa && left_aa != 'X' && left_aa != ' ' && right_aa != 'X' && right_aa != ' ') {
+                            child.aa_transitions_.add(pos, left_aa, right_aa);
                             AD_DEBUG(parameters.debug && parameters.report_pos && pos == *parameters.report_pos,
-                                     "update_aa_transitions_eu_20210503 node:{:4.3s} {}{}{} leaves:{:5d} closest-cumul:{} closest:{}", child.node_id, left_aa, pos, right_aa,
-                                     child.number_leaves_in_subtree(), child.closest_leaf->cumulative_edge_length, child.closest_leaf->seq_id);
+                                     "update_aa_transitions_eu_20210503 node:{:5.3s} {}{}{} leaves:{:5d} closest-cumul:{} closest:{}", child.node_id, left_aa, pos, right_aa,
+                                     child.number_leaves_in_subtree(), right_aa_node->cumulative_edge_length, right_aa_node->seq_id);
                         }
                     }
                 }
@@ -77,10 +90,10 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
         return false;
     };
 
-    tree::iterate_pre(tree, [&parameters, update_children, update_enkels](Node& node) {
+    tree::iterate_pre(tree, [&parameters, update_children, update_enkels, &find_closest_with_aa_at](Node& node) {
         for (auto& aa_transition : node.aa_transitions_) {
             const bool dbg = parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos;
-            AD_DEBUG(dbg, "update_aa_transitions_eu_20210503 {} {}", node.node_id, aa_transition.display());
+            // AD_DEBUG(dbg, "update_aa_transitions_eu_20210503 node:{:6.3} {}", node.node_id, aa_transition.display());
             if (update_children(node, aa_transition, dbg) || update_enkels(node, aa_transition, dbg)) {
                 // remove transition from node, pretend node has the
                 // same left and right (equals left) for this pos,
@@ -94,10 +107,9 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
                             else
                                 child_transition->left = aa_transition.right;
                         }
-                        else if (const auto child_right = child.closest_leaf->aa_sequence.at(aa_transition.pos); child_right != 'X' && child_right != aa_transition.right)
-                            child.aa_transitions_.add(aa_transition.pos, aa_transition.right, child_right);
-                        AD_DEBUG(parameters.debug && parameters.report_pos && aa_transition.pos == *parameters.report_pos, "update_aa_transitions_eu_20210503:      child ({}) updated: {}",
-                                 child.node_id, child.aa_transitions_.display());
+                        else if (const auto [aa_right, child_right] = find_closest_with_aa_at(aa_transition.pos, child); aa_right != 'X' && aa_right != ' ' && aa_right != aa_transition.right)
+                            child.aa_transitions_.add(aa_transition.pos, aa_transition.right, aa_right);
+                        AD_DEBUG(dbg, "update_aa_transitions_eu_20210503:      child ({}) updated: {}", child.node_id, child.aa_transitions_.display());
                     }
                 }
             }

@@ -216,20 +216,30 @@ std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vecto
 
 void acmacs::tal::v3::detail::set_closest_leaf_for_intermediate(Tree& tree)
 {
+     // we have to keep multiple closest leaves because some of them
+     // may have X at some positions (or to be too short) and prevent
+     // from properly detecting aa subst labels in
+     // update_aa_transitions_eu_20210503
+    constexpr const size_t max_number_of_closest_leaves_to_set = 8;
+
     tree.cumulative_calculate();
 
     tree::iterate_post(tree, [](Node& branch) {
-        branch.closest_leaf = nullptr;
+        branch.closest_leaves.clear();
         for (const auto& child : branch.subtree) {
-            if (const auto* leaf = child.is_leaf() ? &child : child.closest_leaf; leaf) {
-                if (branch.closest_leaf == nullptr || branch.closest_leaf->cumulative_edge_length > leaf->cumulative_edge_length)
-                    branch.closest_leaf = leaf;
+            if (child.is_leaf()) {
+                if (branch.closest_leaves.size() < max_number_of_closest_leaves_to_set || branch.closest_leaves.back()->cumulative_edge_length > child.cumulative_edge_length)
+                    branch.closest_leaves.push_back(&child);
             }
+            else {
+                std::copy(std::begin(child.closest_leaves), std::end(child.closest_leaves), std::back_inserter(branch.closest_leaves));
+            }
+            std::sort(std::begin(branch.closest_leaves), std::end(branch.closest_leaves), [](auto* n1, auto* n2) { return n1->cumulative_edge_length < n2->cumulative_edge_length; });
+            branch.closest_leaves.erase(std::unique(std::begin(branch.closest_leaves), std::end(branch.closest_leaves)), std::end(branch.closest_leaves));
         }
     });
 
 } // acmacs::tal::v3::detail::set_closest_leaf_for_intermediate
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

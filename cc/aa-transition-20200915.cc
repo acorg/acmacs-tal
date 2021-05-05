@@ -302,18 +302,18 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200514(Tree& tree, cons
     // parent node, right part being AA at this node
 
     tree::iterate_post(tree, [&parameters](Node& branch) {
-        if (branch.closest_leaf) {
+        if (!branch.closest_leaves.empty()) {
             for (auto& child : branch.subtree) {
-                if (child.closest_leaf && branch.closest_leaf != child.closest_leaf) {
-                    for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaf->aa_sequence.size(), child.closest_leaf->aa_sequence.size()); ++pos) {
+                if (!child.closest_leaves.empty() && branch.closest_leaves[0] != child.closest_leaves[0]) {
+                    for (seqdb::pos0_t pos{0}; pos < std::min(branch.closest_leaves[0]->aa_sequence.size(), child.closest_leaves[0]->aa_sequence.size()); ++pos) {
                         // transitions to/from X ignored
                         // perhaps we need to look for a second closest leaf if found closest leaf has X at the pos
-                        if (const auto left_aa = branch.closest_leaf->aa_sequence.at(pos), right_aa = child.closest_leaf->aa_sequence.at(pos);
+                        if (const auto left_aa = branch.closest_leaves[0]->aa_sequence.at(pos), right_aa = child.closest_leaves[0]->aa_sequence.at(pos);
                             left_aa != right_aa && left_aa != 'X' && right_aa != 'X') {
                             child.aa_transitions_.add(pos, left_aa, right_aa);
                             AD_DEBUG(parameters.debug && parameters.report_pos && pos == *parameters.report_pos,
                                         "update_aa_transitions_eu_20200514 node:{:4.3s} {}{}{} leaves:{:5d} closest-cumul:{} closest:{}", child.node_id,
-                                        left_aa, pos, right_aa, child.number_leaves_in_subtree(), child.closest_leaf->cumulative_edge_length, child.closest_leaf->seq_id);
+                                        left_aa, pos, right_aa, child.number_leaves_in_subtree(), child.closest_leaves[0]->cumulative_edge_length, child.closest_leaves[0]->seq_id);
                         }
                     }
                 }
