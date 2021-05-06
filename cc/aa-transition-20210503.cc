@@ -31,6 +31,49 @@ namespace acmacs::tal::inline v3::detail
 
 // ----------------------------------------------------------------------
 
+// Algorithm:
+//
+// 1. For each intermediate node find the closest leaf in its subtree,
+// i.e. a child leaf with the minimal cumulative edge length. We have
+// to keep references to the multiple closest leaves because signle
+// leaf may have X at some position or its sequence can be too short
+// and then algorithm may fail to set aa substitution label
+// correctly. See warning "no closest leaf" below.
+//
+// 2. For each intermediate child node of a parent node, if the
+// closest leaf of the parent node and the closest leaf of the child
+// node have different aa's at a position and none of those aa's is X,
+// set aa transition label for that position for the child node to
+// transition from parent aa to child aa. If an aa is X, look for the
+// second (third, etc.) closest leaf of the corresponding node (parent
+// of child). If no non-X in the collected closest leaves found, do not
+// set aa transition label, as if parent and child aa's are the same.
+//
+// 3. Descent the tree from the root node. For each intermediate node
+// (parent) that has a transition label for a position, if its child
+// intermediate node also has transition label for that position, mark
+// that (parent) node for updating. If no children have transition
+// labels for that position, look in the grand-children intermediate
+// nodes of the parent and mark parent for updating if a grand-child
+// has label for that position. If parent node is marked, do 4. before
+// descending further.
+//
+// 4. If a node is marked for updating, set right (to) part of its the
+// transition label for that position to be the same as the left
+// (from) part. For each child node update its transition labels
+// assuming closest leaf of its parent has just set aa (in the left
+// and right part). I.e. if the closest leaf of the child has
+// different aa than found in the parent transition label, then set
+// the label accordingly, if aa's are the same, remove the label if it
+// is present. Then continue descending the tree in the step 3 and
+// re-process children as parent nodes in the step 3.
+//
+// 5. Remove labels in the tree nodes that have the same left and
+// right aa's.
+//
+// In the result there should be no transition labels for the same
+// position in the nodes that are close to each other.
+
 void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     // parameters
@@ -55,7 +98,6 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
         return {aa, nullptr};
     };
 
-    // for each intermediate node find closest leaf node of its subtree, i.e. a leaf in the subtree that has minimum cumulative length
     tree::iterate_pre(tree, [&parameters, &find_closest_with_aa_at](Node& branch) {
         if (!branch.closest_leaves.empty()) {
             for (auto& child : branch.subtree) {
