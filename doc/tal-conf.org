@@ -1,4 +1,4 @@
-# Time-stamp: <2021-05-05 14:43:55 eu>
+# Time-stamp: <2021-05-06 09:39:45 eu>
 
 bjorn [145, 155, 156, 158, 159, 189, 193]
 
@@ -193,26 +193,26 @@ If multiple criteria specified within single "select" object, they all used (con
 
 #+BEGIN_SRC bash
 {"N": "aa-transitions", "report": false, 
- "method": "eu-20200915", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
-"show-same-left-right-for-pos": 193}
+ "method": "eu-20210503", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
+ "show-same-left-right-for-pos": 193}
 #+END_SRC
 
 
 #+BEGIN_SRC json
-  {"N": "draw-aa-transitions", 
-   "report": false, "debug": false, "?debug-pos": 278, "?show-same-left-right-for-pos": 160,
-   "method": "eu-20200915", "?method": ["eu-20210503", "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"],
-   "minimum-number-leaves-in-subtree": 0.01, -- if < 1 - relative to total, if > 1 - absolute value
-   "?minimum-number-leaves-in-subtree-per-pos": {"94": 0.0037},
-   "non-common-tolerance": 0.6, -- if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
-   "?non-common-tolerance-per-pos": {"144": 0.7, "159": 0.7},
-   "text-line-interleave": 0.3,
-   "show": true,
-   "?only-for": [<pos>], -- draw only for the specified pos, if list is absent or empty, draw for all pos
-   "all-nodes": {"node_id": "", "label": {<[[Label parameters]]>}},
-   "per-node": [
-   ],
-  },
+{"N": "draw-aa-transitions", 
+ "report": false, "debug": false, "?debug-pos": 278, "?show-same-left-right-for-pos": 160,
+ "method": "eu-20210503", "?method": ["eu-20210503", "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"],
+ "minimum-number-leaves-in-subtree": 0.01, "?minimum-number-leaves-in-subtree": "if < 1 - relative to total, if > 1 - absolute value",
+ "?minimum-number-leaves-in-subtree-per-pos": {"94": 0.0037},
+ "non-common-tolerance": 0.6, "?non-common-tolerance": "if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node",
+ "?non-common-tolerance-per-pos": {"144": 0.7, "159": 0.7},
+ "text-line-interleave": 0.3,
+ "show": true,
+ "?only-for": [<pos>], "? only-for": "draw only for the specified pos, if list is absent or empty, draw for all pos",
+ "all-nodes": {"node_id": "", "label": "{<[[Label parameters]]>}"},
+ "per-node": [
+ ],
+},
 #+END_SRC
 
 #+BEGIN_SRC bash
