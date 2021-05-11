@@ -1204,6 +1204,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         getenv_copy_if_present("report"sv, aa_transitions.report);
         getenv_copy_if_present("debug"sv, aa_transitions.debug);
         getenv_copy_if_present("non-common-tolerance"sv, aa_transitions.non_common_tolerance);
+        getenv_copy_if_present("add-to-leaves"sv, aa_transitions.add_to_leaves);
 
         getenv("non-common-tolerance-per-pos"sv).visit([this, &aa_transitions]<typename Arg>(const Arg& arg) {
             if constexpr (std::is_same_v<Arg, rjson::v3::detail::object>) {

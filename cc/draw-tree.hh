@@ -26,6 +26,7 @@ namespace acmacs::tal::inline v3
             // if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node
             double non_common_tolerance{0.6};
             std::vector<double> non_common_tolerance_per_pos; // negative value means use non_common_tolerance
+            bool add_to_leaves{false};                        // eu_20210503 only, add labels to leaves (SARS2, Sam T request 2021-05-11)
 
             double non_common_tolerance_for(seqdb::pos0_t pos) const
             {

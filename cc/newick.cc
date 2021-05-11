@@ -181,6 +181,11 @@ namespace acmacs::tal::inline v3
 
         if (node.is_leaf()) {
             fmt::format_to(out, "{}", node.seq_id);
+            if (options.add_aa_substitution_labels && !node.aa_transitions_.empty()) {
+                auto label = node.aa_transitions_.display();
+                ::string::replace_in_place(label, ' ', '_');
+                fmt::format_to(out, "+{}", label);
+            }
         }
         else {
             fmt::format_to(out, "(");

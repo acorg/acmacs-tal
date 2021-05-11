@@ -84,14 +84,15 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
 
     set_closest_leaf_for_intermediate(tree);
 
-    const auto find_closest_with_aa_at = [number_of_leaves_in_tree=tree.number_leaves_in_subtree()](seqdb::pos0_t pos, const Node& node) -> std::pair<char, const Node*> {
+    const auto find_closest_with_aa_at = [number_of_leaves_in_tree = tree.number_leaves_in_subtree()](seqdb::pos0_t pos, const Node& node) -> std::pair<char, const Node*> {
         auto aa{'X'};
         for (const auto* bcl : node.closest_leaves) {
             aa = bcl->aa_sequence.at(pos);
             if (aa != 'X' && aa != ' ')
                 return {aa, bcl};
         }
-        if (number_of_leaves_in_tree < 10000 && node.number_leaves_in_subtree() > node.closest_leaves.size() && *pos < static_cast<size_t>(static_cast<double>(*node.closest_leaves[0]->aa_sequence.size()) * 0.9)) // ignore last 10% of positions anyway
+        if (number_of_leaves_in_tree < 10000 && node.number_leaves_in_subtree() > node.closest_leaves.size() &&
+            *pos < static_cast<size_t>(static_cast<double>(*node.closest_leaves[0]->aa_sequence.size()) * 0.9)) // ignore last 10% of positions anyway
             AD_WARNING("update_aa_transitions_eu_20210503: no closest leaf sequence with certain amino acid at {} found for node:{} (num-leaves:{}, closest-leaves:{}), increase "
                        "max_number_of_closest_leaves_to_set in aa-transitions.cc:219",
                        pos, node.node_id, node.number_leaves_in_subtree(), node.closest_leaves.size());
@@ -158,6 +159,28 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
         }
         node.aa_transitions_.remove_left_right_same(parameters, node);
     });
+
+    if (parameters.add_to_leaves) {
+        tree::iterate_pre(tree, [&find_closest_with_aa_at](Node& node) {
+            if (!node.closest_leaves.empty()) {
+                // construct node sequence with minimal number of X
+                std::string seq{*node.closest_leaves[0]->aa_sequence};
+                for (size_t pos{0}; pos < seq.size(); ++pos) {
+                    if (seq[pos] == 'X')
+                        seq[pos] = find_closest_with_aa_at(seqdb::pos0_t{pos}, node).first;
+                }
+
+                for (auto& child : node.subtree) {
+                    if (child.is_leaf()) {
+                        for (size_t pos{0}; pos < seq.size(); ++pos) {
+                            if (const auto child_aa = child.aa_sequence.at(seqdb::pos0_t{pos}); seq[pos] != child_aa && seq[pos] != 'X' && child_aa != 'X' && child_aa != ' ')
+                                child.aa_transitions_.add(seqdb::pos0_t{pos}, seq[pos], child_aa);
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 // ----------------------------------------------------------------------
