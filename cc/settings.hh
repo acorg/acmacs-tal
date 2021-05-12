@@ -5,6 +5,7 @@
 #include "acmacs-base/settings-v3.hh"
 #include "acmacs-tal/tal-data.hh"
 #include "acmacs-tal/clades.hh"
+#include "acmacs-tal/time-series.hh"
 
 // ----------------------------------------------------------------------
 
@@ -58,12 +59,13 @@ namespace acmacs::tal::inline v3
         void antigenic_maps();
 
         void add_tree();
-        void process_color_by(LayoutElementWithColoring& element);
+        void process_color_by(LayoutElementWithColoring& element, const rjson::v3::value& cb_val);
         void process_tree_legend(DrawTree& tree);
         void add_draw_aa_transitions();
         void add_draw_on_tree();
 
         void add_time_series();
+        void add_time_series(TimeSeries& element, TimeSeries::Parameters& param);
         void process_legend(TimeSeries& time_series);
 
         void read_dash_parameters(parameters::Dash& param);

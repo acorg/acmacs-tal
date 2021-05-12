@@ -19,6 +19,7 @@ namespace acmacs::tal::inline v3
     class DrawTree;
     class DrawOnTree;
     class TimeSeries;
+    class TimeSeriesWithShift;
     class Clades;
     class DrawAATransitions;
     class Title;
@@ -68,6 +69,7 @@ namespace acmacs::tal::inline v3
     extern template const DrawTree* Layout::find<DrawTree>(const LayoutElementId& id) const;
     extern template const DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id) const;
     extern template const TimeSeries* Layout::find<TimeSeries>(const LayoutElementId& id) const;
+    extern template const TimeSeriesWithShift* Layout::find<TimeSeriesWithShift>(const LayoutElementId& id) const;
     extern template const Clades* Layout::find<Clades>(const LayoutElementId& id) const;
     extern template const DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id) const;
     extern template const Title* Layout::find<Title>(const LayoutElementId& id) const;
@@ -83,6 +85,7 @@ namespace acmacs::tal::inline v3
     extern template DrawTree* Layout::find<DrawTree>(const LayoutElementId& id);
     extern template DrawOnTree* Layout::find<DrawOnTree>(const LayoutElementId& id);
     extern template TimeSeries* Layout::find<TimeSeries>(const LayoutElementId& id);
+    extern template TimeSeriesWithShift* Layout::find<TimeSeriesWithShift>(const LayoutElementId& id);
     extern template Clades* Layout::find<Clades>(const LayoutElementId& id);
     extern template DrawAATransitions* Layout::find<DrawAATransitions>(const LayoutElementId& id);
     extern template Title* Layout::find<Title>(const LayoutElementId& id);

@@ -87,6 +87,7 @@ template <typename Element> inline const Element* acmacs::tal::v3::Layout::find(
 template const acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>(const LayoutElementId& id) const;
+template const acmacs::tal::v3::TimeSeriesWithShift* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeriesWithShift>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id) const;
 template const acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id) const;
@@ -111,6 +112,7 @@ template <typename Element> inline Element* acmacs::tal::v3::Layout::find(const 
 template acmacs::tal::v3::DrawTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawTree>(const LayoutElementId& id);
 template acmacs::tal::v3::DrawOnTree* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawOnTree>(const LayoutElementId& id);
 template acmacs::tal::v3::TimeSeries* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeries>(const LayoutElementId& id);
+template acmacs::tal::v3::TimeSeriesWithShift* acmacs::tal::v3::Layout::find<acmacs::tal::v3::TimeSeriesWithShift>(const LayoutElementId& id);
 template acmacs::tal::v3::Clades* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Clades>(const LayoutElementId& id);
 template acmacs::tal::v3::DrawAATransitions* acmacs::tal::v3::Layout::find<acmacs::tal::v3::DrawAATransitions>(const LayoutElementId& id);
 template acmacs::tal::v3::Title* acmacs::tal::v3::Layout::find<acmacs::tal::v3::Title>(const LayoutElementId& id);

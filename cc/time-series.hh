@@ -127,6 +127,25 @@ namespace acmacs::tal::inline v3
 
     // ----------------------------------------------------------------------
 
+    class TimeSeriesWithShift : public TimeSeries
+    {
+      public:
+        using TimeSeries::TimeSeries;
+
+        struct Parameters : public TimeSeries::Parameters
+        {
+            size_t shift;
+        };
+
+        constexpr Parameters& parameters() { return parameters_; }
+        constexpr const Parameters& parameters() const { return parameters_; }
+
+      private:
+        Parameters parameters_;
+    };
+
+    // ----------------------------------------------------------------------
+
 } // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------

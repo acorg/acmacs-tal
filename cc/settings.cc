@@ -9,7 +9,6 @@
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/settings.hh"
 #include "acmacs-tal/draw-tree.hh"
-#include "acmacs-tal/time-series.hh"
 #include "acmacs-tal/title.hh"
 #include "acmacs-tal/legend.hh"
 #include "acmacs-tal/dash-bar.hh"
@@ -510,7 +509,7 @@ void acmacs::tal::v3::Settings::clade() const
 void acmacs::tal::v3::Settings::add_tree()
 {
     auto& tree_element = add_element<DrawTree>();
-    process_color_by(tree_element);
+    process_color_by(tree_element, getenv("color-by"));
     process_tree_legend(tree_element);
     add_element<HzSections>();
 
@@ -518,7 +517,7 @@ void acmacs::tal::v3::Settings::add_tree()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& element)
+void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& element, const rjson::v3::value& cb_val)
 {
     using namespace std::string_view_literals;
 
@@ -569,7 +568,6 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         }
     };
 
-    const auto& cb_val = getenv("color-by"sv);
     auto coloring = cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
         if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
             return color_by(arg.template to<std::string_view>(), rjson::v3::detail::object{});
@@ -656,10 +654,28 @@ void acmacs::tal::v3::Settings::add_time_series()
 {
     using namespace std::string_view_literals;
 
-    auto& element = add_element<TimeSeries>();
-    auto& param = element.parameters();
+    const auto shift  = getenv_or("shift"sv, 0ul);
 
-    process_color_by(element);
+    if (shift > 0) {
+        auto& element = add_element<TimeSeriesWithShift>();
+        auto& param = element.parameters();
+        // process_color_by(element, getenv("color-by"sv));
+        add_time_series(element, param);
+    }
+    else {
+        auto& element = add_element<TimeSeries>();
+        auto& param = element.parameters();
+        process_color_by(element, getenv("color-by"sv));
+        add_time_series(element, param);
+    }
+}
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Settings::add_time_series(TimeSeries& element, TimeSeries::Parameters& param)
+{
+    using namespace std::string_view_literals;
+
     process_legend(element);
     read_dash_parameters(param.dash);
 
