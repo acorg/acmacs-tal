@@ -84,8 +84,8 @@ namespace acmacs::tal::inline v3
             LegendParameters legend;
         };
 
-        constexpr Parameters& parameters() { return parameters_; }
-        constexpr const Parameters& parameters() const { return parameters_; }
+        virtual Parameters& parameters() { return parameters_; }
+        virtual const Parameters& parameters() const { return parameters_; }
 
         acmacs::color::Modifier color_for(date::year_month_day date) const;
 
@@ -137,8 +137,8 @@ namespace acmacs::tal::inline v3
             size_t shift;
         };
 
-        constexpr Parameters& parameters() { return parameters_; }
-        constexpr const Parameters& parameters() const { return parameters_; }
+        Parameters& parameters() override { return parameters_; }
+        const Parameters& parameters() const override { return parameters_; }
 
       private:
         Parameters parameters_;
