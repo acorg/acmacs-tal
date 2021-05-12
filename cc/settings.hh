@@ -59,7 +59,7 @@ namespace acmacs::tal::inline v3
         void antigenic_maps();
 
         void add_tree();
-        void process_color_by(LayoutElementWithColoring& element, const rjson::v3::value& cb_val);
+        std::unique_ptr<Coloring> get_color_by(const rjson::v3::value& cb_val);
         void process_tree_legend(DrawTree& tree);
         void add_draw_aa_transitions();
         void add_draw_on_tree();

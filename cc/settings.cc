@@ -509,7 +509,8 @@ void acmacs::tal::v3::Settings::clade() const
 void acmacs::tal::v3::Settings::add_tree()
 {
     auto& tree_element = add_element<DrawTree>();
-    process_color_by(tree_element, getenv("color-by"));
+    if (auto coloring = get_color_by(getenv("color-by")); coloring)
+        tree_element.coloring(std::move(coloring));
     process_tree_legend(tree_element);
     add_element<HzSections>();
 
@@ -517,7 +518,7 @@ void acmacs::tal::v3::Settings::add_tree()
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& element, const rjson::v3::value& cb_val)
+std::unique_ptr<acmacs::tal::Coloring> acmacs::tal::v3::Settings::get_color_by(const rjson::v3::value& cb_val)
 {
     using namespace std::string_view_literals;
 
@@ -568,7 +569,7 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         }
     };
 
-    auto coloring = cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
+    return cb_val.visit([color_by, &cb_val]<typename T>(const T& arg) -> std::unique_ptr<Coloring> {
         if constexpr (std::is_same_v<T, rjson::v3::detail::string>) {
             return color_by(arg.template to<std::string_view>(), rjson::v3::detail::object{});
         }
@@ -580,8 +581,6 @@ void acmacs::tal::v3::Settings::process_color_by(LayoutElementWithColoring& elem
         else
             return {};
     });
-    if (coloring)
-        element.coloring(std::move(coloring));
 
 } // acmacs::tal::v3::Settings::process_color_by
 
@@ -654,18 +653,26 @@ void acmacs::tal::v3::Settings::add_time_series()
 {
     using namespace std::string_view_literals;
 
-    const auto shift  = getenv_or("shift"sv, 0ul);
+    const auto shift = getenv_or("shift"sv, 0ul);
 
     if (shift > 0) {
         auto& element = add_element<TimeSeriesWithShift>();
         auto& param = element.parameters();
-        // process_color_by(element, getenv("color-by"sv));
+        getenv("color-by"sv).visit([]<typename Arg>(const Arg& arg) {
+            if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
+                for (const auto& val : arg)
+                    AD_DEBUG("color_by {}", val);
+            }
+            else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
+                throw error{AD_FORMAT("\"color-by\" for shifted time series must be array")};
+        });
         add_time_series(element, param);
     }
     else {
         auto& element = add_element<TimeSeries>();
         auto& param = element.parameters();
-        process_color_by(element, getenv("color-by"sv));
+        if (auto coloring = get_color_by(getenv("color-by"sv)); coloring)
+            element.coloring(std::move(coloring));
         add_time_series(element, param);
     }
 }
