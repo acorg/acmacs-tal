@@ -60,11 +60,7 @@ void acmacs::tal::v3::TimeSeries::set_width_to_height_ratio()
 
 void acmacs::tal::v3::TimeSeries::prepare_dashes()
 {
-    tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
-        if (!leaf.hidden && !leaf.date.empty())
-            coloring().prepare(leaf);
-    });
-    coloring().prepare();
+    prepare_coloring();
 
     AD_LOG(acmacs::log::time_series, "slots ({})", series_.size());
     for (size_t slot_no = 0; slot_no < series_.size(); ++slot_no)
@@ -81,18 +77,19 @@ void acmacs::tal::v3::TimeSeries::prepare_dashes()
                     date::increment_day(leaf_date, 15);
                 if (const auto slot_no = acmacs::time_series::find(series_, leaf_date); slot_no < series_.size()) {
                     AD_LOG(acmacs::log::time_series, "[{}] -> [{}] slot:{} {}", leaf.date, leaf_date, slot_no, leaf.seq_id);
-                    auto dash_color = coloring().color(leaf);
-                    auto dash_line_width = parameters().dash.line_width;
-                    auto dash_width = parameters().dash.width;
-                    parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
-                        if (per_node.color.has_value())
-                            dash_color = *per_node.color;
-                        if (per_node.line_width.has_value())
-                            dash_line_width = *per_node.line_width;
-                        if (per_node.width.has_value())
-                            dash_width = *per_node.width;
-                    });
-                    dashes_.push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no, .y = leaf.cumulative_vertical_offset_});
+                    prepare_dash(slot_no, leaf);
+                    // auto dash_color = coloring().color(leaf);
+                    // auto dash_line_width = parameters().dash.line_width;
+                    // auto dash_width = parameters().dash.width;
+                    // parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
+                    //     if (per_node.color.has_value())
+                    //         dash_color = *per_node.color;
+                    //     if (per_node.line_width.has_value())
+                    //         dash_line_width = *per_node.line_width;
+                    //     if (per_node.width.has_value())
+                    //         dash_width = *per_node.width;
+                    // });
+                    // dashes_.push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no, .y = leaf.cumulative_vertical_offset_});
                 }
                 else
                     AD_LOG(acmacs::log::time_series, "[{}] -> [{}] no slot {}", leaf.date, leaf_date, leaf.seq_id);
@@ -104,6 +101,37 @@ void acmacs::tal::v3::TimeSeries::prepare_dashes()
     });
 
 } // acmacs::tal::v3::TimeSeries::prepare_colors
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::prepare_dash(size_t slot_no, const Node& leaf)
+{
+    auto dash_color = coloring().color(leaf);
+    auto dash_line_width = parameters().dash.line_width;
+    auto dash_width = parameters().dash.width;
+    parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
+        if (per_node.color.has_value())
+            dash_color = *per_node.color;
+        if (per_node.line_width.has_value())
+            dash_line_width = *per_node.line_width;
+        if (per_node.width.has_value())
+            dash_width = *per_node.width;
+    });
+    dashes_.push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no, .y = leaf.cumulative_vertical_offset_});
+
+} // acmacs::tal::v3::TimeSeries::prepare_dash
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::prepare_coloring()
+{
+    tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+        if (!leaf.hidden && !leaf.date.empty())
+            coloring().prepare(leaf);
+    });
+    coloring().prepare();
+
+} // acmacs::tal::v3::TimeSeries::prepare_coloring
 
 // ----------------------------------------------------------------------
 
@@ -337,12 +365,57 @@ void acmacs::tal::v3::TimeSeriesWithShift::set_width_to_height_ratio()
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::TimeSeriesWithShift::prepare_coloring()
+{
+    tree::iterate_leaf(tal().tree(), [this](const Node& leaf) {
+        if (!leaf.hidden && !leaf.date.empty()) {
+            for (auto& coloring : coloring_)
+                coloring->prepare(leaf);
+        }
+    });
+    // TODO unify colors in all colorings
+    for (auto& coloring : coloring_)
+        coloring->prepare();
+
+} // acmacs::tal::v3::TimeSeriesWithShift::prepare_coloring
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeriesWithShift::prepare_dash(size_t slot_no, const Node& leaf)
+{
+    const Color no_color{0xFFDEAD00};
+
+    auto dash_line_width = parameters().dash.line_width;
+    auto dash_width = parameters().dash.width;
+    auto forced_dash_color = no_color;
+    parameters().per_nodes.find_then(leaf.seq_id, [&](const auto& per_node) {
+        if (per_node.color.has_value())
+            forced_dash_color = *per_node.color;
+        if (per_node.line_width.has_value())
+            dash_line_width = *per_node.line_width;
+        if (per_node.width.has_value())
+            dash_width = *per_node.width;
+    });
+
+    size_t slot_offset = 0;
+    for (auto& coloring : coloring_) {
+        auto dash_color = forced_dash_color;
+        if (dash_color == no_color)
+            dash_color = coloring->color(leaf);
+        dashes().push_back(dash_t{.color = dash_color, .line_width = dash_line_width, .width = dash_width, .slot = slot_no + slot_offset, .y = leaf.cumulative_vertical_offset_});
+        slot_offset += parameters().shift;
+    }
+
+} // acmacs::tal::v3::TimeSeriesWithShift::prepare_dash
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::TimeSeriesWithShift::draw_background_separators(acmacs::surface::Surface& surface) const
 {
     if (!series().empty()) {
         const auto& viewport = surface.viewport();
         double line_offset_x = viewport.left();
-        for (const auto slot_no : range_from_0_to(number_of_slots() + 1)) {
+        for ([[maybe_unused]] const auto slot_no : range_from_0_to(number_of_slots() + 1)) {
             const auto& sep_param = parameters().slot.separator[0];
             surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, sep_param.color, sep_param.line_width, sep_param.dash);
             line_offset_x += parameters().slot.width;

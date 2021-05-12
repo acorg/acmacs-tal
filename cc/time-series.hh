@@ -90,8 +90,22 @@ namespace acmacs::tal::inline v3
         acmacs::color::Modifier color_for(date::year_month_day date) const;
 
       protected:
+        struct dash_t
+        {
+            Color color{PINK};
+            Pixels line_width{0.0};
+            double width{0.0};
+            size_t slot{0};
+            double y;
+        };
+
         const auto& series() const { return series_; }
+        auto& dashes() { return dashes_; }
+
         virtual void set_width_to_height_ratio();
+
+        virtual void prepare_coloring();
+        virtual void prepare_dash(size_t slot_no, const Node& leaf);
 
         virtual void draw_background_separators(acmacs::surface::Surface& surface) const;
         virtual void draw_labels(acmacs::surface::Surface& surface) const;
@@ -102,15 +116,6 @@ namespace acmacs::tal::inline v3
             const Node* node;
 
             constexpr horizontal_line_t(const Node* a_node, const parameters::Line& a_line) : parameters::Line(a_line), node(a_node) {}
-        };
-
-        struct dash_t
-        {
-            Color color{PINK};
-            Pixels line_width{0.0};
-            double width{0.0};
-            size_t slot{0};
-            double y;
         };
 
         Parameters parameters_;
@@ -150,6 +155,9 @@ namespace acmacs::tal::inline v3
 
       protected:
         void set_width_to_height_ratio() override;
+
+        void prepare_coloring() override;
+        void prepare_dash(size_t slot_no, const Node& leaf) override;
 
         void draw_background_separators(acmacs::surface::Surface& surface) const override;
         void draw_labels(acmacs::surface::Surface& surface) const override;
