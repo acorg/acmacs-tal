@@ -89,6 +89,13 @@ namespace acmacs::tal::inline v3
 
         acmacs::color::Modifier color_for(date::year_month_day date) const;
 
+      protected:
+        const auto& series() const { return series_; }
+        virtual void set_width_to_height_ratio();
+
+        virtual void draw_background_separators(acmacs::surface::Surface& surface) const;
+        virtual void draw_labels(acmacs::surface::Surface& surface) const;
+
       private:
         struct horizontal_line_t : public parameters::Line
         {
@@ -116,8 +123,6 @@ namespace acmacs::tal::inline v3
         void make_color_scale();
         void draw_color_scale(acmacs::surface::Surface& surface) const;
 
-        void draw_background_separators(acmacs::surface::Surface& surface) const;
-        void draw_labels(acmacs::surface::Surface& surface) const;
         void draw_legend(acmacs::surface::Surface& surface) const;
         std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
         size_t slot_month(const acmacs::time_series::slot& slot) const;
@@ -140,8 +145,20 @@ namespace acmacs::tal::inline v3
         Parameters& parameters() override { return parameters_; }
         const Parameters& parameters() const override { return parameters_; }
 
+        void add_coloring(std::unique_ptr<Coloring> coloring) { coloring_.push_back(std::move(coloring)); }
+
+
+      protected:
+        void set_width_to_height_ratio() override;
+
+        void draw_background_separators(acmacs::surface::Surface& surface) const override;
+        void draw_labels(acmacs::surface::Surface& surface) const override;
+
       private:
         Parameters parameters_;
+        std::vector<std::unique_ptr<Coloring>> coloring_;
+
+        size_t number_of_slots() const { return series().size() + (coloring_.size() - 1) * parameters().shift; }
     };
 
     // ----------------------------------------------------------------------

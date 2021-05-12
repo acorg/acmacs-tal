@@ -26,8 +26,7 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
 
         series_ = acmacs::time_series::make(parameters().time_series);
         make_color_scale();
-        if (width_to_height_ratio() <= 0.0)
-            width_to_height_ratio() = static_cast<double>(series_.size()) * parameters().slot.width;
+        set_width_to_height_ratio();
 
         const auto long_report = [&ts_stat]() -> std::string { return fmt::format("time series report:\n{}", ts_stat.report("    {value}  {counter:6d}\n")); };
         if (parameters().report == "-"sv)
@@ -47,6 +46,15 @@ void acmacs::tal::v3::TimeSeries::prepare(preparation_stage_t stage)
     LayoutElementWithColoring::prepare(stage);
 
 } // acmacs::tal::v3::TimeSeries::prepare
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeries::set_width_to_height_ratio()
+{
+    if (width_to_height_ratio() <= 0.0)
+        width_to_height_ratio() = static_cast<double>(series_.size()) * parameters().slot.width;
+
+} // acmacs::tal::v3::TimeSeries::set_width_to_height_ratio
 
 // ----------------------------------------------------------------------
 
@@ -317,6 +325,37 @@ void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface)
     }
 
 } // acmacs::tal::v3::TimeSeries::draw_legend
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeriesWithShift::set_width_to_height_ratio()
+{
+    if (width_to_height_ratio() <= 0.0)
+        width_to_height_ratio() = static_cast<double>(number_of_slots()) * parameters().slot.width;
+
+} // acmacs::tal::v3::TimeSeriesWithShift::set_width_to_height_ratio
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeriesWithShift::draw_background_separators(acmacs::surface::Surface& surface) const
+{
+    if (!series().empty()) {
+        const auto& viewport = surface.viewport();
+        double line_offset_x = viewport.left();
+        for (const auto slot_no : range_from_0_to(number_of_slots() + 1)) {
+            const auto& sep_param = parameters().slot.separator[0];
+            surface.line({line_offset_x, viewport.top()}, {line_offset_x, viewport.bottom()}, sep_param.color, sep_param.line_width, sep_param.dash);
+            line_offset_x += parameters().slot.width;
+        }
+    }
+
+} // acmacs::tal::v3::TimeSeriesWithShift::draw_background_separators
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeriesWithShift::draw_labels(acmacs::surface::Surface& /*surface*/) const
+{
+} // acmacs::tal::v3::TimeSeriesWithShift::draw_labels
 
 // ----------------------------------------------------------------------
 /// Local Variables:

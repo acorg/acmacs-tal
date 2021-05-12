@@ -658,10 +658,13 @@ void acmacs::tal::v3::Settings::add_time_series()
     if (shift > 0) {
         auto& element = add_element<TimeSeriesWithShift>();
         auto& param = element.parameters();
-        getenv("color-by"sv).visit([]<typename Arg>(const Arg& arg) {
+        param.shift = shift;
+        getenv("color-by"sv).visit([this, &element]<typename Arg>(const Arg& arg) {
             if constexpr (std::is_same_v<Arg, rjson::v3::detail::array>) {
-                for (const auto& val : arg)
-                    AD_DEBUG("color_by {}", val);
+                for (const auto& val : arg) {
+                    if (auto coloring = get_color_by(val); coloring)
+                        element.add_coloring(std::move(coloring));
+                }
             }
             else if constexpr (!std::is_same_v<Arg, rjson::v3::detail::null>)
                 throw error{AD_FORMAT("\"color-by\" for shifted time series must be array")};
