@@ -610,17 +610,19 @@ void acmacs::tal::v3::Settings::process_tree_legend(DrawTree& tree)
         // AD_DEBUG("legend: color_by-pos-aa-frequency");
         auto legend{std::make_unique<LegendColoredByPos>()};
         auto& param = legend->parameters();
-        param.show = rjson::v3::get_or(legend_v, "show"sv, true); // shown by default
+        param.show = rjson::v3::get_or(substitute(legend_v), "show"sv, true); // shown by default
         extract_coordinates(legend_v["offset"sv], param.offset);
-        if (const auto& color_by_pos = legend_v["color-by-pos"sv]; !color_by_pos.is_null()) {
-            rjson::v3::copy_if_not_null(color_by_pos["text-size"sv], param.text_size);
-            rjson::v3::copy_if_not_null(color_by_pos["title-color"sv], param.title_color);
-            rjson::v3::copy_if_not_null(color_by_pos["interleave"sv], param.interleave);
-            if (const auto& count_v = color_by_pos["count"sv]; !count_v.is_null()) {
-                rjson::v3::copy_if_not_null(count_v["show"sv], param.show_count);
-                rjson::v3::copy_if_not_null(count_v["scale"sv], param.count_scale);
-                rjson::v3::copy_if_not_null(count_v["color"sv], param.count_color);
+        if (const auto& color_by_pos = substitute(legend_v["color-by-pos"sv]); !color_by_pos.is_null()) {
+            rjson::v3::copy_if_not_null(substitute(color_by_pos["text-size"sv]), param.text_size);
+            rjson::v3::copy_if_not_null(substitute(color_by_pos["title-color"sv]), param.title_color);
+            rjson::v3::copy_if_not_null(substitute(color_by_pos["interleave"sv]), param.interleave);
+            if (const auto& count_v = substitute(color_by_pos["count"sv]); !count_v.is_null()) {
+                param.show_count = rjson::v3::get_or(count_v, "show"sv, true);
+                rjson::v3::copy_if_not_null(substitute(count_v["show"sv]), param.show_count);
+                rjson::v3::copy_if_not_null(substitute(count_v["scale"sv]), param.count_scale);
+                rjson::v3::copy_if_not_null(substitute(count_v["color"sv]), param.count_color);
             }
+            param.show_pos = rjson::v3::get_or(legend_v, "pos"sv, true);
         }
         tree.legend(std::move(legend));
     }

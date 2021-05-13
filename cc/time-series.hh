@@ -67,7 +67,8 @@ namespace acmacs::tal::inline v3
             double scale{0.012}; // relative to the time series area height
             double offset{0.022}; // relative to the time series area height
             double gap_scale{1.1}; // relative to scale
-            bool show_count{true};
+            ColoringByPosBase::legend_show_count show_count{ColoringByPosBase::legend_show_count::yes};
+            ColoringByPosBase::legend_show_pos show_pos{ColoringByPosBase::legend_show_pos::yes};
             double count_scale{0.3}; // relative to scale
             Color pos_color{BLACK};
             Color count_color{GREY};
@@ -109,6 +110,7 @@ namespace acmacs::tal::inline v3
 
         virtual void draw_background_separators(acmacs::surface::Surface& surface) const;
         virtual void draw_labels(acmacs::surface::Surface& surface) const;
+        virtual void draw_legend(acmacs::surface::Surface& surface) const;
 
       private:
         struct horizontal_line_t : public parameters::Line
@@ -128,7 +130,6 @@ namespace acmacs::tal::inline v3
         void make_color_scale();
         void draw_color_scale(acmacs::surface::Surface& surface) const;
 
-        void draw_legend(acmacs::surface::Surface& surface) const;
         std::pair<std::string, std::string> labels(const acmacs::time_series::slot& slot) const;
         size_t slot_month(const acmacs::time_series::slot& slot) const;
         void draw_horizontal_lines(acmacs::surface::Surface& surface, const DrawTree* draw_tree) const;
@@ -161,6 +162,7 @@ namespace acmacs::tal::inline v3
 
         void draw_background_separators(acmacs::surface::Surface& surface) const override;
         void draw_labels(acmacs::surface::Surface& surface) const override;
+        void draw_legend(acmacs::surface::Surface& surface) const override;
 
       private:
         Parameters parameters_;

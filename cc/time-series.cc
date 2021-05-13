@@ -345,10 +345,9 @@ void acmacs::tal::v3::TimeSeries::draw_legend(acmacs::surface::Surface& surface)
     if (parameters().legend.show) {
         if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPosBase*>(&coloring()); coloring_by_pos) {
             const auto& viewport = surface.viewport();
-            coloring_by_pos->draw_legend(surface,
-                                         PointCoordinates{viewport.origin.x(), viewport.origin.y() + viewport.size.height + parameters().legend.offset},
-                                         ColoringByPosBase::legend_layout::horizontal, parameters().legend.pos_color,
-                                         Scaled{parameters().legend.scale}, parameters().legend.gap_scale, parameters().legend.show_count, parameters().legend.count_scale, parameters().legend.count_color);
+            coloring_by_pos->draw_legend(surface, PointCoordinates{viewport.origin.x(), viewport.origin.y() + viewport.size.height + parameters().legend.offset},
+                                         ColoringByPosBase::legend_layout::horizontal, parameters().legend.pos_color, Scaled{parameters().legend.scale}, parameters().legend.gap_scale,
+                                         parameters().legend.show_count, parameters().legend.show_pos, parameters().legend.count_scale, parameters().legend.count_color);
         }
     }
 
@@ -446,6 +445,23 @@ void acmacs::tal::v3::TimeSeriesWithShift::draw_background_separators(acmacs::su
 void acmacs::tal::v3::TimeSeriesWithShift::draw_labels(acmacs::surface::Surface& /*surface*/) const
 {
 } // acmacs::tal::v3::TimeSeriesWithShift::draw_labels
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::TimeSeriesWithShift::draw_legend(acmacs::surface::Surface& surface) const
+{
+    // AD_INFO("Time series {}", coloring().report());
+
+    if (parameters().legend.show) {
+        if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPosBase*>(coloring_[0].get()); coloring_by_pos) {
+            const auto& viewport = surface.viewport();
+            coloring_by_pos->draw_legend(surface, PointCoordinates{viewport.origin.x(), viewport.origin.y() + viewport.size.height + parameters().legend.offset},
+                                         ColoringByPosBase::legend_layout::horizontal, parameters().legend.pos_color, Scaled{parameters().legend.scale}, parameters().legend.gap_scale,
+                                         ColoringByPosBase::legend_show_count::no, ColoringByPosBase::legend_show_pos::no, parameters().legend.count_scale, parameters().legend.count_color);
+        }
+    }
+
+} // acmacs::tal::v3::TimeSeriesWithShift::draw_legend
 
 // ----------------------------------------------------------------------
 /// Local Variables:

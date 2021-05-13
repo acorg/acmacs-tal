@@ -82,6 +82,9 @@ namespace acmacs::tal::inline v3
     class ColoringByPosBase : public Coloring
     {
       public:
+        enum class legend_show_count { no, yes };
+        enum class legend_show_pos { no, yes };
+
         ColoringByPosBase(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
         Color color(const Node& node) const override;
         std::string report() const override;
@@ -91,7 +94,7 @@ namespace acmacs::tal::inline v3
 
         enum class legend_layout { horizontal, vertical };
         void draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
-                                                     bool show_count, double count_scale, Color count_color) const;
+                         legend_show_count show_count, legend_show_pos show_pos, double count_scale, Color count_color) const;
 
         key_color_count_t& key_color_count() override { return colors_; } // to unify colors for shifted time series
 

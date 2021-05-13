@@ -40,7 +40,8 @@ void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface
     if (parameters().show) {
         if (const auto* coloring_by_pos = dynamic_cast<const ColoringByPosBase*>(&coloring); coloring_by_pos) {
             coloring_by_pos->draw_legend(surface, parameters().offset + Size{0.0, *parameters().text_size}, ColoringByPosBase::legend_layout::vertical, parameters().title_color,
-                                         parameters().text_size, parameters().interleave, parameters().show_count, parameters().count_scale, parameters().count_color);
+                                         parameters().text_size, parameters().interleave, parameters().show_count ? ColoringByPosBase::legend_show_count::yes : ColoringByPosBase::legend_show_count::no,
+                                         parameters().show_pos ? ColoringByPosBase::legend_show_pos::yes : ColoringByPosBase::legend_show_pos::no, parameters().count_scale, parameters().count_color);
         }
         else
             AD_WARNING("legend with coloring by pos requested but tree is not colored by pos, cannot obtain data for the legend");

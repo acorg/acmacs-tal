@@ -99,18 +99,22 @@ void acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency()
 // ----------------------------------------------------------------------
 
 void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
-                                                     bool show_count, double count_scale, Color count_color) const
+                                                     legend_show_count show_count, legend_show_pos show_pos, double count_scale, Color count_color) const
 {
     auto text_origin{origin};
-    const auto pos_t{fmt::format("{}", pos())};
-    surface.text(text_origin, pos_t, title_color, text_size);
-    if (layout == legend_layout::horizontal)
-        text_origin.x(text_origin.x() + surface.text_size(pos_t, text_size).width - *text_size);
+
+    if (show_pos == legend_show_pos::yes) {
+        const auto pos_text{fmt::format("{}", pos())};
+        surface.text(text_origin, pos_text, title_color, text_size);
+        if (layout == legend_layout::horizontal)
+            text_origin.x(text_origin.x() + surface.text_size(pos_text, text_size).width - *text_size);
+    }
+
     const auto total_percent = static_cast<double>(total_count()) / 100.0;
     const auto count_text_size{text_size * count_scale};
     const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W'), text_size);
     for (const auto& [aa, color_count] : colors()) {
-        if (aa != ' ') {        // ignore data for absent or short sequences, it is ugly and misleading in the legend
+        if (aa != ' ') { // ignore data for absent or short sequences, it is ugly and misleading in the legend
             switch (layout) {
                 case legend_layout::vertical:
                     text_origin.y(text_origin.y() + *text_size * (1.0 + interleave));
@@ -121,7 +125,7 @@ void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& s
             }
             const auto aa_t{fmt::format("{}", aa)};
             surface.text(text_origin, aa_t, color_count.color, text_size);
-            if (show_count) {
+            if (show_count == legend_show_count::yes) {
                 const auto count_x{text_origin.x() + aa_width * 1.1};
                 surface.text({count_x, text_origin.y() - aa_height + *count_text_size * 1.45}, fmt::format("{:.1f}%", static_cast<double>(color_count.count) / total_percent), count_color,
                              count_text_size);

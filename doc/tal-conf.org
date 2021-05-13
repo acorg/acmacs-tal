@@ -1,4 +1,4 @@
-# Time-stamp: <2021-05-11 17:47:57 eu>
+# Time-stamp: <2021-05-13 10:23:19 eu>
 
 bjorn [145, 155, 156, 158, 159, 189, 193]
 
@@ -184,7 +184,7 @@ If multiple criteria specified within single "select" object, they all used (con
                },
                "color-by-pos": {     # for color-by-pos-aa-colors and color-by-pos-aa-frequency
                    "text-size": 0.05 # font size relative to height
-                   "title-color": "black", "count": {"show": true, "scale": 0.3, "color": "grey"}, "interleave": 0.5}
+                   "title-color": "black", "count": {"show": true, "scale": 0.3, "color": "grey"}, "pos": true, "interleave": 0.5}
              }
   },
 #+END_SRC

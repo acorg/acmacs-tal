@@ -86,6 +86,7 @@ namespace acmacs::tal::inline v3
             double interleave{0.5}; // line distance, relative to text_size
             Color title_color{BLACK};
             bool show_count{true};
+            bool show_pos{true};
             double count_scale{0.3};
             Color count_color{GREY};
         };
