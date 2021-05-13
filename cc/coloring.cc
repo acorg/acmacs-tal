@@ -102,12 +102,21 @@ void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& s
                                                      legend_show_count show_count, legend_show_pos show_pos, double count_scale, Color count_color) const
 {
     auto text_origin{origin};
-
     if (show_pos == legend_show_pos::yes) {
         const auto pos_text{fmt::format("{}", pos())};
         surface.text(text_origin, pos_text, title_color, text_size);
         if (layout == legend_layout::horizontal)
             text_origin.x(text_origin.x() + surface.text_size(pos_text, text_size).width - *text_size);
+    }
+    else {
+        switch (layout) {
+            case legend_layout::vertical:
+                text_origin.y(text_origin.y() - *text_size * (1.0 + interleave));
+                break;
+            case legend_layout::horizontal:
+                text_origin.x(text_origin.x() - *text_size * (1.0 + interleave));
+                break;
+        }
     }
 
     const auto total_percent = static_cast<double>(total_count()) / 100.0;
