@@ -763,6 +763,8 @@ void acmacs::tal::v3::Settings::add_time_series(TimeSeries& element, TimeSeries:
                 param.slot.label.rotation = Rotation90DegreesClockwise;
             else if (rot == "anticlockwise"sv || rot == "counterclockwise"sv)
                 param.slot.label.rotation = Rotation90DegreesAnticlockwise;
+            else if (rot == "none"sv || rot == "no"sv)
+                param.slot.label.rotation = NoRotation;
             else
                 AD_WARNING("unrecognzied label rotation value in the time series parameters: \"{}\"", rot);
         }

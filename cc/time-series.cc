@@ -442,8 +442,23 @@ void acmacs::tal::v3::TimeSeriesWithShift::draw_background_separators(acmacs::su
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::TimeSeriesWithShift::draw_labels(acmacs::surface::Surface& /*surface*/) const
+void acmacs::tal::v3::TimeSeriesWithShift::draw_labels(acmacs::surface::Surface& surface) const
 {
+    const auto& viewport = surface.viewport();
+    const TextStyle text_style{};
+    const auto shift = static_cast<double>(parameters().shift);
+    const Scaled label_size{parameters().slot.width * shift * parameters().slot.label.scale};
+    const auto label_pos_y = viewport.origin.y() - *label_size * 0.3;
+
+    double label_offset_x{parameters().slot.width * shift * 0.5};
+    for (auto& coloring : coloring_) {
+        const auto label = fmt::format("{}", dynamic_cast<const ColoringByPosBase*>(coloring.get())->pos());
+        const auto label_drawn_size = surface.text_size(label, label_size, text_style);
+        const auto label_pos_x = label_offset_x - label_drawn_size.width * 0.5 + parameters().slot.label.offset;
+        surface.text({label_pos_x, label_pos_y}, label, parameters().slot.label.color, label_size, text_style, parameters().slot.label.rotation);
+        label_offset_x += parameters().slot.width * shift;
+    }
+
 } // acmacs::tal::v3::TimeSeriesWithShift::draw_labels
 
 // ----------------------------------------------------------------------
