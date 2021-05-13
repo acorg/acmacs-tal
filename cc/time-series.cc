@@ -373,7 +373,24 @@ void acmacs::tal::v3::TimeSeriesWithShift::prepare_coloring()
                 coloring->prepare(leaf);
         }
     });
-    // TODO unify colors in all colorings
+
+    // unify colors in all colorings
+    auto& master = coloring_[0]->key_color_count();
+    for (auto it = std::next(std::begin(coloring_)); it != std::end(coloring_); ++it) {
+        for (const auto& [key, color_count] : (*it)->key_color_count()) {
+            master.find_then_else(
+                key, //
+                [count = color_count.count](auto& master_color_count) { master_color_count.count += count; },
+                [key=key, color=color_count.color, count=color_count.count](auto& mstr) { mstr.emplace_or_replace(key, color, count); });
+        }
+    }
+    // set unified colors
+    for (auto it = std::next(std::begin(coloring_)); it != std::end(coloring_); ++it)
+        (*it)->key_color_count() = master;
+
+    // for (const auto& [key, color_count] : master)
+    //     AD_DEBUG("unify {} {} {:4d}", key, color_count.color, color_count.count);
+
     for (auto& coloring : coloring_)
         coloring->prepare();
 

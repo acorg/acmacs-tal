@@ -23,6 +23,14 @@ namespace acmacs::tal::inline v3
     class Coloring
     {
       public:
+        struct color_count_t
+        {
+            Color color{PINK};
+            size_t count{0};
+        };
+
+        using key_color_count_t = acmacs::small_map_with_unique_keys_t<char, color_count_t>;
+
         virtual ~Coloring() = default;
 
         virtual void prepare(const Node& /*node*/) {}
@@ -30,6 +38,11 @@ namespace acmacs::tal::inline v3
         virtual Color color(const Node& node) const = 0;
         virtual std::string report() const = 0;
         virtual std::string_view legend_type() const { return "none"; }
+
+        virtual key_color_count_t& key_color_count() // to unify colors for shifted time series
+        {
+            throw coloring_error{AD_FORMAT("key_color_count not supported for {}", typeid(this).name())};
+        }
     };
 
     // ----------------------------------------------------------------------
@@ -69,12 +82,6 @@ namespace acmacs::tal::inline v3
     class ColoringByPosBase : public Coloring
     {
       public:
-        struct color_count_t
-        {
-            Color color{PINK};
-            size_t count{0};
-        };
-
         ColoringByPosBase(acmacs::seqdb::pos1_t pos) : pos_{pos} {}
         Color color(const Node& node) const override;
         std::string report() const override;
@@ -86,13 +93,15 @@ namespace acmacs::tal::inline v3
         void draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
                                                      bool show_count, double count_scale, Color count_color) const;
 
+        key_color_count_t& key_color_count() override { return colors_; } // to unify colors for shifted time series
+
       protected:
         constexpr auto& colors() { return colors_; }
         void sort_colors_by_frequency();
 
       private:
         acmacs::seqdb::pos1_t pos_;
-        acmacs::small_map_with_unique_keys_t<char, color_count_t> colors_;
+        key_color_count_t colors_;
 
     }; // class ColoringByPosBase
 
