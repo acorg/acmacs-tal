@@ -447,7 +447,7 @@ void acmacs::tal::v3::TimeSeriesWithShift::draw_labels(acmacs::surface::Surface&
     const auto& viewport = surface.viewport();
     const TextStyle text_style{};
     const auto shift = static_cast<double>(parameters().shift);
-    const Scaled label_size{parameters().slot.width * shift * parameters().slot.label.scale};
+    const Scaled label_size{parameters().slot.width * parameters().slot.label.scale};
     const auto label_pos_y = viewport.origin.y() - *label_size * 0.3;
 
     double label_offset_x{parameters().slot.width * shift * 0.5};
