@@ -603,7 +603,8 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
     acmacs::seqdb::setup(seqdb_filename);
     const auto& seqdb = acmacs::seqdb::get();
 
-    tree::iterate_leaf(*this, [this,&seqdb](Node& node) {
+    std::vector<seq_id_t> not_found;
+    tree::iterate_leaf(*this, [this, &seqdb, &not_found](Node& node) {
         if (const auto subset = seqdb.select_by_seq_id(node.seq_id); !subset.empty()) {
             node.populate(subset.front(), seqdb);
             if (virus_type_.empty())
@@ -616,9 +617,18 @@ void acmacs::tal::v3::Tree::match_seqdb(std::string_view seqdb_filename)
                 AD_WARNING("multiple lineages from seqdb for \"{}\": {} and {}", node.seq_id, lineage_, node.ref.entry->lineage);
         }
         else {
-            AD_WARNING("seq_id \"{}\" not found in seqdb", node.seq_id);
+            not_found.push_back(node.seq_id);
         }
     });
+
+    if (!not_found.empty()) {
+        constexpr const size_t threshold{10};
+        AD_WARNING("{} seq ids not found in the tree", not_found.size());
+        for (size_t no{0}; no < std::min(not_found.size(), threshold); ++no)
+            AD_PRINT("    {}", not_found[no]);
+        if (not_found.size() > threshold)
+            AD_PRINT("    ...");
+    }
 
 } // acmacs::tal::v3::Tree::match_seqdb
 
