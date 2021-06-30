@@ -185,8 +185,10 @@ void acmacs::tal::v3::Clades::add_gaps_to_tree()
     for (const auto& clade : clades_) {
         const auto& clade_param = parameters_for_clade(clade.name);
         for (const auto& section : clade.sections) {
-            tal().tree().set_top_gap(*section.first, clade_param.tree_top_gap);
-            tal().tree().set_bottom_gap(*section.last, clade_param.tree_bottom_gap);
+            if (section.first)
+                tal().tree().set_top_gap(*section.first, clade_param.tree_top_gap);
+            if (section.last)
+                tal().tree().set_bottom_gap(*section.last, clade_param.tree_bottom_gap);
         }
     }
 

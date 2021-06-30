@@ -91,7 +91,10 @@ void acmacs::tal::v3::Settings::update_env()
             setenv("virus-type/lineage"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
         else
             setenv("virus-type/lineage"sv, fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        AD_INFO("virus-type/lineage: \"{}\"", getenv("virus-type/lineage"sv));
     }
+    // else
+    //     AD_WARNING("tree virus_type empty");
     setenv("tree-has-sequences"sv, tal_.tree().has_sequences(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
     setenv("chart-present"sv, tal_.chart_present(), acmacs::settings::v3::replace::yes_or_set_at_bottom);
     if (tal_.chart_present()) {

@@ -28,6 +28,8 @@ namespace acmacs::tal::inline v3
         std::string report_nodes(std::string_view indent, const NodeSet& nodes) const;
         NodeSet select_nodes(const rjson::v3::value& criteria) const;
 
+        void update_env();
+
       private:
         Tal& tal_;
         static size_t uniq_id;   // thread unsafe!
@@ -41,7 +43,6 @@ namespace acmacs::tal::inline v3
 
         void canvas();
         void apply_nodes() const;
-        void update_env();
         void clade() const;
         void select_vaccine(NodeSet& nodes, Tree::Select update, const rjson::v3::value& criteria) const;
         void ladderize();

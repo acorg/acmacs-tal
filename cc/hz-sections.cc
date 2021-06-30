@@ -96,7 +96,14 @@ void acmacs::tal::v3::HzSections::set_aa_transitions()
 
 void acmacs::tal::v3::HzSections::sort()
 {
-    std::sort(std::begin(sections_), std::end(sections_), [](const auto& s1, const auto& s2) { return s1.first->node_id.vertical < s2.first->node_id.vertical; });
+    if (!sections_.empty()) {
+        std::sort(std::begin(sections_), std::end(sections_), [](const auto& s1, const auto& s2) {
+            if (s1.first && s2.first)
+                return s1.first->node_id.vertical < s2.first->node_id.vertical;
+            else
+                return static_cast<bool>(s1.first);
+        });
+    }
 
 } // acmacs::tal::v3::HzSections::sort
 
@@ -147,8 +154,10 @@ void acmacs::tal::v3::HzSections::add_gaps_to_tree()
     for (const auto& section : sections_) {
         if (section.shown) {
             // AD_DEBUG("hz section {} {} gaps top:{} bottom:{}", section.prefix, section.label, parameters().tree_top_gap, parameters().tree_bottom_gap);
-            tal().tree().set_top_gap(*section.first, parameters().tree_top_gap);
-            tal().tree().set_bottom_gap(*section.last, parameters().tree_bottom_gap);
+            if (section.first)
+                tal().tree().set_top_gap(*section.first, parameters().tree_top_gap);
+            if (section.last)
+                tal().tree().set_bottom_gap(*section.last, parameters().tree_bottom_gap);
         }
     }
 

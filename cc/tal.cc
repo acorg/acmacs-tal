@@ -75,8 +75,9 @@ int main(int argc, const char* argv[])
 
         for (;;) {
             tal.import_tree(opt.tree_file);
+            settings.update_env();
 
-            AD_DEBUG("applying \"tal-default\"...");
+            AD_INFO("applying \"tal-default\"...");
             const Timeit time_tal_default("applying \"tal-default\"");
             settings.apply("tal-default"sv);
             time_tal_default.report();
@@ -91,7 +92,7 @@ int main(int argc, const char* argv[])
                 maps_settings.set_defines(opt.defines);
             }
 
-            AD_DEBUG("preparing...");
+            AD_INFO("preparing...");
             const Timeit time_preparing("preparing");
             tal.prepare();
             time_preparing.report();
