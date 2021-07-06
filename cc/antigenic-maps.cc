@@ -269,6 +269,8 @@ void acmacs::tal::v3::AntigenicMaps::draw_map(acmacs::surface::Surface& surface,
     maps_settings_.setenv("section-label"sv, section.label);
     maps_settings_.setenv("section-aa-transitions"sv, section.aa_transitions_format());
 
+    AD_INFO("prefix:\"{}\" label:\"{}\" aa-transitions:\"{}\"", section.prefix, section.label, section.aa_transitions_format());
+
     maps_settings_.apply("antigenic-map"sv);
 
     chart_draw_.calculate_viewport();
