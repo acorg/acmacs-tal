@@ -16,7 +16,7 @@ void acmacs::tal::v3::import_tree(std::string_view filename, Tree& tree)
     auto ext = filepath.extension();
     if (ext == ".xz" || ext == ".bz2")
         ext = filepath.stem().extension();
-    if (ext == ".newick" || ext == ".phy") {
+    if (ext == ".newick" || ext == ".phy" || ext == ".bestTree") {
         try {
             newick_import(filename, tree);
         }
