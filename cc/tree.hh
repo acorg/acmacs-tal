@@ -192,6 +192,7 @@ namespace acmacs::tal::inline v3
     {
       public:
         NodeSetT() = default;
+        NodeSetT(size_t reserve) : std::vector<N>(reserve, nullptr) {}
 
         void add(const NodeSetT<N>& another) { std::copy(std::begin(another), std::end(another), std::back_inserter(*this)); }
         void filter(const NodeSetT<N>& another)
