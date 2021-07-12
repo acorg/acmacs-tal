@@ -82,7 +82,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
 
     AD_DEBUG(parameters.debug, "update_aa_transitions_eu_20210503");
 
-    set_closest_leaf_for_intermediate(tree);
+    tree.set_closest_leaf_for_intermediate();
 
     const auto find_closest_with_aa_at = [number_of_leaves_in_tree = tree.number_leaves_in_subtree()](seqdb::pos0_t pos, const Node& node) -> std::pair<char, const Node*> {
         auto aa{'X'};

@@ -288,7 +288,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200514(Tree& tree, cons
 {
     AD_DEBUG(parameters.debug, "update_aa_transitions_eu_20200514");
 
-    set_closest_leaf_for_intermediate(tree);
+    tree.set_closest_leaf_for_intermediate();
 
     // see https://notebooks.antigenic-cartography.org/eu/results/2020-0513-tree-aa-subst-left/
     // for testing, methods description and known issues

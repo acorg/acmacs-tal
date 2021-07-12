@@ -243,6 +243,7 @@ namespace acmacs::tal::inline v3
 
         void select_all(NodeSet& nodes, Select update);
         void select_all_and_intermediate(NodeSet& nodes, Select update);
+        void select_intermediate(NodeSet& nodes, Select update, size_t min_subtree_size); // select only intermediate nodes if their subtree size >= min_subtree_size
         void select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end);
         void select_by_seq_id(NodeSet& nodes, Select update, std::string_view regexp);
         void select_by_country(NodeSet& nodes, Select update, std::string_view country);
@@ -344,6 +345,9 @@ namespace acmacs::tal::inline v3
         void resize_common_aa(size_t longest_sequence);
 
         size_t longest_seq_id() const;
+
+        void set_closest_leaf_for_intermediate();
+        NodeSet closest_leaf_subtree_size(size_t min_subtree_size);
 
       private:
         const clade_t* find_clade(std::string_view name) const;

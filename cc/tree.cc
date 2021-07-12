@@ -380,6 +380,11 @@ void acmacs::tal::v3::Tree::select_all_and_intermediate(NodeSet& nodes, Select u
     select_update(nodes, update, Descent::yes, *this, [](const Node& node) { return !node.hidden; });
 }
 
+void acmacs::tal::v3::Tree::select_intermediate(NodeSet& nodes, Select update, size_t min_subtree_size) // select only intermediate nodes if their subtree size >= min_subtree_size
+{
+    select_update(nodes, update, Descent::yes, *this, [min_subtree_size](const Node& node) { return !node.is_leaf() && !node.hidden && node.number_leaves_in_subtree() >= min_subtree_size; });
+}
+
 void acmacs::tal::v3::Tree::select_by_date(NodeSet& nodes, Select update, std::string_view start, std::string_view end)
 {
     select_update(nodes, update, Descent::yes, *this, [start,end](const Node& node) { return node.is_leaf() && !node.hidden && (start.empty() || node.date >= start) && (end.empty() || node.date < end); });
@@ -1335,6 +1340,51 @@ void acmacs::tal::v3::Tree::resize_common_aa(size_t longest_sequence)
     AD_DEBUG("{} nodes resized", nodes);
 
 } // acmacs::tal::v3::Tree::resize_common_aa
+
+// ----------------------------------------------------------------------
+
+void acmacs::tal::v3::Tree::set_closest_leaf_for_intermediate()
+{
+     // we have to keep multiple closest leaves because some of them
+     // may have X at some positions (or to be too short) and prevent
+     // from properly detecting aa subst labels in
+     // update_aa_transitions_eu_20210503
+    constexpr const size_t max_number_of_closest_leaves_to_set = 8;
+
+    cumulative_calculate();
+
+    tree::iterate_post(*this, [](Node& branch) {
+        branch.closest_leaves.clear();
+        for (const auto& child : branch.subtree) {
+            if (child.is_leaf()) {
+                if (branch.closest_leaves.size() < max_number_of_closest_leaves_to_set || branch.closest_leaves.back()->cumulative_edge_length > child.cumulative_edge_length)
+                    branch.closest_leaves.push_back(&child);
+            }
+            else {
+                std::copy(std::begin(child.closest_leaves), std::end(child.closest_leaves), std::back_inserter(branch.closest_leaves));
+            }
+            std::sort(std::begin(branch.closest_leaves), std::end(branch.closest_leaves), [](auto* n1, auto* n2) { return n1->cumulative_edge_length < n2->cumulative_edge_length; });
+            branch.closest_leaves.erase(std::unique(std::begin(branch.closest_leaves), std::end(branch.closest_leaves)), std::end(branch.closest_leaves));
+        }
+    });
+
+} // acmacs::tal::v3::Tree::set_closest_leaf_for_intermediate
+
+// ----------------------------------------------------------------------
+
+acmacs::tal::v3::NodeSet acmacs::tal::v3::Tree::closest_leaf_subtree_size(size_t min_subtree_size)
+{
+    set_closest_leaf_for_intermediate();
+    NodeSet nodes;
+    select_intermediate(nodes, Select::init, min_subtree_size);
+    std::sort(std::begin(nodes), std::end(nodes), [](const Node* n1, const Node* n2) { return n1->number_leaves_in_subtree() > n2->number_leaves_in_subtree(); });
+
+    // for (const Node* node : nodes)
+    //     fmt::print("{:4d} {}\n", node->number_leaves_in_subtree(), node->closest_leaves[0]->seq_id);
+
+    return nodes;
+
+} // acmacs::tal::v3::Tree::closest_leaf_subtree_size
 
 // ----------------------------------------------------------------------
 /// Local Variables:
