@@ -347,6 +347,7 @@ namespace acmacs::tal::inline v3
         size_t longest_seq_id() const;
 
         void set_closest_leaf_for_intermediate();
+        // returns intermediate node set sorted by number of leaves in subtree
         NodeSet closest_leaf_subtree_size(size_t min_subtree_size);
 
       private:
