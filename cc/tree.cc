@@ -1374,6 +1374,7 @@ void acmacs::tal::v3::Tree::set_closest_leaf_for_intermediate()
 
 acmacs::tal::v3::NodeSet acmacs::tal::v3::Tree::closest_leaf_subtree_size(size_t min_subtree_size)
 {
+    // the same closest leaf may be referenced by different intermediate nodes
     set_closest_leaf_for_intermediate();
     NodeSet nodes;
     select_intermediate(nodes, Select::init, min_subtree_size);
