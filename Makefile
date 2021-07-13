@@ -54,9 +54,13 @@ $(TAL_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(TAL_SOURCES)) | $(DIST) install-heade
 	$(call echo_shared_lib,$@)
 	$(call make_shared_lib,$(TAL_LIB_NAME),$(TAL_LIB_MAJOR),$(TAL_LIB_MINOR)) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-$(DIST)/tal: $(BUILD)/%.o | $(TAL_LIB) install-headers
+$(DIST)/%: $(BUILD)/%.o | $(TAL_LIB)
 	$(call echo_link_exe,$@)
 	$(CXX) $(LDFLAGS) -o $@ $^ $(TAL_LIB) $(LDLIBS) $(AD_RPATH)
+
+$(BUILD)/%.o: cc/$(ALGLIB)/%.cpp | $(BUILD) install-headers
+	$(call echo_compile,$<)
+	$(CXX) -c -o $@ $(abspath $<)
 
 # ======================================================================
 ### Local Variables:
