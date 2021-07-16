@@ -87,11 +87,19 @@ void acmacs::tal::v3::Settings::update_env()
         AD_LOG(acmacs::log::settings, "tree virus type: \"{}\" lineage: \"\"", virus_type, lineage);
         setenv("virus-type"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
         setenv("lineage"sv, lineage, acmacs::settings::v3::replace::yes_or_set_at_bottom);
-        if (virus_type != "B" || lineage.empty())
+        if (virus_type != "B" || lineage.empty()) {
             setenv("virus-type/lineage"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
-        else
-            setenv("virus-type/lineage"sv, fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3))), acmacs::settings::v3::replace::yes_or_set_at_bottom);
-        AD_INFO("virus-type/lineage: \"{}\"", getenv("virus-type/lineage"sv));
+            if (virus_type == "A(H1N1)")
+                setenv("virus-type/lineage-subset"sv, fmt::format("{}{}", virus_type, "2009pdm"), acmacs::settings::v3::replace::yes_or_set_at_bottom);
+            else
+                setenv("virus-type/lineage-subset"sv, virus_type, acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        }
+        else {
+            const auto virus_type_lineage = fmt::format("{}/{}", virus_type, ::string::capitalize(lineage.substr(0, 3)));
+            setenv("virus-type/lineage"sv, virus_type_lineage, acmacs::settings::v3::replace::yes_or_set_at_bottom);
+            setenv("virus-type/lineage-subset"sv, virus_type_lineage, acmacs::settings::v3::replace::yes_or_set_at_bottom);
+        }
+        AD_INFO("virus-type/lineage-subset: {}", getenv("virus-type/lineage-subset"sv));
     }
     // else
     //     AD_WARNING("tree virus_type empty");

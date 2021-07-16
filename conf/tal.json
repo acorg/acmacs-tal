@@ -176,7 +176,7 @@
     ],
 
     "clades-whocc": [
-        "clades-{virus-type}{lineage}",
+        "clades-{virus-type/lineage-subset}",
         {"N": "clades",
          "per-clade": [
              {"?N": "---------- H1 ----------"},
