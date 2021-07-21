@@ -5,7 +5,7 @@
 #include "acmacs-base/argv.hh"
 #include "acmacs-base/quicklook.hh"
 #include "acmacs-base/timeit.hh"
-// #include "acmacs-base/string-split.hh"
+#include "acmacs-base/coredump.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/log.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -54,6 +54,8 @@ static void signal_handler(int sig_num);
 
 int main(int argc, const char* argv[])
 {
+    acmacs::enable_coredump();
+
     using namespace std::string_view_literals;
     try {
         Options opt(argc, argv);
