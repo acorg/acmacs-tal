@@ -59,7 +59,7 @@ void acmacs::tal::v3::HzSections::update_from_parameters()
             section.last = tree.find_node_by_seq_id(section_data.last);
         else if (!section.last)
             section.last = tree.last_next_leaf;
-        if (section.last->leaf_pos == Tree::leaf_position::first && section.last->first_prev_leaf)
+        if (section.last && section.last->leaf_pos == Tree::leaf_position::first && section.last->first_prev_leaf)
             section.last = section.last->first_prev_leaf;
         // while (section.last->leaf_pos != Tree::leaf_position::last && section.last->last_next_leaf)
         //     section.last = section.last->last_next_leaf;
@@ -172,7 +172,7 @@ void acmacs::tal::v3::HzSections::add_separators_to_time_series()
             if (section.shown) {
                 const auto warn_if_present = section.id.size() < 3 || section.id[section.id.size() - 2] != '-';
                 time_series->add_horizontal_line_above(section.first, parameters().line, warn_if_present);
-                if (section.last->last_next_leaf) {
+                if (section.last && section.last->last_next_leaf) {
                     // AD_DEBUG("add_horizontal_line_above: \"{}\" {} --> {}", section.label, section.last->seq_id, section.last->last_next_leaf->seq_id);
                     time_series->add_horizontal_line_above(section.last->last_next_leaf, parameters().line, warn_if_present);
                 }
