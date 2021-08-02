@@ -1125,11 +1125,23 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
         for (const rjson::v3::value& color_data : colors.array())
             param.colors_by_frequency.emplace_back(color_data.to<std::string_view>());
     }
+    else if (colors.is_object()) {
+        for (const auto& [aa, color_data] : colors.object())
+            param.colors_by_aa.emplace_or_replace(aa[0], color_data.to<std::string_view>());
+    }
+    else
+        throw error{fmt::format("\"dash-bar-aa-at\" \"colors\" invalid: {}", colors)};
 
     if (const auto& labels = getenv("labels"sv); labels.is_array()) {
         for (const rjson::v3::value& label_data : labels.array())
             read_label_parameters(label_data, param.labels_by_frequency.emplace_back());
     }
+    else if (labels.is_object()) {
+        for (const auto& [aa, label_data] : labels.object())
+            read_label_parameters(label_data, param.labels_by_aa.emplace_or_replace(aa[0], parameters::Label{}).second);
+    }
+    else
+        throw error{fmt::format("\"dash-bar-aa-at\" \"labels\" invalid: {}", labels)};
 
 } // acmacs::tal::v3::Settings::add_dash_bar_aa_at
 

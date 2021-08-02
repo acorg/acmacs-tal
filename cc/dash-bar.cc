@@ -1,4 +1,3 @@
-#include "acmacs-base/flat-map.hh"
 #include "acmacs-base/color-distinct.hh"
 #include "acmacs-tal/dash-bar.hh"
 #include "acmacs-tal/tal-data.hh"
@@ -169,19 +168,19 @@ void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
             counter_aa.count(leaf.aa_sequence.at(pos));
     });
 
-    const auto get_color = [this](size_t ind) {
+    const auto get_color = [this](size_t ind, char aa) {
+        Color color = acmacs::color::distinct(ind);
         if (ind < parameters().colors_by_frequency.size())
-            return parameters().colors_by_frequency[ind];
-        else
-            return acmacs::color::distinct(ind);
+            color = parameters().colors_by_frequency[ind];
+        return parameters().colors_by_aa.get_or(aa, color);
     };
 
-    acmacs::small_map_with_unique_keys_t<char, Color> colors;
+    small_map_with_unique_keys_t<char, Color> colors;
     const auto& aa_by_fequency = counter_aa.sorted();
     size_t aa_no = 0;
     for (const auto aa : aa_by_fequency) {
         if (aa != 'X' && aa != ' ') {
-            colors.emplace_not_replace(aa, get_color(aa_no));
+            colors.emplace_not_replace(aa, get_color(aa_no, aa));
             ++aa_no;
         }
     }
@@ -197,7 +196,20 @@ void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
         }
     });
 
-    if (!parameters().labels_by_frequency.empty()) {
+    if (!parameters().labels_by_aa.empty()) {
+        size_t extra = 0;
+        const auto default_param = [&extra, this]() {
+            const auto scale = parameters().labels_by_aa.begin()->second.scale;
+            return parameters::Label{.scale = scale,
+                                     .vpos = parameters::vertical_position::top,
+                                     .hpos = parameters::horizontal_position::right,
+                                     .offset = {0.002, scale * static_cast<double>(++extra)}};
+        };
+        for (const auto aa : aa_by_fequency) {
+            draw_label(surface, fmt::format("{}{}", parameters().pos, aa), colors.get(aa), parameters().labels_by_aa.get_or(aa, default_param()));
+        }
+    }
+    else if (!parameters().labels_by_frequency.empty()) {
         for (const auto [ind, aa] : acmacs::enumerate(aa_by_fequency)) {
             if (ind < parameters().labels_by_frequency.size()) {
                 draw_label(surface, fmt::format("{}{}", parameters().pos, aa), colors.get(aa), parameters().labels_by_frequency[ind]);

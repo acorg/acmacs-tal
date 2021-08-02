@@ -1,5 +1,6 @@
 #pragma once
 
+#include "acmacs-base/flat-map.hh"
 #include "acmacs-tal/layout.hh"
 #include "acmacs-tal/tree.hh"
 
@@ -103,7 +104,9 @@ namespace acmacs::tal::inline v3
         struct Parameters : public DashBarBase::Parameters
         {
             seqdb::pos1_t pos{193};
+            small_map_with_unique_keys_t<char, Color> colors_by_aa;
             std::vector<Color> colors_by_frequency;
+            small_map_with_unique_keys_t<char, parameters::Label> labels_by_aa;
             std::vector<parameters::Label> labels_by_frequency;
         };
 
