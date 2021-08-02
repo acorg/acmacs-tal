@@ -169,12 +169,25 @@ void acmacs::tal::v3::DashBarAAAt::draw(acmacs::surface::Surface& surface) const
             counter_aa.count(leaf.aa_sequence.at(pos));
     });
 
+    const auto get_color = [this](size_t ind) {
+        if (ind < parameters().colors_by_frequency.size())
+            return parameters().colors_by_frequency[ind];
+        else
+            return acmacs::color::distinct(ind);
+    };
+
     acmacs::small_map_with_unique_keys_t<char, Color> colors;
     const auto& aa_by_fequency = counter_aa.sorted();
-    for (const auto [ind, aa] : acmacs::enumerate(aa_by_fequency))
-        colors.emplace_not_replace(aa, acmacs::color::distinct(ind));
+    size_t aa_no = 0;
+    for (const auto aa : aa_by_fequency) {
+        if (aa != 'X' && aa != ' ') {
+            colors.emplace_not_replace(aa, get_color(aa_no));
+            ++aa_no;
+        }
+    }
     colors.emplace_or_replace('X', GREY);
     colors.emplace_or_replace(' ', TRANSPARENT);
+    AD_INFO("dash-bar-aa-at {}: {}", parameters().pos, colors);
 
     tree::iterate_leaf(tal().tree(), [&surface, &colors, pos = parameters().pos, dash_pos_x, dash_width, viewport_width = viewport.size.width, vertical_step, dash_line_width](const Node& leaf) {
         if (!leaf.hidden) {
