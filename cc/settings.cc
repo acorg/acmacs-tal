@@ -1121,17 +1121,15 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
 
     read_dash_parameters(param.dash);
 
+    if (const auto& colors = getenv("colors"sv); colors.is_array()) {
+        for (const rjson::v3::value& color_data : colors.array())
+            param.colors_by_frequency.emplace_back(color_data.to<std::string_view>());
+    }
+
     if (const auto& labels = getenv("labels"sv); labels.is_array()) {
         for (const rjson::v3::value& label_data : labels.array())
             read_label_parameters(label_data, param.labels_by_frequency.emplace_back());
     }
-
-    // for (const rjson::v3::value& for_clade : getenv("clades"sv).array()) {
-    //     auto& clade = param.clades.emplace_back();
-    //     rjson::v3::copy_if_not_null(for_clade["name"sv], clade.name);
-    //     rjson::v3::copy_if_not_null(for_clade["color"sv], clade.color);
-    //     read_label_parameters(for_clade["label"sv], clade.label);
-    // }
 
 } // acmacs::tal::v3::Settings::add_dash_bar_aa_at
 
