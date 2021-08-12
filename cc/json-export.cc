@@ -18,7 +18,7 @@ std::string acmacs::tal::v3::json_export(const Tree& tree, size_t indent)
     json << to_json::key_val_if_not_empty("v", tree.virus_type())
          << to_json::key_val_if_not_empty("l", tree.lineage())
          << to_json::key_val("tree", export_node(tree));
-    return fmt::format(fmt::format("{{:{}}}", indent), json);
+    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", indent)), json);
 
 } // acmacs::tal::v3::json_export
 

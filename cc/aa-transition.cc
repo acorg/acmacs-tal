@@ -95,7 +95,7 @@ void acmacs::tal::v3::report_aa_transitions(const Node& root, const draw_tree::A
     tree::iterate_pre(root, [&parameters](const Node& node) {
         if (node.number_leaves_in_subtree() >= parameters.report_number_leaves_threshold) {
             if (const auto rep = node.aa_transitions_.display(parameters.report_pos, AA_Transitions::show_empty_left::yes); !rep.empty())
-                fmt::print(stderr, "   {:5.3} (children:{} leaves:{}) {}\n", node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
+                fmt::print(stderr, fmt::runtime("   {:5.3} (children:{} leaves:{}) {}\n"), node.node_id, node.subtree.size(), node.number_leaves_in_subtree(), rep);
         }
     });
 

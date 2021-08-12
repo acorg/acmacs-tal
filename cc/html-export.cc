@@ -22,7 +22,7 @@ std::string acmacs::tal::v3::names_export(const Tree& tree)
 {
     fmt::memory_buffer names;
     tree::iterate_leaf(tree, [&names](const auto& node) {
-        fmt::format_to(names, "{}\n", node.seq_id);
+        fmt::format_to_mb(names, "{}\n", node.seq_id);
     });
     return fmt::to_string(names);
 
@@ -37,10 +37,10 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
     fmt::print(stderr, ">>>> html export: cumul max {} edge_scale {}\n", tree.max_cumulative_shown(), edge_scale);
 
     fmt::memory_buffer html;
-    fmt::format_to(html, sHeader, fmt::arg("title", fmt::format("{} {}", tree.virus_type(), tree.lineage())));
+    fmt::format_to_mb(html, fmt::runtime(sHeader), fmt::arg("title", fmt::format("{} {}", tree.virus_type(), tree.lineage())));
     prefix_t prefix;
     add_nodes_html(html, tree, tree, edge_scale, prefix, false);
-    fmt::format_to(html, sFooter);
+    fmt::format_to_mb(html, "{}", sFooter);
     return fmt::to_string(html);
 
 } // acmacs::tal::v3::html_export
@@ -50,7 +50,7 @@ std::string acmacs::tal::v3::html_export(const Tree& tree)
 void add_nodes_html(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node, const acmacs::tal::v3::Node& /*parent*/, double edge_scale, prefix_t& prefix, bool last)
 {
     if (node.is_leaf()) {
-        fmt::format_to(html,
+        fmt::format_to_mb(html,
                        "<li><table><tr>{prefix}<td><div class='e {node_edge_last}' style='width: {edge}px;'></div></td><td class='s' style='color: "
                        "{color_tree_label}'>{seq_id} <span class='b'>{accession_numbers}</span></td></tr></table></li>\n",
                        fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)), fmt::arg("node_edge_last", last ? "n" : ""),
@@ -61,15 +61,15 @@ void add_nodes_html(fmt::memory_buffer& html, const acmacs::tal::v3::Node& node,
     }
     else {
         const auto edge = static_cast<int>(node.edge_length.as_number() * edge_scale);
-        fmt::format_to(html, "<li><table><tr>{prefix}<td><div class='e {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
+        fmt::format_to_mb(html, "<li><table><tr>{prefix}<td><div class='e {node_edge_last}' style='width: {edge}px;'></div></td>", fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),
                        fmt::arg("node_edge_last", last ? "n" : ""), fmt::arg("edge", edge));
         // if (node.number_leaves_in_subtree() >= 20) {
             // if (const auto rep = node.common_aa_.report(parent.common_aa_); !rep.empty())
-            //     fmt::format_to(html, "<td class='a'>leaves:{} {}</td>", node.number_leaves_in_subtree(), rep);
+            //     fmt::format_to_mb(html, "<td class='a'>leaves:{} {}</td>", node.number_leaves_in_subtree(), rep);
         if (const auto rep = node.aa_transitions_.display(); !rep.empty())
-            fmt::format_to(html, "<td class='a'>{}leaves:{} {} -- left:{}</td>", node.seq_id.empty() ? std::string{} : fmt::format("[{}] ", node.seq_id), node.number_leaves_in_subtree(), rep, node.node_for_left_aa_transitions_ ? node.node_for_left_aa_transitions_->seq_id : std::string_view{});
+            fmt::format_to_mb(html, "<td class='a'>{}leaves:{} {} -- left:{}</td>", node.seq_id.empty() ? std::string{} : fmt::format("[{}] ", node.seq_id), node.number_leaves_in_subtree(), rep, node.node_for_left_aa_transitions_ ? node.node_for_left_aa_transitions_->seq_id : std::string_view{});
         // }
-        fmt::format_to(html, "</tr></table></li>\n");
+        fmt::format_to_mb(html, "</tr></table></li>\n");
         prefix.push_back(fmt::format("<td class='subnode m'><div style='width: {edge}px;'></div></td>", fmt::arg("edge", edge)));
         for (auto subnode = std::begin(node.subtree); subnode != std::end(node.subtree); ++subnode) {
             if (subnode->children_are_shown()) {
@@ -128,7 +128,7 @@ std::string acmacs::tal::v3::text_export(const Tree& tree)
     fmt::print(stderr, ">>>> text export: cumul max {} edge_step {}\n", tree.max_cumulative_shown(), edge_step);
 
     fmt::memory_buffer text;
-    fmt::format_to(text, "-*- Tal-Text-Tree -*-\n");
+    fmt::format_to_mb(text, "-*- Tal-Text-Tree -*-\n");
     prefix_t prefix;
     add_nodes_text(text, tree, edge_step, prefix, false);
     return fmt::to_string(text);
@@ -156,7 +156,7 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
 
     const auto aa_transitions = node.aa_transitions_.display();
     if (node.is_leaf()) {
-        fmt::format_to(text, "{prefix}{edge} \"{seq_id}\" {aa_transitions}{accession_numbers} edge: {edge_val}  cumul: {cumul_val}  v:{vert}\n",
+        fmt::format_to_mb(text, "{prefix}{edge} \"{seq_id}\" {aa_transitions}{accession_numbers} edge: {edge_val}  cumul: {cumul_val}  v:{vert}\n",
                        fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)), fmt::arg("edge", std::string(static_cast<size_t>(node.edge_length.as_number() * edge_step), '-')),
                        fmt::arg("seq_id", node.seq_id),
                        fmt::arg("accession_numbers", format_accession_numbers(node)),
@@ -168,12 +168,12 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
     }
     else {
         const auto edge = static_cast<size_t>(node.edge_length.as_number() * edge_step);
-        fmt::format_to(text, "{prefix}{edge}\\ >>>> leaves: {leaves}{aa_transitions}",                        //
+        fmt::format_to_mb(text, "{prefix}{edge}\\ >>>> leaves: {leaves}{aa_transitions}",                        //
                        fmt::arg("prefix", acmacs::string::join(acmacs::string::join_concat, prefix)),                              //
                        fmt::arg("edge", std::string(edge, '=')),                                                                   //
                        fmt::arg("leaves", node.number_leaves_in_subtree()),                                                        //
                        fmt::arg("aa_transitions", aa_transitions.empty() ? std::string{} : fmt::format(" [{}]", aa_transitions)));
-        fmt::format_to(text, " node_id: {} edge: {}  cumul: {}\n", node.node_id, node.edge_length.as_number(), node.cumulative_edge_length.as_number());
+        fmt::format_to_mb(text, " node_id: {} edge: {}  cumul: {}\n", node.node_id, node.edge_length.as_number(), node.cumulative_edge_length.as_number());
         if (!prefix.empty()) {
             if (prefix.back().back() == '\\')
                 prefix.back().back() = ' ';

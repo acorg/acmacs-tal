@@ -177,30 +177,30 @@ namespace acmacs::tal::inline v3
             return prepend_comma;
 
         if (prepend_comma)
-            fmt::format_to(out, ",");
+            fmt::format_to_mb(out, ",");
 
         if (node.is_leaf()) {
-            fmt::format_to(out, "{}", node.seq_id);
+            fmt::format_to_mb(out, "{}", node.seq_id);
             if (options.add_aa_substitution_labels && !node.aa_transitions_.empty()) {
                 auto label = node.aa_transitions_.display();
                 ::string::replace_in_place(label, ' ', '_');
-                fmt::format_to(out, "+{}", label);
+                fmt::format_to_mb(out, "+{}", label);
             }
         }
         else {
-            fmt::format_to(out, "(");
+            fmt::format_to_mb(out, "(");
             bool add_comma = false;
             for (const auto& sub_node : node.subtree)
                 add_comma = export_node(out, sub_node, options, add_comma);
-            fmt::format_to(out, ")");
+            fmt::format_to_mb(out, ")");
             if (options.add_aa_substitution_labels && !node.aa_transitions_.empty()) {
                 auto label = node.aa_transitions_.display();
                 ::string::replace_in_place(label, ' ', '_');
-                fmt::format_to(out, "{}", label);
+                fmt::format_to_mb(out, "{}", label);
             }
         }
         if (!node.edge_length.is_zero())
-            fmt::format_to(out, ":{}", node.edge_length.as_string());
+            fmt::format_to_mb(out, ":{}", node.edge_length.as_string());
         return true;
     }
 
@@ -212,7 +212,7 @@ std::string acmacs::tal::v3::newick_export(const Tree& tree, const ExportOptions
 {
     fmt::memory_buffer out;
     export_node(out, tree, options, false);
-    fmt::format_to(out, ";");
+    fmt::format_to_mb(out, ";");
     return fmt::to_string(out);
 
 } // acmacs::tal::v3::newick_export

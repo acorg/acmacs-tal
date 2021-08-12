@@ -117,9 +117,9 @@ std::string acmacs::tal::v3::Tree::report_cumulative(size_t max) const
     std::sort(std::begin(nodes), std::end(nodes), [](const auto& en1, const auto& en2) { return en1->cumulative_edge_length > en2->cumulative_edge_length; });
 
     fmt::memory_buffer out;
-    fmt::format_to(out, "Nodes {} sorted by cumulative\nCumulative       Edge       Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
+    fmt::format_to_mb(out, "Nodes {} sorted by cumulative\nCumulative       Edge       Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
     for (const auto [no, node] : acmacs::enumerate(nodes)) {
-        fmt::format_to(out, "{:12.8f}  {:12.8f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id);
+        fmt::format_to_mb(out, "{:12.8f}  {:12.8f}  {}\n", node->cumulative_edge_length.as_number(), node->edge_length.as_number(), node->seq_id);
         if (max > 0 && no >= max)
             break;
     }
@@ -136,16 +136,16 @@ std::string acmacs::tal::v3::Tree::report_by_edge(size_t max, size_t max_names_p
     std::vector<const Node*> nodes = sorted_by_edge();
 
     fmt::memory_buffer out;
-    fmt::format_to(out, "Nodes {} sorted by edge length\nEdge          Cumulative           Node id     Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
+    fmt::format_to_mb(out, "Nodes {} sorted by edge length\nEdge          Cumulative           Node id     Seq id\n", max > 0 ? fmt::format("(max {})", max) : std::string{"(all)"});
     for (const auto [no, node] : acmacs::enumerate(nodes)) {
-        fmt::format_to(out, "{:12.8f}  {:12.8f}  [{:5d}] {:5.4}", node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->number_leaves_in_subtree(), node->node_id);
+        fmt::format_to_mb(out, fmt::runtime("{:12.8f}  {:12.8f}  [{:5d}] {:5.4}"), node->edge_length.as_number(), node->cumulative_edge_length.as_number(), node->number_leaves_in_subtree(), node->node_id);
         size_t no2{0};
         tree::iterate_leaf_stop(*node, [&no2, max_names_per_row, &out](const auto& subnode) {
-            fmt::format_to(out, " {}", subnode.seq_id);
+            fmt::format_to_mb(out, " {}", subnode.seq_id);
             ++no2;
             return no2 > max_names_per_row;
         });
-        fmt::format_to(out, "\n");
+        fmt::format_to_mb(out, "\n");
         if (max > 0 && no >= max)
             break;
     }
@@ -263,7 +263,7 @@ void acmacs::tal::v3::Tree::branches_by_edge()
     if (!selected.empty()) {
         fmt::print("         edge      node-id      Seq Id\n");
         for (Node* node : selected) {
-            fmt::print("    {:12.8f}   {:5.4}   {}\n", node->edge_length.as_number(), node->node_id, node->seq_id);
+            fmt::print(fmt::runtime("    {:12.8f}   {:5.4}   {}\n"), node->edge_length.as_number(), node->node_id, node->seq_id);
             node->color_edge_line = RED;
         }
     }
@@ -966,13 +966,13 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
     std::vector<acmacs::CounterChar> counter(pos.size());
     fmt::memory_buffer out;
     if (names) {
-        fmt::format_to(out, "{:{}s} ", "", seq_id_size);
+        fmt::format_to_mb(out, "{:{}s} ", "", seq_id_size);
         for (const auto pp : pos)
-            fmt::format_to(out, " {:4d}", pp);
+            fmt::format_to_mb(out, " {:4d}", pp);
     }
     tree::iterate_leaf(*this, [&pos, &counter, &out, names, seq_id_size](const Node& leaf) {
         if (names)
-            fmt::format_to(out, "\n{:{}s}", leaf.seq_id, seq_id_size);
+            fmt::format_to_mb(out, "\n{:{}s}", leaf.seq_id, seq_id_size);
         for (auto it = pos.begin(); it != pos.end(); ++it) {
             const auto aa = acmacs::seqdb::at_pos(leaf.aa_sequence, *it);
             if (aa != ' ')
@@ -980,13 +980,13 @@ std::string acmacs::tal::v3::Tree::report_aa_at(const std::vector<acmacs::seqdb:
             // else
             //     AD_WARNING("{}: space at {}, seq length: {}", leaf.seq_id, *it, leaf.aa_sequence.size());
             if (names)
-                fmt::format_to(out, "    {}", aa);
+                fmt::format_to_mb(out, "    {}", aa);
         }
     });
     if (names)
-        fmt::format_to(out, "\n\n\n");
+        fmt::format_to_mb(out, "\n\n\n");
     for (auto it = pos.begin(); it != pos.end(); ++it)
-        fmt::format_to(out, "  {}\n{}\n", *it, counter[static_cast<size_t>(it - pos.begin())].report_sorted_max_first("    {first} {second:5d}\n"));
+        fmt::format_to_mb(out, "  {}\n{}\n", *it, counter[static_cast<size_t>(it - pos.begin())].report_sorted_max_first("    {first} {second:5d}\n"));
     return fmt::to_string(out);
 
 } // acmacs::tal::v3::Tree::report_aa_at

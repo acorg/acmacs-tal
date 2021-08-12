@@ -28,7 +28,7 @@ namespace acmacs::tal::inline v3
 
             void format_to(fmt::memory_buffer& out, std::string_view format, double total) const
             {
-                fmt::format_to(out, format, fmt::arg("value", aa), fmt::arg("counter", count), fmt::arg("counter_percent", static_cast<double>(count) / total * 100.0));
+                fmt::format_to_mb(out, fmt::runtime(format), fmt::arg("value", aa), fmt::arg("counter", count), fmt::arg("counter_percent", static_cast<double>(count) / total * 100.0));
             }
         };
 

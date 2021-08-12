@@ -227,7 +227,7 @@ void acmacs::tal::v3::Clades::report_clades()
                        clade.sections.size(), clade.name, clade_param.display_name, clade_param.section_inclusion_tolerance, clade_param.section_exclusion_tolerance, clade_param.any_shown());
             for (size_t section_no = 0; section_no < clade.sections.size(); ++section_no) {
                 const auto& section = clade.sections[section_no];
-                fmt::print("  ({}) \"{}\" [{}] slot:{} {:.0} \"{}\" .. {:.0} \"{}\"  next: \"{}\"\n", section_no, section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
+                fmt::print(fmt::runtime("  ({}) \"{}\" [{}] slot:{} {:.0} \"{}\" .. {:.0} \"{}\"  next: \"{}\"\n"), section_no, section.display_name, section.size(), section.slot_no, section.first->node_id, section.first->seq_id, section.last->node_id,
                            section.last->seq_id, section.last->last_next_leaf ? section.last->last_next_leaf->seq_id : seq_id_t{});
                 if (section_no < (clade.sections.size() - 1))
                     fmt::print("   gap {}\n", clade.sections[section_no + 1].first->node_id.vertical - section.last->node_id.vertical - 1);

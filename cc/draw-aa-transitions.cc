@@ -172,8 +172,8 @@ void acmacs::tal::v3::DrawAATransitions::report() const
         const auto name = fmt::format("\"{}\",", transition.node->aa_transitions_.display());
         if (comma)
             fmt::print(",\n");
-        fmt::print("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"show\": {} \"label\": {{\"offset\": [{:6.3f}, {:6.3f}], \"?box\": {:.3f}}}, "
-                   "\"?first\": {:<{}s} \"?last\": {:<{}s} \"?before first\": {:<{}s} \"?after last\": {}}}",
+        fmt::print(fmt::runtime("    {{\"node_id\": {:>{}s}, \"name\": {:<{}s} \"show\": {} \"label\": {{\"offset\": [{:6.3f}, {:6.3f}], \"?box\": {:.3f}}}, "
+                                "\"?first\": {:<{}s} \"?last\": {:<{}s} \"?before first\": {:<{}s} \"?after last\": {}}}"),
                    //
                    node_id, max_id + 2,                                                                                                       // node_id
                    name, max_name + 3,                                                                                                        // name

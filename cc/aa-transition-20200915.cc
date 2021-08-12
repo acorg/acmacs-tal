@@ -26,7 +26,7 @@ namespace acmacs::tal::inline v3::detail
             else {
                 if (child.common_aa_->at<dbg>(pos, tolerance) == aa) {
                     if constexpr (dbg)
-                        fmt::format_to(common_children, " {}", child.node_id);
+                        fmt::format_to_mb(common_children, " {}", child.node_id);
                     ++num;
                 }
             }
@@ -40,7 +40,7 @@ namespace acmacs::tal::inline v3::detail
         const auto aa = node.common_aa_->at(pos, tolerance);
         if (aa == NoCommon) {
             if constexpr (dbg)
-                fmt::format_to(msg, "common:no");
+                fmt::format_to_mb(msg, "common:no");
             return {false, fmt::to_string(msg)};
         }
         // tolerance problem: aa is common with tolerance but in
@@ -52,8 +52,8 @@ namespace acmacs::tal::inline v3::detail
         const auto not_common = // num_common_aa_children > 0 && number_of_children_with_the_same_common_aa <= 1 &&
             node.subtree.size() > static_cast<size_t>(num_common_aa_children);
         if constexpr (dbg) {
-            fmt::format_to(msg, "common:{} <-- {} {:5.3} aa:{} tolerance:{} number_of_children_with_the_same_common_aa:{} ({}) subtree-size:{}", !not_common, pos, node.node_id, aa, tolerance,
-                           num_common_aa_children, common_children, node.subtree.size());
+            fmt::format_to_mb(msg, fmt::runtime("common:{} <-- {} {:5.3} aa:{} tolerance:{} number_of_children_with_the_same_common_aa:{} ({}) subtree-size:{}"), !not_common, pos, node.node_id, aa,
+                              tolerance, num_common_aa_children, common_children, node.subtree.size());
         }
         return {!not_common, fmt::to_string(msg)};
     }
@@ -64,15 +64,15 @@ namespace acmacs::tal::inline v3::detail
         const auto aa = node.common_aa_->at(pos, tolerance);
         if (aa == NoCommon) {
             if constexpr (dbg)
-                fmt::format_to(msg, "common:no");
+                fmt::format_to_mb(msg, "common:no");
             return {false, fmt::to_string(msg)};
         }
         else {
             const auto [num_common_aa_children, common_children] = number_of_children_with_the_same_common_aa<dbg>(node, aa, pos, tolerance);
             const auto not_common = num_common_aa_children <= 1; // && node.subtree.size() > static_cast<size_t>(num_common_aa_children);
             if constexpr (dbg) {
-                fmt::format_to(msg, "common:{} <-- {} {:5.3} aa:{} tolerance:{} number_of_children_with_the_same_common_aa:{} ({}) subtree-size:{}", !not_common, pos, node.node_id, aa, tolerance,
-                               num_common_aa_children, common_children, node.subtree.size());
+                fmt::format_to_mb(msg, fmt::runtime("common:{} <-- {} {:5.3} aa:{} tolerance:{} number_of_children_with_the_same_common_aa:{} ({}) subtree-size:{}"), !not_common, pos, node.node_id,
+                                  aa, tolerance, num_common_aa_children, common_children, node.subtree.size());
             }
             return {!not_common, fmt::to_string(msg)};
         }
