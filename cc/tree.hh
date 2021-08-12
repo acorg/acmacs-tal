@@ -12,6 +12,7 @@
 #include "acmacs-base/date.hh"
 #include "acmacs-base/color.hh"
 #include "acmacs-base/flat-set.hh"
+#include "acmacs-base/string-from-chars.hh"
 #include "seqdb-3/seqdb.hh"
 #include "acmacs-tal/aa-transition.hh"
 #include "acmacs-tal/error.hh"
@@ -387,15 +388,15 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
         if (it != ctx.end() && *it == ':')
             ++it;
         if (it != ctx.end() && *it != '}' && *it != '.') {
-            char* end{nullptr};
-            v_size_ = std::strtoul(&*it, &end, 10);
+            const char* end{nullptr};
+            v_size_ = acmacs::string::from_chars_to_i<size_t>(&*it, &end);
             it = std::next(it, end - &*it);
         }
         if (it != ctx.end() && *it == '.')
             ++it;
         if (it != ctx.end() && *it != '}') {
-            char* end{nullptr};
-            h_size_ = std::strtoul(&*it, &end, 10);
+            const char* end{nullptr};
+            h_size_ = acmacs::string::from_chars_to_i<size_t>(&*it, &end);
             it = std::next(it, end - &*it);
         }
         while (it != ctx.end() && *it != '}')
@@ -403,7 +404,7 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
         return it;
     }
 
-    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx)
+    template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) const
     {
         if (v_size_.has_value())
             format_to(ctx.out(), "{:>{}d}", node_id.vertical, *v_size_);
