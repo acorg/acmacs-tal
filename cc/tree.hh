@@ -389,14 +389,14 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
             ++it;
         if (it != ctx.end() && *it != '}' && *it != '.') {
             const char* end{nullptr};
-            v_size_ = acmacs::string::from_chars_to_i<size_t>(&*it, &end);
+            v_size_ = acmacs::string::from_chars_to_unsigned<size_t>(&*it, &end);
             it = std::next(it, end - &*it);
         }
         if (it != ctx.end() && *it == '.')
             ++it;
         if (it != ctx.end() && *it != '}') {
             const char* end{nullptr};
-            h_size_ = acmacs::string::from_chars_to_i<size_t>(&*it, &end);
+            h_size_ = acmacs::string::from_chars_to_unsigned<size_t>(&*it, &end);
             it = std::next(it, end - &*it);
         }
         while (it != ctx.end() && *it != '}')
