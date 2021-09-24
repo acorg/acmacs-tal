@@ -69,10 +69,12 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                 surface.line({horizontal_step_ * (leaf.cumulative_edge_length - leaf.edge_length).as_number(), vertical_step() * leaf.cumulative_vertical_offset_},
                              {horizontal_step_ * leaf.cumulative_edge_length.as_number(), vertical_step() * leaf.cumulative_vertical_offset_}, leaf.color_edge_line,
                              line_width * leaf.edge_line_width_scale);
-                const auto label_size = text_size * leaf.label_scale;
-                const auto label_color = leaf.label_color.has_value() ? *leaf.label_color : coloring().color(leaf);
-                surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + *label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + *label_size * 0.3},
-                             std::string{leaf.seq_id}, label_color, label_size);
+                if (leaf.label_scale > 0) {
+                    const auto label_size = text_size * leaf.label_scale;
+                    const auto label_color = leaf.label_color.has_value() ? *leaf.label_color : coloring().color(leaf);
+                    surface.text({horizontal_step_ * leaf.cumulative_edge_length.as_number() + *label_size * 0.5, vertical_step() * leaf.cumulative_vertical_offset_ + *label_size * 0.3},
+                                 std::string{leaf.seq_id}, label_color, label_size);
+                }
             }
         },
         // pre
@@ -87,9 +89,11 @@ void acmacs::tal::v3::DrawTree::draw(acmacs::surface::Surface& surface) const
                                  {horizontal_step_ * node.cumulative_edge_length.as_number(), vertical_step() * shown_children.back()->cumulative_vertical_offset_ + vertical_additon}, BLACK,
                                  line_width * node.edge_line_width_scale);
 
-                    surface.text({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *parameters_.node_id_text_size * 0.5,
-                                  vertical_step() * node.cumulative_vertical_offset_ - *line_width - *parameters_.node_id_text_size * 0.1},
-                                 fmt::format("{}", node.node_id), BLACK, parameters_.node_id_text_size);
+                    if (parameters_.node_id_text_size > Scaled{0}) {
+                        surface.text({horizontal_step_ * (node.cumulative_edge_length - node.edge_length).as_number() + *parameters_.node_id_text_size * 0.5,
+                                      vertical_step() * node.cumulative_vertical_offset_ - *line_width - *parameters_.node_id_text_size * 0.1},
+                                     fmt::format("{}", node.node_id), BLACK, parameters_.node_id_text_size);
+                    }
                 }
                 else
                     AD_WARNING("node is not hidden but all ist children are hidden {} total children: {}", node.node_id, node.subtree.size());

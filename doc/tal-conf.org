@@ -1,4 +1,4 @@
-# Time-stamp: <2021-05-13 10:23:19 eu>
+# Time-stamp: <2021-09-24 15:15:27 eu>
 
 bjorn [145, 155, 156, 158, 159, 189, 193]
 
@@ -61,7 +61,7 @@ If multiple criteria specified within single "select" object, they all used (con
 {"aa": ["192Q", "!123E"]}
 {"nuc": ["354A", "547C"]}
 {"cumulative >=": 0.01, "report": true}
-{"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >= 
+{"top-cumulative-gap": 2.0, "report": true} -- sort cumulative gaps, if top cumul gap divided by the second cumul gap is bigger than the sepcified (default 2.0), select all nodes with cumul edge >=
 {"edge >=": 0.01, "report": true}
 {"date": ["start >=", "end <"], "report": true}
 {"seq_id": "regexp", "report": true}
@@ -104,7 +104,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** Tree label color and scale
 
-{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-scale": 2.0}}
+{"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-scale": 2.0, "?": "use -1 to hide label"}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-label-color": "black"}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-color": "red"}}
 {"N": "nodes", "select": {<[[Select Nodes]]>}, "apply": {"tree-edge-line-width": 2.0}} -- relative to the inferred line width for all edge lines
@@ -128,7 +128,7 @@ If multiple criteria specified within single "select" object, they all used (con
 
 *** node_id label size
 
-{"N": "node-id-size", "size": 0.004},
+{"N": "node-id-size", "size": 0.004, "?": "use -1 to hide"},
 
 * Settings
 
@@ -175,7 +175,7 @@ If multiple criteria specified within single "select" object, they all used (con
                "offset": [0.0, 0.9], # relative to tree
                "world-map": {
                    "size": 0.1,   # world map width relative to tree height
-                   "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"}, 
+                   "equator": {"color": "black", "line_width": 0.1, "dash": "no-dash"},
                    "tropics": {"color": "black", "line_width": 0.1, "dash": "dash1"},
                    "dots": [ # placement is *very* approximate due to world map layout is not correct
                              {"location": "SYDNEY", "size": 3, "outline": "white", "fill": "black", "outline_width": 1},
@@ -192,14 +192,14 @@ If multiple criteria specified within single "select" object, they all used (con
 *** AA subst labels
 
 #+BEGIN_SRC bash
-{"N": "aa-transitions", "report": false, 
+{"N": "aa-transitions", "report": false,
  "method": "eu-20210503", "debug": false, "pos": 193, "number-leaves-threshold": 10, #-- use upon hiding nodes, specify pos to debug
  "show-same-left-right-for-pos": 193}
 #+END_SRC
 
 
 #+BEGIN_SRC json
-{"N": "draw-aa-transitions", 
+{"N": "draw-aa-transitions",
  "report": false, "debug": false, "?debug-pos": 278, "?show-same-left-right-for-pos": 160,
  "method": "eu-20210503", "?method": ["eu-20210503", "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"],
  "minimum-number-leaves-in-subtree": 0.01, "?minimum-number-leaves-in-subtree": "if < 1 - relative to total, if > 1 - absolute value",
@@ -264,7 +264,7 @@ If multiple criteria specified within single "select" object, they all used (con
 **** Clade parameters
 
 #+BEGIN_SRC json
-  {"name": "183P-1", 
+  {"name": "183P-1",
    "display_name": "183P-1", # "display_name": ["183P-1", "183P-11"], per section display_name
    "show": true, # "show": [true, false] per section show
    "slot": 1, # "slot": [1, 2] per section slots
@@ -412,7 +412,7 @@ Text substitutions: {virus-type} {lineage} {virus-type/lineage} {chart-assay} (h
 *** Draw on tree
 
 #+BEGIN_SRC json
-{"N": "draw-on-tree", 
+{"N": "draw-on-tree",
  "texts": [{<[[Text parameters]]>}, ...]
 }
 #+END_SRC
