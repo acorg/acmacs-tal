@@ -9,13 +9,13 @@
   "H": <true if hidden>,
   "t": [
    {
-    "l": 0.001,
-    "c": 0.001,
-    "t": [...]
+    "l": 0.001, -- edge length
+    "c": 0.001, -- cumulative edge length
+    "t": [...]  -- subtree
    },
    {
-    "l": 0.002,
-    "c": 0.002,
+    "l": 0.002, -- edge length
+    "c": 0.002, -- cumulative edge length
     "n": "seq_id",
     "a": "aligned aa sequence",
     "N": "aligned nuc sequence",
