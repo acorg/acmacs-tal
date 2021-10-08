@@ -6,6 +6,7 @@
          "report-cumulative-max": 100,
          "report-time-series-output": "",
          "whocc": false,
+         "do-populate-with-nuc-duplicates": true,
          "report-aa-at-pos-counter": false,
          "ladderize-method": "number-of-leaves",
          "tree-draw-aa-transitions": true,
@@ -129,7 +130,9 @@
     "tal-pre": [
         {"N": "if", "condition": {"and": ["$whocc", {"not": "$tree-has-sequences"}]}, "then": [
             {"N": "seqdb", "filename": "$seqdb-filename"},
-            {"N": "populate-with-nuc-duplicates"}
+            {"N": "if", "condition": "$do-populate-with-nuc-duplicates", "then": [
+                {"N": "populate-with-nuc-duplicates"}
+            ]}
         ]},
         {"N": "report-cumulative", "output": "$report-cumulative-output", "max": "$report-cumulative-max"},
         {"N": "ladderize", "method": "$ladderize-method"}
