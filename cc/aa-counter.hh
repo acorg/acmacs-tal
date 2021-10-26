@@ -13,7 +13,7 @@ namespace acmacs::tal::inline v3
     class AACounter
     {
       public:
-        constexpr static const size_t number_of_positions{1300};
+        constexpr static const size_t number_of_positions{4000}; // 1300 for tree with aa sequences, 4000 for tree with nuc sequences (sars)
         constexpr static const size_t number_of_aa{17};
         constexpr static const char nothing{'.'}; // dot is to ease reporting
 
