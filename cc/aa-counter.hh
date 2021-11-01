@@ -72,7 +72,7 @@ namespace acmacs::tal::inline v3
                     return;
                 }
             }
-            throw std::runtime_error{AD_FORMAT("AACounter::count: increase number_of_aa in aa-counter.hh:17")};
+            throw std::runtime_error{AD_FORMAT("AACounter::count: number_of_aa ({}) is too small, cannot handle '{}' at pos {}", number_of_aa, aa, pos)};
         }
 
         void add(pos_t pos, const AACounter& other)
