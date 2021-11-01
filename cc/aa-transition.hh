@@ -30,6 +30,7 @@ namespace acmacs::tal::inline v3
         CommonAA(size_t number_of_positions, size_t number_of_aa) : at_pos_(number_of_positions, number_of_aa) {}
         bool empty(seqdb::pos0_t pos) const { return at_pos_.empty(*pos); }
         size_t allocated() const { return at_pos_.allocated(); }
+        size_t max_count() const { return at_pos_.max_count(); }
 
         char at(seqdb::pos0_t pos) const
         {
@@ -103,6 +104,7 @@ namespace acmacs::tal::inline v3
 
         void create(size_t number_of_positions, size_t number_of_aa) { data_ = std::make_unique<CommonAA>(number_of_positions, number_of_aa); }
         size_t allocated() const { return data_ ? data_->allocated() : 0; }
+        size_t max_count() const { return data_ ? data_->max_count() : 0; }
 
         CommonAA* operator->() { return data_.get(); }
         const CommonAA* operator->() const { return data_.get(); }

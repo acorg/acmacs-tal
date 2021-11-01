@@ -32,7 +32,8 @@ void acmacs::tal::v3::detail::update_common_aa(Tree& tree, seqdb::pos0_t longest
     tree.resize_common_aa(*longest_aa_sequence, number_of_aas);
 
     const Timeit ti{"update_common_aa"};
-    tree::iterate_post(tree, [](Node& node) {
+    size_t max_count{0};
+    tree::iterate_post(tree, [&max_count](Node& node) {
         for (auto& child : node.subtree) {
             if (!child.hidden) {
                 if (child.is_leaf())
@@ -41,7 +42,9 @@ void acmacs::tal::v3::detail::update_common_aa(Tree& tree, seqdb::pos0_t longest
                     node.common_aa_->update(*child.common_aa_);
             }
         }
+        max_count = std::max(max_count, node.common_aa_.max_count());
     });
+    AD_INFO("update_common_aa: max_count: {}", max_count);
 }
 
 // ----------------------------------------------------------------------

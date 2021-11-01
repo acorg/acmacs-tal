@@ -107,6 +107,7 @@ namespace acmacs::tal::inline v3
             }
 
         size_t allocated() const { return data_.capacity() * sizeof(value_type); }
+        size_t max_count() const { return max_element(std::begin(data_), std::end(data_))->count; }
 
       private:
         data_type data_;
