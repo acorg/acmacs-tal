@@ -16,7 +16,7 @@ namespace acmacs::tal::inline v3
       public:
         const size_t number_of_positions;
         const size_t number_of_aa;
-        // constexpr static const size_t number_of_positions = number_of_positions_p; //{1300};
+        // constexpr static const size_t number_of_positions = number_of_positions_p; //{1300} , 4000 for tree with nuc sequences (sars)
         // constexpr static const size_t number_of_aa = number_of_aa_p; //{17};
         constexpr static const char nothing{'.'}; // dot is to ease reporting
 
