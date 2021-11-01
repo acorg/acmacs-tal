@@ -22,12 +22,12 @@ namespace acmacs::tal::inline v3
 
         using count_t = uint32_t;
 
-        struct value_type
+        struct value_type_full
         {
             char aa{nothing};
             count_t count{0};
 
-            bool operator<(const value_type& rhs) const { return count < rhs.count; }
+            bool operator<(const value_type_full& rhs) const { return count < rhs.count; }
 
             void format_to(fmt::memory_buffer& out, std::string_view format, double total) const
             {
@@ -35,6 +35,20 @@ namespace acmacs::tal::inline v3
             }
         };
 
+        struct value_type_bits
+        {
+            char aa{nothing};
+            unsigned int count : 24 {0};
+
+            bool operator<(const value_type_bits& rhs) const { return count < rhs.count; }
+
+            void format_to(fmt::memory_buffer& out, std::string_view format, double total) const
+            {
+                fmt::format_to_mb(out, fmt::runtime(format), fmt::arg("value", aa), fmt::arg("counter", count), fmt::arg("counter_percent", static_cast<double>(count) / total * 100.0));
+            }
+        };
+
+        using value_type = value_type_bits;
         // using data_type = std::array<value_type, number_of_positions * number_of_aa>;
         using data_type = std::vector<value_type>;
         using iterator = typename data_type::iterator;
