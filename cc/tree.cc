@@ -1302,12 +1302,16 @@ double acmacs::tal::v3::Tree::compute_cumulative_vertical_offsets()
 
 // ----------------------------------------------------------------------
 
-acmacs::seqdb::pos0_t acmacs::tal::v3::Tree::longest_aa_sequence() const
+std::pair<acmacs::seqdb::pos0_t, size_t> acmacs::tal::v3::Tree::longest_aa_sequence() const
 {
     // const Timeit ti{"longest_aa_sequence"};
     seqdb::pos0_t longest{0};
-    tree::iterate_leaf(*this, [&longest](const Node& leaf) { longest = std::max(longest, leaf.aa_sequence.size()); });
-    return longest;
+    acmacs::CounterCharSome<> aas;
+    tree::iterate_leaf(*this, [&longest, &aas](const Node& leaf) {
+        longest = std::max(longest, leaf.aa_sequence.size());
+        aas.count(leaf.aa_sequence->begin(), leaf.aa_sequence->end());
+    });
+    return {longest, aas.size()};
 
 } // acmacs::tal::v3::Tree::longest_sequence
 
@@ -1324,20 +1328,26 @@ acmacs::seqdb::pos0_t acmacs::tal::v3::Tree::longest_nuc_sequence() const
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::Tree::resize_common_aa(size_t longest_sequence)
+void acmacs::tal::v3::Tree::resize_common_aa(size_t longest_sequence, size_t number_of_aas)
 {
-    AD_DEBUG("resize_common_aa to {}", longest_sequence);
-    const Timeit ti{fmt::format("resize_common_aa to {}", longest_sequence)};
+    // AD_DEBUG("resize_common_aa to {}", longest_sequence);
+    const Timeit ti{fmt::format("resize_common_aa: longest sequence: {}  number of aa: {}", longest_sequence, number_of_aas)};
 
-    if (longest_sequence > AACounter::number_of_positions)
-        throw std::runtime_error{fmt::format("Tree::resize_common_aa {}: change number_of_positions in aa-counter.hh:15", longest_sequence)};
+    // if (longest_sequence > AACounter::number_of_positions)
+    //     throw std::runtime_error{fmt::format("Tree::resize_common_aa {}: change number_of_positions in aa-counter.hh:15", longest_sequence)};
 
     size_t nodes{0};
-    tree::iterate_pre(*this, [&nodes](Node& node) {
-        node.common_aa_.create();
+    tree::iterate_pre(*this, [&nodes, longest_sequence, number_of_aas](Node& node) {
+        node.common_aa_.create(longest_sequence, number_of_aas);
         ++nodes;
     });
-    AD_DEBUG("{} nodes resized", nodes);
+    tree::iterate_pre_stop(*this, [nodes](const Node& node) {
+        const auto size = node.common_aa_.allocated();
+        AD_INFO("node.common_aa_ allocated: {} bytes per node, total: {:.2f}Gb", size, static_cast<double>(size) * static_cast<double>(nodes) / 1024.0 / 1024.0 / 1024.0);
+        return false;
+    });
+
+    // AD_DEBUG("{} nodes resized", nodes);
 
 } // acmacs::tal::v3::Tree::resize_common_aa
 

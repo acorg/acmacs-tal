@@ -27,7 +27,9 @@ namespace acmacs::tal::inline v3
     class CommonAA
     {
       public:
+        CommonAA(size_t number_of_positions, size_t number_of_aa) : at_pos_(number_of_positions, number_of_aa) {}
         bool empty(seqdb::pos0_t pos) const { return at_pos_.empty(*pos); }
+        size_t allocated() const { return at_pos_.allocated(); }
 
         char at(seqdb::pos0_t pos) const
         {
@@ -99,7 +101,8 @@ namespace acmacs::tal::inline v3
         CommonAA_Ptr(CommonAA_Ptr&&) = default;
         CommonAA_Ptr& operator=(CommonAA_Ptr&&) = default;
 
-        void create() { data_ = std::make_unique<CommonAA>(); }
+        void create(size_t number_of_positions, size_t number_of_aa) { data_ = std::make_unique<CommonAA>(number_of_positions, number_of_aa); }
+        size_t allocated() const { return data_ ? data_->allocated() : 0; }
 
         CommonAA* operator->() { return data_.get(); }
         const CommonAA* operator->() const { return data_.get(); }
@@ -324,7 +327,7 @@ namespace acmacs::tal::inline v3
 
     namespace detail
     {
-        void update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence);
+        void update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence, size_t number_of_aas);
         void update_aa_transitions_eu_20210503(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20210503.cc
         void update_aa_transitions_eu_20200915(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
         void update_aa_transitions_eu_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc

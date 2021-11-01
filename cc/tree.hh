@@ -342,9 +342,9 @@ namespace acmacs::tal::inline v3
         enum class leaves_only { no, yes };
         std::vector<const Node*> sorted_by_cumulative_edge(leaves_only lo) const; // bigger cumul length first
 
-        seqdb::pos0_t longest_aa_sequence() const;
+        std::pair<seqdb::pos0_t, size_t> longest_aa_sequence() const; // longest sequence size, number of aa
         seqdb::pos0_t longest_nuc_sequence() const;
-        void resize_common_aa(size_t longest_sequence);
+        void resize_common_aa(size_t longest_sequence, size_t number_of_aas);
 
         size_t longest_seq_id() const;
 

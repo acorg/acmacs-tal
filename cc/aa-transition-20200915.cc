@@ -142,8 +142,8 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200915(Tree& tree, cons
 {
     const auto leaves_ratio_threshold = 0.005;
 
-    const auto longest_sequence = tree.longest_aa_sequence();
-    update_common_aa(tree, longest_sequence);
+    const auto [longest_sequence, number_of_aas] = tree.longest_aa_sequence();
+    update_common_aa(tree, longest_sequence, number_of_aas);
 
     AD_DEBUG(parameters.debug, "eu-20200915 set aa transitions =============================================================");
     set_aa_transitions_eu_20210205(tree, longest_sequence, parameters);
@@ -333,8 +333,8 @@ void acmacs::tal::v3::detail::update_aa_transitions_derek_2016(Tree& tree, const
     AD_DEBUG(parameters.debug, "update_aa_transitions_derek_2016");
 
     tree.cumulative_calculate();
-    const auto longest_sequence = tree.longest_aa_sequence();
-    detail::update_common_aa(tree, longest_sequence);
+    const auto [longest_sequence, number_of_aas] = tree.longest_aa_sequence();
+    detail::update_common_aa(tree, longest_sequence, number_of_aas);
 
     const auto aa_at = [](const Node& node, seqdb::pos0_t pos) {
         if (node.is_leaf())
@@ -343,7 +343,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_derek_2016(Tree& tree, const
             return node.common_aa_->at(pos);
     };
 
-    tree::iterate_post(tree, [aa_at, longest_sequence, &parameters](Node& node) {
+    tree::iterate_post(tree, [aa_at, longest_sequence=longest_sequence, &parameters](Node& node) {
         for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
             const auto dbg = parameters.debug && parameters.report_pos && pos == *parameters.report_pos;
             const auto common_aa_at = node.common_aa_->at(pos);

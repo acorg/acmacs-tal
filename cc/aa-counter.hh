@@ -1,6 +1,7 @@
 #pragma once
 
-#include <array>
+// #include <array>
+#include <vector>
 #include <algorithm>
 #include <numeric>
 
@@ -13,8 +14,10 @@ namespace acmacs::tal::inline v3
     class AACounter
     {
       public:
-        constexpr static const size_t number_of_positions{1300};
-        constexpr static const size_t number_of_aa{17};
+        const size_t number_of_positions;
+        const size_t number_of_aa;
+        // constexpr static const size_t number_of_positions = number_of_positions_p; //{1300};
+        // constexpr static const size_t number_of_aa = number_of_aa_p; //{17};
         constexpr static const char nothing{'.'}; // dot is to ease reporting
 
         using count_t = uint32_t;
@@ -32,12 +35,13 @@ namespace acmacs::tal::inline v3
             }
         };
 
-        using data_type = std::array<value_type, number_of_positions * number_of_aa>;
+        // using data_type = std::array<value_type, number_of_positions * number_of_aa>;
+        using data_type = std::vector<value_type>;
         using iterator = typename data_type::iterator;
         using const_iterator = typename data_type::const_iterator;
         using pos_t = size_t;
 
-        AACounter() noexcept = default;
+        AACounter(size_t a_number_of_positions, size_t a_number_of_aa) noexcept : number_of_positions{a_number_of_positions}, number_of_aa{a_number_of_aa}, data_(number_of_positions * number_of_aa) {}
 
         bool empty(pos_t pos) const { return at(pos)->aa == nothing; }
 
@@ -101,6 +105,8 @@ namespace acmacs::tal::inline v3
                     en.format_to(out, format, static_cast<double>(total));
                 return fmt::to_string(out);
             }
+
+        size_t allocated() const { return data_.capacity() * sizeof(value_type); }
 
       private:
         data_type data_;

@@ -27,9 +27,9 @@ void acmacs::tal::v3::reset_aa_transitions(Tree& tree)
 
 // ----------------------------------------------------------------------
 
-void acmacs::tal::v3::detail::update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence)
+void acmacs::tal::v3::detail::update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence, size_t number_of_aas)
 {
-    tree.resize_common_aa(*longest_aa_sequence);
+    tree.resize_common_aa(*longest_aa_sequence, number_of_aas);
 
     const Timeit ti{"update_common_aa"};
     tree::iterate_post(tree, [](Node& node) {

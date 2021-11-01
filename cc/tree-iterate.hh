@@ -115,6 +115,17 @@ namespace acmacs::tal::inline v3::tree
         }
     }
 
+    // Stop descending the tree if f_subtree_pre returned false
+    template <typename N, typename F3> inline void iterate_pre_stop(N&& node, F3 f_subtree_pre)
+    {
+        if (!node.is_leaf()) {
+            if (f_subtree_pre(std::forward<N>(node))) {
+                for (auto& subnode : node.subtree)
+                    iterate_pre_stop(subnode, f_subtree_pre);
+            }
+        }
+    }
+
     // template <typename N, typename F3> inline void iterate_pre(N&& node, F3 f_subtree_pre, size_t index)
     // {
     //     if (!node.is_leaf()) {
