@@ -7,13 +7,16 @@
   "c": <cumulative-edge-length: double>,
   "A": ["aa subst", "N193K"],
   "H": <true if hidden>,
+  "M": <max-cumulative: double (ae only)>,
   "t": [
    {
+    "I": <node-id: int (ae only)>,
     "l": 0.001, -- edge length
     "c": 0.001, -- cumulative edge length
     "t": [...]  -- subtree
    },
    {
+    "I": <node-id: int (ae only)>,
     "l": 0.002, -- edge length
     "c": 0.002, -- cumulative edge length
     "n": "seq_id",
