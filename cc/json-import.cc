@@ -26,6 +26,9 @@ namespace
                   case 'l':
                       node_.edge_length = acmacs::tal::v3::EdgeLength{data};
                       break;
+                  case 'I':     // ae node_id_
+                  case 'M':     // ae max_cumulative
+                      break;
                   default:
                       throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
                 }
