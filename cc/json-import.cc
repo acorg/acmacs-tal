@@ -28,6 +28,7 @@ namespace
                       break;
                   case 'I':     // ae node_id_
                   case 'M':     // ae max_cumulative
+                  case 'L':     // ae number_leaves_in_tree
                       break;
                   default:
                       throw in_json::parse_error(fmt::format("unsupported field: \"{}\"", key_));
