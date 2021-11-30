@@ -40,6 +40,8 @@ namespace acmacs::tal::inline v3
         template <bool dbg = false> char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
             // AD_DEBUG(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
+            if (at_pos_.size() == 1)
+                pos = seqdb::pos0_t{0}; // for update_aa_transitions_eu_20200915_per_pos
             const auto total = at_pos_.total(*pos);
             if (const auto& max = at_pos_.max_count(*pos); (static_cast<double>(max.count) / static_cast<double>(total)) > tolerance) {
                 if constexpr (dbg)
@@ -330,8 +332,11 @@ namespace acmacs::tal::inline v3
     namespace detail
     {
         void update_common_aa(Tree& tree, seqdb::pos0_t longest_aa_sequence, size_t number_of_aas);
+        void update_common_aa_for_pos(Tree& tree, seqdb::pos0_t pos, size_t number_of_aas);
         void update_aa_transitions_eu_20210503(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20210503.cc
         void update_aa_transitions_eu_20200915(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
+        void update_aa_transitions_eu_20200915_per_pos(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
+        void update_aa_transitions_eu_20200915_stage_3(Tree& tree, seqdb::pos0_t pos, const seqdb::sequence_aligned_ref_t& root_sequence, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
         void update_aa_transitions_eu_20200514(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
         void update_aa_transitions_derek_2016(Tree& tree, const draw_tree::AATransitionsParameters& parameters); // aa-transition-20200915.cc
     }

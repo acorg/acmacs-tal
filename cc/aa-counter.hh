@@ -58,6 +58,7 @@ namespace acmacs::tal::inline v3
         AACounter(size_t a_number_of_positions, size_t a_number_of_aa) noexcept : number_of_positions{a_number_of_positions}, number_of_aa{a_number_of_aa}, data_(number_of_positions * number_of_aa) {}
 
         bool empty(pos_t pos) const { return at(pos)->aa == nothing; }
+        size_t size() const { return data_.size(); }
 
         void count(pos_t pos, char aa, count_t increment = 1)
         {
@@ -77,7 +78,6 @@ namespace acmacs::tal::inline v3
 
         void add(pos_t pos, const AACounter& other)
         {
-
             if (auto obeg = other.at(pos); obeg->aa != nothing) {
                 if (const auto beg = at(pos); beg->aa == nothing)
                     std::copy(obeg, other.at(pos + 1), beg);
@@ -89,15 +89,21 @@ namespace acmacs::tal::inline v3
         }
 
         void add(const AACounter& other)
-            {
-                for (pos_t pos{0}; pos < number_of_positions; ++pos)
-                    add(pos, other);
-            }
+        {
+            for (pos_t pos{0}; pos < number_of_positions; ++pos)
+                add(pos, other);
+        }
 
         const_iterator at(pos_t pos) const { return std::next(std::cbegin(data_), static_cast<ssize_t>(pos * number_of_aa)); }
         iterator at(pos_t pos) { return std::next(std::begin(data_), static_cast<ssize_t>(pos * number_of_aa)); }
 
-        char max(pos_t pos) const { return std::max_element(at(pos), at(pos + 1))->aa; }
+        char max(pos_t pos) const
+        {
+            if (data_.size() != 1)
+                return std::max_element(at(pos), at(pos + 1))->aa;
+            else
+                return std::max_element(at(0), at(1))->aa;
+        }
         const value_type& max_count(pos_t pos) const { return *std::max_element(at(pos), at(pos + 1)); }
         auto total(pos_t pos) const
         {
@@ -105,20 +111,20 @@ namespace acmacs::tal::inline v3
         }
 
         std::string report_sorted_max_first(pos_t pos, std::string_view format) const
-            {
-                std::vector<value_type> pairs;
-                size_t total{0};
-                for (auto iter = at(pos); iter != at(pos + 1) && iter->aa != nothing; ++iter) {
-                    pairs.push_back(*iter);
-                    total += iter->count;
-                }
-                std::sort(std::begin(pairs), std::end(pairs), [](const auto& e1, const auto& e2) { return e1.count > e2.count; });
-
-                fmt::memory_buffer out;
-                for (const auto& en : pairs)
-                    en.format_to(out, format, static_cast<double>(total));
-                return fmt::to_string(out);
+        {
+            std::vector<value_type> pairs;
+            size_t total{0};
+            for (auto iter = at(pos); iter != at(pos + 1) && iter->aa != nothing; ++iter) {
+                pairs.push_back(*iter);
+                total += iter->count;
             }
+            std::sort(std::begin(pairs), std::end(pairs), [](const auto& e1, const auto& e2) { return e1.count > e2.count; });
+
+            fmt::memory_buffer out;
+            for (const auto& en : pairs)
+                en.format_to(out, format, static_cast<double>(total));
+            return fmt::to_string(out);
+        }
 
         size_t allocated() const { return data_.capacity() * sizeof(value_type); }
         size_t max_count() const { return max_element(std::begin(data_), std::end(data_))->count; }
@@ -126,7 +132,7 @@ namespace acmacs::tal::inline v3
       private:
         data_type data_;
     };
-}
+} // namespace acmacs::tal::inline v3
 
 // ----------------------------------------------------------------------
 /// Local Variables:

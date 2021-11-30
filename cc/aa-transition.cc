@@ -49,6 +49,27 @@ void acmacs::tal::v3::detail::update_common_aa(Tree& tree, seqdb::pos0_t longest
 
 // ----------------------------------------------------------------------
 
+void acmacs::tal::v3::detail::update_common_aa_for_pos(Tree& tree, seqdb::pos0_t pos, size_t number_of_aas)
+{
+    tree.resize_common_aa(1, number_of_aas);
+    size_t max_count{0};
+    tree::iterate_post(tree, [&max_count, pos](Node& node) {
+        for (auto& child : node.subtree) {
+            if (!child.hidden) {
+                if (child.is_leaf())
+                    node.common_aa_->update(seqdb::sequence_aligned_ref_t{child.aa_sequence->substr(*pos, 1)});
+                else
+                    node.common_aa_->update(*child.common_aa_);
+            }
+        }
+        max_count = std::max(max_count, node.common_aa_.max_count());
+    });
+    AD_INFO("update_common_aa_for_pos {}: max_count: {}", pos, max_count);
+
+} // acmacs::tal::v3::detail::update_common_aa_for_pos
+
+// ----------------------------------------------------------------------
+
 void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATransitionsParameters& parameters)
 {
     switch (parameters.method) {

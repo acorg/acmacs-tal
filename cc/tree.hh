@@ -143,6 +143,8 @@ namespace acmacs::tal::inline v3
         CommonAA_Ptr common_aa_;
         const Node* node_for_left_aa_transitions_{nullptr};
 
+        // 2021-11-30: attempt to reduce memory usage for eu-20200915 algorithm
+
         // -------------------- drawing support --------------------
         mutable double cumulative_vertical_offset_{0.0};
         constexpr static const double default_vertical_offset{1.0};
