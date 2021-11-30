@@ -79,6 +79,9 @@ void acmacs::tal::v3::update_aa_transitions(Tree& tree, const draw_tree::AATrans
         case draw_tree::AATransitionsParameters::method::eu_20200915:
             detail::update_aa_transitions_eu_20200915(tree, parameters);
             break;
+        case draw_tree::AATransitionsParameters::method::eu_20200915_low_mem:
+            detail::update_aa_transitions_eu_20200915_per_pos(tree, parameters); // reduce memory usage to handle huge sars trees
+            break;
         case draw_tree::AATransitionsParameters::method::eu_20200514:
             detail::update_aa_transitions_eu_20200514(tree, parameters);
             break;
