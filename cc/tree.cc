@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <regex>
 #include <set>
+#include <unordered_map>
 #include <stack>
 
 #include "acmacs-base/statistics.hh"
@@ -8,6 +8,7 @@
 #include "acmacs-base/counter.hh"
 #include "acmacs-base/range-v3.hh"
 #include "acmacs-base/string-join.hh"
+#include "acmacs-base/regex.hh"
 #include "acmacs-virus/virus-name-normalize.hh"
 #include "acmacs-virus/virus-name-v1.hh"
 #include "acmacs-chart-2/chart.hh"
@@ -1214,33 +1215,76 @@ void acmacs::tal::v3::Tree::clade_report(std::string_view clade_name_to_report) 
 
 // ----------------------------------------------------------------------
 
+struct string_hash
+{
+    using hash_type = std::hash<std::string_view>;
+    using is_transparent = void;
+
+    size_t operator()(const char* str) const        { return hash_type{}(str); }
+    size_t operator()(std::string_view str) const   { return hash_type{}(str); }
+    size_t operator()(std::string const& str) const { return hash_type{}(str); }
+};
+
 void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
 {
     if (!chart_matched_) {
         auto antigens = chart.antigens();
         auto sera = chart.sera();
-        std::map<std::string, size_t, std::less<>> antigen_names;
-        std::map<acmacs::virus::name_t, std::vector<size_t>, std::less<>> serum_names;
-        for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
-            antigen_names[antigens->at(ag_no)->name_full()] = ag_no;
+        std::unordered_map<std::string, size_t, string_hash, std::equal_to<>> antigen_names, antigen_names_full;
+        std::unordered_map<std::string, std::vector<size_t>, string_hash, std::equal_to<>> serum_names;
         for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
-            serum_names[sera->at(sr_no)->name()].push_back(sr_no);
-        serum_to_node_.resize(sera->size());
-        tree::iterate_leaf(*this, [&antigen_names, &serum_names, &sera, this](const Node& node) {
+            serum_names[*sera->at(sr_no)->name()].push_back(sr_no);
+
+        const auto match_seqdb3_names = [&antigens, &antigen_names_full, &serum_names, &sera, this](const Node& node) {
+            if (antigen_names_full.empty()) {
+                for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
+                    antigen_names_full[antigens->at(ag_no)->name_full()] = ag_no;
+            }
             for (const auto& hi_name : node.hi_names) {
-                if (const auto found = antigen_names.find(hi_name); found != std::end(antigen_names)) {
+                if (const auto found = antigen_names_full.find(hi_name); found != std::end(antigen_names_full)) {
                     node.antigen_index_in_chart_ = found->second;
                     break;
                 }
             }
             const auto parsed_seq_id = acmacs::virus::name::parse(node.seq_id);
-            if (const auto found = serum_names.find(parsed_seq_id.name()); found != std::end(serum_names)) {
+            // AD_DEBUG("parsed_seq_id \"{}\" <- \"{}\"", parsed_seq_id.name(), node.seq_id);
+            if (const auto found = serum_names.find(*parsed_seq_id.name()); found != std::end(serum_names)) {
                 for (auto serum_index : found->second) {
                     node.serum_index_in_chart_.push_back({serum_index, sera->at(serum_index)->reassortant() == parsed_seq_id.reassortant,
                                                           sera->at(serum_index)->passage().is_egg() == parsed_seq_id.passage.is_egg(), sera->at(serum_index)->passage() == parsed_seq_id.passage});
                     serum_to_node_[serum_index].nodes.push_back(&node);
                 }
             }
+        };
+
+        const std::regex year_passage_sep{"/(?:19|20)[0-9][0-9](_)", acmacs::regex::icase};
+        const auto match_seqdb4_names = [&antigens, &antigen_names, &serum_names, &sera, &year_passage_sep, this](const Node& node) {
+            using namespace std::string_view_literals;
+            if (antigen_names.empty()) {
+                for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no) {
+                    std::string name = antigens->at(ag_no)->format("{name_without_subtype}"sv);
+                    ::string::replace_in_place(name, ' ', '_');
+                    antigen_names[name] = ag_no;
+                    // AD_DEBUG("\"{}\" -> {}", name, ag_no);
+                }
+            }
+            std::string_view seq_name{node.seq_id};
+            std::cmatch match;
+            if (acmacs::regex::search(node.seq_id, match, year_passage_sep))
+                seq_name.remove_suffix(seq_name.size() - static_cast<size_t>(match.position(1)));
+            // AD_DEBUG("parsed_seq_id \"{}\" <- \"{}\"", seq_name, node.seq_id);
+            if (const auto found = antigen_names.find(seq_name); found != antigen_names.end())
+                node.antigen_index_in_chart_ = found->second;
+            // else
+            //     AD_DEBUG("name not in chart: \"{}\"", seq_name);
+        };
+
+        serum_to_node_.resize(sera->size());
+        tree::iterate_leaf(*this, [match_seqdb3_names, match_seqdb4_names](const Node& node) {
+            if ((node.seq_id[0] == 'A' || node.seq_id[0] == 'B') && (node.seq_id[1] == '/' || node.seq_id[1] == '('))
+                match_seqdb3_names(node);
+            else
+                match_seqdb4_names(node);
         });
         for (const auto sr_no : range_from_0_to(sera->size())) {
             if (auto& nodes = serum_to_node_[sr_no].nodes; !nodes.empty()) {
