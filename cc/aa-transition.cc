@@ -64,7 +64,7 @@ void acmacs::tal::v3::detail::update_common_aa_for_pos(Tree& tree, seqdb::pos0_t
         }
         max_count = std::max(max_count, node.common_aa_.max_count());
     });
-    AD_INFO("update_common_aa_for_pos {}: max_count: {}", pos, max_count);
+    // AD_INFO("update_common_aa_for_pos {}: max_count: {}", pos, max_count);
 
 } // acmacs::tal::v3::detail::update_common_aa_for_pos
 
