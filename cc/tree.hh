@@ -124,9 +124,9 @@ namespace acmacs::tal::inline v3
         struct serum_from_chart_t
         {
             size_t serum_no;
-            bool reassortant_matches;
-            bool passage_type_matches;
-            bool passage_matches;
+            bool reassortant_matches{false};
+            bool passage_type_matches{false};
+            bool passage_matches{false};
         };
 
         mutable std::vector<serum_from_chart_t> serum_index_in_chart_;

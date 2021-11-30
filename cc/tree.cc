@@ -1232,13 +1232,15 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
         auto sera = chart.sera();
         std::unordered_map<std::string, size_t, string_hash, std::equal_to<>> antigen_names, antigen_names_full;
         std::unordered_map<std::string, std::vector<size_t>, string_hash, std::equal_to<>> serum_names;
-        for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
-            serum_names[*sera->at(sr_no)->name()].push_back(sr_no);
 
         const auto match_seqdb3_names = [&antigens, &antigen_names_full, &serum_names, &sera, this](const Node& node) {
             if (antigen_names_full.empty()) {
                 for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
                     antigen_names_full[antigens->at(ag_no)->name_full()] = ag_no;
+            }
+            if (serum_names.empty()) {
+                for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
+                    serum_names[*sera->at(sr_no)->name()].push_back(sr_no);
             }
             for (const auto& hi_name : node.hi_names) {
                 if (const auto found = antigen_names_full.find(hi_name); found != std::end(antigen_names_full)) {
@@ -1260,13 +1262,18 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
         const std::regex year_passage_sep{"/(?:19|20)[0-9][0-9](_)", acmacs::regex::icase};
         const auto match_seqdb4_names = [&antigens, &antigen_names, &serum_names, &sera, &year_passage_sep, this](const Node& node) {
             using namespace std::string_view_literals;
-            if (antigen_names.empty()) {
-                for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no) {
-                    std::string name = antigens->at(ag_no)->format("{name_without_subtype}"sv);
+            const auto make_name = [](const auto& ag_sr) {
+                    std::string name = ag_sr.format("{name_without_subtype}"sv);
                     ::string::replace_in_place(name, ' ', '_');
-                    antigen_names[name] = ag_no;
-                    // AD_DEBUG("\"{}\" -> {}", name, ag_no);
-                }
+                    return name;
+            };
+            if (antigen_names.empty()) {
+                for (size_t ag_no = 0; ag_no < antigens->size(); ++ag_no)
+                    antigen_names[make_name(*antigens->at(ag_no))] = ag_no;
+            }
+            if (serum_names.empty()) {
+                for (size_t sr_no = 0; sr_no < sera->size(); ++sr_no)
+                    serum_names[make_name(*sera->at(sr_no))].push_back(sr_no);
             }
             std::string_view seq_name{node.seq_id};
             std::cmatch match;
@@ -1277,6 +1284,12 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
                 node.antigen_index_in_chart_ = found->second;
             // else
             //     AD_DEBUG("name not in chart: \"{}\"", seq_name);
+            if (const auto found = serum_names.find(seq_name); found != std::end(serum_names)) {
+                for (auto serum_index : found->second) {
+                    node.serum_index_in_chart_.push_back({serum_index});
+                    serum_to_node_[serum_index].nodes.push_back(&node);
+                }
+            }
         };
 
         serum_to_node_.resize(sera->size());
