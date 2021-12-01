@@ -28,19 +28,23 @@ namespace acmacs::tal::inline v3
     {
       public:
         CommonAA(size_t number_of_positions, size_t number_of_aa) : at_pos_(number_of_positions, number_of_aa) {}
-        bool empty(seqdb::pos0_t pos) const { return at_pos_.empty(*pos); }
+        bool empty(seqdb::pos0_t pos) const { return at_pos_.empty(low_mem_mode() ? 0ul : *pos); }
         size_t allocated() const { return at_pos_.allocated(); }
         size_t max_count() const { return at_pos_.max_count(); }
 
+        bool low_mem_mode() const { return at_pos_.low_mem_mode(); }
+
         char at(seqdb::pos0_t pos) const
         {
-            return at_pos_.max(*pos);
+            if (!low_mem_mode())
+                return at_pos_.max(*pos);
+            else
+                return at_pos_.max(0); // support for eu-20200915-low-mem
         }
 
         template <bool dbg = false> char at(seqdb::pos0_t pos, double tolerance) const // tolerance: see AATransitionsParameters::non_common_tolerance_for() in draw-tree.hh
         {
-            // AD_DEBUG(dbg, "                CommonAA.at(pos:{}, tolerance:{}): at_pos_.size():{}", pos, tolerance, at_pos_.size());
-            if (at_pos_.size() == 1)
+            if (low_mem_mode())
                 pos = seqdb::pos0_t{0}; // for update_aa_transitions_eu_20200915_per_pos
             const auto total = at_pos_.total(*pos);
             if (const auto& max = at_pos_.max_count(*pos); (static_cast<double>(max.count) / static_cast<double>(total)) > tolerance) {

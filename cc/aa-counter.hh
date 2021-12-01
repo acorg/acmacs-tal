@@ -57,17 +57,17 @@ namespace acmacs::tal::inline v3
 
         AACounter(size_t a_number_of_positions, size_t a_number_of_aa) noexcept : number_of_positions{a_number_of_positions}, number_of_aa{a_number_of_aa}, data_(number_of_positions * number_of_aa) {}
 
+        size_t size() const { return data_.size(); }
+        bool low_mem_mode() const { return number_of_positions == 1; }
+
         bool empty(pos_t pos) const
         {
-            if (size() == 1)
-                pos = 0; // support for eu-20200915-low-mem
             return at(pos)->aa == nothing;
         }
-        size_t size() const { return data_.size(); }
 
         void count(pos_t pos, char aa, count_t increment = 1)
         {
-            if (size() == 1)
+            if (low_mem_mode())
                 pos = 0; // support for eu-20200915-low-mem
             for (auto iter = at(pos); iter != at(pos + 1); ++iter) {
                 if (iter->aa == aa) {
@@ -85,7 +85,7 @@ namespace acmacs::tal::inline v3
 
         void add(pos_t pos, const AACounter& other)
         {
-            if (size() == 1)
+            if (low_mem_mode())
                 pos = 0; // support for eu-20200915-low-mem
             if (auto obeg = other.at(pos); obeg->aa != nothing) {
                 if (const auto beg = at(pos); beg->aa == nothing)
@@ -99,7 +99,7 @@ namespace acmacs::tal::inline v3
 
         void add(const AACounter& other)
         {
-            if (size() == 1) {
+            if (low_mem_mode()) {
                 add(0, other); // support for eu-20200915-low-mem
             }
             else {
@@ -110,40 +110,29 @@ namespace acmacs::tal::inline v3
 
         const_iterator at(pos_t pos) const
         {
-            if (size() == 1)
-                pos = 0; // support for eu-20200915-low-mem
             return std::next(std::cbegin(data_), static_cast<ssize_t>(pos * number_of_aa));
         }
         iterator at(pos_t pos)
         {
-            if (size() == 1)
-                pos = 0; // support for eu-20200915-low-mem
             return std::next(std::begin(data_), static_cast<ssize_t>(pos * number_of_aa));
         }
 
         char max(pos_t pos) const
         {
-            if (data_.size() != 1)
-                return std::max_element(at(pos), at(pos + 1))->aa;
-            else
-                return std::max_element(at(0), at(1))->aa; // support for eu-20200915-low-mem
+            return std::max_element(at(pos), at(pos + 1))->aa;
         }
         const value_type& max_count(pos_t pos) const
         {
-            if (size() == 1)
-                pos = 0; // support for eu-20200915-low-mem
             return *std::max_element(at(pos), at(pos + 1));
         }
         auto total(pos_t pos) const
         {
-            if (size() == 1)
-                pos = 0; // support for eu-20200915-low-mem
             return std::accumulate(at(pos), at(pos + 1), count_t{0}, [](count_t sum, const auto& val) { return sum + val.count; });
         }
 
         std::string report_sorted_max_first(pos_t pos, std::string_view format) const
         {
-            if (size() == 1)
+            if (low_mem_mode())
                 pos = 0; // support for eu-20200915-low-mem
             std::vector<value_type> pairs;
             size_t total{0};
