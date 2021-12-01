@@ -56,8 +56,10 @@ void acmacs::tal::v3::detail::update_common_aa_for_pos(Tree& tree, seqdb::pos0_t
     tree::iterate_post(tree, [&max_count, pos](Node& node) {
         for (auto& child : node.subtree) {
             if (!child.hidden) {
-                if (child.is_leaf())
-                    node.common_aa_->update(seqdb::sequence_aligned_ref_t{child.aa_sequence->substr(*pos, 1)});
+                if (child.is_leaf()) {
+                    if (child.aa_sequence.size() > pos)
+                        node.common_aa_->update(seqdb::sequence_aligned_ref_t{child.aa_sequence->substr(*pos, 1)});
+                }
                 else
                     node.common_aa_->update(*child.common_aa_);
             }

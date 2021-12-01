@@ -259,6 +259,7 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200915_per_pos(Tree& tr
     const auto& root_sequence = tree.find_first_leaf().aa_sequence;
         // const auto total_leaves = tree.number_leaves_in_subtree();
     const auto [longest_sequence, number_of_aas] = tree.longest_aa_sequence();
+    auto start = acmacs::timestamp(), chunk_start = start;
     for (seqdb::pos0_t pos{0}; pos < longest_sequence; ++pos) {
         update_common_aa_for_pos(tree, pos, number_of_aas);
 
@@ -269,7 +270,12 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20200915_per_pos(Tree& tr
         // AD_DEBUG("update aa transitions");
         // const Timeit ti{"update aa transitions"};
         update_aa_transitions_eu_20200915_stage_3(tree, pos, root_sequence, parameters);
+        if ((*pos % 100) == 99) {
+            AD_DEBUG("aa_transitions eu-20200915-low-mem pos:{:5d}  time: {}", pos, acmacs::format_duration(acmacs::elapsed(chunk_start)));
+            chunk_start = acmacs::timestamp();
+        }
     }
+    AD_DEBUG("aa_transitions eu-20200915-low-mem positions: {}  time: {}", longest_sequence, acmacs::format_duration(acmacs::elapsed(start)));
 
     tree::iterate_pre(tree, [&parameters](Node& node) { node.aa_transitions_.remove_left_right_same(parameters, node); });
 
@@ -321,20 +327,13 @@ void acmacs::tal::v3::detail::set_aa_transitions_eu_20210205(Tree& tree, seqdb::
 void acmacs::tal::v3::detail::set_aa_transitions_eu_20210205_for_pos(Tree& tree, seqdb::pos0_t pos, const draw_tree::AATransitionsParameters& parameters)
 {
     const auto dbg = parameters.debug && parameters.report_pos && pos == *parameters.report_pos;
-    size_t nodes_processed{0};
-    auto start = acmacs::timestamp();
-    tree::iterate_post(tree, [pos, dbg, &parameters, &nodes_processed, &start](Node& node) {
+
+    tree::iterate_post(tree, [pos, dbg, &parameters](Node& node) {
         const auto non_common_tolerance = parameters.non_common_tolerance_for(pos);
         if (dbg)
             set_aa_transitions_for_pos_eu_20210205<true>(node, pos, non_common_tolerance);
         else
             set_aa_transitions_for_pos_eu_20210205<false>(node, pos, non_common_tolerance);
-
-        ++nodes_processed;
-        if ((nodes_processed % 10000) == 0) {
-            AD_DEBUG("nodes_processed: {}      last chunk: {}", nodes_processed, acmacs::format_duration(acmacs::elapsed(start)));
-            start = acmacs::timestamp();
-        }
     });
 
     if (parameters.debug && parameters.report_pos) {
