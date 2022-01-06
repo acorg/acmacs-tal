@@ -341,7 +341,7 @@ void acmacs::tal::v3::Settings::ladderize()
         tree().ladderize(Tree::Ladderize::NumberOfLeaves);
     else if (method == "max-edge-length"sv)
         tree().ladderize(Tree::Ladderize::MaxEdgeLength);
-    else
+    else if (method != "none"sv)
         throw acmacs::settings::v3::error{fmt::format("unsupported ladderize method: {}", method)};
 
 } // acmacs::tal::v3::Settings::ladderize
