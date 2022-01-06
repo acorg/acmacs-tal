@@ -708,9 +708,8 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
 
         node_id_t::value_type vertical{0};
         Node* prev_leaf{nullptr};
-        std::vector<Node*> parents;
 
-        const auto leaf = [&vertical, &prev_leaf, &parents](Node& node) {
+        const auto leaf = [&vertical, &prev_leaf](Node& node) {
             if (!node.hidden) {
                 node.node_id.vertical = vertical;
                 node.node_id.horizontal = 0;
@@ -722,18 +721,21 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
                     node.first_prev_leaf = nullptr;
                 node.last_next_leaf = nullptr;
                 prev_leaf = &node;
-                for (Node* parent : parents) {
-                    if (!parent->first_prev_leaf)
-                        parent->first_prev_leaf = &node;
-                    parent->last_next_leaf = &node;
-                }
+                // for (Node* parent : parents) {
+                //     if (!parent->first_prev_leaf)
+                //         parent->first_prev_leaf = &node;
+                //     parent->last_next_leaf = &node;
+                // }
                 ++vertical;
+            }
+            else {
+                node.node_id.vertical = node_id_t::NotSet;
+                node.node_id.horizontal = node_id_t::NotSet;
             }
         };
 
-        const auto pre = [&parents](Node& node) {
+        const auto pre = [](Node& node) {
             node.first_prev_leaf = nullptr; // reset
-            parents.push_back(&node);
             if (node.subtree.size() > 1) {
                 node.subtree.front().leaf_pos = leaf_position::first;
                 node.subtree.back().leaf_pos = leaf_position::last;
@@ -744,10 +746,26 @@ void acmacs::tal::v3::Tree::set_first_last_next_node_id()
                 node.subtree.front().leaf_pos = leaf_position::single;
         };
 
-        const auto post = [&parents](Node& node) {
+        const auto post = [](Node& node) {
             node.node_id.vertical = (node.subtree.front().node_id.vertical + node.subtree.back().node_id.vertical) / 2;
             node.node_id.horizontal = std::max(node.subtree.front().node_id.horizontal, node.subtree.back().node_id.horizontal) + 1;
-            parents.pop_back();
+            if (node.subtree.front().is_leaf())
+                node.first_prev_leaf = &node.subtree.front();
+            else
+                node.first_prev_leaf = node.subtree.front().first_prev_leaf;
+            if (node.subtree.back().is_leaf())
+                node.last_next_leaf = &node.subtree.back();
+            else
+                node.last_next_leaf = node.subtree.back().last_next_leaf;
+            node.number_leaves = 0;
+            for (const auto& child : node.subtree) {
+                if (!child.hidden) {
+                    if (child.is_leaf())
+                        ++node.number_leaves;
+                    else
+                        node.number_leaves += child.number_leaves;
+                }
+            }
         };
 
         tree::iterate_leaf_pre_post(*this, leaf, pre, post);
@@ -811,8 +829,10 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
     };
 
     const auto reorder_by_number_of_leaves = [reorder_by_max_edge_length](const Node& node1, const Node& node2) -> bool {
-        if (node1.number_leaves_in_subtree() == node2.number_leaves_in_subtree())
+        if (node1.number_leaves_in_subtree() == node2.number_leaves_in_subtree()) {
+            // AD_DEBUG(node1.number_leaves_in_subtree() > 2, "same number_leaves_in_subtree: {} {} {}", node1.number_leaves_in_subtree(), node1.node_id, node2.node_id);
             return reorder_by_max_edge_length(node1, node2);
+        }
         else
             return node1.number_leaves_in_subtree() < node2.number_leaves_in_subtree();
     };
@@ -831,7 +851,7 @@ void acmacs::tal::v3::Tree::ladderize(Ladderize method)
             break;
         case Ladderize::NumberOfLeaves:
             AD_INFO("ladderizing by NumberOfLeaves");
-            number_leaves_in_subtree();
+            AD_INFO("number_leaves_in_subtree: {}", number_leaves_in_subtree());
             tree::iterate_post(*this, [reorder_by_number_of_leaves](Node& node) { std::sort(node.subtree.begin(), node.subtree.end(), reorder_by_number_of_leaves); });
             break;
         case Ladderize::None:

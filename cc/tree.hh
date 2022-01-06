@@ -49,7 +49,7 @@ namespace acmacs::tal::inline v3
 
     struct node_id_t
     {
-        using value_type = unsigned short;
+        using value_type = unsigned;
         constexpr static const value_type NotSet{static_cast<value_type>(-1)};
 
         value_type vertical{NotSet};
@@ -100,6 +100,7 @@ namespace acmacs::tal::inline v3
         // branch node only
         Subtree subtree;
         std::vector<std::string_view> aa_substs;
+        size_t number_leaves{1}; // set in set_first_last_next_node_id()
 
         // -> export
         double edge_line_width_scale{1.0};
@@ -161,19 +162,7 @@ namespace acmacs::tal::inline v3
         void hide();
         void populate(const acmacs::seqdb::ref& a_ref, const acmacs::seqdb::Seqdb& seqdb);
 
-        size_t number_leaves_in_subtree() const
-        {
-            if (!is_leaf()) {
-                if (!first_prev_leaf || !last_next_leaf) {
-                    // AD_WARNING("first_prev_leaf or last_next_leaf is null, all subtree is hidden?", subtree.size(), fmt::ptr(subtree[0].first_prev_leaf));
-                    return 0;
-                }
-                else
-                    return last_next_leaf->node_id.vertical - first_prev_leaf->node_id.vertical + 1;
-            }
-            else
-                return 1;
-        }
+        size_t number_leaves_in_subtree() const { return number_leaves; }
 
         // char aa_at(seqdb::pos0_t pos0) const { return is_leaf() ? aa_sequence.at(pos0) : common_aa_.at(pos0); }
 
