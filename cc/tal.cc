@@ -68,7 +68,7 @@ int main(int argc, const char* argv[])
         tal.import_chart(opt.chart_file);
 
         acmacs::tal::Settings settings{tal};
-        settings.load_from_conf({"tal.json"sv, "clades.json"sv, "vaccines.json"sv});
+        settings.load_from_conf({"tal.json"sv, "vaccines.json"sv});
         settings.load(opt.settings_files);
         settings.set_defines(opt.defines);
 
@@ -167,6 +167,3 @@ void signal_handler(int sig_num)
 } // signal_handler
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

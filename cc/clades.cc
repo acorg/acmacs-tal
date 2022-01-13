@@ -87,6 +87,7 @@ void acmacs::tal::v3::Clades::make_sections()
 
     tal().tree().make_clade_sections();
     const auto& tree_clades = tal().tree().clades();
+    AD_LOG(acmacs::log::clades, "make_sections tree_clades: {}", tree_clades.size());
     for (const auto& tree_clade : tree_clades) {
         AD_LOG(acmacs::log::clades, "tree clade {}", tree_clade.name);
         const auto& clade_param = parameters_for_clade(tree_clade.name);
@@ -356,6 +357,3 @@ acmacs::tal::v3::Clades::CladeParameters& acmacs::tal::v3::Clades::Parameters::f
 } // acmacs::tal::v3::Clades::Parameters::find_or_add_pre_clade
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

@@ -118,8 +118,8 @@
             {"N": "nodes", "select": {"vaccine": {"type": "current", "passage": "cell"}, "report": false}, "apply": "report"}
         ]},
 
-        {"N": "if", "condition": {"and": ["$whocc", {"not-empty": "$virus-type"}]}, "then": [
-            "clades-whocc"
+        {"?N": "if", "condition": {"and": ["$whocc", {"not-empty": "$virus-type"}]}, "then": [
+            "clades-whocc obsolete"
         ]},
 
         {"N": "if", "condition": "$report-aa-at-pos-counter", "then": [{"N": "aa-at-pos-counter-report", "tolerance": 0.01}]},
@@ -179,7 +179,7 @@
         ]}
     ],
 
-    "clades-whocc": [
+    "? obsolete clades-whocc": [
         "clades-{virus-type/lineage-subset}",
         {"N": "clades",
          "per-clade": [

@@ -138,6 +138,3 @@ template <> struct fmt::formatter<acmacs::tal::Clades::slot_no_t> : fmt::formatt
 };
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

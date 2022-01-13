@@ -1115,12 +1115,22 @@ const acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::str
 
 acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_clade(std::string_view clade_name)
 {
+    // AD_DEBUG("Tree::find_clade \"{}\"", clade_name);
     if (auto found = std::find_if(std::begin(clades_), std::end(clades_), [clade_name](const auto& cl) { return cl.name == clade_name; }); found != std::end(clades_))
         return &*found;
     else
         return nullptr;
 
 } // acmacs::tal::v3::Tree::find_clade
+
+acmacs::tal::v3::Tree::clade_t* acmacs::tal::v3::Tree::find_or_add_clade(std::string_view name)
+{
+    if (auto* found = find_clade(name); found)
+        return found;
+    else
+        return &clades_.emplace_back(name, name);
+
+} // acmacs::tal::v3::Tree::find_or_add_clade
 
 // ----------------------------------------------------------------------
 
@@ -1188,7 +1198,7 @@ void acmacs::tal::v3::Tree::make_clade_sections()
     tree::iterate_leaf(*this, [this, &clade_data_found](Node& node) {
         if (!node.hidden) {
             for (const auto& clade_name : node.clades) {
-                if (clade_t* clade = find_clade(clade_name); clade) {
+                if (clade_t* clade = find_or_add_clade(clade_name); clade) {
                     if (clade->sections.empty() || (node.node_id.vertical - clade->sections.back().last->node_id.vertical) > 1)
                         clade->sections.emplace_back(&node);
                     else
@@ -1198,8 +1208,10 @@ void acmacs::tal::v3::Tree::make_clade_sections()
             }
         }
     });
-    if (!clade_data_found)
-        AD_WARNING("no clade names found in tree nodes, forgot to add \"clades-{{virus-type/lineage}}\" or \"clades-whocc\" in settings?");
+    if (!clade_data_found) {
+        // AD_WARNING("no clade names found in tree nodes, forgot to add \"clades-{{virus-type/lineage}}\" or \"clades-whocc\" in settings?");
+        AD_WARNING("no clade names found in tree nodes, forgot to populate tree with ae tree-to-json?");
+    }
 
 } // acmacs::tal::v3::Tree::make_clade_sections
 
@@ -1470,6 +1482,3 @@ acmacs::tal::v3::NodeSet acmacs::tal::v3::Tree::closest_leaf_subtree_size(size_t
 } // acmacs::tal::v3::Tree::closest_leaf_subtree_size
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

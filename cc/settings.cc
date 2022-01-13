@@ -924,7 +924,9 @@ void acmacs::tal::v3::Settings::read_per_clade(Clades::Parameters& parameters)
 {
     using namespace std::string_view_literals;
     for (const rjson::v3::value& for_clade : getenv("per-clade"sv).array()) {
-        if (const auto& name = for_clade["name"sv]; !name.is_null())
+        if (for_clade.is_string() && !for_clade.to<std::string_view>().empty() && for_clade.to<std::string_view>()[0] == '?')
+            ; // ignore
+        else if (const auto& name = for_clade["name"sv]; !name.is_null())
             read_clade_parameters(for_clade, parameters.find_or_add_pre_clade(name.to<std::string_view>()));
     }
 
@@ -1459,6 +1461,3 @@ void acmacs::tal::v3::Settings::select_vaccine(NodeSet& nodes, Tree::Select upda
 } // acmacs::tal::v3::Settings::select_vaccine
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

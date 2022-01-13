@@ -346,6 +346,7 @@ namespace acmacs::tal::inline v3
       private:
         const clade_t* find_clade(std::string_view name) const;
         clade_t* find_clade(std::string_view name);
+        clade_t* find_or_add_clade(std::string_view name);
         std::vector<const Node*> sorted_by_edge() const;
         double mean_edge_of(double fraction_or_number,
                             const std::vector<const Node*>& sorted) const; // nodes sorted by edge, longest nodes (fraction of all or by number) taken and their mean edge calculated
@@ -414,6 +415,3 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
 };
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:
