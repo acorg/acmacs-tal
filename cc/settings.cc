@@ -1131,7 +1131,7 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
         for (const auto& [aa, color_data] : colors.object())
             param.colors_by_aa.emplace_or_replace(aa[0], color_data.to<std::string_view>());
     }
-    else
+    else if (!colors.is_null())
         throw error{fmt::format("\"dash-bar-aa-at\" \"colors\" invalid: {}", colors)};
 
     if (const auto& labels = getenv("labels"sv); labels.is_array()) {
@@ -1142,7 +1142,7 @@ void acmacs::tal::v3::Settings::add_dash_bar_aa_at()
         for (const auto& [aa, label_data] : labels.object())
             read_label_parameters(label_data, param.labels_by_aa.emplace_or_replace(aa[0], parameters::Label{}).second);
     }
-    else
+    else if (!labels.is_null())
         throw error{fmt::format("\"dash-bar-aa-at\" \"labels\" invalid: {}", labels)};
 
 } // acmacs::tal::v3::Settings::add_dash_bar_aa_at

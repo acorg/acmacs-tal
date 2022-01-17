@@ -324,6 +324,3 @@ void acmacs::tal::v3::AntigenicMaps::antigen_fill_time_series_color_scale(const 
 } // acmacs::tal::v3::AntigenicMaps::antigen_fill_time_series_color_scale
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:
