@@ -1321,10 +1321,11 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
 
         serum_to_node_.resize(sera->size());
         tree::iterate_leaf(*this, [match_seqdb3_names, match_seqdb4_names](const Node& node) {
-            if ((node.seq_id[0] == 'A' || node.seq_id[0] == 'B') && (node.seq_id[1] == '/' || node.seq_id[1] == '('))
+            if ((node.seq_id[0] == 'A' || node.seq_id[0] == 'B') && (node.seq_id[1] == '/' || node.seq_id[1] == '(')) {
+                AD_WARNING("trying match_seqdb3_names \"{}\"", node.seq_id);
                 match_seqdb3_names(node);
-            else
-                match_seqdb4_names(node);
+            }
+            match_seqdb4_names(node); // match seqdb4 anyway
         });
         for (const auto sr_no : range_from_0_to(sera->size())) {
             if (auto& nodes = serum_to_node_[sr_no].nodes; !nodes.empty()) {
