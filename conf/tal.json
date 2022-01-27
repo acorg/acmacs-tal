@@ -165,8 +165,9 @@
             {"N": "dash-bar-clades",
              "width-to-height-ratio": 0.009,
              "clades": [
-                 {"name": "2DEL2017", "color": "#A0A0A0"},
-                 {"name": "3DEL2017", "color": "#606060"}
+                 {"name": "V1A.1", "color": "#A0A0A0"},
+                 {"name": "V1A.2", "color": "#606060"},
+                 {"name": "V1A.3", "color": "#606060"}
              ],
              "?dash": {"width": 1.0, "line_width_pixels": 0.5}, "?": "dash width is a fraction of area width",
              "?debug-outline": "lightblue"},
