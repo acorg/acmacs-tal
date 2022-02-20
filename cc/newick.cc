@@ -218,6 +218,3 @@ std::string acmacs::tal::v3::newick_export(const Tree& tree, const ExportOptions
 } // acmacs::tal::v3::newick_export
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

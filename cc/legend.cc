@@ -50,6 +50,3 @@ void acmacs::tal::v3::LegendColoredByPos::draw(acmacs::surface::Surface& surface
 } // acmacs::tal::v3::LegendColoredByPos::draw
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

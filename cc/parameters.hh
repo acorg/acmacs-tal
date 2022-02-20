@@ -62,6 +62,3 @@ namespace acmacs::tal::inline v3::parameters
 } // namespace acmacs::tal::inline v3::parameters
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

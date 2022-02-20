@@ -251,6 +251,3 @@ void acmacs::tal::v3::DrawAATransitions::draw_transitions(acmacs::surface::Surfa
 } // acmacs::tal::v3::DrawAATransitions::draw_transitions
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

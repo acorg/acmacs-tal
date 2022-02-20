@@ -53,6 +53,3 @@ to_json::object export_node(const acmacs::tal::v3::Node& node)
 } // export_node
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

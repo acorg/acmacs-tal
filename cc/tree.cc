@@ -582,7 +582,7 @@ void acmacs::tal::v3::Tree::hide(const NodeSet& nodes, hide_if_too_many_leaves f
     const auto total_leaves{number_leaves_in_subtree()};
     const auto percent_to_hide{double(leaves_to_hide) / double(total_leaves) * 100.0};
 
-    if ((leaves_to_hide * 2) > total_leaves && force == hide_if_too_many_leaves::no) {
+    if (leaves_to_hide > 1 && (leaves_to_hide * 2) > total_leaves && force == hide_if_too_many_leaves::no) {
         AD_WARNING("requested to hide too many leaves (ignored): {} nodes with {} leaves ({:.1f}% of all leaves)", nodes.size(), leaves_to_hide, percent_to_hide);
         return;
     }

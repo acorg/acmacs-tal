@@ -242,6 +242,3 @@ std::vector<std::string> acmacs::tal::v3::AA_Transitions::names(const std::vecto
 } // acmacs::tal::v3::AA_Transitions::names
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

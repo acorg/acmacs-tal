@@ -59,6 +59,3 @@ void acmacs::tal::v3::Tal::export_tree(std::string_view filename, const ExportOp
 } // acmacs::tal::v3::Tal::export_tree
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

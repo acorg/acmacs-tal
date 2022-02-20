@@ -240,6 +240,3 @@ namespace acmacs::tal::inline v3::tree
 } // namespace acmacs::tal::inlinev3::tree
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

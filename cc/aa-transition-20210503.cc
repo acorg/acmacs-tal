@@ -184,6 +184,3 @@ void acmacs::tal::v3::detail::update_aa_transitions_eu_20210503(Tree& tree, cons
 }
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

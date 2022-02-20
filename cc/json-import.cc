@@ -218,6 +218,3 @@ void acmacs::tal::v3::json_import(std::string_view filename, Tree& tree)
 } // acmacs::tal::v3::json_import
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

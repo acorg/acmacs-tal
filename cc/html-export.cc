@@ -197,6 +197,3 @@ void add_nodes_text(fmt::memory_buffer& text, const acmacs::tal::v3::Node& node,
 } // add_nodes_text
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

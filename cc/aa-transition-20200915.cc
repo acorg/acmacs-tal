@@ -647,6 +647,3 @@ void acmacs::tal::v3::detail::update_aa_transitions_derek_2016(Tree& tree, const
 // } // acmacs::tal::v3::set_aa_transitions_eu_20200915
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

@@ -39,6 +39,3 @@ namespace acmacs::tal::inline v3
 } // namespace acmacs::tal::inlinev3
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

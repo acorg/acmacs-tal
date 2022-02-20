@@ -147,6 +147,3 @@ void acmacs::tal::v3::DrawOnTree::draw_on_tree(acmacs::surface::Surface& surface
 } // acmacs::tal::v3::DrawOnTree::draw_on_tree
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

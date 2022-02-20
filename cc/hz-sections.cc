@@ -276,6 +276,3 @@ void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) c
 } // acmacs::tal::v3::HzSectionMarker::draw
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

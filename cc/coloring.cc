@@ -196,6 +196,3 @@ void acmacs::tal::v3::ColoringByPosAAFrequency::prepare()
 } // acmacs::tal::v3::ColoringByPosAAFrequency::prepare
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

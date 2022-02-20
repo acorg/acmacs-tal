@@ -280,6 +280,3 @@ void acmacs::tal::v3::Gap::prepare(preparation_stage_t stage)
 } // acmacs::tal::v3::Gap::prepare
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

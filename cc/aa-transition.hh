@@ -378,6 +378,3 @@ template <> struct fmt::formatter<acmacs::tal::AA_Transitions> : fmt::formatter<
 
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

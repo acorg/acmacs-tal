@@ -29,6 +29,3 @@ void acmacs::tal::v3::Title::draw(acmacs::surface::Surface& surface) const
 } // acmacs::tal::v3::Title::draw
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:

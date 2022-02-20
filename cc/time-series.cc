@@ -479,6 +479,3 @@ void acmacs::tal::v3::TimeSeriesWithShift::draw_legend(acmacs::surface::Surface&
 } // acmacs::tal::v3::TimeSeriesWithShift::draw_legend
 
 // ----------------------------------------------------------------------
-/// Local Variables:
-/// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
-/// End:
