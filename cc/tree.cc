@@ -1337,7 +1337,7 @@ void acmacs::tal::v3::Tree::match(const acmacs::chart::Chart& chart) const
                     const auto sr_en_2 = ranges::find_if(n2->serum_index_in_chart_, pred);
                     return rank(*sr_en_1) > rank(*sr_en_2);
                 });
-                // AD_DEBUG("serum nodes {:3d} {:2d} {}", sr_no, serum_to_node_[sr_no].nodes.size(), nodes.front()->seq_id);
+                AD_DEBUG("serum nodes {:3d} {:2d} {} {}", sr_no, serum_to_node_[sr_no].nodes.size(), nodes.front()->seq_id, nodes.front()->node_id);
             }
         }
         chart_matched_ = true;
