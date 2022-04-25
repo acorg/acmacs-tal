@@ -101,6 +101,30 @@ void acmacs::tal::v3::ColoringByPosBase::sort_colors_by_frequency()
 void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& surface, const PointCoordinates& origin, legend_layout layout, Color title_color, Scaled text_size, double interleave,
                                                      legend_show_count show_count, legend_show_pos show_pos, double count_scale, Color count_color) const
 {
+    const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W'), text_size);
+    const auto count_text_size{text_size * count_scale};
+
+    Size legend_box_size;
+    PointCoordinates legend_box_offset = origin;
+    switch (layout) {
+        case legend_layout::vertical:
+            break;
+        case legend_layout::horizontal:
+            legend_box_size.height = *text_size * 1.2;
+            legend_box_offset.y(legend_box_offset.y() - *text_size);
+            if (show_pos == legend_show_pos::yes)
+                legend_box_size.width += surface.text_size(fmt::format("{}", pos()), text_size).width;
+            for (const auto& [aa, color_count] : colors()) {
+                if (aa != ' ') { // ignore data for absent or short sequences, it is ugly and misleading in the legend
+                    legend_box_size.width += *text_size * (1.0 + interleave);
+                }
+            }
+            legend_box_size.width += *count_text_size * 1.5;
+            break;
+    }
+
+    surface.rectangle_filled(legend_box_offset, legend_box_size, WHITE, Pixels{0}, WHITE);
+
     auto text_origin{origin};
     if (show_pos == legend_show_pos::yes) {
         const auto pos_text{fmt::format("{}", pos())};
@@ -120,8 +144,6 @@ void acmacs::tal::v3::ColoringByPosBase::draw_legend(acmacs::surface::Surface& s
     }
 
     const auto total_percent = static_cast<double>(total_count()) / 100.0;
-    const auto count_text_size{text_size * count_scale};
-    const auto [aa_height, aa_width] = surface.text_size(std::string(1, 'W'), text_size);
     for (const auto& [aa, color_count] : colors()) {
         if (aa != ' ') { // ignore data for absent or short sequences, it is ugly and misleading in the legend
             switch (layout) {
