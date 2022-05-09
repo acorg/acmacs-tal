@@ -1256,6 +1256,7 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
         aa_transitions.calculate = true;
         getenv_copy_if_present("report"sv, aa_transitions.report);
         getenv_copy_if_present("debug"sv, aa_transitions.debug);
+        getenv_copy_if_present("use-nuc"sv, aa_transitions.use_nuc);
         getenv_copy_if_present("non-common-tolerance"sv, aa_transitions.non_common_tolerance);
         getenv_copy_if_present("add-to-leaves"sv, aa_transitions.add_to_leaves);
 

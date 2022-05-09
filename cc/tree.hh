@@ -212,6 +212,7 @@ namespace acmacs::tal::inline v3
         void lineage(std::string_view lineage) { lineage_.assign(lineage); }
 
         bool has_sequences() const;
+        void replace_aa_sequence_with_nuc();  // hack to make nuc transitions
 
         NodePath find_path_by_seq_id(const seq_id_t& look_for) const;
         const Node* find_node_by_seq_id(const seq_id_t& look_for) const;

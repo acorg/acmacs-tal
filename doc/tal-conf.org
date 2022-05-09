@@ -1,4 +1,4 @@
-# Time-stamp: <2021-09-24 15:15:27 eu>
+# Time-stamp: <2022-05-09 09:24:12 eu>
 
 bjorn [145, 155, 156, 158, 159, 189, 193]
 
@@ -199,21 +199,22 @@ If multiple criteria specified within single "select" object, they all used (con
 
 
 #+BEGIN_SRC json
-{"N": "draw-aa-transitions",
- "report": false, "debug": false, "?debug-pos": 278, "?show-same-left-right-for-pos": 160,
- "method": "eu-20210503", "?method": ["eu-20210503", "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"],
- "minimum-number-leaves-in-subtree": 0.01, "?minimum-number-leaves-in-subtree": "if < 1 - relative to total, if > 1 - absolute value",
- "?minimum-number-leaves-in-subtree-per-pos": {"94": 0.0037},
- "non-common-tolerance": 0.6, "?non-common-tolerance": "if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node",
- "?non-common-tolerance-per-pos": {"144": 0.7, "159": 0.7},
- "text-line-interleave": 0.3,
- "add-to-leaves": false, "?add-to-leaves": "eu-20210503 only, add labels to leaves (SARS2, Sam T request 2021-05-11)",
- "show": true,
- "?only-for": [<pos>], "? only-for": "draw only for the specified pos, if list is absent or empty, draw for all pos",
- "all-nodes": {"node_id": "", "label": "{<[[Label parameters]]>}"},
- "per-node": [
- ],
-},
+  {"N": "draw-aa-transitions",
+   "report": false, "debug": false, "?debug-pos": 278, "?show-same-left-right-for-pos": 160,
+   "method": "eu-20210503", "?method": ["eu-20210503", "eu-20200915", "eu-20200909", "derek-20200907", "derek-2016", "eu-20200514"],
+   "use-nuc": false,
+   "minimum-number-leaves-in-subtree": 0.01, "?minimum-number-leaves-in-subtree": "if < 1 - relative to total, if > 1 - absolute value",
+   "?minimum-number-leaves-in-subtree-per-pos": {"94": 0.0037},
+   "non-common-tolerance": 0.6, "?non-common-tolerance": "if in the intermediate node most freq aa occupies more that this value (relative to total), consider the most freq aa to be common in this node",
+   "?non-common-tolerance-per-pos": {"144": 0.7, "159": 0.7},
+   "text-line-interleave": 0.3,
+   "add-to-leaves": false, "?add-to-leaves": "eu-20210503 only, add labels to leaves (SARS2, Sam T request 2021-05-11)",
+   "show": true,
+   "?only-for": [<pos>], "? only-for": "draw only for the specified pos, if list is absent or empty, draw for all pos",
+   "all-nodes": {"node_id": "", "label": "{<[[Label parameters]]>}"},
+   "per-node": [
+   ],
+  },
 #+END_SRC
 
 #+BEGIN_SRC bash

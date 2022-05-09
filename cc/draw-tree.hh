@@ -20,6 +20,7 @@ namespace acmacs::tal::inline v3
             bool calculate{false};
             bool report{false};
             bool debug{false};
+            bool use_nuc{false}; // hack to use nuc in place of aa
             std::optional<seqdb::pos1_t> report_pos;
             size_t report_number_leaves_threshold{20};
             std::optional<seqdb::pos1_t> show_same_left_right_for_pos;

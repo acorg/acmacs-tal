@@ -1154,6 +1154,20 @@ bool acmacs::tal::v3::Tree::has_sequences() const
 
 // ----------------------------------------------------------------------
 
+// hack to make nuc transitions
+void acmacs::tal::v3::Tree::replace_aa_sequence_with_nuc()
+{
+    acmacs::tal::tree::iterate_leaf(*this, [](acmacs::tal::Node& node) {
+        if (node.nuc_sequence.empty())
+            AD_WARNING("replace_aa_sequence_with_nuc: no nuc sequence for {}", node.seq_id);
+        // throw error(fmt::format("replace_aa_sequence_with_nuc: no nuc sequence for {}", node.seq_id));
+        node.aa_sequence = node.nuc_sequence;
+    });
+
+} // acmacs::tal::v3::Tree::replace_aa_sequence_with_nuc
+
+// ----------------------------------------------------------------------
+
 template <typename AA_AT> static inline void clade_set_by(std::string_view clade_name, AA_AT&& aa_at_pos, std::string_view display_name, acmacs::tal::Tree& tree)
 {
     tree.add_clade(clade_name, display_name);

@@ -28,8 +28,11 @@ void acmacs::tal::v3::DrawTree::prepare(preparation_stage_t stage)
     if (stage == 1 && prepared_ < stage) {
         // AD_DEBUG("DrawTree::prepare");
         tree.set_first_last_next_node_id();
-        if (parameters().aa_transitions.calculate)
+        if (parameters().aa_transitions.calculate) {
+            if (parameters().aa_transitions.use_nuc)
+                tree.replace_aa_sequence_with_nuc(); // hack to make nuc transitions
             update_aa_transitions(tree, parameters().aa_transitions);
+        }
 
         tree::iterate_leaf(tree, [this](const Node& leaf) {
             if (!leaf.hidden)
