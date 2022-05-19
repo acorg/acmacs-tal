@@ -84,12 +84,12 @@ namespace acmacs::tal::inline v3
         EdgeLength edge_length{0.0};
         mutable EdgeLength cumulative_edge_length{EdgeLengthNotSet};
         bool hidden{false};
+        acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
+        acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
 
         // leaf node only
         seq_id_t seq_id;
         acmacs::seqdb::ref ref;
-        acmacs::seqdb::sequence_aligned_ref_t aa_sequence;
-        acmacs::seqdb::sequence_aligned_ref_t nuc_sequence;
         std::string_view strain_name; // from seqdb
         std::string_view date;
         std::string_view continent;
@@ -100,6 +100,7 @@ namespace acmacs::tal::inline v3
         // branch node only
         Subtree subtree;
         std::vector<std::string_view> aa_substs;
+        std::vector<std::string_view> nuc_substs;
         size_t number_leaves{1}; // set in set_first_last_next_node_id()
 
         // -> export

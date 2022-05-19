@@ -10,7 +10,7 @@ namespace
     class node_data : public in_json::stack_entry
     {
       public:
-        enum class array_processing { none, subnodes, hi_names, aa_substs, clades };
+        enum class array_processing { none, subnodes, hi_names, aa_substs, nuc_substs, clades };
 
         node_data(acmacs::tal::v3::Node& node) : node_{node} {}
 
@@ -53,6 +53,9 @@ namespace
                       break;
                   case 'A':
                       array_processing_ = array_processing::aa_substs;
+                      break;
+                  case 'B':
+                      array_processing_ = array_processing::nuc_substs;
                       break;
                   case 'h':
                       array_processing_ = array_processing::hi_names;
@@ -125,6 +128,9 @@ namespace
                     break;
                 case array_processing::aa_substs:
                     node_.aa_substs.push_back(data);
+                    break;
+                case array_processing::nuc_substs:
+                    node_.nuc_substs.push_back(data);
                     break;
                 case array_processing::clades:
                     node_.clades.add(std::string{data});
