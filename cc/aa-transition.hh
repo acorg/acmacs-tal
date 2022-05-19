@@ -247,6 +247,12 @@ namespace acmacs::tal::inline v3
         auto size() const { return data_.size(); }
         void add(seqdb::pos0_t pos, char right) { data_.emplace_back(pos, right); }
         void add(seqdb::pos0_t pos, char left, char right) { data_.emplace_back(pos, left, right); }
+        void add(std::string_view text)
+            {
+                const seqdb::pos1_t pos{std::stoul(text.substr(1, text.size() - 2))};
+                data_.emplace_back(pos, text.front(), text.back());
+            }
+
         bool remove(seqdb::pos0_t pos)
         {
             return remove_if([pos](const auto& en) { return en.pos == pos; });

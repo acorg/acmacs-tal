@@ -1164,6 +1164,11 @@ void acmacs::tal::v3::Tree::replace_aa_sequence_with_nuc()
         node.aa_sequence = node.nuc_sequence;
     });
 
+    // for "imported" method
+    acmacs::tal::tree::iterate_pre(*this, [](acmacs::tal::Node& node) {
+        node.aa_transitions_ = node.nuc_transitions_;
+    });
+
 } // acmacs::tal::v3::Tree::replace_aa_sequence_with_nuc
 
 // ----------------------------------------------------------------------

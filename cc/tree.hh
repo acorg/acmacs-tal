@@ -99,8 +99,8 @@ namespace acmacs::tal::inline v3
 
         // branch node only
         Subtree subtree;
-        std::vector<std::string_view> aa_substs;
-        std::vector<std::string_view> nuc_substs;
+        // std::vector<std::string_view> aa_substs;
+        // std::vector<std::string_view> nuc_substs;
         size_t number_leaves{1}; // set in set_first_last_next_node_id()
 
         // -> export
@@ -137,6 +137,7 @@ namespace acmacs::tal::inline v3
 
         // -------------------- AA transitions (branch node only) --------------------
         AA_Transitions aa_transitions_;
+        AA_Transitions nuc_transitions_; // "import" method only!
 
         // 20200514
         std::vector<const Node*> closest_leaves{}; // child leaves with minimal cumulative_edge_length, multiple leaves necessary because closest one may have X at some positions

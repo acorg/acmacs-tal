@@ -83,6 +83,7 @@ namespace
               case array_processing::subnodes:
                   return std::make_unique<node_data>(node_.subtree.emplace_back());
               case array_processing::aa_substs:
+              case array_processing::nuc_substs:
               case array_processing::hi_names:
               case array_processing::clades:
               case array_processing::none:
@@ -127,10 +128,10 @@ namespace
                     node_.hi_names.push_back(data);
                     break;
                 case array_processing::aa_substs:
-                    node_.aa_substs.push_back(data);
+                    node_.aa_transitions_.add(data);
                     break;
                 case array_processing::nuc_substs:
-                    node_.nuc_substs.push_back(data);
+                    node_.nuc_transitions_.add(data);
                     break;
                 case array_processing::clades:
                     node_.clades.add(std::string{data});
