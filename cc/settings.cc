@@ -1297,6 +1297,8 @@ void acmacs::tal::v3::Settings::add_draw_aa_transitions()
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::derek_2016;
             else if (method == "eu_20200514"sv || method == "eu-20200514"sv)
                 aa_transitions.method = draw_tree::AATransitionsParameters::method::eu_20200514;
+            else if (method == "imported"sv) // use transition labels stored in tjz
+                aa_transitions.method = draw_tree::AATransitionsParameters::method::imported;
             else
                 throw error{"\"draw-aa-transitions\": invalid \"method\" (\"eu-20200915\", \"eu-20200915-low-mem\", \"eu-20210503\", \"derek-2016\", \"eu-20200514\" expected)"};
         }

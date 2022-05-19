@@ -14,7 +14,7 @@ namespace acmacs::tal::inline v3
     {
         struct AATransitionsParameters
         {
-            enum class method { derek_2016, eu_20200514, eu_20200915, eu_20200915_low_mem, eu_20210503 };
+            enum class method { derek_2016, eu_20200514, eu_20200915, eu_20200915_low_mem, eu_20210503, imported };
 
             enum method method { method::eu_20210503 };
             bool calculate{false};
