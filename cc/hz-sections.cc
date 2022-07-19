@@ -256,18 +256,23 @@ void acmacs::tal::v3::HzSectionMarker::draw(acmacs::surface::Surface& surface) c
             const Scaled label_size{parameters().label_size * viewport.size.width};
             for (const auto& section : hz_sections->sections()) {
                 if (section.shown) {
-                    const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
-                    const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
-                    const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
-                    surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
-                    if (time_series) {
-                        tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
-                        tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
+                    if (section.first && section.last) {
+                        const auto pos_y_top = pos_y_above(*section.first, draw_tree->vertical_step());
+                        const auto pos_y_bottom = pos_y_below(*section.last, draw_tree->vertical_step());
+                        const std::vector<PointCoordinates> path{{viewport.left(), pos_y_top}, {viewport.right(), pos_y_top}, {viewport.right(), pos_y_bottom}, {viewport.left(), pos_y_bottom}};
+                        surface.path_outline(std::begin(path), std::end(path), parameters().line.color, parameters().line.line_width);
+                        if (time_series) {
+                            tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_top, parameters().line.color, parameters().line.line_width);
+                            tal().draw().layout().draw_horizontal_line_between(time_series, this, pos_y_bottom, parameters().line.color, parameters().line.line_width);
+                        }
+                        const auto prefix_size = surface.text_size(section.prefix, label_size);
+                        surface.rectangle_filled({viewport.right() - prefix_size.width * 0.7, pos_y_top + prefix_size.height * 0.5}, {prefix_size.width * 1.4, prefix_size.height * 2.0},
+                                                 parameters().line.color, Pixels{0}, WHITE);
+                        surface.text({viewport.right() - prefix_size.width * 0.5, pos_y_top + prefix_size.height * 2.0}, section.prefix, parameters().label_color, label_size);
                     }
-                    const auto prefix_size = surface.text_size(section.prefix, label_size);
-                    surface.rectangle_filled({viewport.right() - prefix_size.width * 0.7, pos_y_top + prefix_size.height * 0.5}, {prefix_size.width * 1.4, prefix_size.height * 2.0},
-                                             parameters().line.color, Pixels{0}, WHITE);
-                    surface.text({viewport.right() - prefix_size.width * 0.5, pos_y_top + prefix_size.height * 2.0}, section.prefix, parameters().label_color, label_size);
+                    else {
+                        AD_WARNING("HZ Section: \"{}\" cannot show section.first: {} section.last: {}", section.id, fmt::ptr(section.first), fmt::ptr(section.last));
+                    }
                 }
             }
         }
