@@ -82,7 +82,9 @@
         {"N": "tree", "color-by": "continent", "width-to-height-ratio": 0.48, "legend": {"show": true}, "debug-outline": false},
         {"N": "draw-on-tree"},
         {"?N": "gap", "width-to-height-ratio": 0.2, "debug-outline": {"color": "green", "width": 5}},
+        "tal-dash-bar-left-1",
         "tal-dash-bar-clades",
+        "tal-dash-bar-left-2",
         {"N": "time-series", "color-by": "continent", "color-scale": {"show": false}, "report": "$report-time-series-output"},
         {"N": "clades"},
         {"N": "title", "text": "{virus-type/lineage}", "color": "black", "size": 0.015}
@@ -137,6 +139,9 @@
         {"N": "report-cumulative", "output": "$report-cumulative-output", "max": "$report-cumulative-max"},
         {"N": "ladderize", "method": "$ladderize-method"}
     ],
+
+    "tal-dash-bar-left-1": [],
+    "tal-dash-bar-left-2": [],
 
     "tal-dash-bar-clades": [
         {"?N": "---------- H1 ----------"},
