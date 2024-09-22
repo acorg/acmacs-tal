@@ -402,15 +402,15 @@ template <> struct fmt::formatter<acmacs::tal::node_id_t>
     template <typename FormatCtx> auto format(const acmacs::tal::node_id_t& node_id, FormatCtx& ctx) const
     {
         if (v_size_.has_value())
-            format_to(ctx.out(), "{:>{}d}", node_id.vertical, *v_size_);
+            fmt::format_to(ctx.out(), "{:>{}d}", node_id.vertical, *v_size_);
         else
-            format_to(ctx.out(), "{}", node_id.vertical);
+            fmt::format_to(ctx.out(), "{}", node_id.vertical);
         if (h_size_.has_value()) {
             if (*h_size_ > 0)
-                format_to(ctx.out(), ".{:<{}d}", node_id.horizontal, *h_size_);
+                fmt::format_to(ctx.out(), ".{:<{}d}", node_id.horizontal, *h_size_);
         }
         else
-            format_to(ctx.out(), ".{}", node_id.horizontal);
+            fmt::format_to(ctx.out(), ".{}", node_id.horizontal);
         return ctx.out();
     }
 

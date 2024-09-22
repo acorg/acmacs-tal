@@ -130,9 +130,9 @@ template <> struct fmt::formatter<acmacs::tal::Clades::slot_no_t> : fmt::formatt
     template <typename FormatCtx> auto format(const acmacs::tal::Clades::slot_no_t& value, FormatCtx& ctx)
     {
         if (value == acmacs::tal::Clades::NoSlot)
-            format_to(ctx.out(), "none");
+            fmt::format_to(ctx.out(), "none");
         else
-            format_to(ctx.out(), "{}", *value);
+            fmt::format_to(ctx.out(), "{}", *value);
         return ctx.out();
     }
 };
